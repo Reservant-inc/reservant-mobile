@@ -1,4 +1,4 @@
-package com.example.reservant_mobile.models
+package com.example.reservant_mobile.data.models
 
 import kotlinx.serialization.*
 

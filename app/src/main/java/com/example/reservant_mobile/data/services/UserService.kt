@@ -1,4 +1,4 @@
-package com.example.reservant_mobile.services
+package com.example.reservant_mobile.data.services
 
 interface IUserService{
 
