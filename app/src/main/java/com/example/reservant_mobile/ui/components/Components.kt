@@ -13,8 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun InputUserInfo(
     inputText: MutableState<String> = remember { mutableStateOf("") },
-    label: String,
-    placeholder: String,
+    label: String = "",
+    placeholder: String = "",
     visualTransformation:VisualTransformation =  VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
