@@ -3,7 +3,7 @@ package com.example.reservant_mobile.data.models.dtos
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginDTO(
+data class LoginCredentialsDTO(
     val login: String,
     val password: String
 )
