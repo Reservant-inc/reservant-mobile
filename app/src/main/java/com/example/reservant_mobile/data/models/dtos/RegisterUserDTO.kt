@@ -1,9 +1,9 @@
-package com.example.reservant_mobile.data.models
+package com.example.reservant_mobile.data.models.dtos
 
 import kotlinx.serialization.*
 
 @Serializable
-data class User(
+data class RegisterUserDTO(
     val firstName: String,
     val lastName: String,
     val birthday: String,
