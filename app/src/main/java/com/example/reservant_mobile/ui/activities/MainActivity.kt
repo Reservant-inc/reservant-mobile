@@ -14,18 +14,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            Column {
-                InputUserInfo("Login", "Insert login")
-                InputUserInfo("Password", "Insert password")
-            }
-        }
+        TODO("Navigation between activities")
+
     }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    Text("Android")
+fun Preview() {
+    //preview if needed
 }
