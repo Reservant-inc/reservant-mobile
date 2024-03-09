@@ -11,7 +11,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun InputUserInfo(label: String, placeholder: String) {
+fun InputUserInfo(
+    label: String,
+    placeholder: String
+) {
     var text by remember { mutableStateOf("") }
 
     TextField(
