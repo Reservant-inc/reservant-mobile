@@ -9,4 +9,4 @@ data class User(
     val birthday: String,
     val email: String,
     val phoneNum: String,
-)
+) 
