@@ -1,19 +1,23 @@
 package com.example.reservant_mobile.data.services
 
-import com.example.reservant_mobile.data.models.User
-import com.example.reservant_mobile.data.models.dtos.LoginDTO
+import kotlinx.serialization.Serializable
 
 interface APIService{
-    fun post(loginDTO: LoginDTO)
-    fun get()
+    fun get(endpoint: String = "")
+    fun post(obj: Serializable, endpoint: String = "")
 }
 
 class APIServiceImpl: APIService {
-    override fun post(loginDTO: LoginDTO) {
+    override fun post(
+        obj: Serializable,
+        endpoint: String
+    ) {
         TODO("Not yet implemented")
     }
 
-    override fun get() {
+    override fun get(
+        endpoint: String
+    ) {
         TODO("Not yet implemented")
     }
 
