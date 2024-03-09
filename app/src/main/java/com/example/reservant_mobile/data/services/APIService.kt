@@ -4,21 +4,15 @@ import kotlinx.serialization.Serializable
 
 interface APIService{
     fun get(endpoint: String = "")
-    fun post(obj: Serializable, endpoint: String = "")
+    fun post(obj: @Serializable Any, endpoint: String = "")
 }
 
 class APIServiceImpl: APIService {
-    override fun post(
-        obj: Serializable,
-        endpoint: String
-    ) {
+    override fun get(endpoint: String) {
         TODO("Not yet implemented")
     }
 
-    override fun get(
-        endpoint: String
-    ) {
+    override fun post(obj: Any, endpoint: String) {
         TODO("Not yet implemented")
     }
-
 }

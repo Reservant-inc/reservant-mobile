@@ -1,7 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.data.models.User
-import com.example.reservant_mobile.data.models.dtos.LoginDTO
+import kotlinx.serialization.json.Json
 
 interface IUserService{
     fun postUser(user: User)
@@ -14,7 +14,7 @@ class UserMockService(
 ) : IUserService {
     override fun postUser(user: User) {
         api.post(
-            LoginDTO("", "")
+            user
         )
     }
 
