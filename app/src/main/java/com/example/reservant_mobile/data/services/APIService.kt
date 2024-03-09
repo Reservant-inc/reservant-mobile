@@ -12,7 +12,7 @@ class APIServiceImpl: APIService {
         TODO("Not yet implemented")
     }
 
-    override fun post(obj: Any, endpoint: String) {
+    override fun post(obj: @Serializable Any, endpoint: String) {
         TODO("Not yet implemented")
     }
 }
