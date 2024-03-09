@@ -8,7 +8,7 @@ interface IUserService{
 }
 
 
-class UserMockService(
+class UserService(
     private var api: APIService = APIServiceImpl()
 ) : IUserService {
     override fun postUser(user: User) {
