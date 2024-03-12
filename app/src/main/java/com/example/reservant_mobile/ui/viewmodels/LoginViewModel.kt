@@ -11,14 +11,10 @@ class LoginViewModel : ViewModel() {
     var password by mutableStateOf("")
 
     fun validateLogin(): Boolean {
-        return !(isInvalidLogin(login) || isInvalidPassword(password))
+        return !(isInvalid(login) || isInvalid(password))
     }
 
-    private fun isInvalidLogin(login: String) : Boolean{
-        return login.isBlank()
+    private fun isInvalid(str: String) : Boolean{
+        return str.isBlank()
     }
-    private fun isInvalidPassword(password: String) : Boolean{
-        return password.isBlank()
-    }
-
 }
