@@ -1,12 +1,11 @@
 package com.example.reservant_mobile
 
-import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 
-class LoginUnitTest {
+class LoginViewModelUnitTest {
 
     @Test
     fun `empty login returns false`() {
