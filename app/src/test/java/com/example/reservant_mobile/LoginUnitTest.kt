@@ -10,25 +10,29 @@ class LoginUnitTest {
 
     @Test
     fun `empty login returns false`() {
-
-        val user = LoginCredentialsDTO("","123")
-        val result = LoginViewModel.validate()
+        val result = LoginViewModel().apply {
+            login = ""
+            password = "123"
+        }.validateLogin()
         assertThat(result).isFalse()
     }
 
+
     @Test
     fun `empty password returns false`() {
-
-        val user = LoginCredentialsDTO("test","")
-        val result = LoginViewModel.validate()
+        val result = LoginViewModel().apply {
+            login = "test"
+            password = ""
+        }.validateLogin()
         assertThat(result).isFalse()
     }
 
     @Test
     fun `valid login and password returns true`() {
-
-        val user = LoginCredentialsDTO("test","123")
-        val result = LoginViewModel.validate()
+        val result = LoginViewModel().apply {
+            login = "test"
+            password = "123"
+        }.validateLogin()
         assertThat(result).isTrue()
     }
 
