@@ -2,6 +2,7 @@ package com.example.reservant_mobile.ui.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import java.util.regex.Pattern
@@ -13,19 +14,17 @@ data class FormState(
 
 class RegisterViewModel : ViewModel() {
 
-    private val registerFormState = MutableLiveData<FormState>()
+    var firstName by mutableStateOf("")
+    var lastName by mutableStateOf("")
+    var birthday by mutableStateOf("")
+    var email by mutableStateOf("")
+    var phoneNum by mutableStateOf("")
+    var password by mutableStateOf("")
+    var confirmPassword by mutableStateOf("")
 
-    private val firstName by mutableStateOf("")
-    private val lastName by mutableStateOf("")
-    private val birthday by mutableStateOf("")
-    private val email by mutableStateOf("")
-    private val phoneNum by mutableStateOf("")
-    private val password by mutableStateOf("")
-    private val confirmPassword by mutableStateOf("")
-
-    private val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-    private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    private val phoneRegex = "^\\d{9}$"
+    val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+    val phoneRegex = "^\\d{9}$"
 
     fun validateForm(): Boolean {
         return !(
