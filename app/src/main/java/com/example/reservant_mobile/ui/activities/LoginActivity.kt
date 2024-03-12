@@ -8,14 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.InputUserInfo
+import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun LoginActivity(navController: NavHostController) {
@@ -40,55 +35,21 @@ fun LoginActivity(navController: NavHostController) {
             modifier = Modifier.size(120.dp)
         )
 
-        var emailText by remember { mutableStateOf("") }
-        var passwordText by remember { mutableStateOf("") }
+        var maxWidth = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
 
-        TextField(
-            value = emailText,
-            onValueChange = { emailText = it },
-            label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
+        InputUserInfo(label = "login", modifier = maxWidth)
 
-        TextField(
-            value = passwordText,
-            onValueChange = { passwordText = it },
-            label = { Text("Password") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
+        InputUserInfo(label = "password", modifier = maxWidth)
 
-        Button(
-            onClick = { /* Handle login */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Login")
-        }
+        UserButton(onClick = { /* Handle login */ }, label = "login", modifier = maxWidth)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = { navController.navigate("register") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Sign up")
-        }
+        UserButton(onClick = { navController.navigate("register") }, label = "Sign up", modifier = maxWidth)
 
-        Button(
-            onClick = { /* Handle Password Recovery */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Don't remember a password")
-        }
+        UserButton(onClick = { /* Handle Password Recovery */ }, label = "Don't remember a password", modifier = maxWidth)
     }
 }
 

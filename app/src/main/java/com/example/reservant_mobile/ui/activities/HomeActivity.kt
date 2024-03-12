@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun HomeActivity(navController: NavHostController) {
@@ -34,23 +33,13 @@ fun HomeActivity(navController: NavHostController) {
             modifier = Modifier.size(120.dp)
         )
 
-        Button(
-            onClick = { navController.navigate("login") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Login")
-        }
+        var maxWidth = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
 
-        Button(
-            onClick = { navController.navigate("register") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Sign up")
-        }
+        UserButton(onClick = { navController.navigate("login") }, label = "Login", modifier = maxWidth)
+
+        UserButton(onClick = { navController.navigate("register") }, label = "Sign up", modifier = maxWidth)
     }
 }
 
