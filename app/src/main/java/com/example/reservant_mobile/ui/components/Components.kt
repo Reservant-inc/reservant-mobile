@@ -35,7 +35,7 @@ fun InputUserInfo(
 
     Column {
         TextField(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             value = inputText,
@@ -60,7 +60,7 @@ fun UserButton(
     label: String = "",
 ){
     Button(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         onClick = onClick,
