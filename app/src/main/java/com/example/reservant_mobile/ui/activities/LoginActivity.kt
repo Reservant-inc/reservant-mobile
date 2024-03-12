@@ -13,14 +13,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
 fun LoginActivity(navController: NavHostController) {
+
+    val loginViewModel = viewModel<LoginViewModel>()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,23 +36,23 @@ fun LoginActivity(navController: NavHostController) {
         Logo()
 
         InputUserInfo(
-            inputText = "",
-            onValueChange = {},
+            inputText = loginViewModel.login,
+            onValueChange = { loginViewModel.login = it },
             label = "Email",
             isError = false,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
         InputUserInfo(
-            inputText = "",
-            onValueChange = {},
+            inputText = loginViewModel.password,
+            onValueChange = { loginViewModel.password = it },
             label = "Password",
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = false,
         )
 
-        UserButton(onClick = { /* Handle login */ }, label = "login")
+        UserButton(onClick = { println("LOGIN VALIDATION: "+loginViewModel.validateLogin()) }, label = "login")
 
         Spacer(modifier = Modifier.weight(1f))
 
