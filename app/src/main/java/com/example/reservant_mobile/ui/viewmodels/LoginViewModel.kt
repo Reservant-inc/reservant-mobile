@@ -8,8 +8,10 @@ class LoginViewModel : ViewModel() {
 
     private val isValid = MutableLiveData<Boolean>()
 
-    fun validate(loginCredentialsDTO: LoginCredentialsDTO) {
-        isValid.value = validateLogin(loginCredentialsDTO.login) && validatePassword(loginCredentialsDTO.password)
+    fun validate(loginCredentialsDTO: LoginCredentialsDTO): Boolean {
+        val result: Boolean = validateLogin(loginCredentialsDTO.login) && validatePassword(loginCredentialsDTO.password)
+        isValid.value = result
+        return result
     }
 
     private fun validateLogin(login: String) : Boolean{
