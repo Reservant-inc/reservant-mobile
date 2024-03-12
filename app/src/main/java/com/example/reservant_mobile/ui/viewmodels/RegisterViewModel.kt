@@ -14,7 +14,7 @@ class RegisterViewModel : ViewModel() {
 
     private val registerFormState = MutableLiveData<FormState>()
 
-    fun validateForm(registerUserDTO: RegisterUserDTO) {
+    fun validateForm(registerUserDTO: RegisterUserDTO): Boolean {
         val errors = mutableListOf<String>()
 
         with(registerUserDTO) {
@@ -24,6 +24,7 @@ class RegisterViewModel : ViewModel() {
             validateWithRegex(birthday, email, phoneNum, errors)
 
             registerFormState.value = FormState(isValid = errors.isEmpty(), errorMessages = errors)
+            return errors.isEmpty()
         }
     }
 
