@@ -1,49 +1,45 @@
 package com.example.reservant_mobile.ui.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
-import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import java.util.regex.Pattern
 
 data class FormState(
     val isValid: Boolean = false,
-    val errorMessages: List<String> = emptyList()
+    val errorMessage: String
 )
 
 class RegisterViewModel : ViewModel() {
 
     private val registerFormState = MutableLiveData<FormState>()
 
-    fun validateForm(registerUserDTO: RegisterUserDTO): Boolean {
-        val errors = mutableListOf<String>()
+    private val firstName by mutableStateOf("")
+    private val lastName by mutableStateOf("")
+    private val birthday by mutableStateOf("")
+    private val email by mutableStateOf("")
+    private val phoneNum by mutableStateOf("")
+    private val password by mutableStateOf("")
+    private val confirmPassword by mutableStateOf("")
 
-        with(registerUserDTO) {
+    private val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
+    private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+    private val phoneRegex = "^\\d{9}$"
 
-            if (firstName.isBlank()) errors.add("First name cannot be empty")
-            if (lastName.isBlank()) errors.add("Last name cannot be empty")
-            validateWithRegex(birthday, email, phoneNum, errors)
-
-            registerFormState.value = FormState(isValid = errors.isEmpty(), errorMessages = errors)
-            return errors.isEmpty()
-        }
+    fun validateForm(): Boolean {
+        return !(
+                firstName.isBlank() ||
+                lastName.isBlank()  ||
+                isInvalidWithRegex(dateRegex, birthday)  ||
+                isInvalidWithRegex(emailRegex, email)    ||
+                isInvalidWithRegex(phoneRegex, phoneNum) ||
+                password.isBlank() ||
+                confirmPassword.isBlank()
+        )
     }
 
-    private fun validateWithRegex(birthday: String, email: String, phoneNum: String, errors: MutableList<String>){
-
-        val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-        val phoneRegex = "^\\d{9}$"
-
-        if (!Pattern.matches(dateRegex, birthday))
-            errors.add("Birthday is not in the correct format")
-
-        if (!Pattern.matches(emailRegex, email))
-            errors.add("Email is not in the correct format")
-
-        if (!Pattern.matches(phoneRegex, phoneNum))
-            errors.add("Phone number is not in the correct format")
+    private fun isInvalidWithRegex(regex: String, str: String): Boolean{
+        return !Pattern.matches(regex, str)
     }
-
-
-
 }
