@@ -22,20 +22,26 @@ class RegisterViewModel : ViewModel() {
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
 
-    val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    val phoneRegex = "^\\d{9}$"
+    private val nameRegex = "^[A-Za-z]+$"
+    private val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
+    private val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+
+    // Format - od 9 do 15 cyfr, opcjonalnie zaczynając od +
+    private val phoneRegex = "^\\+?\\d{9,15}$"
+
+    // Min 8 znaków, co najmniej jedna litera mała, jedna wielka, jedna cyfra i jeden znak specjalny
+    private val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
 
     fun validateForm(): Boolean {
         return !(
-                firstName.isBlank() ||
-                lastName.isBlank()  ||
-                isInvalidWithRegex(dateRegex, birthday)  ||
-                isInvalidWithRegex(emailRegex, email)    ||
-                isInvalidWithRegex(phoneRegex, phoneNum) ||
-                password.isBlank() ||
-                confirmPassword.isBlank()
-        )
+                isInvalidWithRegex(nameRegex, firstName) ||
+                        isInvalidWithRegex(nameRegex, lastName)  ||
+                        isInvalidWithRegex(dateRegex, birthday)  ||
+                        isInvalidWithRegex(emailRegex, email)    ||
+                        isInvalidWithRegex(phoneRegex, phoneNum) ||
+                        isInvalidWithRegex(passwordRegex, password) ||
+                        confirmPassword != password
+                )
     }
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
