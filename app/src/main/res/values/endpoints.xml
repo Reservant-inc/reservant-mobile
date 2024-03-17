@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_register_restaurant_owner" translatable="false">/auth/register-restaurant-owner</string>
+    <string name="endpoint_register_restaurant_employee" translatable="false">/auth/register-restaurant-employee</string>
+    <string name="endpoint_register_customer_support_agent" translatable="false">/auth/register-customer-support-agent</string>
+    <string name="endpoint_login" translatable="false">/auth/login</string>
+    <string name="endpoint_logout" translatable="false">/auth/logout</string>
+    <string name="endpoint_register_customer" translatable="false">/auth/register-customer</string>
+</resources>
