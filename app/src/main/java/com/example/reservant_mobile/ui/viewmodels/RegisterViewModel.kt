@@ -16,12 +16,17 @@ class RegisterViewModel : ViewModel() {
 
     var firstName by mutableStateOf("")
     var lastName by mutableStateOf("")
-    var birthday by mutableStateOf("")
+    var dayOfBirth by mutableStateOf("1")
+    var monthOfBirth by mutableStateOf("1")
+    var yearOfBirth by mutableStateOf("1999")
     var email by mutableStateOf("")
-    var phoneNum by mutableStateOf("")
+    var prefix by mutableStateOf("")
+    var number by mutableStateOf("")
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
 
+    val birthday = "$yearOfBirth-$monthOfBirth-$dayOfBirth"
+    val phoneNum = prefix+number
     val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
     val phoneRegex = "^\\d{9}$"
