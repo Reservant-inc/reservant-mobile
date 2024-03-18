@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginCredentialsDTO(
-    val login: String,
-    val password: String
+    val email: String,
+    val password: String,
+    val rememberMe: Boolean
 )
