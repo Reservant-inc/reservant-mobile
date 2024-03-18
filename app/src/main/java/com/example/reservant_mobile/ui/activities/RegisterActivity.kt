@@ -87,7 +87,7 @@ fun RegisterActivity() {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        UserButton(onClick = { println("REGISTER VALIDATION: "+registerViewModel.validateForm()) }, label = "Sign up")
+        UserButton(onClick = { println("REGISTER VALIDATION: ${registerViewModel.validateForm()}") }, label = "Sign up")
     }
 }
 
