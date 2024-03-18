@@ -2,6 +2,9 @@ package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 interface IUserService{
     fun registerUser(user: RegisterUserDTO)
@@ -10,11 +13,11 @@ interface IUserService{
 }
 
 
-class UserMockService(
-    private var api: APIService = APIServiceImpl()
-) : IUserService {
+class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     override fun registerUser(user: RegisterUserDTO) {
-        TODO("post RegisterUserDTO to apiService")
+//        TODO("post RegisterUserDTO to apiService")
         //TODO("service response from apiService") - later
     }
 
