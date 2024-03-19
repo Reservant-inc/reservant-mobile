@@ -1,8 +1,9 @@
 package com.example.reservant_mobile.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,12 +22,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import java.time.LocalDate
 
 val roundedShape = RoundedCornerShape(12.dp)
 
@@ -41,25 +45,33 @@ fun InputUserInfo(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     shape: RoundedCornerShape = roundedShape,
-    errorText: String = ""
+    errorText: String = "",
+    showError: Boolean = true
 
 ) {
-    TextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        value = inputText,
-        onValueChange = onValueChange,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        shape = shape,
-        isError = isError
-    )
-    if (isError) {
-        Text(text = errorText)
-    }
+//    Column {
+        TextField(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            value = inputText,
+            onValueChange = onValueChange,
+            label = { Text(text = label) },
+            placeholder = { Text(text = placeholder) },
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            shape = shape,
+            isError = isError
+        )
+        if (isError && showError) {
+            Text(
+                text = errorText,
+                color = Color.Red,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
+//    }
 }
 
 
@@ -95,9 +107,10 @@ fun DropdownMenuBox(
     label: String,
     itemsList: List<String>,
     shape: RoundedCornerShape = roundedShape,
-    onItemSelected: (String) -> Unit
+    onItemSelected: (String) -> Unit,
+    enabled: Boolean = true,
+    isError: Boolean = false
 ) {
-    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
@@ -118,7 +131,9 @@ fun DropdownMenuBox(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor(),
-                shape = shape
+                shape = shape,
+                enabled = enabled,
+                isError = isError
             )
 
             ExposedDropdownMenu(
@@ -132,7 +147,6 @@ fun DropdownMenuBox(
                             selectedText = item
                             expanded = false
                             onItemSelected(item)
-                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
                         }
                     )
                 }
@@ -141,6 +155,101 @@ fun DropdownMenuBox(
     }
 }
 
+
+@Composable
+fun BirthdayInput(
+    registerViewModel: RegisterViewModel,
+    isError: Boolean = false,
+    errorText: String = ""
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        DropdownMenuBox(
+            label = "Year",
+            itemsList = (1900..LocalDate.now().year - 18).map { it.toString() }.reversed(),
+            modifier = Modifier.weight(1f),
+            onItemSelected = { value ->
+                registerViewModel.yearOfBirth = value
+            },
+            isError = isError
+        )
+
+        DropdownMenuBox(
+            label = "Month",
+            itemsList = if (registerViewModel.yearOfBirth.isEmpty()) listOf() else (1..12).map { it.toString() },
+            modifier = Modifier.weight(1f),
+            onItemSelected = { value ->
+                if (registerViewModel.yearOfBirth.isNotEmpty()) {
+                    if (registerViewModel.monthOfBirth.length == 1) {
+                        registerViewModel.monthOfBirth = "0$value"
+                    } else
+                        registerViewModel.monthOfBirth = value
+                }
+            },
+            enabled = registerViewModel.yearOfBirth.isNotEmpty(),
+            isError = isError
+        )
+
+        DropdownMenuBox(
+            label = "Day",
+            itemsList = registerViewModel.getDaysList(registerViewModel.yearOfBirth, registerViewModel.monthOfBirth),
+            modifier = Modifier.weight(1f),
+            onItemSelected = { value ->
+                if (registerViewModel.yearOfBirth.isNotEmpty() && registerViewModel.monthOfBirth.isNotEmpty()) {
+                    if (registerViewModel.dayOfBirth.length == 1) {
+                        registerViewModel.dayOfBirth = "0$value"
+                    } else
+                        registerViewModel.dayOfBirth = value
+                }
+            },
+            enabled = registerViewModel.yearOfBirth.isNotEmpty() && registerViewModel.monthOfBirth.isNotEmpty(),
+            isError = isError
+        )
+
+    }
+    if (isError) {
+        Text(
+            text = errorText,
+            color = Color.Red,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+}
+@Composable
+fun PhoneInput(
+    registerViewModel: RegisterViewModel,
+    isError: Boolean = false,
+    errorText: String = ""
+){
+    Row (Modifier.fillMaxWidth()) {
+        DropdownMenuBox(
+            label = "Prefix",
+            itemsList = registerViewModel.getCountryCodesWithPrefixes(),
+            modifier = Modifier.weight(0.33f),
+            onItemSelected = { value ->
+                registerViewModel.prefix = "00" + value.substringAfter(" - ").trim()
+            },
+            isError = isError
+        )
+        InputUserInfo(
+            modifier = Modifier.weight(0.67f),
+            inputText = registerViewModel.number,
+            onValueChange = { registerViewModel.number = it },
+            label = "Phone number",
+            isError = isError,
+            showError = false,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        )
+    }
+    if (isError) {
+        Text(
+            text = errorText,
+            color = Color.Red,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
