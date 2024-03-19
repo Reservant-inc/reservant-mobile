@@ -2,28 +2,28 @@ package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import io.ktor.client.call.body
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 interface IUserService{
-    fun registerUser(user: RegisterUserDTO)
-    fun loginUser(credentials: LoginCredentialsDTO): Boolean
-
+    suspend fun registerUser(user: RegisterUserDTO): Any?
+    suspend fun loginUser(credentials: LoginCredentialsDTO): Any?
 }
 
-
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
-    private val scope = CoroutineScope(Dispatchers.IO)
 
-    override fun registerUser(user: RegisterUserDTO) {
-//        TODO("post RegisterUserDTO to apiService")
-        //TODO("service response from apiService") - later
+    override suspend fun registerUser(user: RegisterUserDTO): Any? {
+//        TODO("point endpoint to /res/.../endpoints.xml")
+        val res = api.post(user,"/auth/register-customer") ?: return null
+        return res.status.value
     }
 
-    override fun loginUser(credentials: LoginCredentialsDTO): Boolean {
-        TODO("post LoginCredentialsDTO to apiService")
-        //TODO("service response from apiService") - later
+    override suspend fun loginUser(credentials: LoginCredentialsDTO): Any? {
+//        TODO("point endpoint to /res/.../endpoints.xml")
+        val res = api.post(credentials,"/auth/login") ?: return null
+        return res.status.value
     }
 
 }
