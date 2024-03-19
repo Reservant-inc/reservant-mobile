@@ -10,15 +10,18 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.InternalAPI
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.serialization.Serializable
 import java.lang.Exception
 
 interface APIService{
-    suspend fun get(endpoint: String = "")
-    suspend fun post(obj: @Serializable Any, endpoint: String = "")
+    suspend fun get(endpoint: String = ""): HttpResponse?
+    suspend fun post(obj: @Serializable Any, endpoint: String = ""): HttpResponse?
 }
 
 const val URL_PATH = "http://172.21.40.127:12038"
@@ -30,36 +33,34 @@ class APIServiceImpl: APIService {
         }
         install(HttpCookies)
     }
-    override suspend fun get(endpoint: String) {
-        try {
+    override suspend fun get(endpoint: String): HttpResponse? {
+        return try {
             val res = client.get(URL_PATH+endpoint)
 
-//        TODO: implement better logging system
+    //        TODO: implement better logging system
             println("[GET]$endpoint body: "+ res.body())
 
-            return res.body()
-        }
-        catch (e: Exception){
+            res
+        } catch (e: Exception){
             println("[GET]$endpoint error: "+ e.message)
-            return
+            null
         }
     }
 
-    override suspend fun post(obj: @Serializable Any, endpoint: String) {
-        try {
+    override suspend fun post(obj: @Serializable Any, endpoint: String): HttpResponse? {
+        return try {
             val res =  client.post(URL_PATH+endpoint) {
                 contentType(ContentType.Application.Json)
                 setBody(obj)
             }
 
-//        TODO: implement better logging system
+    //        TODO: implement better logging system
             println("[POST]$endpoint body: "+ res.body())
 
-            return res.body()
-        }
-        catch (e: Exception){
+            res.body()
+        } catch (e: Exception){
             println("[POST]$endpoint error: "+ e.message)
-            return
+            null
         }
     }
 }
