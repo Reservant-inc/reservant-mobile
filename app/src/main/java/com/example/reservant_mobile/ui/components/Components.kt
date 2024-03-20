@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import java.time.LocalDate
+import java.time.YearMonth
 
 val roundedShape = RoundedCornerShape(12.dp)
 
@@ -49,29 +51,27 @@ fun InputUserInfo(
     showError: Boolean = true
 
 ) {
-//    Column {
-        TextField(
-            modifier = modifier
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        value = inputText,
+        onValueChange = onValueChange,
+        label = { Text(text = label) },
+        placeholder = { Text(text = placeholder) },
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        shape = shape,
+        isError = isError
+    )
+    if (isError && showError) {
+        Text(
+            text = errorText,
+            color = Color.Red,
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            value = inputText,
-            onValueChange = onValueChange,
-            label = { Text(text = label) },
-            placeholder = { Text(text = placeholder) },
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
-            shape = shape,
-            isError = isError
         )
-        if (isError && showError) {
-            Text(
-                text = errorText,
-                color = Color.Red,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        }
-//    }
+    }
 }
 
 
@@ -115,13 +115,14 @@ fun DropdownMenuBox(
     var selectedText by remember { mutableStateOf("") }
 
     Box(
-        modifier = modifier
-            .padding(vertical = 8.dp),
+        modifier = modifier.padding(vertical = 8.dp)
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
-                expanded = it
+                if (enabled) {
+                    expanded = it
+                }
             }
         ) {
             TextField(
@@ -138,16 +139,23 @@ fun DropdownMenuBox(
 
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = {
+                    if (enabled) {
+                        expanded = false
+                    }
+                }
             ) {
                 itemsList.forEach { item ->
                     DropdownMenuItem(
                         text = { Text(text = item) },
                         onClick = {
-                            selectedText = item
-                            expanded = false
-                            onItemSelected(item)
-                        }
+                            if (enabled) {
+                                selectedText = item
+                                expanded = false
+                                onItemSelected(item)
+                            }
+                        },
+                        enabled = enabled
                     )
                 }
             }
@@ -170,23 +178,19 @@ fun BirthdayInput(
             onItemSelected = { value ->
                 registerViewModel.yearOfBirth = value
             },
-            isError = isError
         )
 
         DropdownMenuBox(
             label = "Month",
-            itemsList = if (registerViewModel.yearOfBirth.isEmpty()) listOf() else (1..12).map { it.toString() },
+            itemsList = (1..12).map { it.toString() },
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                if (registerViewModel.yearOfBirth.isNotEmpty()) {
-                    if (registerViewModel.monthOfBirth.length == 1) {
-                        registerViewModel.monthOfBirth = "0$value"
-                    } else
-                        registerViewModel.monthOfBirth = value
-                }
+                if (registerViewModel.monthOfBirth.length == 1) {
+                    registerViewModel.monthOfBirth = "0$value"
+                } else
+                    registerViewModel.monthOfBirth = value
             },
             enabled = registerViewModel.yearOfBirth.isNotEmpty(),
-            isError = isError
         )
 
         DropdownMenuBox(
@@ -194,34 +198,23 @@ fun BirthdayInput(
             itemsList = registerViewModel.getDaysList(registerViewModel.yearOfBirth, registerViewModel.monthOfBirth),
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                if (registerViewModel.yearOfBirth.isNotEmpty() && registerViewModel.monthOfBirth.isNotEmpty()) {
                     if (registerViewModel.dayOfBirth.length == 1) {
                         registerViewModel.dayOfBirth = "0$value"
                     } else
                         registerViewModel.dayOfBirth = value
-                }
             },
-            enabled = registerViewModel.yearOfBirth.isNotEmpty() && registerViewModel.monthOfBirth.isNotEmpty(),
-            isError = isError
-        )
-
-    }
-    if (isError) {
-        Text(
-            text = errorText,
-            color = Color.Red,
-            modifier = Modifier
-                .fillMaxWidth()
+            enabled = registerViewModel.monthOfBirth.isNotEmpty(),
         )
     }
 }
+
 @Composable
 fun PhoneInput(
     registerViewModel: RegisterViewModel,
     isError: Boolean = false,
     errorText: String = ""
-){
-    Row (Modifier.fillMaxWidth()) {
+) {
+    Row(Modifier.fillMaxWidth()) {
         DropdownMenuBox(
             label = "Prefix",
             itemsList = registerViewModel.getCountryCodesWithPrefixes(),
@@ -231,8 +224,9 @@ fun PhoneInput(
             },
             isError = isError
         )
+        Spacer(modifier = Modifier.weight(0.01f))
         InputUserInfo(
-            modifier = Modifier.weight(0.67f),
+            modifier = Modifier.weight(0.66f),
             inputText = registerViewModel.number,
             onValueChange = { registerViewModel.number = it },
             label = "Phone number",
