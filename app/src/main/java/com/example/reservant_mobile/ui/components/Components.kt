@@ -2,7 +2,6 @@ package com.example.reservant_mobile.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,11 +29,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.viewmodels.Calendar
-import com.example.reservant_mobile.ui.viewmodels.PhoneNum
-import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import com.example.reservant_mobile.ui.viewmodels.DateOfBirth
+import com.example.reservant_mobile.ui.viewmodels.PhoneNumber
 import java.time.LocalDate
-import java.time.YearMonth
 
 val roundedShape = RoundedCornerShape(12.dp)
 
@@ -169,7 +166,7 @@ fun DropdownMenuBox(
 
 @Composable
 fun BirthdayInput(
-    calendar: Calendar,
+    dateOfBirth: DateOfBirth,
     onYearChange: (String) -> Unit,
     onMonthChange: (String) -> Unit,
     onDayChange: (String) -> Unit
@@ -195,12 +192,12 @@ fun BirthdayInput(
                     onMonthChange(value)
                 }
             },
-            enabled = calendar.yearOfBirth.isNotEmpty(),
+            enabled = dateOfBirth.yearOfBirth.isNotEmpty(),
         )
 
         DropdownMenuBox(
             label = "Day",
-            itemsList = calendar.getDaysList(calendar.yearOfBirth, calendar.monthOfBirth),
+            itemsList = dateOfBirth.getDaysList(dateOfBirth.yearOfBirth, dateOfBirth.monthOfBirth),
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
                 if (value.length == 1) {
@@ -209,7 +206,7 @@ fun BirthdayInput(
                     onDayChange(value)
                 }
             },
-            enabled = calendar.monthOfBirth.isNotEmpty(),
+            enabled = dateOfBirth.monthOfBirth.isNotEmpty(),
         )
     }
 }
@@ -217,7 +214,7 @@ fun BirthdayInput(
 
 @Composable
 fun PhoneInput(
-    phone: PhoneNum,
+    phoneNumber: PhoneNumber,
     onPrefixChange: (String) -> Unit,
     onNumberChange: (String) -> Unit,
     isError: Boolean = false,
@@ -226,7 +223,7 @@ fun PhoneInput(
     Row(Modifier.fillMaxWidth()) {
         DropdownMenuBox(
             label = "Prefix",
-            itemsList = phone.getCountryCodesWithPrefixes(),
+            itemsList = phoneNumber.getCountryCodesWithPrefixes(),
             modifier = Modifier.weight(0.33f),
             onItemSelected = { value ->
                 onPrefixChange("00" + value.substringAfter(" - ").trim())
@@ -236,7 +233,7 @@ fun PhoneInput(
         Spacer(modifier = Modifier.weight(0.01f))
         InputUserInfo(
             modifier = Modifier.weight(0.66f),
-            inputText = phone.number,
+            inputText = phoneNumber.number,
             onValueChange = { onNumberChange(it) },
             label = "Phone number",
             isError = isError,

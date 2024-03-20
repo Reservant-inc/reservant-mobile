@@ -20,12 +20,9 @@ class RegisterViewModel : ViewModel() {
 
     var firstName by mutableStateOf("")
     var lastName by mutableStateOf("")
-    var dayOfBirth by mutableStateOf("")
-    var monthOfBirth by mutableStateOf("")
-    var yearOfBirth by mutableStateOf("")
+    var dateOfBirth by mutableStateOf(DateOfBirth())
     var email by mutableStateOf("")
-    var prefix by mutableStateOf("")
-    var number by mutableStateOf("")
+    var phoneNumber by mutableStateOf(PhoneNumber())
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
     var birthday by mutableStateOf("") //nie jest uzywana
@@ -52,7 +49,7 @@ class RegisterViewModel : ViewModel() {
     }
 }
 
-class Calendar {
+class DateOfBirth {
     var yearOfBirth: String by mutableStateOf("")
     var monthOfBirth: String by mutableStateOf("")
     var dayOfBirth: String by mutableStateOf("")
@@ -65,7 +62,7 @@ class Calendar {
         }
     }
 }
-class PhoneNum {
+class PhoneNumber {
     var prefix: String by mutableStateOf("")
     var number: String by mutableStateOf("")
 

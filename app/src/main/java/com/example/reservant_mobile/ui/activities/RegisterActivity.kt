@@ -19,16 +19,12 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.PhoneInput
 import com.example.reservant_mobile.ui.components.UserButton
-import com.example.reservant_mobile.ui.viewmodels.Calendar
-import com.example.reservant_mobile.ui.viewmodels.PhoneNum
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
 fun RegisterActivity() {
 
     val registerViewModel = viewModel<RegisterViewModel>()
-    val calendar = Calendar()
-    val phone = PhoneNum()
 
     Column(
         modifier = Modifier
@@ -53,18 +49,15 @@ fun RegisterActivity() {
         )
 
         BirthdayInput(
-            calendar = calendar,
+            dateOfBirth = registerViewModel.dateOfBirth,
             onYearChange = { year ->
-                calendar.yearOfBirth = year
-                registerViewModel.yearOfBirth = year
+                registerViewModel.dateOfBirth.yearOfBirth = year
             },
             onMonthChange = { month ->
-                calendar.monthOfBirth = month
-                registerViewModel.monthOfBirth = month
+                registerViewModel.dateOfBirth.monthOfBirth = month
             },
             onDayChange = { day ->
-                calendar.dayOfBirth = day
-                registerViewModel.dayOfBirth = day
+                registerViewModel.dateOfBirth.dayOfBirth = day
             }
         )
 
@@ -77,14 +70,12 @@ fun RegisterActivity() {
         )
 
         PhoneInput(
-            phone = phone,
+            phoneNumber = registerViewModel.phoneNumber,
             onPrefixChange = { prefix ->
-                phone.prefix = prefix
-                registerViewModel.prefix = prefix
+                registerViewModel.phoneNumber.prefix = prefix
             },
             onNumberChange = { number ->
-                phone.number = number
-                registerViewModel.number = number
+                registerViewModel.phoneNumber.number = number
             },)
 
         InputUserInfo(
