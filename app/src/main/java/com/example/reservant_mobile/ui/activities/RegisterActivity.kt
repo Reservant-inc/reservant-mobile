@@ -19,12 +19,14 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.PhoneInput
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.viewmodels.Calendar
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
 fun RegisterActivity() {
 
     val registerViewModel = viewModel<RegisterViewModel>()
+    val calendar = Calendar()
 
     Column(
         modifier = Modifier
@@ -48,7 +50,21 @@ fun RegisterActivity() {
             isError = false
         )
 
-        BirthdayInput(registerViewModel = registerViewModel, isError = false)
+        BirthdayInput(
+            calendar = calendar,
+            onYearChange = { year ->
+                calendar.yearOfBirth = year
+                registerViewModel.yearOfBirth = year
+            },
+            onMonthChange = { month ->
+                calendar.monthOfBirth = month
+                registerViewModel.monthOfBirth = month
+            },
+            onDayChange = { day ->
+                calendar.dayOfBirth = day
+                registerViewModel.dayOfBirth = day
+            }
+        )
 
         InputUserInfo(
             inputText = registerViewModel.email,

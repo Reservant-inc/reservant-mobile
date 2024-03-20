@@ -1,11 +1,9 @@
 package com.example.reservant_mobile.ui.viewmodels
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import java.time.YearMonth
 import java.util.Locale
@@ -15,6 +13,8 @@ data class FormState(
     val isValid: Boolean = false,
     val errorMessage: String
 )
+
+
 
 class RegisterViewModel : ViewModel() {
 
@@ -51,15 +51,6 @@ class RegisterViewModel : ViewModel() {
         return !Pattern.matches(regex, str)
     }
 
-
-    fun getDaysList(year: String, month: String): List<String> {
-        return if (year.isNotEmpty() && month.isNotEmpty()) {
-            (1..YearMonth.of(year.toInt(), month.toInt()).lengthOfMonth()).map { it.toString() }
-        } else {
-            listOf()
-        }
-    }
-
     fun getCountryCodesWithPrefixes(): List<String> {
         val phoneNumberUtil = PhoneNumberUtil.getInstance()
         val countryCodesWithPrefixes = mutableListOf<String>()
@@ -72,5 +63,19 @@ class RegisterViewModel : ViewModel() {
         }
 
         return countryCodesWithPrefixes.sorted()
+    }
+}
+
+class Calendar {
+    var yearOfBirth: String by mutableStateOf("")
+    var monthOfBirth: String by mutableStateOf("")
+    var dayOfBirth: String by mutableStateOf("")
+
+    fun getDaysList(year: String, month: String): List<String> {
+        return if (year.isNotEmpty() && month.isNotEmpty()) {
+            (1..YearMonth.of(year.toInt(), month.toInt()).lengthOfMonth()).map { it.toString() }
+        } else {
+            listOf()
+        }
     }
 }

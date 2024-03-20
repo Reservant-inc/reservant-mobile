@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.viewmodels.Calendar
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -166,9 +167,10 @@ fun DropdownMenuBox(
 
 @Composable
 fun BirthdayInput(
-    registerViewModel: RegisterViewModel,
-    isError: Boolean = false,
-    errorText: String = ""
+    calendar: Calendar,
+    onYearChange: (String) -> Unit,
+    onMonthChange: (String) -> Unit,
+    onDayChange: (String) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
         DropdownMenuBox(
@@ -176,8 +178,8 @@ fun BirthdayInput(
             itemsList = (1900..LocalDate.now().year - 18).map { it.toString() }.reversed(),
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                registerViewModel.yearOfBirth = value
-            },
+                onYearChange(value)
+            }
         )
 
         DropdownMenuBox(
@@ -185,28 +187,31 @@ fun BirthdayInput(
             itemsList = (1..12).map { it.toString() },
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                if (registerViewModel.monthOfBirth.length == 1) {
-                    registerViewModel.monthOfBirth = "0$value"
-                } else
-                    registerViewModel.monthOfBirth = value
+                if (calendar.monthOfBirth.length == 1) {
+                    onMonthChange("0$value")
+                } else {
+                    onMonthChange(value)
+                }
             },
-            enabled = registerViewModel.yearOfBirth.isNotEmpty(),
+            enabled = calendar.yearOfBirth.isNotEmpty(),
         )
 
         DropdownMenuBox(
             label = "Day",
-            itemsList = registerViewModel.getDaysList(registerViewModel.yearOfBirth, registerViewModel.monthOfBirth),
+            itemsList = calendar.getDaysList(calendar.yearOfBirth, calendar.monthOfBirth),
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                    if (registerViewModel.dayOfBirth.length == 1) {
-                        registerViewModel.dayOfBirth = "0$value"
-                    } else
-                        registerViewModel.dayOfBirth = value
+                if (calendar.dayOfBirth.length == 1) {
+                    onDayChange("0$value")
+                } else {
+                    onDayChange(value)
+                }
             },
-            enabled = registerViewModel.monthOfBirth.isNotEmpty(),
+            enabled = calendar.monthOfBirth.isNotEmpty(),
         )
     }
 }
+
 
 @Composable
 fun PhoneInput(
