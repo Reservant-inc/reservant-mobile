@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.viewmodels.Calendar
+import com.example.reservant_mobile.ui.viewmodels.PhoneNum
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -49,8 +50,8 @@ fun InputUserInfo(
     isError: Boolean = false,
     shape: RoundedCornerShape = roundedShape,
     errorText: String = "",
-    showError: Boolean = true
-
+    showError: Boolean = true,
+    maxLines: Int = 1
 ) {
     TextField(
         modifier = modifier
@@ -63,7 +64,8 @@ fun InputUserInfo(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         shape = shape,
-        isError = isError
+        isError = isError,
+        maxLines = maxLines
     )
     if (isError && showError) {
         Text(
@@ -187,7 +189,7 @@ fun BirthdayInput(
             itemsList = (1..12).map { it.toString() },
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                if (calendar.monthOfBirth.length == 1) {
+                if (value.length == 1) {
                     onMonthChange("0$value")
                 } else {
                     onMonthChange(value)
@@ -201,7 +203,7 @@ fun BirthdayInput(
             itemsList = calendar.getDaysList(calendar.yearOfBirth, calendar.monthOfBirth),
             modifier = Modifier.weight(1f),
             onItemSelected = { value ->
-                if (calendar.dayOfBirth.length == 1) {
+                if (value.length == 1) {
                     onDayChange("0$value")
                 } else {
                     onDayChange(value)
@@ -215,25 +217,27 @@ fun BirthdayInput(
 
 @Composable
 fun PhoneInput(
-    registerViewModel: RegisterViewModel,
+    phone: PhoneNum,
+    onPrefixChange: (String) -> Unit,
+    onNumberChange: (String) -> Unit,
     isError: Boolean = false,
     errorText: String = ""
 ) {
     Row(Modifier.fillMaxWidth()) {
         DropdownMenuBox(
             label = "Prefix",
-            itemsList = registerViewModel.getCountryCodesWithPrefixes(),
+            itemsList = phone.getCountryCodesWithPrefixes(),
             modifier = Modifier.weight(0.33f),
             onItemSelected = { value ->
-                registerViewModel.prefix = "00" + value.substringAfter(" - ").trim()
+                onPrefixChange("00" + value.substringAfter(" - ").trim())
             },
             isError = isError
         )
         Spacer(modifier = Modifier.weight(0.01f))
         InputUserInfo(
             modifier = Modifier.weight(0.66f),
-            inputText = registerViewModel.number,
-            onValueChange = { registerViewModel.number = it },
+            inputText = phone.number,
+            onValueChange = { onNumberChange(it) },
             label = "Phone number",
             isError = isError,
             showError = false,

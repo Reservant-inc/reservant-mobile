@@ -50,20 +50,6 @@ class RegisterViewModel : ViewModel() {
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
         return !Pattern.matches(regex, str)
     }
-
-    fun getCountryCodesWithPrefixes(): List<String> {
-        val phoneNumberUtil = PhoneNumberUtil.getInstance()
-        val countryCodesWithPrefixes = mutableListOf<String>()
-
-        for (regionCode in phoneNumberUtil.supportedRegions) {
-            val countryPrefix = phoneNumberUtil.getCountryCodeForRegion(regionCode).toString()
-            val countryName = Locale("", regionCode).getDisplayCountry(Locale.ENGLISH)
-            val formattedString = "$countryName - $countryPrefix"
-            countryCodesWithPrefixes.add(formattedString)
-        }
-
-        return countryCodesWithPrefixes.sorted()
-    }
 }
 
 class Calendar {
@@ -77,5 +63,23 @@ class Calendar {
         } else {
             listOf()
         }
+    }
+}
+class PhoneNum {
+    var prefix: String by mutableStateOf("")
+    var number: String by mutableStateOf("")
+
+    fun getCountryCodesWithPrefixes(): List<String> {
+        val phoneNumberUtil = PhoneNumberUtil.getInstance()
+        val countryCodesWithPrefixes = mutableListOf<String>()
+
+        for (regionCode in phoneNumberUtil.supportedRegions) {
+            val countryPrefix = phoneNumberUtil.getCountryCodeForRegion(regionCode).toString()
+            val countryName = Locale("", regionCode).getDisplayCountry(Locale.ENGLISH)
+            val formattedString = "$countryName - $countryPrefix"
+            countryCodesWithPrefixes.add(formattedString)
+        }
+
+        return countryCodesWithPrefixes.sorted()
     }
 }

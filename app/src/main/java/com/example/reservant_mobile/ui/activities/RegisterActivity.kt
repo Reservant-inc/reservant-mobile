@@ -20,6 +20,7 @@ import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.PhoneInput
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.Calendar
+import com.example.reservant_mobile.ui.viewmodels.PhoneNum
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
@@ -27,6 +28,7 @@ fun RegisterActivity() {
 
     val registerViewModel = viewModel<RegisterViewModel>()
     val calendar = Calendar()
+    val phone = PhoneNum()
 
     Column(
         modifier = Modifier
@@ -74,7 +76,16 @@ fun RegisterActivity() {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
-        PhoneInput(registerViewModel = registerViewModel, isError = false)
+        PhoneInput(
+            phone = phone,
+            onPrefixChange = { prefix ->
+                phone.prefix = prefix
+                registerViewModel.prefix = prefix
+            },
+            onNumberChange = { number ->
+                phone.number = number
+                registerViewModel.number = number
+            },)
 
         InputUserInfo(
             inputText = registerViewModel.password,
