@@ -4,8 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
 import java.util.regex.Pattern
+import com.example.reservant_mobile.ui.constants.*
 
 data class FormState(
     val isValid: Boolean = false,
@@ -22,20 +22,16 @@ class RegisterViewModel : ViewModel() {
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
 
-    val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    val phoneRegex = "^\\d{9}$"
-
     fun validateForm(): Boolean {
         return !(
-                firstName.isBlank() ||
-                lastName.isBlank()  ||
-                isInvalidWithRegex(dateRegex, birthday)  ||
-                isInvalidWithRegex(emailRegex, email)    ||
-                isInvalidWithRegex(phoneRegex, phoneNum) ||
-                password.isBlank() ||
-                confirmPassword.isBlank()
-        )
+                isInvalidWithRegex(NAME_REG, firstName) ||
+                        isInvalidWithRegex(NAME_REG, lastName)  ||
+                        isInvalidWithRegex(DATE_REG, birthday)  ||
+                        isInvalidWithRegex(EMAIL_REG, email)    ||
+                        isInvalidWithRegex(PHONE_REG, phoneNum) ||
+                        isInvalidWithRegex(PASSWORD_REG, password) ||
+                        confirmPassword != password
+                )
     }
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
