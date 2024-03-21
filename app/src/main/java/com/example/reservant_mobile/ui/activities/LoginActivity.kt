@@ -53,7 +53,8 @@ fun LoginActivity(navController: NavHostController) {
             isError = false,
         )
 
-        UserButton(onClick = { println("LOGIN VALIDATION: ${loginViewModel.validateLogin()}") }, label = "login")
+
+        UserButton(onClick = { println("LOGIN VALIDATION: "+loginViewModel.validateLogin()) }, label = "Login")
 
         Spacer(modifier = Modifier.weight(1f))
 
