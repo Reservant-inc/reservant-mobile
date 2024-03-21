@@ -23,9 +23,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
@@ -81,7 +84,7 @@ fun LoginActivity(navController: NavHostController) {
         )
 
 
-        UserButton(onClick = { println("LOGIN VALIDATION: "+loginViewModel.validateLogin()) }, label = "Login")
+        UserButton(onClick = { print("LOGIN-API RESPONSE: ${loginViewModel.login()}\n") }, label = "login")
 
         Spacer(modifier = Modifier.weight(1f))
 

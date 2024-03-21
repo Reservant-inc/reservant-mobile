@@ -8,9 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import com.example.reservant_mobile.data.services.IUserService
+import com.example.reservant_mobile.data.services.UserService
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val userService: IUserService) : ViewModel() {
+class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
     var login by mutableStateOf("")
     var password by mutableStateOf("")
@@ -22,7 +23,7 @@ class LoginViewModel(private val userService: IUserService) : ViewModel() {
             viewModelScope.launch {
                 code = userService.loginUser(
                     LoginCredentialsDTO(
-                        email = login,
+                        login = login,
                         password = password,
                         rememberMe = true
                     )
