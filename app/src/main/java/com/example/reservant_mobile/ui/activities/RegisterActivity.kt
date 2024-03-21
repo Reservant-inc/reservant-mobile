@@ -15,14 +15,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
-fun RegisterActivity() {
+fun RegisterActivity(navController: NavHostController) {
 
     val registerViewModel = viewModel<RegisterViewModel>()
 
@@ -33,7 +36,7 @@ fun RegisterActivity() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Logo()
+        LogoWithReturn(navController)
 
         InputUserInfo(
             inputText = registerViewModel.firstName,
@@ -95,5 +98,5 @@ fun RegisterActivity() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegister() {
-    RegisterActivity()
+    RegisterActivity(rememberNavController())
 }
