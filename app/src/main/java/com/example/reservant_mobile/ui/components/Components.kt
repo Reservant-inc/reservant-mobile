@@ -13,6 +13,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,6 @@ fun InputUserInfo(
     isError: Boolean = false,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
     errorText: String = ""
-
 ) {
 
     Column {
@@ -43,9 +43,14 @@ fun InputUserInfo(
             label = { Text(text = label) },
             placeholder = { Text(text = placeholder) },
             visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
+            keyboardOptions = keyboardOptions.copy(
+                imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
+                    ImeAction.Next
+                else keyboardOptions.imeAction
+            ),
             shape = shape,
-            isError = isError
+            isError = isError,
+            singleLine = true
         )
         if (isError){
             Text(text = errorText)
