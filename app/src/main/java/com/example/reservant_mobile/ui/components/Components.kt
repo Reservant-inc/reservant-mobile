@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
@@ -104,7 +107,7 @@ fun LogoWithReturn(navController: NavController = rememberNavController()){
             )
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.back_arrow),
+                Icons.AutoMirrored.Rounded.ArrowBack,
                 contentDescription = "back",
                 modifier = Modifier.size(35.dp)
             )
