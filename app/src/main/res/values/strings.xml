@@ -2,4 +2,7 @@
     <string name="app_name">reservant-mobile</string>
     <string name="label_login">Sign in</string>
     <string name="label_register">Sign up</string>
+    <string name="error_connection_server">Error while connecting to the server</string>
+    <string name="error_register_username_taken">Username is already taken</string>
+    <string name="error_login_wrong_credentials">Incorrect login or password</string>
 </resources>

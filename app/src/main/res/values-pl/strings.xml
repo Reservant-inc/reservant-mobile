@@ -3,4 +3,7 @@
     <string name="app_name">reservant-mobile</string>
     <string name="label_login">Zaloguj się</string>
     <string name="label_register">Zarejestruj się</string>
+    <string name="error_connection_server">Błąd podczas połączenia z serverem</string>
+    <string name="error_register_username_taken">Nazwa użytkownika zajęta</string>
+    <string name="error_login_wrong_credentials">Niepoprawny login lub hasło</string>
 </resources>
