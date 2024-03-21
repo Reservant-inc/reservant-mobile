@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     LoginActivity(navController = navController)
                 }
                 composable(route = "register") {
-                    RegisterActivity()
+                    RegisterActivity(navController = navController)
                 }
 
             }
