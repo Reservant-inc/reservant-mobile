@@ -8,6 +8,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import java.time.YearMonth
 import java.util.Locale
 import java.util.regex.Pattern
+import com.example.reservant_mobile.ui.constants.*
 
 data class FormState(
     val isValid: Boolean = false,
@@ -28,20 +29,16 @@ class RegisterViewModel : ViewModel() {
     var birthday by mutableStateOf("") //nie jest uzywana
     var phoneNum by mutableStateOf("") //nie jest uzywana
 
-    val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    val phoneRegex = "^\\d{9}$"
-
     fun validateForm(): Boolean {
         return !(
-                firstName.isBlank() ||
-                lastName.isBlank()  ||
-                isInvalidWithRegex(dateRegex, birthday)  ||
-                isInvalidWithRegex(emailRegex, email)    ||
-                isInvalidWithRegex(phoneRegex, phoneNum) ||
-                password.isBlank() ||
-                confirmPassword.isBlank()
-        )
+                isInvalidWithRegex(NAME_REG, firstName) ||
+                        isInvalidWithRegex(NAME_REG, lastName)  ||
+                        isInvalidWithRegex(DATE_REG, birthday)  ||
+                        isInvalidWithRegex(EMAIL_REG, email)    ||
+                        isInvalidWithRegex(PHONE_REG, phoneNum) ||
+                        isInvalidWithRegex(PASSWORD_REG, password) ||
+                        confirmPassword != password
+                )
     }
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{

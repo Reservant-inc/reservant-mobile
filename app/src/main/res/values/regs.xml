@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reg_user_firstname" translatable="false">^[A-Za-z]+$</string>
+    <string name="reg_user_email" translatable="false">^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$</string>
+    <string name="reg_date" translatable="false">\\d{4}-\\d{2}-\\d{2}</string>
+    <string name="reg_phone" translatable="false">^\\+?\\d{9,15}$</string>
+</resources>

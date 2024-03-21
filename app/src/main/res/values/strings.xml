@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">reservant-mobile</string>
+    <string name="label_login">Sign in</string>
+    <string name="label_register">Sign up</string>
 </resources>
