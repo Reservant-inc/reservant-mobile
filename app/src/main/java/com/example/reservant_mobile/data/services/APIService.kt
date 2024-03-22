@@ -20,7 +20,7 @@ interface APIService{
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): HttpResponse?
 }
 
-const val URL_PATH = "http://172.21.40.127:12038"
+
 class APIServiceImpl: APIService {
 
     private val client = HttpClient(CIO){
@@ -31,7 +31,7 @@ class APIServiceImpl: APIService {
     }
     override suspend fun get(endpoint: String): HttpResponse? {
         return try {
-            val res = client.get(URL_PATH+endpoint)
+            val res = client.get(endpoint)
 
     //        TODO: implement better logging system
             println("[GET]$endpoint body: "+ res.body())
@@ -45,7 +45,7 @@ class APIServiceImpl: APIService {
 
     override suspend fun post(obj: @Serializable Any, endpoint: String): HttpResponse? {
         return try {
-            val res =  client.post(URL_PATH+endpoint) {
+            val res =  client.post(endpoint) {
                 contentType(ContentType.Application.Json)
                 setBody(obj)
             }
