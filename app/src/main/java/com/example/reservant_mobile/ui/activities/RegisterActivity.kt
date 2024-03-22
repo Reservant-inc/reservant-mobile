@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -28,11 +29,16 @@ import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.ui.components.InputUserInfo
+import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
-fun RegisterActivity() {
+fun RegisterActivity(navController: NavHostController) {
 
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -44,7 +50,7 @@ fun RegisterActivity() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Logo()
+        LogoWithReturn(navController)
 
         InputUserInfo(
             inputText = registerViewModel.firstName,
@@ -135,7 +141,7 @@ fun RegisterActivity() {
                 VisualTransformation.None
             else
                 PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             isError = false,
         )
 
@@ -152,5 +158,5 @@ fun RegisterActivity() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegister() {
-    RegisterActivity()
+    RegisterActivity(rememberNavController())
 }

@@ -6,12 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -21,6 +26,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -30,13 +37,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
@@ -57,11 +69,10 @@ fun InputUserInfo(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
-    shape: RoundedCornerShape = roundedShape,
     errorText: String = "",
-    showError: Boolean = true,
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
 ) {
     OutlinedTextField(
         modifier = modifier
@@ -72,13 +83,17 @@ fun InputUserInfo(
         label = { Text(text = label) },
         placeholder = { Text(text = placeholder) },
         visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
+        keyboardOptions = keyboardOptions.copy(
+            imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
+                ImeAction.Next
+            else keyboardOptions.imeAction
+        ),
         shape = shape,
         isError = isError,
         maxLines = maxLines,
         leadingIcon = leadingIcon
     )
-    if (isError && showError) {
+    if (isError) {
         Text(
             text = errorText,
             color = Color.Red,
@@ -106,11 +121,12 @@ fun UserButton(
 }
 
 @Composable
-fun Logo() {
+
+fun Logo(modifier: Modifier = Modifier){
     Image(
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = "Logo",
-        modifier = Modifier.size(120.dp)
+        modifier = modifier.size(120.dp)
     )
 }
 
@@ -319,6 +335,26 @@ fun CountryCodePickerDialog(
                 }
             }
         }
+
+        
+@Composable
+fun LogoWithReturn(navController: NavController = rememberNavController()){
+    Box (modifier = Modifier.fillMaxWidth()){
+        Button(modifier = Modifier
+            .align(Alignment.CenterStart)
+            ,onClick = { navController.popBackStack() },
+            colors = ButtonColors(
+                Color.Transparent, Color.Black,
+                Color.Transparent, Color.Black
+            )
+        ) {
+            Icon(
+                Icons.AutoMirrored.Rounded.ArrowBack,
+                contentDescription = "back",
+                modifier = Modifier.size(35.dp)
+            )
+        }
+        Logo(modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -326,5 +362,5 @@ fun CountryCodePickerDialog(
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    //preview if needed
+    LogoWithReturn()
 }

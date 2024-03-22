@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 
@@ -44,7 +45,7 @@ fun LoginActivity(navController: NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Logo()
+        LogoWithReturn(navController)
 
         InputUserInfo(
             inputText = loginViewModel.login,
@@ -79,7 +80,8 @@ fun LoginActivity(navController: NavHostController) {
             isError = false,
         )
 
-        UserButton(onClick = { println("LOGIN VALIDATION: ${loginViewModel.validateLogin()}") }, label = "login")
+
+        UserButton(onClick = { println("LOGIN VALIDATION: "+loginViewModel.validateLogin()) }, label = "Login")
 
         Spacer(modifier = Modifier.weight(1f))
 
