@@ -177,6 +177,7 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
         onValueChange = { },
         label = { Text("Select your birthday") },
         readOnly = true,
+        shape = roundedShape,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
