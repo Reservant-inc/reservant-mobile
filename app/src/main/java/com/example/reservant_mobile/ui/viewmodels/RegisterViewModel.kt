@@ -9,7 +9,7 @@ import com.example.reservant_mobile.ui.constants.EMAIL_REG
 import com.example.reservant_mobile.ui.constants.NAME_REG
 import com.example.reservant_mobile.ui.constants.PASSWORD_REG
 import com.example.reservant_mobile.ui.constants.PHONE_REG
-import com.example.reservant_mobile.ui.constants.getCountriesList
+import com.example.reservant_mobile.data.utils.getCountriesList
 import java.util.regex.Pattern
 
 data class FormState(

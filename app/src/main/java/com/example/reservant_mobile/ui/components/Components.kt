@@ -38,8 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.constants.Country
-import com.example.reservant_mobile.ui.constants.getFlagEmojiFor
+import com.example.reservant_mobile.data.utils.Country
+import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -63,7 +63,7 @@ fun InputUserInfo(
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
-    TextField(
+    OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
@@ -114,18 +114,23 @@ fun Logo() {
     )
 }
 
-private fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd-MM-yyyy")
-    return formatter.format(Date(millis))
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val defaultDateMillis = convertDateToMillis((LocalDate.now().year-28).toString() + "-01-01")
+    fun convertMillisToDate(millis: Long): String {
+        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        return formatter.format(Date(millis))
+    }
+
+    fun convertDateToMillis(date: String): Long {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return formatter.parse(date)?.time ?: 0L
+    }
+
+    val defaultDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15")
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = defaultDateMillis,
         selectableDates = object : SelectableDates {
@@ -159,11 +164,6 @@ fun DatePickerDialog(
             state = datePickerState
         )
     }
-}
-
-fun convertDateToMillis(date: String): Long {
-    val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    return format.parse(date)?.time ?: 0L
 }
 
 
