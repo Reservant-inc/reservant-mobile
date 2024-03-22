@@ -6,18 +6,28 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.reservant_mobile.ui.components.BirthdayInput
+import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.Logo
-import com.example.reservant_mobile.ui.components.PhoneInput
+import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 
@@ -25,6 +35,7 @@ import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 fun RegisterActivity() {
 
     val registerViewModel = viewModel<RegisterViewModel>()
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -48,18 +59,7 @@ fun RegisterActivity() {
             isError = false
         )
 
-        BirthdayInput(
-            dateOfBirth = registerViewModel.dateOfBirth,
-            onYearChange = { year ->
-                registerViewModel.dateOfBirth.yearOfBirth = year
-            },
-            onMonthChange = { month ->
-                registerViewModel.dateOfBirth.monthOfBirth = month
-            },
-            onDayChange = { day ->
-                registerViewModel.dateOfBirth.dayOfBirth = day
-            }
-        )
+        MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
 
         InputUserInfo(
             inputText = registerViewModel.email,
@@ -69,28 +69,72 @@ fun RegisterActivity() {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
-        PhoneInput(
-            phoneNumber = registerViewModel.phoneNumber,
-            onPrefixChange = { prefix ->
-                registerViewModel.phoneNumber.prefix = prefix
+        InputUserInfo(
+            inputText = registerViewModel.phoneNum,
+            onValueChange = { registerViewModel.phoneNum = it },
+            label = "Phone",
+            leadingIcon = {
+                registerViewModel.mobileCountry?.let {
+                    CountryPickerView(
+                        countries = registerViewModel.countriesList,
+                        selectedCountry = it,
+                        onSelection = { selectedCountry ->
+                            registerViewModel.mobileCountry = selectedCountry
+                        },
+                    )
+                }
             },
-            onNumberChange = { number ->
-                registerViewModel.phoneNumber.number = number
-            },)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            isError = false,
+        )
+
 
         InputUserInfo(
             inputText = registerViewModel.password,
             onValueChange = { registerViewModel.password = it },
             label = "Password",
-            visualTransformation = PasswordVisualTransformation(),
+            leadingIcon = {
+                IconButton(onClick = {
+                    isPasswordVisible = !isPasswordVisible
+                }) {
+                    Icon(
+                        imageVector = if (isPasswordVisible)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff,
+                        contentDescription = "Password Visibility"
+                    )
+                }
+            },
+            visualTransformation = if (isPasswordVisible)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = false,
-        )
+
+            )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword,
             onValueChange = { registerViewModel.confirmPassword = it },
             label = "Repeat Password",
-            visualTransformation = PasswordVisualTransformation(),
+            leadingIcon = {
+                IconButton(onClick = {
+                    isPasswordVisible = !isPasswordVisible
+                }) {
+                    Icon(
+                        imageVector = if (isPasswordVisible)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff,
+                        contentDescription = "Password Visibility"
+                    )
+                }
+            },
+            visualTransformation = if (isPasswordVisible)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = false,
         )

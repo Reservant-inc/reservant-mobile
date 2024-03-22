@@ -4,11 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.google.i18n.phonenumbers.PhoneNumberUtil
-import java.time.YearMonth
-import java.util.Locale
+import com.example.reservant_mobile.ui.constants.DATE_REG
+import com.example.reservant_mobile.ui.constants.EMAIL_REG
+import com.example.reservant_mobile.ui.constants.NAME_REG
+import com.example.reservant_mobile.ui.constants.PASSWORD_REG
+import com.example.reservant_mobile.ui.constants.PHONE_REG
+import com.example.reservant_mobile.ui.constants.getCountriesList
 import java.util.regex.Pattern
-import com.example.reservant_mobile.ui.constants.*
 
 data class FormState(
     val isValid: Boolean = false,
@@ -21,13 +23,13 @@ class RegisterViewModel : ViewModel() {
 
     var firstName by mutableStateOf("")
     var lastName by mutableStateOf("")
-    var dateOfBirth by mutableStateOf(DateOfBirth())
     var email by mutableStateOf("")
-    var phoneNumber by mutableStateOf(PhoneNumber())
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
-    var birthday by mutableStateOf("") //nie jest uzywana
-    var phoneNum by mutableStateOf("") //nie jest uzywana
+    var birthday by mutableStateOf("")
+    var phoneNum by mutableStateOf("")
+    val countriesList = getCountriesList()
+    var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
     fun validateForm(): Boolean {
         return !(
@@ -43,37 +45,5 @@ class RegisterViewModel : ViewModel() {
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
         return !Pattern.matches(regex, str)
-    }
-}
-
-class DateOfBirth {
-    var yearOfBirth: String by mutableStateOf("")
-    var monthOfBirth: String by mutableStateOf("")
-    var dayOfBirth: String by mutableStateOf("")
-
-    fun getDaysList(year: String, month: String): List<String> {
-        return if (year.isNotEmpty() && month.isNotEmpty()) {
-            (1..YearMonth.of(year.toInt(), month.toInt()).lengthOfMonth()).map { it.toString() }
-        } else {
-            listOf()
-        }
-    }
-}
-class PhoneNumber {
-    var prefix: String by mutableStateOf("")
-    var number: String by mutableStateOf("")
-
-    fun getCountryCodesWithPrefixes(): List<String> {
-        val phoneNumberUtil = PhoneNumberUtil.getInstance()
-        val countryCodesWithPrefixes = mutableListOf<String>()
-
-        for (regionCode in phoneNumberUtil.supportedRegions) {
-            val countryPrefix = phoneNumberUtil.getCountryCodeForRegion(regionCode).toString()
-            val countryName = Locale("", regionCode).getDisplayCountry(Locale.ENGLISH)
-            val formattedString = "$countryName - $countryPrefix"
-            countryCodesWithPrefixes.add(formattedString)
-        }
-
-        return countryCodesWithPrefixes.sorted()
     }
 }
