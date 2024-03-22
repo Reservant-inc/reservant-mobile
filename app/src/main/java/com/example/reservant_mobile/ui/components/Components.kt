@@ -335,6 +335,8 @@ fun CountryCodePickerDialog(
                 }
             }
         }
+    }
+}
 
         
 @Composable
