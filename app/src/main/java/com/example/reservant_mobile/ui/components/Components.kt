@@ -129,10 +129,9 @@ fun DatePickerDialog(
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return formatter.parse(date)?.time ?: 0L
     }
-
-    val defaultDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15")
+    
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = defaultDateMillis,
+        initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis <= System.currentTimeMillis()
