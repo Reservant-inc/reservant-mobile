@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -34,6 +35,7 @@ import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginActivity(navController: NavHostController) {
@@ -84,7 +86,11 @@ fun LoginActivity(navController: NavHostController) {
         )
 
 
-        UserButton(onClick = { print("LOGIN-API RESPONSE: ${loginViewModel.login()}\n") }, label = "login")
+        UserButton(onClick = {
+            loginViewModel.viewModelScope.launch {
+                println("[API] RESPONSE FROM LOGIN: ${loginViewModel.login()}")
+            }
+        }, label = "login")
 
         Spacer(modifier = Modifier.weight(1f))
 

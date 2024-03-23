@@ -17,24 +17,23 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
     var password by mutableStateOf("")
     private var code by mutableIntStateOf(0);
 
-    fun login(): Boolean{
+    suspend fun login(): Boolean{
 
-        if(validateLogin()){
-            viewModelScope.launch {
-                code = userService.loginUser(
-                    LoginCredentialsDTO(
-                        login = login,
-                        password = password,
-                        rememberMe = true
-                    )
-                ) as Int
-            }
-            return when(code){
+        return if(validateLogin()){
+            // TODO: loading screen, 3 different responses instead true/false
+            code = userService.loginUser(
+                LoginCredentialsDTO(
+                    login = login,
+                    password = password,
+                    rememberMe = true
+                )
+            ) as Int
+            when(code){
                 200 -> true
                 else -> false
             }
         }else{
-            return false;
+            false;
         }
     }
 
