@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,7 +28,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -39,8 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,10 +80,23 @@ fun InputUserInfo(
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
 ) {
+
+    var beginValidation : Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var beginValidationOnNextFocus : Boolean by remember {
+        mutableStateOf(false)
+    }
+
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .onFocusChanged {
+                if (beginValidationOnNextFocus) beginValidation = true
+                if (it.isFocused) beginValidationOnNextFocus = true
+            },
         value = inputText,
         onValueChange = onValueChange,
         label = { Text(text = label) },
@@ -89,11 +108,11 @@ fun InputUserInfo(
             else keyboardOptions.imeAction
         ),
         shape = shape,
-        isError = isError,
+        isError = isError && beginValidation,
         maxLines = maxLines,
         leadingIcon = leadingIcon
     )
-    if (isError) {
+    if (isError && beginValidation) {
         Text(
             text = errorText,
             color = Color.Red,
@@ -109,15 +128,24 @@ fun UserButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
+    isLoading : Boolean = false
 ) {
     Button(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         onClick = onClick,
-    ) {
-        Text(text = label)
-    }
+        content = {
+            if (isLoading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
+                    trackColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            } else {
+                Text(text = label)
+            }
+        }
+    )
 }
 
 @Composable
@@ -360,9 +388,17 @@ fun LogoWithReturn(navController: NavController = rememberNavController()){
     }
 }
 
+@Composable
+fun ErrorResourceText(id : Int){
+    Text(color = Color.Red,
+        text = if (id != -1) stringResource(id) else ""
+    )
+}
+
+
 
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    LogoWithReturn()
+    UserButton(onClick = { }, isLoading = true)
 }

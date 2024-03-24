@@ -11,8 +11,10 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,24 +26,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.ui.components.ErrorResourceText
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterActivity(navController: NavHostController) {
 
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorResourceId by remember { mutableIntStateOf(-1) }
 
     Column(
         modifier = Modifier
@@ -56,13 +60,15 @@ fun RegisterActivity(navController: NavHostController) {
             inputText = registerViewModel.firstName,
             onValueChange = { registerViewModel.firstName = it },
             label = "Name",
-            isError = false
+            isError = registerViewModel.isFirstNameInvalid(),
+            errorText = "Invalid name"
         )
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
             label = "Surname",
-            isError = false
+            isError = registerViewModel.isLastNameInvalid(),
+            errorText = "Invalid surname"
         )
 
         MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
@@ -71,8 +77,9 @@ fun RegisterActivity(navController: NavHostController) {
             inputText = registerViewModel.email,
             onValueChange = { registerViewModel.email = it },
             label = "Email",
-            isError = false,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            isError = registerViewModel.isEmailInvalid(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            errorText = "Invalid email"
         )
 
         InputUserInfo(
@@ -91,7 +98,8 @@ fun RegisterActivity(navController: NavHostController) {
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            isError = false,
+            isError = registerViewModel.isPhoneInvalid(),
+            errorText = "Invalid phone number"
         )
 
 
@@ -117,9 +125,10 @@ fun RegisterActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = false,
+            isError = registerViewModel.isPasswordInvalid(),
+            errorText = "Invalid password"
 
-            )
+        )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword,
             onValueChange = { registerViewModel.confirmPassword = it },
@@ -142,14 +151,29 @@ fun RegisterActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            isError = false,
+            isError = registerViewModel.isConfirmPasswordDiff(),
+            errorText = "Passwords must match"
         )
-
 
         Spacer(modifier = Modifier.weight(1f))
 
+        ErrorResourceText(id = errorResourceId)
+        
         UserButton(
-            onClick = { println("REGISTER VALIDATION: " + registerViewModel.validateForm()) },
+            onClick = {
+                registerViewModel.viewModelScope.launch {
+                    isLoading = true
+
+                    val registerCode = registerViewModel.register()
+
+                    if (registerCode == -1){
+                        //navigate to next screen
+                    }
+
+                    errorResourceId = registerCode
+                    isLoading = false
+                }
+            },
             label = "Sign up"
         )
     }
