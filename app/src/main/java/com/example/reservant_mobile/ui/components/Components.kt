@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,7 +28,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -109,15 +112,24 @@ fun UserButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
+    isLoading : Boolean = false
 ) {
     Button(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         onClick = onClick,
-    ) {
-        Text(text = label)
-    }
+        content = {
+            if (isLoading){
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
+                    trackColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            } else {
+                Text(text = label)
+            }
+        }
+    )
 }
 
 @Composable
@@ -364,5 +376,5 @@ fun LogoWithReturn(navController: NavController = rememberNavController()){
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    LogoWithReturn()
+    UserButton(onClick = { }, isLoading = true)
 }

@@ -24,24 +24,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterActivity(navController: NavHostController) {
 
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -149,7 +149,13 @@ fun RegisterActivity(navController: NavHostController) {
         Spacer(modifier = Modifier.weight(1f))
 
         UserButton(
-            onClick = { println("REGISTER VALIDATION: " + registerViewModel.validateForm()) },
+            onClick = {
+                registerViewModel.viewModelScope.launch {
+                    isLoading = true
+                    println("REGISTER VALIDATION: " + registerViewModel.register())
+                    isLoading = false
+                }
+            },
             label = "Sign up"
         )
     }

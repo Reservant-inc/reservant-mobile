@@ -1,7 +1,6 @@
 package com.example.reservant_mobile
 
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
-import com.google.common.truth.ExpectFailure.assertThat
 import com.google.common.truth.Truth.assertThat
 
 import org.junit.Test
@@ -18,7 +17,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isTrue()
     }
 
@@ -32,7 +31,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -46,7 +45,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -60,7 +59,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -74,7 +73,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -88,7 +87,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -102,7 +101,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -116,7 +115,7 @@ class RegisterViewModelUnitTest {
             phoneNum = ""
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -130,7 +129,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "invalid"
             password = "Password123"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -144,7 +143,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = ""
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -158,7 +157,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = ""
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
@@ -172,7 +171,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "invalid"
             confirmPassword = "Password123"
-        }.validateForm()
+        }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 }
