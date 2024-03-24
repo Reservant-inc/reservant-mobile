@@ -2,27 +2,28 @@ package com.example.reservant_mobile
 
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Test
 
 class RegisterViewModelUnitTest {
 
     @Test
-    fun `validateForm returns true when all fields are valid`() {
+    fun `validateForm returns true when all fields are valid`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
             birthday = "2001-02-22"
             email = "john@test.com"
             phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isRegisterInvalid()
+            password = "Password123@"
+            confirmPassword = "Password123@"
+        }.validateForm()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when first name is empty`() {
+    fun `validateForm returns false when first name is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = ""
             lastName = "Dope"
@@ -36,7 +37,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when last name is empty`() {
+    fun `validateForm returns false when last name is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = ""
@@ -50,7 +51,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when birthdate is empty`() {
+    fun `validateForm returns false when birthdate is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -64,7 +65,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when birthdate has wrong format`() {
+    fun `validateForm returns false when birthdate has wrong format`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -78,7 +79,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when email is empty`() {
+    fun `validateForm returns false when email is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -92,7 +93,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when email has wrong format`() {
+    fun `validateForm returns false when email has wrong format`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -106,7 +107,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when phone number is empty`() {
+    fun `validateForm returns false when phone number is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -120,7 +121,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when phone number has wrong format`() {
+    fun `validateForm returns false when phone number has wrong format`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -134,7 +135,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when password is empty`() {
+    fun `validateForm returns false when password is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -148,7 +149,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when confirm password is empty`() {
+    fun `validateForm returns false when confirm password is empty`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -162,7 +163,7 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `validateForm returns false when passwords do not match`() {
+    fun `validateForm returns false when passwords do not match`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
