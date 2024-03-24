@@ -8,12 +8,8 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.services.IUserService
 import com.example.reservant_mobile.data.services.UserService
-import com.example.reservant_mobile.ui.constants.DATE_REG
-import com.example.reservant_mobile.ui.constants.EMAIL_REG
-import com.example.reservant_mobile.ui.constants.NAME_REG
-import com.example.reservant_mobile.ui.constants.PASSWORD_REG
-import com.example.reservant_mobile.ui.constants.PHONE_REG
 import com.example.reservant_mobile.data.utils.getCountriesList
+import com.example.reservant_mobile.ui.constants.Regex
 import java.util.regex.Pattern
 
 class RegisterViewModel(private val userService: IUserService = UserService()) : ViewModel() {
@@ -59,27 +55,27 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
     }
 
     fun isFirstNameInvalid() : Boolean{
-        return isInvalidWithRegex(NAME_REG, firstName)
+        return isInvalidWithRegex(Regex.NAME_REG, firstName)
     }
 
     fun isLastNameInvalid() : Boolean{
-        return isInvalidWithRegex(NAME_REG, lastName)
+        return isInvalidWithRegex(Regex.NAME_REG, lastName)
     }
 
     fun isBirthDateInvalid() : Boolean{
-        return isInvalidWithRegex(DATE_REG, birthday)
+        return isInvalidWithRegex(Regex.DATE_REG, birthday)
     }
 
     fun isEmailInvalid() : Boolean{
-        return isInvalidWithRegex(EMAIL_REG, email)
+        return isInvalidWithRegex(Regex.EMAIL_REG, email)
     }
 
     fun isPhoneInvalid() : Boolean{
-        return isInvalidWithRegex(PHONE_REG, phoneNum)
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum)
     }
 
     fun isPasswordInvalid() : Boolean{
-        return isInvalidWithRegex(PASSWORD_REG, password)
+        return isInvalidWithRegex(Regex.PASSWORD_REG, password)
     }
 
     fun isConfirmPasswordDiff() : Boolean{
