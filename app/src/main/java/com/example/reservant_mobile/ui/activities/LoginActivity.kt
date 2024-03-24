@@ -57,7 +57,8 @@ fun LoginActivity(navController: NavHostController) {
             inputText = loginViewModel.login,
             onValueChange = { loginViewModel.login = it },
             label = "Login",
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isError = errorResourceId != -1
         )
 
         InputUserInfo(
@@ -82,12 +83,14 @@ fun LoginActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            isError = errorResourceId != -1
         )
 
 
         UserButton(onClick = {
             loginViewModel.viewModelScope.launch {
                 isLoading = true
+                errorResourceId = -1
 
                 val loginCode = loginViewModel.login()
 
@@ -99,7 +102,7 @@ fun LoginActivity(navController: NavHostController) {
                 isLoading = false
 
             }
-        }, label = "login", isLoading = isLoading)
+        }, label = "Login", isLoading = isLoading)
 
         ErrorResourceText(id = errorResourceId)
 

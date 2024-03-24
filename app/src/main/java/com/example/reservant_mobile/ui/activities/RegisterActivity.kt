@@ -60,13 +60,15 @@ fun RegisterActivity(navController: NavHostController) {
             inputText = registerViewModel.firstName,
             onValueChange = { registerViewModel.firstName = it },
             label = "Name",
-            isError = false
+            isError = registerViewModel.isFirstNameInvalid(),
+            errorText = "Invalid name"
         )
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
             label = "Surname",
-            isError = false
+            isError = registerViewModel.isLastNameInvalid(),
+            errorText = "Invalid surname"
         )
 
         MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
@@ -75,8 +77,9 @@ fun RegisterActivity(navController: NavHostController) {
             inputText = registerViewModel.email,
             onValueChange = { registerViewModel.email = it },
             label = "Email",
-            isError = false,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            isError = registerViewModel.isEmailInvalid(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            errorText = "Invalid email"
         )
 
         InputUserInfo(
@@ -95,7 +98,8 @@ fun RegisterActivity(navController: NavHostController) {
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            isError = false,
+            isError = registerViewModel.isPhoneInvalid(),
+            errorText = "Invalid phone number"
         )
 
 
@@ -121,9 +125,10 @@ fun RegisterActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = false,
+            isError = registerViewModel.isPasswordInvalid(),
+            errorText = "Invalid password"
 
-            )
+        )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword,
             onValueChange = { registerViewModel.confirmPassword = it },
@@ -146,7 +151,8 @@ fun RegisterActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            isError = false,
+            isError = registerViewModel.isConfirmPasswordDiff(),
+            errorText = "Passwords must match"
         )
 
         Spacer(modifier = Modifier.weight(1f))

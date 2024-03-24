@@ -42,6 +42,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -78,10 +80,23 @@ fun InputUserInfo(
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
 ) {
+
+    var beginValidation : Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    var beginValidationOnNextFocus : Boolean by remember {
+        mutableStateOf(false)
+    }
+
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .onFocusChanged {
+                if (beginValidationOnNextFocus) beginValidation = true
+                if (it.isFocused) beginValidationOnNextFocus = true
+            },
         value = inputText,
         onValueChange = onValueChange,
         label = { Text(text = label) },
@@ -93,11 +108,11 @@ fun InputUserInfo(
             else keyboardOptions.imeAction
         ),
         shape = shape,
-        isError = isError,
+        isError = isError && beginValidation,
         maxLines = maxLines,
         leadingIcon = leadingIcon
     )
-    if (isError) {
+    if (isError && beginValidation) {
         Text(
             text = errorText,
             color = Color.Red,

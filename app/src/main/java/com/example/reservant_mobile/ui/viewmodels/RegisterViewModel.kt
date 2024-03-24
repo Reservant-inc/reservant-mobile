@@ -54,7 +54,7 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
                 isEmailInvalid()    ||
                 isPhoneInvalid() ||
                 isPasswordInvalid() ||
-                confirmPassword != password
+                isConfirmPasswordDiff()
 
     }
 
@@ -80,6 +80,10 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
 
     fun isPasswordInvalid() : Boolean{
         return isInvalidWithRegex(PASSWORD_REG, password)
+    }
+
+    fun isConfirmPasswordDiff() : Boolean{
+        return confirmPassword != password
     }
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
