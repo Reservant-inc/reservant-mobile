@@ -23,20 +23,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginActivity(navController: NavHostController) {
 
     val loginViewModel = viewModel<LoginViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -50,8 +52,7 @@ fun LoginActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = loginViewModel.login,
             onValueChange = { loginViewModel.login = it },
-            label = "Email",
-            isError = false,
+            label = "Login",
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
 
@@ -77,17 +78,23 @@ fun LoginActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = false,
         )
 
 
-        UserButton(onClick = { println("LOGIN VALIDATION: "+loginViewModel.validateLogin()) }, label = "Login")
+        UserButton(onClick = {
+            loginViewModel.viewModelScope.launch {
+                isLoading = true
+
+                println("[API] RESPONSE FROM LOGIN: ${loginViewModel.login()}")
+                isLoading = false
+            }
+        }, label = "login")
 
         Spacer(modifier = Modifier.weight(1f))
 
-        UserButton(onClick = { navController.navigate("register") }, label = "Sign up")
+        UserButton(onClick = { if (!isLoading) navController.navigate("register") }, label = "Sign up")
 
-        UserButton(onClick = { /* Handle Password Recovery */ }, label = "Don't remember a password")
+        UserButton(onClick = { if (!isLoading) return@UserButton /* Handle Password Recovery */ }, label = "Don't remember a password")
     }
 }
 

@@ -8,7 +8,7 @@ import com.example.reservant_mobile.ui.constants.Endpoints
 
 interface IUserService{
     suspend fun registerUser(user: RegisterUserDTO): List<Int>
-    suspend fun loginUser(credentials: LoginCredentialsDTO): Boolean
+    suspend fun loginUser(credentials: LoginCredentialsDTO): Int
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
@@ -25,9 +25,12 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         return listOf(R.string.error_register_username_taken)
     }
 
-    override suspend fun loginUser(credentials: LoginCredentialsDTO): Boolean {
-        val res = api.post(credentials, Endpoints.LOGIN) ?: return false
-        return res.status.value == 200
+    override suspend fun loginUser(credentials: LoginCredentialsDTO): Int {
+        val res = api.post(credentials, Endpoints.LOGIN) ?: return R.string.error_connection_server
+        return if(res.status.value == 200)
+            -1
+        else
+            R.string.error_login_wrong_credentials
     }
 
 
