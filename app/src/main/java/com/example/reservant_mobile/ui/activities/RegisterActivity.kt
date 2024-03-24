@@ -11,8 +11,10 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,6 +33,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.ui.components.ErrorResourceText
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
@@ -42,6 +45,7 @@ fun RegisterActivity(navController: NavHostController) {
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var errorResourceId by remember { mutableIntStateOf(-1) }
 
     Column(
         modifier = Modifier
@@ -145,14 +149,22 @@ fun RegisterActivity(navController: NavHostController) {
             isError = false,
         )
 
-
         Spacer(modifier = Modifier.weight(1f))
 
+        ErrorResourceText(id = errorResourceId)
+        
         UserButton(
             onClick = {
                 registerViewModel.viewModelScope.launch {
                     isLoading = true
-                    println("REGISTER VALIDATION: " + registerViewModel.register())
+
+                    val registerCode = registerViewModel.register()
+
+                    if (registerCode == -1){
+                        //navigate to next screen
+                    }
+
+                    errorResourceId = registerCode
                     isLoading = false
                 }
             },

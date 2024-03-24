@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -371,6 +372,14 @@ fun LogoWithReturn(navController: NavController = rememberNavController()){
         Logo(modifier = Modifier.align(Alignment.Center))
     }
 }
+
+@Composable
+fun ErrorResourceText(id : Int){
+    Text(color = Color.Red,
+        text = if (id != -1) stringResource(id) else ""
+    )
+}
+
 
 
 @Preview(showBackground = true)
