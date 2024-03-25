@@ -1,36 +1,35 @@
 package com.example.reservant_mobile.ui.components
 
+import android.text.BoringLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -43,21 +42,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.activities.RegisterActivity
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -76,6 +75,7 @@ fun InputUserInfo(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorText: String = "",
+    optional: Boolean = false,
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
@@ -89,37 +89,49 @@ fun InputUserInfo(
         mutableStateOf(false)
     }
 
-    OutlinedTextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .onFocusChanged {
-                if (beginValidationOnNextFocus) beginValidation = true
-                if (it.isFocused) beginValidationOnNextFocus = true
+    Column {
+        OutlinedTextField(
+            modifier =
+            if (optional) {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            } else {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .onFocusChanged {
+                        if (beginValidationOnNextFocus) beginValidation = true
+                        if (it.hasFocus) beginValidationOnNextFocus = true
+                    }
             },
-        value = inputText,
-        onValueChange = onValueChange,
-        label = { Text(text = label) },
-        placeholder = { Text(text = placeholder) },
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions.copy(
-            imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
-                ImeAction.Next
-            else keyboardOptions.imeAction
-        ),
-        shape = shape,
-        isError = isError && beginValidation,
-        maxLines = maxLines,
-        leadingIcon = leadingIcon
-    )
-    if (isError && beginValidation) {
-        Text(
-            text = errorText,
-            color = Color.Red,
-            modifier = Modifier
-                .fillMaxWidth()
+            value = inputText,
+            onValueChange = onValueChange,
+            label = { Row {
+                Text(text = label)
+                if (optional)
+                    Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+            } },
+            placeholder = { Text(text = placeholder) },
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions.copy(
+                imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
+                    ImeAction.Next
+                else keyboardOptions.imeAction
+            ),
+            shape = shape,
+            isError = isError && beginValidation,
+            maxLines = maxLines,
+            leadingIcon = leadingIcon
         )
+        if (isError && beginValidation) {
+            Text(
+                text = errorText,
+                color = Color.Red
+            )
+        }
     }
+
 }
 
 
@@ -400,5 +412,5 @@ fun ErrorResourceText(id : Int){
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    UserButton(onClick = { }, isLoading = true)
+    RegisterActivity(rememberNavController())
 }

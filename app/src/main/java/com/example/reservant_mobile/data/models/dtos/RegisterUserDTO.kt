@@ -4,10 +4,11 @@ import kotlinx.serialization.*
 
 @Serializable
 data class RegisterUserDTO(
+    val login : String,
     val firstName: String,
     val lastName: String,
     val birthDate: String,
     val email: String,
-    val phoneNumber: String,
+    var phoneNumber: String = "",
     val password: String
 ) 

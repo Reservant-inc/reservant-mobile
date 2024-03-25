@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.constants
 
 data object Regex{
+    const val LOGIN = "[\\w.\\-$!]{3,}"
     const val NAME_REG = "^[A-Za-z]+$"
     const val DATE_REG = "^[0,1,2]\\d-[0,1]\\d-[0,1,2]\\d{3}$"
     const val EMAIL_REG = "[a-zA-z0-9][\\w.-]*@[a-zA-z0-9]{2,}\\.[a-zA-Z]{2,}"

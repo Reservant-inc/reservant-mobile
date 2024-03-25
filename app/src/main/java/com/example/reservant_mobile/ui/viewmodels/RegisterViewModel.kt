@@ -14,6 +14,7 @@ import java.util.regex.Pattern
 
 class RegisterViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
+    var login by mutableStateOf("")
     var firstName by mutableStateOf("")
     var lastName by mutableStateOf("")
     var email by mutableStateOf("")
@@ -30,28 +31,33 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
             return R.string.error_register_invalid_request
         }
 
-        return userService.registerUser(
-            user = RegisterUserDTO(
-                firstName = firstName,
-                lastName = lastName,
-                birthDate = birthday,
-                email = email,
-                phoneNumber = phoneNum,
-                password = password
-            )
-        )[0]
+        val user = RegisterUserDTO(
+            login = login,
+            firstName = firstName,
+            lastName = lastName,
+            birthDate = birthday,
+            email = email,
+            password = password
+        )
 
+        if (!isPhoneInvalid()) user.phoneNumber = phoneNum
+
+        return userService.registerUser(user)[0]
     }
 
     fun isRegisterInvalid(): Boolean {
-        return isFirstNameInvalid() ||
+        return isLoginInvalid() ||
+                isFirstNameInvalid() ||
                 isLastNameInvalid()  ||
                 isBirthDateInvalid()  ||
                 isEmailInvalid()    ||
-                isPhoneInvalid() ||
                 isPasswordInvalid() ||
                 isConfirmPasswordDiff()
 
+    }
+
+    fun isLoginInvalid(): Boolean{
+        return isInvalidWithRegex(Regex.LOGIN, login)
     }
 
     fun isFirstNameInvalid() : Boolean{
