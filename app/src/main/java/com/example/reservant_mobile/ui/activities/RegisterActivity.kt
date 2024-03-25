@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,13 +27,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.reservant_mobile.ui.components.CountryPickerView
-import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.ErrorResourceText
+import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
+import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import kotlinx.coroutines.launch
@@ -52,9 +51,17 @@ fun RegisterActivity(navController: NavHostController) {
             .fillMaxSize()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         LogoWithReturn(navController)
+
+        InputUserInfo(
+            inputText = registerViewModel.login,
+            onValueChange = { registerViewModel.login = it },
+            label = "Login",
+            isError = registerViewModel.isLoginInvalid(),
+            errorText = "Invalid login"
+        )
 
         InputUserInfo(
             inputText = registerViewModel.firstName,
@@ -63,6 +70,7 @@ fun RegisterActivity(navController: NavHostController) {
             isError = registerViewModel.isFirstNameInvalid(),
             errorText = "Invalid name"
         )
+
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
