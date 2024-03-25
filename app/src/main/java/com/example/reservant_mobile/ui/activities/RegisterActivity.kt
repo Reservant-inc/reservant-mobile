@@ -110,7 +110,8 @@ fun RegisterActivity(navController: NavHostController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             isError = registerViewModel.isPhoneInvalid(),
-            errorText = "Invalid phone number"
+            errorText = "Invalid phone number",
+            optional = true
         )
 
 

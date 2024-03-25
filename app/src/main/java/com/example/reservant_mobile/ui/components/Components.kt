@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.components
 
+import android.text.BoringLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,6 +45,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,6 +75,7 @@ fun InputUserInfo(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorText: String = "",
+    optional: Boolean = false,
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
@@ -87,16 +91,27 @@ fun InputUserInfo(
 
     Column {
         OutlinedTextField(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .onFocusChanged {
-                    if (beginValidationOnNextFocus) beginValidation = true
-                    if (it.hasFocus) beginValidationOnNextFocus = true
-                },
+            modifier =
+            if (optional) {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            } else {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .onFocusChanged {
+                        if (beginValidationOnNextFocus) beginValidation = true
+                        if (it.hasFocus) beginValidationOnNextFocus = true
+                    }
+            },
             value = inputText,
             onValueChange = onValueChange,
-            label = { Text(text = label) },
+            label = { Row {
+                Text(text = label)
+                if (optional)
+                    Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+            } },
             placeholder = { Text(text = placeholder) },
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions.copy(
