@@ -31,7 +31,7 @@ class LoginViewModelUnitTest {
     fun `valid login and password returns true`() = runTest{
         val result = LoginViewModel().apply {
             login = "john@doe.pl"
-            password = ""
+            password = "Pa${'$'}${'$'}w0rd"
         }.login()
         assertThat(result).isEqualTo(-1)
     }
