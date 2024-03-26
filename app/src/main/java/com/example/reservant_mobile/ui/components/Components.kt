@@ -1,14 +1,16 @@
 package com.example.reservant_mobile.ui.components
 
-import android.text.BoringLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,10 +30,15 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,15 +55,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.activities.RegisterActivity
+import com.example.reservant_mobile.ui.theme.Purple40
+import com.example.reservant_mobile.ui.theme.Purple80
+import com.example.reservant_mobile.ui.theme.PurpleGrey40
+import com.example.reservant_mobile.ui.theme.PurpleGrey80
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -81,11 +95,11 @@ fun InputUserInfo(
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
 ) {
 
-    var beginValidation : Boolean by remember {
+    var beginValidation: Boolean by remember {
         mutableStateOf(false)
     }
 
-    var beginValidationOnNextFocus : Boolean by remember {
+    var beginValidationOnNextFocus: Boolean by remember {
         mutableStateOf(false)
     }
 
@@ -107,11 +121,13 @@ fun InputUserInfo(
             },
             value = inputText,
             onValueChange = onValueChange,
-            label = { Row {
-                Text(text = label)
-                if (optional)
-                    Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
-            } },
+            label = {
+                Row {
+                    Text(text = label)
+                    if (optional)
+                        Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+                }
+            },
             placeholder = { Text(text = placeholder) },
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions.copy(
@@ -140,7 +156,7 @@ fun UserButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
-    isLoading : Boolean = false
+    isLoading: Boolean = false
 ) {
     Button(
         modifier = modifier
@@ -148,7 +164,7 @@ fun UserButton(
             .padding(vertical = 8.dp),
         onClick = onClick,
         content = {
-            if (isLoading){
+            if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(32.dp),
                     trackColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -162,7 +178,7 @@ fun UserButton(
 
 @Composable
 
-fun Logo(modifier: Modifier = Modifier){
+fun Logo(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = "Logo",
@@ -185,7 +201,7 @@ fun DatePickerDialog(
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return formatter.parse(date)?.time ?: 0L
     }
-    
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
         selectableDates = object : SelectableDates {
@@ -378,13 +394,13 @@ fun CountryCodePickerDialog(
     }
 }
 
-        
+
 @Composable
-fun LogoWithReturn(navController: NavController = rememberNavController()){
-    Box (modifier = Modifier.fillMaxWidth()){
-        Button(modifier = Modifier
-            .align(Alignment.CenterStart)
-            ,onClick = { navController.popBackStack() },
+fun LogoWithReturn(navController: NavController = rememberNavController()) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Button(
+            modifier = Modifier
+                .align(Alignment.CenterStart), onClick = { navController.popBackStack() },
             colors = ButtonColors(
                 Color.Transparent, Color.Black,
                 Color.Transparent, Color.Black
@@ -401,13 +417,85 @@ fun LogoWithReturn(navController: NavController = rememberNavController()){
 }
 
 @Composable
-fun ErrorResourceText(id : Int){
-    Text(color = Color.Red,
+fun ErrorResourceText(id: Int) {
+    Text(
+        color = Color.Red,
         text = if (id != -1) stringResource(id) else ""
     )
 }
 
+@Composable
+fun BottomNavigation(navController: NavHostController) {
 
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.New,
+        BottomNavItem.Login,
+        BottomNavItem.Register
+    )
+
+    NavigationBar {
+        for (i in items) {
+            AddItem(
+                screen = i,
+                onClick = { navController.navigate(i.title.lowercase()) }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun heading() {
+    TopAppBar(
+        title = { Text("Your App") },
+        colors = TopAppBarColors(Purple80, PurpleGrey80, PurpleGrey40, Color.Black, Purple40)
+    )
+}
+
+@Composable
+fun Content() {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Zgłodniałeś?")
+    }
+}
+
+@Composable
+fun RowScope.AddItem(
+    screen: BottomNavItem,
+    onClick: () -> Unit,
+) {
+    NavigationBarItem(
+        label = {
+            Text(text = screen.title)
+        },
+
+        icon = {
+            Icon(
+                screen.icon,
+                contentDescription = screen.title,
+            )
+        },
+
+        // Display if the icon it is select or not
+        selected = true,
+
+        // Always show the label bellow the icon or not
+        alwaysShowLabel = true,
+
+        // Click listener for the icon
+        onClick = onClick,
+
+        // Control all the colors of the icon
+        colors = NavigationBarItemDefaults.colors()
+    )
+}
 
 @Preview(showBackground = true)
 @Composable

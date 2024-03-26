@@ -17,14 +17,17 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "home") {
 
-                composable(route = "home") {
-                    HomeActivity(navController = navController)
+                composable(route = "new") {
+                    NewActivity(navController = navController)
                 }
                 composable(route = "login") {
                     LoginActivity(navController = navController)
                 }
                 composable(route = "register") {
                     RegisterActivity(navController = navController)
+                }
+                composable(route = "home") {
+                    HomeActivity(navController = navController)
                 }
 
             }
