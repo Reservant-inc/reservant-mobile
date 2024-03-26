@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,6 +39,7 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,7 +53,7 @@ fun RegisterActivity(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp) // TODO: resource
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
@@ -61,24 +63,24 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.login,
             onValueChange = { registerViewModel.login = it },
-            label = "Login",
+            label = stringResource(R.string.label_login),
             isError = registerViewModel.isLoginInvalid(),
-            errorText = "Invalid login"
+            errorText = stringResource(R.string.error_login_invalid)
         )
 
         InputUserInfo(
             inputText = registerViewModel.firstName,
             onValueChange = { registerViewModel.firstName = it },
-            label = "Name",
+            label = stringResource(R.string.label_name),
             isError = registerViewModel.isFirstNameInvalid(),
-            errorText = "Invalid name"
+            errorText = stringResource(R.string.error_register_invalid_name)
         )
 
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
             label = "Surname",
-            isError = registerViewModel.isLastNameInvalid(),
+            isError = registerViewModel.isLastNameInvalid(), // TODO: lastName or surname?
             errorText = "Invalid surname"
         )
 
@@ -87,10 +89,10 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.email,
             onValueChange = { registerViewModel.email = it },
-            label = "Email",
+            label = stringResource(R.string.label_email),
             isError = registerViewModel.isEmailInvalid(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            errorText = "Invalid email"
+            errorText = stringResource(R.string.error_register_invalid_email)
         )
 
         InputUserInfo(

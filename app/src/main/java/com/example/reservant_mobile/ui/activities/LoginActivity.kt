@@ -49,7 +49,7 @@ fun LoginActivity(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp), // TODO: resource
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -58,7 +58,7 @@ fun LoginActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = loginViewModel.login,
             onValueChange = { loginViewModel.login = it },
-            label = stringResource(R.string.label_input_login),
+            label = stringResource(R.string.label_login),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = errorResourceId != -1
         )
@@ -66,7 +66,7 @@ fun LoginActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = loginViewModel.password,
             onValueChange = { loginViewModel.password = it },
-            label = stringResource(R.string.label_input_password),
+            label = stringResource(R.string.label_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -76,7 +76,7 @@ fun LoginActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = stringResource(R.string.label_input_password_visibility)
+                        contentDescription = "Password Visibility" // TODO: review
                     )
                 }
             },
@@ -104,15 +104,17 @@ fun LoginActivity(navController: NavHostController) {
                 isLoading = false
 
             }
-        }, label = "Login", isLoading = isLoading)
+        }, label = stringResource(R.string.label_signin), isLoading = isLoading)
 
         ErrorResourceText(id = errorResourceId)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        UserButton(onClick = { if (!isLoading) navController.navigate("register") }, label = "Sign up")
+        UserButton(onClick = { if (!isLoading) navController.navigate("register") },
+            label = stringResource(R.string.label_signup))
 
-        UserButton(onClick = { if (!isLoading) return@UserButton /* Handle Password Recovery */ }, label = "Don't remember a password")
+        UserButton(onClick = { if (!isLoading) return@UserButton /* Handle Password Recovery */ },
+            label = stringResource(R.string.label_password_forgot))
     }
 }
 
