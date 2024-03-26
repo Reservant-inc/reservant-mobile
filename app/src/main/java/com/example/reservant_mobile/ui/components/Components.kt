@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.ui.components
 
-import android.text.BoringLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -224,13 +223,14 @@ fun DatePickerDialog(
 
 @Composable
 fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
+    // TODO: insert resource stringResource(R.string.label_register_birthday_dialog)
     var date by remember { mutableStateOf("Open date picker dialog") }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = date,
         onValueChange = { },
-        label = { Text("Select your birthday") },
+        label = { Text(stringResource(R.string.label_register_birthday_select)) },
         readOnly = true,
         shape = roundedShape,
         modifier = Modifier
