@@ -9,13 +9,11 @@
     <string name="error_register_username_taken">Nazwa użytkownika zajęta</string>
     <string name="error_register_invalid_request">Niepoprawne dane rejestracji</string>
     <string name="error_login_wrong_credentials">Niepoprawny login lub hasło</string>
-    <string name="label_password_visibility">Widoczność Hasła</string>
     <string name="label_password_forgot">Nie pamiętam hasła</string>
     <string name="error_login_invalid">Niepoprawna nazwa użytkownika</string>
     <string name="label_name">Imię</string>
-    <string name="label_surname">Nazwisko</string>
+    <string name="label_lastname">Nazwisko</string>
     <string name="error_register_invalid_name">Niepoprawne imię</string>
-    <string name="error_register_invalid_surname">Niepoprawne nazwisko</string>
     <string name="label_email">Adres email</string>
     <string name="error_register_invalid_email">Niepoprawny adres email</string>
     <string name="label_phone">Telefon</string>
@@ -23,4 +21,6 @@
     <string name="error_register_invalid_password">Niepoprawne hasło</string>
     <string name="label_register_repeat_password">Powtórz hasło</string>
     <string name="error_register_password_match">Hasła muszą się zgadzać</string>
+    <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
+    <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
 </resources>

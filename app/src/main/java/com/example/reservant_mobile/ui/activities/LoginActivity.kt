@@ -49,7 +49,7 @@ fun LoginActivity(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp), // TODO: resource
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -76,7 +76,7 @@ fun LoginActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility" // TODO: review
+                        contentDescription = stringResource(R.string.label_password_visibility)
                     )
                 }
             },

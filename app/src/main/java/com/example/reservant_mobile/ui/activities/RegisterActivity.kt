@@ -53,7 +53,7 @@ fun RegisterActivity(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp) // TODO: resource
+            .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
@@ -79,9 +79,9 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
-            label = "Surname",
-            isError = registerViewModel.isLastNameInvalid(), // TODO: lastName or surname?
-            errorText = "Invalid surname"
+            label = stringResource(R.string.label_lastname),
+            isError = registerViewModel.isLastNameInvalid(),
+            errorText = stringResource(R.string.error_register_invalid_lastname)
         )
 
         MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
@@ -130,7 +130,7 @@ fun RegisterActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility" // TODO: review
+                        contentDescription = stringResource(R.string.label_password_visibility)
                     )
                 }
             },
@@ -156,7 +156,7 @@ fun RegisterActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility"
+                        contentDescription = stringResource(R.string.label_password_visibility)
                     )
                 }
             },

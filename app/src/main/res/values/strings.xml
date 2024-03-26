@@ -8,13 +8,12 @@
     <string name="error_register_username_taken">Username is already taken</string>
     <string name="error_register_invalid_request">Invalid register data</string>
     <string name="error_login_wrong_credentials">Incorrect login or password</string>
-    <string name="label_password_visibility">Password Visibility</string>
+    <string name="label_password_visibility" translatable="false">Password Visibility</string>
     <string name="label_password_forgot">Forgot my password</string>
     <string name="error_login_invalid">Invalid login</string>
     <string name="label_name">Name</string>
-    <string name="label_surname">Surname</string>
+    <string name="label_lastname">Last name</string>
     <string name="error_register_invalid_name">Invalid name</string>
-    <string name="error_register_invalid_surname">Invalid surname</string>
     <string name="label_email">Email address</string>
     <string name="error_register_invalid_email">Invalid email address</string>
     <string name="label_phone">Phone</string>
@@ -22,4 +21,7 @@
     <string name="error_register_invalid_password">Invalid password</string>
     <string name="label_register_repeat_password">Repeat Password</string>
     <string name="error_register_password_match">Passwords must match</string>
+    <string name="error_register_invalid_lastname">Invalid lastname</string>
+    <string name="label_register_birthday_select">Select your birthday</string>
+    <string name="label_register_birthday_dialog">Open date picker dialog</string>
 </resources>
