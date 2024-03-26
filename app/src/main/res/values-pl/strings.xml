@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reservant-mobile</string>
-    <string name="label_login">Zaloguj się</string>
-    <string name="label_register">Zarejestruj się</string>
+    <string name="label_signin">Zaloguj się</string>
+    <string name="label_login">Nazwa użytkownika</string>
+    <string name="label_signup">Zarejestruj się</string>
+    <string name="label_password">Hasło</string>
     <string name="error_connection_server">Błąd podczas połączenia z serverem</string>
     <string name="error_register_username_taken">Nazwa użytkownika zajęta</string>
     <string name="error_register_invalid_request">Niepoprawne dane rejestracji</string>

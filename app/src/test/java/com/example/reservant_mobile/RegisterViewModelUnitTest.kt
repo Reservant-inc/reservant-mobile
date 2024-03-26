@@ -2,41 +2,56 @@ package com.example.reservant_mobile
 
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 
 import org.junit.Test
 
 class RegisterViewModelUnitTest {
 
     @Test
-    fun `validateForm returns true when all fields are valid`() {
+    fun `Form returns error code when username already taken`() = runTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
-            email = "john@test.com"
+            birthday = "21-02-2002"
+            email = "john@doe.pl"
             phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isTrue()
+            password = "Password123@"
+            confirmPassword = "Password123@"
+        }.register()
+        assertThat(result).isNotEqualTo(-1)
     }
 
     @Test
-    fun `validateForm returns false when first name is empty`() {
+    fun `Form returns no error when all fields are valid`() {
         val result = RegisterViewModel().apply {
-            firstName = ""
+            firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "01-02-2002"
             email = "john@test.com"
             phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
+            password = "Password123@"
+            confirmPassword = "Password123@"
         }.isRegisterInvalid()
         assertThat(result).isFalse()
     }
 
     @Test
-    fun `validateForm returns false when last name is empty`() {
+    fun `Form returns error when first name is empty`()  {
+        val result = RegisterViewModel().apply {
+            firstName = ""
+            lastName = "Dope"
+            birthday = "20-02-2002"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "Password123"
+            confirmPassword = "Password123"
+        }.isFirstNameInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Form returns error when last name is empty`()  {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = ""
@@ -45,12 +60,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isLastNameInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when birthdate is empty`() {
+    fun `Form returns error when birthdate is empty`()  {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -59,12 +74,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isBirthDateInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when birthdate has wrong format`() {
+    fun `Form returns error when birthdate has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -73,12 +88,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isBirthDateInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when email is empty`() {
+    fun `Form returns error when email is empty`(){
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -87,12 +102,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isEmailInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when email has wrong format`() {
+    fun `Form returns error when email has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -101,12 +116,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isEmailInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when phone number is empty`() {
+    fun `Form returns error when phone number is empty`(){
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -115,12 +130,12 @@ class RegisterViewModelUnitTest {
             phoneNum = ""
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isPhoneInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when phone number has wrong format`() {
+    fun `Form returns error when phone number has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -129,12 +144,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "invalid"
             password = "Password123"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isPhoneInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when password is empty`() {
+    fun `Form returns error when password is empty`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -143,12 +158,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = ""
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isPasswordInvalid()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when confirm password is empty`() {
+    fun `Form returns error when confirm password is empty`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -157,12 +172,12 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "Password123"
             confirmPassword = ""
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isConfirmPasswordDiff()
+        assertThat(result).isTrue()
     }
 
     @Test
-    fun `validateForm returns false when passwords do not match`() {
+    fun `Form returns error when passwords do not match`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -171,7 +186,7 @@ class RegisterViewModelUnitTest {
             phoneNum = "123456789"
             password = "invalid"
             confirmPassword = "Password123"
-        }.isRegisterInvalid()
-        assertThat(result).isFalse()
+        }.isConfirmPasswordDiff()
+        assertThat(result).isTrue()
     }
 }
