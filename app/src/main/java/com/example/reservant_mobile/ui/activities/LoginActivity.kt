@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,6 +35,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,7 +58,7 @@ fun LoginActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = loginViewModel.login,
             onValueChange = { loginViewModel.login = it },
-            label = "Login",
+            label = stringResource(R.string.label_input_login),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             isError = errorResourceId != -1
         )
@@ -64,7 +66,7 @@ fun LoginActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = loginViewModel.password,
             onValueChange = { loginViewModel.password = it },
-            label = "Password",
+            label = stringResource(R.string.label_input_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -74,7 +76,7 @@ fun LoginActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility"
+                        contentDescription = stringResource(R.string.label_input_password_visibility)
                     )
                 }
             },

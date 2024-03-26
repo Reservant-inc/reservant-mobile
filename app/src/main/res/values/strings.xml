@@ -8,4 +8,7 @@
     <string name="error_register_username_taken">Username is already taken</string>
     <string name="error_register_invalid_request">Invalid register data</string>
     <string name="error_login_wrong_credentials">Incorrect login or password</string>
+    <string name="label_input_login" translatable="false">Login</string>
+    <string name="label_input_password">Password</string>
+    <string name="label_input_password_visibility">Password Visibility</string>
 </resources>
