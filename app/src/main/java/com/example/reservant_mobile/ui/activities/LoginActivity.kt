@@ -104,7 +104,7 @@ fun LoginActivity(navController: NavHostController) {
                 isLoading = false
 
             }
-        }, label = stringResource(R.string.label_signin), isLoading = isLoading)
+        }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
 
         ErrorResourceText(id = errorResourceId)
 

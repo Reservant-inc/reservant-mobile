@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">reservant-mobile</string>
-    <string name="label_signin">Zaloguj się</string>
+    <string name="label_login_action">Zaloguj się</string>
     <string name="label_login">Nazwa użytkownika</string>
     <string name="label_signup">Zarejestruj się</string>
     <string name="label_password">Hasło</string>

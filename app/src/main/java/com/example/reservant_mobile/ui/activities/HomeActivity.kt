@@ -28,7 +28,7 @@ fun HomeActivity(navController: NavHostController) {
         Logo()
 
         UserButton(onClick = { navController.navigate("login") },
-            label = stringResource(R.string.label_signin))
+            label = stringResource(R.string.label_login_action))
 
         UserButton(onClick = { navController.navigate("register") },
             label = stringResource(R.string.label_signup))

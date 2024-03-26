@@ -40,7 +40,7 @@ class LoginActivityTest {
         }
         this.loginLabel = rule.activity.getString(R.string.label_login)
         this.passwordLabel = rule.activity.getString(R.string.label_password)
-        this.signInLabel = rule.activity.getString(R.string.label_signin)
+        this.signInLabel = rule.activity.getString(R.string.label_login_action)
         this.error1 = rule.activity.getString(R.string.error_connection_server)
         this.error2 = rule.activity.getString(R.string.error_login_wrong_credentials)
 
