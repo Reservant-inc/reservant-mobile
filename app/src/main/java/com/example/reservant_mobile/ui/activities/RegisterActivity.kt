@@ -98,7 +98,7 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.phoneNum,
             onValueChange = { registerViewModel.phoneNum = it },
-            label = "Phone",
+            label = stringResource(R.string.label_phone),
             leadingIcon = {
                 registerViewModel.mobileCountry?.let {
                     CountryPickerView(
@@ -112,7 +112,7 @@ fun RegisterActivity(navController: NavHostController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             isError = registerViewModel.isPhoneInvalid(),
-            errorText = "Invalid phone number",
+            errorText = stringResource(R.string.error_register_invalid_phone),
             optional = true
         )
 
@@ -120,7 +120,7 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.password,
             onValueChange = { registerViewModel.password = it },
-            label = "Password",
+            label = stringResource(R.string.label_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -130,7 +130,7 @@ fun RegisterActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility"
+                        contentDescription = "Password Visibility" // TODO: review
                     )
                 }
             },
@@ -140,13 +140,13 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = registerViewModel.isPasswordInvalid(),
-            errorText = "Invalid password"
+            errorText = stringResource(R.string.error_register_invalid_password)
 
         )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword,
             onValueChange = { registerViewModel.confirmPassword = it },
-            label = "Repeat Password",
+            label = stringResource(R.string.label_register_repeat_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -166,7 +166,7 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             isError = registerViewModel.isConfirmPasswordDiff(),
-            errorText = "Passwords must match"
+            errorText = stringResource(R.string.error_register_password_match)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -188,7 +188,7 @@ fun RegisterActivity(navController: NavHostController) {
                     isLoading = false
                 }
             },
-            label = "Sign up"
+            label = stringResource(R.string.label_signup)
         )
     }
 }
