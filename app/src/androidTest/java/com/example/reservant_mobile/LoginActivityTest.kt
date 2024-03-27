@@ -5,7 +5,9 @@ import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -66,6 +68,9 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("Pa${'$'}${'$'}w0rd")
         rule.onNode(signInButton).performClick()
 
+        // test loading circle
+        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
+
         rule.waitUntilExactlyOneExists(hasText(error2), 5000)
     }
     @Test
@@ -73,6 +78,9 @@ class LoginActivityTest {
         rule.onNode(loginField).performTextInput("john@doe.pl")
         rule.onNode(passwordField).performTextInput("invalid")
         rule.onNode(signInButton).performClick()
+
+        // test loading circle
+        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
 
         rule.waitUntilExactlyOneExists(hasText(error2), 5000)
     }
