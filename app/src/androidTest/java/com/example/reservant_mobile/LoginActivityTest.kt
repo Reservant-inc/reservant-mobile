@@ -1,6 +1,7 @@
 package com.example.reservant_mobile
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
@@ -44,9 +45,9 @@ class LoginActivityTest {
         this.error1 = rule.activity.getString(R.string.error_connection_server)
         this.error2 = rule.activity.getString(R.string.error_login_wrong_credentials)
 
-        this.loginField = hasText(loginLabel) and hasSetTextAction()
-        this.passwordField = hasText(passwordLabel) and hasSetTextAction()
-        this.signInButton = hasText(signInLabel) and hasClickAction()
+        this.loginField = hasSetTextAction() and hasText(loginLabel)
+        this.passwordField = hasSetTextAction() and hasText(passwordLabel)
+        this.signInButton = hasClickAction() and hasTestTag("Button") and hasText(signInLabel)
     }
 
     @Test
