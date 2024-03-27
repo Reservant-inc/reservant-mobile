@@ -62,8 +62,11 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.googlecode.libphonenumber:libphonenumber:8.12.39")
+    implementation("androidx.navigation:navigation-testing:2.7.7")
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.google.truth:truth:1.0.1")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
@@ -77,6 +80,12 @@ dependencies {
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
-    implementation( ("androidx.navigation:navigation-compose:2.5.1"))
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
+    implementation("androidx.navigation:navigation-compose:2.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.4")
 
 }

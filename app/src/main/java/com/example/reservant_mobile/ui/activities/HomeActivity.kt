@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.UserButton
 
@@ -25,9 +27,11 @@ fun HomeActivity(navController: NavHostController) {
     ) {
         Logo()
 
-        UserButton(onClick = { navController.navigate("login") }, label = "Login")
+        UserButton(onClick = { navController.navigate("login") },
+            label = stringResource(R.string.label_login_action))
 
-        UserButton(onClick = { navController.navigate("register") }, label = "Sign up")
+        UserButton(onClick = { navController.navigate("register") },
+            label = stringResource(R.string.label_signup))
     }
 }
 

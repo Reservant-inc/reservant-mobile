@@ -1,18 +1,62 @@
 package com.example.reservant_mobile.data.services
 
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import java.lang.Exception
 
 interface APIService{
-    fun get(endpoint: String = "")
-    fun post(obj: @Serializable Any, endpoint: String = "")
+    suspend fun get(endpoint: String = ""): HttpResponse?
+    suspend fun post(obj: @Serializable Any, endpoint: String = ""): HttpResponse?
 }
 
+
 class APIServiceImpl: APIService {
-    override fun get(endpoint: String) {
-        TODO("Not yet implemented")
+
+    private val client = HttpClient(CIO){
+        install(ContentNegotiation) {
+            json()
+        }
+        install(HttpCookies)
+    }
+    override suspend fun get(endpoint: String): HttpResponse? {
+        return try {
+            val res = client.get(endpoint)
+
+    //        TODO: implement better logging system
+            println("[GET]$endpoint body: "+ res.body())
+
+            res
+        } catch (e: Exception){
+            println("[GET]$endpoint error: "+ e.message)
+            null
+        }
     }
 
-    override fun post(obj: @Serializable Any, endpoint: String) {
-        TODO("Not yet implemented")
+    override suspend fun post(obj: @Serializable Any, endpoint: String): HttpResponse? {
+        return try {
+            val res =  client.post(endpoint) {
+                contentType(ContentType.Application.Json)
+                setBody(obj)
+            }
+
+    //        TODO: implement better logging system
+            println("[POST]$endpoint body: "+ res.body())
+
+            res.body()
+        } catch (e: Exception){
+            println("[POST]$endpoint error: "+ e.message)
+            null
+        }
     }
 }

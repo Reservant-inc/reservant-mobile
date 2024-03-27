@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">reservant-mobile</string>
+    <string name="label_login_action">Zaloguj się</string>
+    <string name="label_login">Nazwa użytkownika</string>
+    <string name="label_signup">Zarejestruj się</string>
+    <string name="label_password">Hasło</string>
+    <string name="error_connection_server">Błąd podczas połączenia z serverem</string>
+    <string name="error_register_username_taken">Nazwa użytkownika zajęta</string>
+    <string name="error_register_invalid_request">Niepoprawne dane rejestracji</string>
+    <string name="error_login_wrong_credentials">Niepoprawny login lub hasło</string>
+    <string name="label_password_forgot">Nie pamiętam hasła</string>
+    <string name="error_login_invalid">Niepoprawna nazwa użytkownika</string>
+    <string name="label_name">Imię</string>
+    <string name="label_lastname">Nazwisko</string>
+    <string name="error_register_invalid_name">Niepoprawne imię</string>
+    <string name="label_email">Adres email</string>
+    <string name="error_register_invalid_email">Niepoprawny adres email</string>
+    <string name="label_phone">Telefon</string>
+    <string name="error_register_invalid_phone">Niepoprawny numer telefonu</string>
+    <string name="error_register_invalid_password">Niepoprawne hasło</string>
+    <string name="label_register_repeat_password">Powtórz hasło</string>
+    <string name="error_register_password_match">Hasła muszą się zgadzać</string>
+    <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
+    <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
+    <string name="label_register_birthday_dialog">Otwórz dialog wyboru daty</string>
+</resources>

@@ -4,38 +4,87 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.MutableLiveData
+import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
+import com.example.reservant_mobile.data.services.IUserService
+import com.example.reservant_mobile.data.services.UserService
+import com.example.reservant_mobile.data.utils.getCountriesList
+import com.example.reservant_mobile.ui.constants.Regex
 import java.util.regex.Pattern
 
-data class FormState(
-    val isValid: Boolean = false,
-    val errorMessage: String
-)
+class RegisterViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
-class RegisterViewModel : ViewModel() {
-
+    var login by mutableStateOf("")
     var firstName by mutableStateOf("")
     var lastName by mutableStateOf("")
-    var birthday by mutableStateOf("")
     var email by mutableStateOf("")
-    var phoneNum by mutableStateOf("")
     var password by mutableStateOf("")
     var confirmPassword by mutableStateOf("")
+    var birthday by mutableStateOf("")
+    var phoneNum by mutableStateOf("")
+    val countriesList = getCountriesList()
+    var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
-    val dateRegex = "\\d{4}-\\d{2}-\\d{2}"
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    val phoneRegex = "^\\d{9}$"
+    suspend fun register() : Int{
 
-    fun validateForm(): Boolean {
-        return !(
-                firstName.isBlank() ||
-                lastName.isBlank()  ||
-                isInvalidWithRegex(dateRegex, birthday)  ||
-                isInvalidWithRegex(emailRegex, email)    ||
-                isInvalidWithRegex(phoneRegex, phoneNum) ||
-                password.isBlank() ||
-                confirmPassword.isBlank()
+        if (isRegisterInvalid()){
+            return R.string.error_register_invalid_request
+        }
+
+        val user = RegisterUserDTO(
+            login = login,
+            firstName = firstName,
+            lastName = lastName,
+            birthDate = birthday,
+            email = email,
+            password = password
         )
+
+        if (!isPhoneInvalid()) user.phoneNumber = phoneNum
+
+        return userService.registerUser(user)[0]
+    }
+
+    fun isRegisterInvalid(): Boolean {
+        return isLoginInvalid() ||
+                isFirstNameInvalid() ||
+                isLastNameInvalid()  ||
+                isBirthDateInvalid()  ||
+                isEmailInvalid()    ||
+                isPasswordInvalid() ||
+                isConfirmPasswordDiff()
+    }
+
+    fun isLoginInvalid(): Boolean{
+        return isInvalidWithRegex(Regex.LOGIN, login)
+    }
+
+    fun isFirstNameInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.NAME_REG, firstName)
+    }
+
+    fun isLastNameInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.NAME_REG, lastName)
+    }
+
+    fun isBirthDateInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.DATE_REG, birthday)
+    }
+
+    fun isEmailInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.EMAIL_REG, email)
+    }
+
+    fun isPhoneInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum)
+    }
+
+    fun isPasswordInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.PASSWORD_REG, password)
+    }
+
+    fun isConfirmPasswordDiff() : Boolean{
+        return confirmPassword != password
     }
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{

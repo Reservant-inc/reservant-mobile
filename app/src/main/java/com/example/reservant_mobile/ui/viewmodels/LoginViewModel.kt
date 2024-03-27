@@ -4,14 +4,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import com.example.reservant_mobile.data.services.IUserService
+import com.example.reservant_mobile.data.services.UserService
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
     var login by mutableStateOf("")
     var password by mutableStateOf("")
 
-    fun validateLogin(): Boolean {
-        return !(isInvalid(login) || isInvalid(password))
+    suspend fun login(): Int{
+
+        if (isInvalidLogin()){
+            return R.string.error_login_wrong_credentials
+        }
+
+        return userService.loginUser(
+            LoginCredentialsDTO(
+                login = login,
+                password = password,
+                rememberMe = true
+            )
+        )
+    }
+
+    private fun isInvalidLogin(): Boolean {
+        return isInvalid(login) || isInvalid(password)
     }
 
     private fun isInvalid(str: String) : Boolean{
