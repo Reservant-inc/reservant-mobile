@@ -28,8 +28,7 @@ class LoginActivityTest {
     private lateinit var loginLabel: String
     private lateinit var passwordLabel: String
     private lateinit var signInLabel: String
-    private lateinit var error1: String
-    private lateinit var error2: String
+    private lateinit var error: String
 
     private lateinit var loginField: SemanticsMatcher
     private lateinit var passwordField: SemanticsMatcher
@@ -44,8 +43,7 @@ class LoginActivityTest {
         this.loginLabel = rule.activity.getString(R.string.label_login)
         this.passwordLabel = rule.activity.getString(R.string.label_password)
         this.signInLabel = rule.activity.getString(R.string.label_login_action)
-        this.error1 = rule.activity.getString(R.string.error_connection_server)
-        this.error2 = rule.activity.getString(R.string.error_login_wrong_credentials)
+        this.error = rule.activity.getString(R.string.error_login_wrong_credentials)
 
         this.loginField = hasSetTextAction() and hasText(loginLabel)
         this.passwordField = hasSetTextAction() and hasText(passwordLabel)
@@ -59,7 +57,7 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("")
         rule.onNode(signInButton).performClick()
 
-        rule.onNodeWithText(error2).assertExists()
+        rule.onNodeWithText(error).assertExists()
     }
 
     @Test
@@ -71,7 +69,7 @@ class LoginActivityTest {
         // test loading circle
         rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
 
-        rule.waitUntilExactlyOneExists(hasText(error2), 5000)
+        rule.waitUntilExactlyOneExists(hasText(error), 5000)
     }
     @Test
     fun enterInvalidPassword_showError() {
@@ -82,6 +80,6 @@ class LoginActivityTest {
         // test loading circle
         rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
 
-        rule.waitUntilExactlyOneExists(hasText(error2), 5000)
+        rule.waitUntilExactlyOneExists(hasText(error), 5000)
     }
 }
