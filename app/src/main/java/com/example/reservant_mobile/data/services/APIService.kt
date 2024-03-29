@@ -1,14 +1,15 @@
 package com.example.reservant_mobile.data.services
 
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -28,6 +29,11 @@ interface APIService{
 class APIServiceImpl: APIService {
 
     private val client = HttpClient(CIO){
+        defaultRequest {
+            url("http://172.21.40.127:12038")
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+        }
         install(ContentNegotiation) {
             json()
         }
@@ -47,11 +53,9 @@ class APIServiceImpl: APIService {
 
     override suspend fun post(obj: @Serializable Any, endpoint: String): HttpResponse? {
         return try {
-            val res =  client.post(endpoint) {
-                contentType(ContentType.Application.Json)
+            client.post(endpoint) {
                 setBody(obj)
             }
-            res.body()
         } catch (e: Exception){
             null
         }
