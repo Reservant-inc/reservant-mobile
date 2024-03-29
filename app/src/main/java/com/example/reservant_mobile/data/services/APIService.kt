@@ -5,6 +5,10 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -28,17 +32,15 @@ class APIServiceImpl: APIService {
             json()
         }
         install(HttpCookies)
+        install(Logging) {
+            logger = Logger.SIMPLE
+            level = LogLevel.HEADERS
+        }
     }
     override suspend fun get(endpoint: String): HttpResponse? {
         return try {
-            val res = client.get(endpoint)
-
-    //        TODO: implement better logging system
-            println("[GET]$endpoint body: "+ res.body())
-
-            res
+            client.get(endpoint)
         } catch (e: Exception){
-            println("[GET]$endpoint error: "+ e.message)
             null
         }
     }
@@ -49,13 +51,8 @@ class APIServiceImpl: APIService {
                 contentType(ContentType.Application.Json)
                 setBody(obj)
             }
-
-    //        TODO: implement better logging system
-            println("[POST]$endpoint body: "+ res.body())
-
             res.body()
         } catch (e: Exception){
-            println("[POST]$endpoint error: "+ e.message)
             null
         }
     }
