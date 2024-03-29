@@ -337,7 +337,8 @@ fun CountryPickerView(
             .clickable {
                 showDialog = true
             }
-            .padding(start = 20.dp, end = 5.dp),
+            .padding(start = 20.dp, end = 5.dp)
+            .testTag("CountryPicker"),
         text = "${getFlagEmojiFor(selectedCountry.nameCode)} +${selectedCountry.code}"
     )
 
