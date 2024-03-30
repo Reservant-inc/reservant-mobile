@@ -1,7 +1,14 @@
 package com.example.reservant_mobile.data.services
 
+import android.content.Context
+import android.media.session.MediaSession
+import com.example.reservant_mobile.data.models.dtos.TokenDTO
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
@@ -11,8 +18,10 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -28,6 +37,8 @@ interface APIService{
 
 class APIServiceImpl: APIService {
 
+    private val localService = LocalService()
+
     private val client = HttpClient(CIO){
         defaultRequest {
             url("http://172.21.40.127:12038")
@@ -42,6 +53,26 @@ class APIServiceImpl: APIService {
             logger = Logger.SIMPLE
             level = LogLevel.HEADERS
         }
+        install(Auth) {
+            bearer {
+                loadTokens {
+                    // Load tokens from a local storage and return them as the 'BearerTokens' instance
+                    BearerTokens(localService.getBearerToken(), localService.getRefreshToken())
+                }
+                refreshTokens {
+                    val token: TokenDTO = client.get {
+                        markAsRefreshTokenRequest()
+                        url("refreshToken")
+                        parameter("refreshToken", localService.getRefreshToken())
+                    }.body()
+                    BearerTokens(
+                        accessToken = token.bearerToken,
+                        refreshToken = token.refreshToken
+                    )
+                }
+            }
+        }
+
     }
     override suspend fun get(endpoint: String): HttpResponse? {
         return try {
