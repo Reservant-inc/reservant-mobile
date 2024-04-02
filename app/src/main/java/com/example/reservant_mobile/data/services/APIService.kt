@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.data.models.dtos.TokenDTO
+import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -39,7 +40,7 @@ class APIServiceImpl: APIService {
 
     private val client = HttpClient(CIO){
         defaultRequest {
-            url("http://172.21.40.127:12038")
+            url(Endpoints.BACKEND_URL)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
         }
@@ -54,13 +55,15 @@ class APIServiceImpl: APIService {
         install(Auth) {
             bearer {
                 loadTokens {
-                    // Load tokens from a local storage and return them as the 'BearerTokens' instance
-                    BearerTokens(localService.getBearerToken(), localService.getRefreshToken())
+                    BearerTokens(
+                        localService.getBearerToken(),
+                        localService.getRefreshToken()
+                    )
                 }
                 refreshTokens {
                     val token: TokenDTO = client.get {
                         markAsRefreshTokenRequest()
-                        url("refreshToken")
+                        url(Endpoints.REFRESH_ACCESS_TOKEN)
                         parameter("refreshToken", localService.getRefreshToken())
                     }.body()
                     BearerTokens(
