@@ -26,7 +26,7 @@ class LocalBearerService{
     suspend fun getBearerToken(): String {
         return try {
             context.dataStore.data.first()[bearerTokenKey].toString()
-        } catch (_: NoSuchElementException){
+        } catch (_: Exception){
             ""
         }
     }
@@ -34,9 +34,10 @@ class LocalBearerService{
     suspend fun getRefreshToken(): String {
         return try {
             context.dataStore.data.first()[refreshTokenKey].toString()
-        } catch (_: NoSuchElementException){
+        } catch (_: Exception){
             ""
-        }    }
+        }
+    }
 
     private val bearerTokenKey = stringPreferencesKey("bearer_token")
     private val refreshTokenKey = stringPreferencesKey("refresh_token")
