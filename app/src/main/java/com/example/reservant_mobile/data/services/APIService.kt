@@ -31,6 +31,7 @@ import java.lang.Exception
 interface APIService{
     suspend fun get(endpoint: String = ""): HttpResponse?
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): HttpResponse?
+    suspend fun getHttpClient(): HttpClient
 }
 
 
@@ -67,8 +68,8 @@ class APIServiceImpl: APIService {
                         parameter("refreshToken", localService.getRefreshToken())
                     }.body()
                     BearerTokens(
-                        accessToken = token.bearerToken,
-                        refreshToken = token.refreshToken
+                        accessToken = token.token,
+                        refreshToken = token.token
                     )
                 }
             }
@@ -91,5 +92,9 @@ class APIServiceImpl: APIService {
         } catch (e: Exception){
             null
         }
+    }
+
+    override suspend fun getHttpClient(): HttpClient {
+        return client
     }
 }
