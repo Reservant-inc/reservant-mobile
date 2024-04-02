@@ -9,10 +9,15 @@ import kotlinx.coroutines.flow.first
 
 
 class LocalBearerService{
-    private val context  = ApplicationService.instance
-    private val Context.dataStore by preferencesDataStore(context.packageName)
 
-    suspend fun saveBearerToken(bearerToken: String) {
+    companion object {
+        private val context  = ApplicationService.instance
+        private val Context.dataStore by preferencesDataStore(context.packageName)
+        private val bearerTokenKey = stringPreferencesKey("bearer_token")
+        private val refreshTokenKey = stringPreferencesKey("refresh_token")
+    }
+
+        suspend fun saveBearerToken(bearerToken: String) {
         context.dataStore.edit {
             it[bearerTokenKey] = bearerToken
         }
@@ -40,6 +45,4 @@ class LocalBearerService{
         }
     }
 
-    private val bearerTokenKey = stringPreferencesKey("bearer_token")
-    private val refreshTokenKey = stringPreferencesKey("refresh_token")
 }
