@@ -26,7 +26,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
-import java.lang.Exception
+import kotlin.Exception
 
 interface APIService{
     suspend fun get(endpoint: String = ""): HttpResponse?
@@ -62,15 +62,22 @@ class APIServiceImpl: APIService {
                     )
                 }
                 refreshTokens {
-                    val token: TokenDTO = client.get {
-                        markAsRefreshTokenRequest()
-                        url(Endpoints.REFRESH_ACCESS_TOKEN)
-                        parameter("refreshToken", localService.getRefreshToken())
-                    }.body()
-                    BearerTokens(
-                        accessToken = token.token,
-                        refreshToken = token.token
-                    )
+                    try {
+                        val token: TokenDTO = client.get {
+                            markAsRefreshTokenRequest()
+                            url(Endpoints.REFRESH_ACCESS_TOKEN)
+                            parameter("refreshToken", localService.getRefreshToken())
+                        }.body()
+                        BearerTokens(
+                            accessToken = token.token,
+                            refreshToken = token.token
+                        )
+                    }
+                    catch (e: Exception){
+                        println("[REFRESH TOKEN ERROR]: "+e.message)
+                        null
+                    }
+
                 }
             }
         }
@@ -80,6 +87,7 @@ class APIServiceImpl: APIService {
         return try {
             client.get(endpoint)
         } catch (e: Exception){
+            println("[GET ERROR]: "+e.message)
             null
         }
     }
@@ -90,6 +98,7 @@ class APIServiceImpl: APIService {
                 setBody(obj)
             }
         } catch (e: Exception){
+            println("[POST ERROR]: "+e.message)
             null
         }
     }
