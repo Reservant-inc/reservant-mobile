@@ -1,4 +1,4 @@
-package com.example.reservant_mobile.data.services
+package com.example.reservant_mobile
 
 import android.app.Application
 
