@@ -5,10 +5,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 
 
-class LocalService{
+class LocalBearerService{
     private val context  = ApplicationService.instance
     private val Context.dataStore by preferencesDataStore(context.packageName)
 

@@ -1,7 +1,5 @@
 package com.example.reservant_mobile.data.services
 
-import android.content.Context
-import android.media.session.MediaSession
 import com.example.reservant_mobile.data.models.dtos.TokenDTO
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -37,7 +35,7 @@ interface APIService{
 
 class APIServiceImpl: APIService {
 
-    private val localService = LocalService()
+    private val localService = LocalBearerService()
 
     private val client = HttpClient(CIO){
         defaultRequest {
