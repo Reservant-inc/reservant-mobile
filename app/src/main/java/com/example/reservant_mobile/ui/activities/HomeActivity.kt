@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
-import com.example.reservant_mobile.ui.components.heading
+import com.example.reservant_mobile.ui.components.Heading
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -18,12 +18,13 @@ fun HomeActivity(navController: NavHostController) {
             BottomNavigation(navController)
         },
         topBar = {
-            heading()
+            Heading()
         },
         content = {
             Content()
         }
     )
+//    BurgerMenu()
 }
 
 @Preview(showBackground = true)
