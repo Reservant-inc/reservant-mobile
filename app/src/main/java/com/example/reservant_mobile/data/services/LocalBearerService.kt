@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.reservant_mobile.ApplicationService
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 
 
 class LocalBearerService{
@@ -30,19 +31,12 @@ class LocalBearerService{
     }
 
     suspend fun getBearerToken(): String {
-        return try {
-            context.dataStore.data.first()[bearerTokenKey].toString()
-        } catch (_: Exception){
-            ""
-        }
+            return context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
     }
 
     suspend fun getRefreshToken(): String {
-        return try {
-            context.dataStore.data.first()[refreshTokenKey].toString()
-        } catch (_: Exception){
-            ""
-        }
+        return context.dataStore.data.firstOrNull()?.get(refreshTokenKey).orEmpty()
+
     }
 
 }
