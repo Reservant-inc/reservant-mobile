@@ -37,8 +37,10 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
     var postalCode by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
 
-    var filePicked by remember { mutableStateOf<Uri?>(null)}
-
+    var lease by remember { mutableStateOf<Uri?>(null)}
+    var license by remember { mutableStateOf<Uri?>(null)}
+    var consent by remember { mutableStateOf<Uri?>(null)}
+    var idCard by remember { mutableStateOf<Uri?>(null)}
 
     Column(
         modifier = Modifier
@@ -98,14 +100,31 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
         InputUserFile(
             label = "Umowa najmu lokalu (opcjonalnie)",
             onFilePicked = { file ->
-                filePicked = file;
+                lease = file;
             }
         )
 
+        InputUserFile(
+            label = "Licencja na sprzedaż alkoholu (opcjonalnie)",
+            onFilePicked = { file ->
+                license = file;
+            }
+        )
 
+        InputUserFile(
+            label = "Zgoda na prowadzenie działalności",
+            onFilePicked = { file ->
+                consent = file;
+            }
+        )
 
-
-
+        InputUserFile(
+            label = "Dowód osobisty",
+            onFilePicked = { file ->
+                idCard = file;
+            }
+        )
+        
         Spacer(modifier = Modifier.weight(1f))
 
         UserButton(
