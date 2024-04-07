@@ -143,9 +143,12 @@ fun InputUserInfo(
 fun RestaurantTypeDropdown(
     selectedOption: String,
     onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    // Definicja opcji
     val options = listOf(
         stringResource(R.string.label_restaurant_type_restaurant),
         stringResource(R.string.label_restaurant_type_bar),
@@ -157,19 +160,26 @@ fun RestaurantTypeDropdown(
             value = selectedOption,
             onValueChange = { },
             readOnly = true,
-            label = { stringResource(R.string.label_restaurant_type) },
+            label = { Text(stringResource(R.string.label_restaurant_type)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }
                 .padding(vertical = 8.dp),
+            interactionSource = interactionSource,
             trailingIcon = {
                 Icon(
                     imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Zwiń" else "Rozwiń",
-                    modifier = Modifier.clickable { expanded = !expanded }
+                    contentDescription = if (expanded) "Zwiń" else "Rozwiń"
                 )
             }
         )
+
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                if (interaction is PressInteraction.Release) {
+                    expanded = true
+                }
+            }
+        }
 
         DropdownMenu(
             expanded = expanded,
@@ -178,7 +188,7 @@ fun RestaurantTypeDropdown(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option) },
+                    text = { Text(option) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false
@@ -186,9 +196,9 @@ fun RestaurantTypeDropdown(
                 )
             }
         }
-
     }
 }
+
 
 @Composable
 fun InputUserFile(
