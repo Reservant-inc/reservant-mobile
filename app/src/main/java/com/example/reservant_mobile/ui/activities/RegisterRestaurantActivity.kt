@@ -10,6 +10,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,15 +22,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
+import com.example.reservant_mobile.ui.components.RestaurantTypeDropdown
 
+// TODO: labels to resources, fix dropdown menu
 @Composable
 fun RegisterRestaurantActivity(navController: NavHostController) {
-    var name = "";
-    var nip = "";
-    var restaurantType = "";
-    var address = "";
-    var postalCode = "";
-    var city = "";
+    var name by remember { mutableStateOf("") }
+    var nip by remember { mutableStateOf("") }
+    var restaurantType by remember { mutableStateOf("Restaurant") }
+    var address by remember { mutableStateOf("") }
+    var postalCode by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -52,11 +58,12 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
             optional = false
         )
 
-        InputUserInfo(
-            inputText = restaurantType,
-            onValueChange = { restaurantType = it },
-            label = "Rodzaj restauracji",
-            optional = false
+        RestaurantTypeDropdown(
+            selectedOption = restaurantType,
+            onOptionSelected = { option ->
+                restaurantType = option
+            },
+            modifier = Modifier.padding(vertical = 8.dp)
         )
 
         InputUserInfo(
@@ -79,6 +86,10 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
             label = "Miasto",
             optional = false
         )
+
+
+
+
 
         Spacer(modifier = Modifier.weight(1f))
 
