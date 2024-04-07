@@ -157,7 +157,7 @@ fun RestaurantTypeDropdown(
             value = selectedOption,
             onValueChange = { },
             readOnly = true,
-            label = { Text("Rodzaj restauracji") },
+            label = { stringResource(R.string.label_restaurant_type) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
