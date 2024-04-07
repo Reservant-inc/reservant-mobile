@@ -132,7 +132,11 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
         UserButton(
             label = stringResource(R.string.label_register_restaurant),
             onClick = {
-                // Handle registration
+                if(consent == null || idCard == null){
+                    println("Missing files!")
+                }else{
+                    // Handle registration
+                }
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
