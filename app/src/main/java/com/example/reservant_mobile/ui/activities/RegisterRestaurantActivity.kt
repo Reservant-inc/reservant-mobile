@@ -3,9 +3,12 @@ package com.example.reservant_mobile.ui.activities
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -29,7 +32,7 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.RestaurantTypeDropdown
 import com.example.reservant_mobile.ui.components.UserButton
 
-// TODO: fix dropdown menu, add resource in mutableStateOf
+// TODO: fix dropdown menu, add resource in mutableStateOf (40th line)
 @Composable
 fun RegisterRestaurantActivity(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
@@ -129,17 +132,28 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        UserButton(
-            label = stringResource(R.string.label_register_restaurant),
-            onClick = {
-                if(consent == null || idCard == null){
-                    println("Missing files!")
-                }else{
-                    // Handle registration
-                }
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            UserButton(
+                label = stringResource(R.string.label_register_restaurant),
+                onClick = {
+                    // Handling registration
+                },
+                modifier = Modifier.weight(1f)
+            )
+
+            Spacer(Modifier.width(16.dp))
+
+            UserButton(
+                label = stringResource(R.string.label_add_to_group),
+                onClick = {
+                    // Adding to group
+                },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
