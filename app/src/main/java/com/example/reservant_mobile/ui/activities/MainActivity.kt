@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "home") {
+            NavHost(navController = navController, startDestination = "test") {
 
                 composable(route = "home") {
                     HomeActivity(navController = navController)
@@ -25,6 +25,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(route = "register") {
                     RegisterActivity(navController = navController)
+                }
+                composable(route = "test") {
+                    TestCardActivity(navController = navController)
                 }
 
             }
