@@ -16,18 +16,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.RestaurantTypeDropdown
 import com.example.reservant_mobile.ui.components.UserButton
 
-// TODO: labels to resources, fix dropdown menu
+// TODO: fix dropdown menu, add resource in mutableStateOf
 @Composable
 fun RegisterRestaurantActivity(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
@@ -55,14 +57,14 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = name,
             onValueChange = { name = it },
-            label = "Nazwa",
+            label = stringResource(R.string.label_restaurant_name),
             optional = false
         )
 
         InputUserInfo(
             inputText = nip,
             onValueChange = { nip = it },
-            label = "NIP",
+            label = stringResource(R.string.label_restaurant_nip),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             optional = false
         )
@@ -78,14 +80,14 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = address,
             onValueChange = { address = it },
-            label = "Adres",
+            label = stringResource(R.string.label_restaurant_address),
             optional = false
         )
 
         InputUserInfo(
             inputText = postalCode,
             onValueChange = { postalCode = it },
-            label = "Kod pocztowy",
+            label = stringResource(R.string.label_restaurant_postal),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             optional = false
         )
@@ -93,42 +95,42 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = city,
             onValueChange = { city = it },
-            label = "Miasto",
+            label = stringResource(R.string.label_restaurant_city),
             optional = false
         )
 
         InputUserFile(
-            label = "Umowa najmu lokalu (opcjonalnie)",
+            label = stringResource(R.string.label_restaurant_lease),
             onFilePicked = { file ->
                 lease = file;
             }
         )
 
         InputUserFile(
-            label = "Licencja na sprzedaż alkoholu (opcjonalnie)",
+            label = stringResource(R.string.label_restaurant_license),
             onFilePicked = { file ->
                 license = file;
             }
         )
 
         InputUserFile(
-            label = "Zgoda na prowadzenie działalności",
+            label = stringResource(R.string.label_restaurant_consent),
             onFilePicked = { file ->
                 consent = file;
             }
         )
 
         InputUserFile(
-            label = "Dowód osobisty",
+            label = stringResource(R.string.label_restaurant_ownerId),
             onFilePicked = { file ->
                 idCard = file;
             }
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
 
         UserButton(
-            label = "Zarejestruj restaurację",
+            label = stringResource(R.string.label_register_restaurant),
             onClick = {
                 // Handle registration
             },

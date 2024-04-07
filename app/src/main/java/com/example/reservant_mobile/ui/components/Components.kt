@@ -146,7 +146,11 @@ fun RestaurantTypeDropdown(
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Restauracja", "Bar", "Kawiarnia")
+    val options = listOf(
+        stringResource(R.string.label_restaurant_type_restaurant),
+        stringResource(R.string.label_restaurant_type_bar),
+        stringResource(R.string.label_restaurant_type_cafe)
+    )
 
     Column(modifier = modifier) {
         OutlinedTextField(
