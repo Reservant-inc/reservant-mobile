@@ -33,7 +33,7 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.RestaurantTypeDropdown
 import com.example.reservant_mobile.ui.components.UserButton
 
-// TODO: fix dropdown menu, add resource in mutableStateOf (40th line)
+// TODO: fix dropdown menu, add resource in mutableStateOf (41th line)
 @Composable
 fun RegisterRestaurantActivity(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
