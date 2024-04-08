@@ -15,7 +15,7 @@ import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
-fun NewActivity(navController: NavHostController) {
+fun LandingActivity(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,5 +34,5 @@ fun NewActivity(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewNew() {
-    NewActivity(rememberNavController())
+    LandingActivity(rememberNavController())
 }

@@ -24,7 +24,6 @@ fun HomeActivity(navController: NavHostController) {
             Content()
         }
     )
-//    BurgerMenu()
 }
 
 @Preview(showBackground = true)

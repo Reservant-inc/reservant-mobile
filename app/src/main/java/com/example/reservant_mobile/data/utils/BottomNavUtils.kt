@@ -17,9 +17,9 @@ sealed class BottomNavItem(
             Icons.Filled.Home
         )
 
-    data object New :
+    data object Landing :
         BottomNavItem(
-            "New",
+            "Landing",
             Icons.Filled.Accessibility
         )
 

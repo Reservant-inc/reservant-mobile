@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -79,6 +80,7 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.activities.HomeActivity
 import com.example.reservant_mobile.ui.activities.RegisterActivity
 import com.example.reservant_mobile.ui.theme.Purple40
 import com.example.reservant_mobile.ui.theme.Purple80
@@ -443,7 +445,7 @@ fun BottomNavigation(navController: NavHostController) {
 
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.New,
+        BottomNavItem.Landing,
         BottomNavItem.Login,
         BottomNavItem.Register
     )
@@ -490,43 +492,46 @@ fun RowScope.AddItem(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Heading() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                ModalDrawerSheet {
-                    Text("Drawer title", modifier = Modifier.padding(16.dp))
-                    HorizontalDivider()
-                    NavigationDrawerItem(
-                        label = { Text(text = "Drawer Item") },
-                        selected = false,
-                        onClick = { /*TODO*/ }
-                    )
-                    // ...other drawer items
-                }
+                Text("Drawer title", modifier = Modifier.padding(16.dp))
+                HorizontalDivider()
+                NavigationDrawerItem(
+                    label = { Text("Drawer Item") },
+                    selected = false,
+                    onClick = { /* Akcja po kliknięciu */ }
+                )
+                // Dodaj więcej elementów, jeśli są potrzebne
             }
         },
     ) {
-        TopAppBar(
-            title = { Text("Your App") },
-            navigationIcon = {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.TopStart
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                    .padding(4.dp) // wielkość kolorowego tła
+            ) {
                 IconButton(onClick = {
                     scope.launch {
-                        drawerState.apply {
-                            if (isClosed) open() else close()
-                        }
+                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
                     }
                 }) {
                     Icon(Icons.Filled.Menu, contentDescription = "Menu")
                 }
-            },
-            colors = TopAppBarColors(Purple80, PurpleGrey80, PurpleGrey40, Color.Black, Purple40)
-        )
+            }
+        }
     }
 }
 
@@ -546,5 +551,5 @@ fun Content() {
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    RegisterActivity(rememberNavController())
+    HomeActivity(rememberNavController())
 }
