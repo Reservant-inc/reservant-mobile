@@ -1,10 +1,13 @@
 package com.example.reservant_mobile
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -25,8 +28,7 @@ class LoginActivityTest {
     private lateinit var loginLabel: String
     private lateinit var passwordLabel: String
     private lateinit var signInLabel: String
-    private lateinit var error1: String
-    private lateinit var error2: String
+    private lateinit var error: String
 
     private lateinit var loginField: SemanticsMatcher
     private lateinit var passwordField: SemanticsMatcher
@@ -41,12 +43,11 @@ class LoginActivityTest {
         this.loginLabel = rule.activity.getString(R.string.label_login)
         this.passwordLabel = rule.activity.getString(R.string.label_password)
         this.signInLabel = rule.activity.getString(R.string.label_login_action)
-        this.error1 = rule.activity.getString(R.string.error_connection_server)
-        this.error2 = rule.activity.getString(R.string.error_login_wrong_credentials)
+        this.error = rule.activity.getString(R.string.error_login_wrong_credentials)
 
-        this.loginField = hasText(loginLabel) and hasSetTextAction()
-        this.passwordField = hasText(passwordLabel) and hasSetTextAction()
-        this.signInButton = hasText(signInLabel) and hasClickAction()
+        this.loginField = hasSetTextAction() and hasText(loginLabel)
+        this.passwordField = hasSetTextAction() and hasText(passwordLabel)
+        this.signInButton = hasClickAction() and hasTestTag("Button") and hasText(signInLabel)
     }
 
     @Test
@@ -56,7 +57,7 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("")
         rule.onNode(signInButton).performClick()
 
-        rule.onNodeWithText(error2).assertExists()
+        rule.onNodeWithText(error).assertExists()
     }
 
     @Test
@@ -65,7 +66,10 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("Pa${'$'}${'$'}w0rd")
         rule.onNode(signInButton).performClick()
 
-        rule.waitUntilExactlyOneExists(hasText(error2), 5000)
+        // test loading circle
+        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
+
+        rule.waitUntilExactlyOneExists(hasText(error), 5000)
     }
     @Test
     fun enterInvalidPassword_showError() {
@@ -73,6 +77,9 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("invalid")
         rule.onNode(signInButton).performClick()
 
-        rule.waitUntilExactlyOneExists(hasText(error2), 5000)
+        // test loading circle
+        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
+
+        rule.waitUntilExactlyOneExists(hasText(error), 5000)
     }
 }
