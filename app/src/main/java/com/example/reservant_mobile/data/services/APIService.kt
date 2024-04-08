@@ -48,7 +48,6 @@ class APIServiceImpl: APIService {
         install(ContentNegotiation) {
             json()
         }
-        install(HttpCookies)
         install(Logging) {
             logger = Logger.SIMPLE
             level = LogLevel.HEADERS
