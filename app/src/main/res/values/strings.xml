@@ -24,4 +24,5 @@
     <string name="error_register_invalid_lastname">Invalid lastname</string>
     <string name="label_register_birthday_select">Select your birthday</string>
     <string name="label_register_birthday_dialog">Open date picker dialog</string>
+    <string name="error_unknown">Unknown error</string>
 </resources>
