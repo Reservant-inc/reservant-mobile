@@ -97,7 +97,7 @@ fun LoginActivity(navController: NavHostController) {
                 val loginCode = loginViewModel.login()
 
                 if (loginCode == -1){
-                    //navigate to next screen
+                    navController.navigate("home")
                 }
 
                 errorResourceId = loginCode
