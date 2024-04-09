@@ -38,4 +38,5 @@
     <string name="label_restaurant_ownerId">Dowód osobisty</string>
     <string name="label_add_to_group">Dodaj do grupy</string>
     <string name="error_unknown">Nieznany błąd</string>
+    <string name="error_unauthorized_access">Funkcja niedostępna</string>
 </resources>
