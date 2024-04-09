@@ -24,5 +24,18 @@
     <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
     <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
     <string name="label_register_birthday_dialog">Otwórz dialog wyboru daty</string>
+    <string name="label_restaurant_name">Nazwa</string>
+    <string name="label_restaurant_type">Rodzaj restaurancji</string>
+    <string name="label_restaurant_type_restaurant">Restauracja</string>
+    <string name="label_restaurant_type_cafe">Kawiarnia</string>
+    <string name="label_restaurant_address">Adres</string>
+    <string name="label_restaurant_postal">Kod pocztowy</string>
+    <string name="label_restaurant_city">Miasto</string>
+    <string name="label_register_restaurant">Zarejestruj restaurację</string>
+    <string name="label_restaurant_lease">Umowa najmu lokalu (opcjonalna)</string>
+    <string name="label_restaurant_license">Licencja na sprzedaż alkoholu (opcjonalnie)</string>
+    <string name="label_restaurant_consent">Zgoda na prowadzenie działalności</string>
+    <string name="label_restaurant_ownerId">Dowód osobisty</string>
+    <string name="label_add_to_group">Dodaj do grupy</string>
     <string name="error_unknown">Nieznany błąd</string>
 </resources>

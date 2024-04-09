@@ -16,7 +16,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "landing") {
-
                 composable(route = "landing") {
                     LandingActivity(navController = navController)
                 }
