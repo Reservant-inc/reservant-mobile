@@ -179,7 +179,7 @@ fun RegisterActivity(navController: NavHostController) {
                     val registerCode = registerViewModel.register()
 
                     if (registerCode == -1){
-                        //navigate to next screen
+                        navController.navigate("home")
                     }
 
                     errorResourceId = registerCode
