@@ -64,6 +64,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -177,7 +178,8 @@ fun UserButton(
     Button(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .testTag("Button"),
         onClick = onClick,
         content = {
             if (isLoading) {
@@ -256,13 +258,14 @@ fun DatePickerDialog(
 
 @Composable
 fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
+    // TODO: insert resource stringResource(R.string.label_register_birthday_dialog)
     var date by remember { mutableStateOf("Open date picker dialog") }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = date,
         onValueChange = { },
-        label = { Text("Select your birthday") },
+        label = { Text(stringResource(R.string.label_register_birthday_select)) },
         readOnly = true,
         shape = roundedShape,
         modifier = Modifier
@@ -367,7 +370,8 @@ fun CountryPickerView(
             .clickable {
                 showDialog = true
             }
-            .padding(start = 20.dp, end = 5.dp),
+            .padding(start = 20.dp, end = 5.dp)
+            .testTag("CountryPicker"),
         text = "${getFlagEmojiFor(selectedCountry.nameCode)} +${selectedCountry.code}"
     )
 

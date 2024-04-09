@@ -53,7 +53,6 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
                 isEmailInvalid()    ||
                 isPasswordInvalid() ||
                 isConfirmPasswordDiff()
-
     }
 
     fun isLoginInvalid(): Boolean{

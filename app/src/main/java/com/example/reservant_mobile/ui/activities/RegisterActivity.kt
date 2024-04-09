@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,6 +39,7 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -61,25 +63,25 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.login,
             onValueChange = { registerViewModel.login = it },
-            label = "Login",
+            label = stringResource(R.string.label_login),
             isError = registerViewModel.isLoginInvalid(),
-            errorText = "Invalid login"
+            errorText = stringResource(R.string.error_login_invalid)
         )
 
         InputUserInfo(
             inputText = registerViewModel.firstName,
             onValueChange = { registerViewModel.firstName = it },
-            label = "Name",
+            label = stringResource(R.string.label_name),
             isError = registerViewModel.isFirstNameInvalid(),
-            errorText = "Invalid name"
+            errorText = stringResource(R.string.error_register_invalid_name)
         )
 
         InputUserInfo(
             inputText = registerViewModel.lastName,
             onValueChange = { registerViewModel.lastName = it },
-            label = "Surname",
+            label = stringResource(R.string.label_lastname),
             isError = registerViewModel.isLastNameInvalid(),
-            errorText = "Invalid surname"
+            errorText = stringResource(R.string.error_register_invalid_lastname)
         )
 
         MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
@@ -87,16 +89,16 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.email,
             onValueChange = { registerViewModel.email = it },
-            label = "Email",
+            label = stringResource(R.string.label_email),
             isError = registerViewModel.isEmailInvalid(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            errorText = "Invalid email"
+            errorText = stringResource(R.string.error_register_invalid_email)
         )
 
         InputUserInfo(
             inputText = registerViewModel.phoneNum,
             onValueChange = { registerViewModel.phoneNum = it },
-            label = "Phone",
+            label = stringResource(R.string.label_phone),
             leadingIcon = {
                 registerViewModel.mobileCountry?.let {
                     CountryPickerView(
@@ -110,7 +112,7 @@ fun RegisterActivity(navController: NavHostController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             isError = registerViewModel.isPhoneInvalid(),
-            errorText = "Invalid phone number",
+            errorText = stringResource(R.string.error_register_invalid_phone),
             optional = true
         )
 
@@ -118,7 +120,7 @@ fun RegisterActivity(navController: NavHostController) {
         InputUserInfo(
             inputText = registerViewModel.password,
             onValueChange = { registerViewModel.password = it },
-            label = "Password",
+            label = stringResource(R.string.label_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -128,7 +130,7 @@ fun RegisterActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility"
+                        contentDescription = stringResource(R.string.label_password_visibility)
                     )
                 }
             },
@@ -138,13 +140,13 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = registerViewModel.isPasswordInvalid(),
-            errorText = "Invalid password"
+            errorText = stringResource(R.string.error_register_invalid_password)
 
         )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword,
             onValueChange = { registerViewModel.confirmPassword = it },
-            label = "Repeat Password",
+            label = stringResource(R.string.label_register_repeat_password),
             leadingIcon = {
                 IconButton(onClick = {
                     isPasswordVisible = !isPasswordVisible
@@ -154,7 +156,7 @@ fun RegisterActivity(navController: NavHostController) {
                             Icons.Filled.Visibility
                         else
                             Icons.Filled.VisibilityOff,
-                        contentDescription = "Password Visibility"
+                        contentDescription = stringResource(R.string.label_password_visibility)
                     )
                 }
             },
@@ -164,7 +166,7 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             isError = registerViewModel.isConfirmPasswordDiff(),
-            errorText = "Passwords must match"
+            errorText = stringResource(R.string.error_register_password_match)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -186,7 +188,7 @@ fun RegisterActivity(navController: NavHostController) {
                     isLoading = false
                 }
             },
-            label = "Sign up"
+            label = stringResource(R.string.label_signup)
         )
     }
 }
