@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "home") {
+            NavHost(navController = navController, startDestination = "landing") {
 
                 composable(route = "landing") {
                     LandingActivity(navController = navController)
