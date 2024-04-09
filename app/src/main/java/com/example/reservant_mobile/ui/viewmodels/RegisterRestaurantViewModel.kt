@@ -38,8 +38,18 @@ class RegisterRestaurantViewModel : ViewModel() {
             postalCode = postalCode,
             city = city,
             lease = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
-            license = licenseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
-            consent = consentUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
+            license = licenseUri?.let {
+                GetFileFromURIUtil().getFileDataFromUri(
+                    context,
+                    it.toUri()
+                )
+            },
+            consent = consentUri?.let {
+                GetFileFromURIUtil().getFileDataFromUri(
+                    context,
+                    it.toUri()
+                )
+            },
             idCard = idCardUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
         )
 
@@ -64,8 +74,24 @@ class RegisterRestaurantViewModel : ViewModel() {
     }
 
     private fun isNipInvalid(): Boolean {
-        // NIP
-        return false
+        // Sprawdzenie czy NIP składa się z 10 cyfr
+        if (nip.length != 10 || !nip.all { it.isDigit() }) {
+            return true
+        }
+
+        // Wagi dla poszczególnych cyfr NIP
+        val weights = listOf(6, 5, 7, 2, 3, 4, 5, 6, 7)
+
+        // Obliczanie sumy iloczynów
+        var sum = 0
+        for (i in 0 until 9) {
+            sum += Character.getNumericValue(nip[i]) * weights[i]
+        }
+
+        // Sprawdzenie poprawności ostatniej cyfry kontrolnej
+        val controlDigit = if (sum % 11 == 10) 0 else sum % 11
+        val lastDigit = Character.getNumericValue(nip[9])
+        return controlDigit != lastDigit
     }
 
     private fun isAddressInvalid(): Boolean {
