@@ -24,4 +24,20 @@
     <string name="error_register_invalid_lastname">Invalid lastname</string>
     <string name="label_register_birthday_select">Select your birthday</string>
     <string name="label_register_birthday_dialog">Open date picker dialog</string>
+    <string name="label_restaurant_name">Name</string>
+    <string name="label_restaurant_nip" translatable="false">NIP</string>
+    <string name="label_restaurant_type">Restaurant type</string>
+    <string name="label_restaurant_type_bar" translatable="false">Bar</string>
+    <string name="label_restaurant_type_restaurant">Restaurant</string>
+    <string name="label_restaurant_type_cafe">Cafe</string>
+    <string name="label_restaurant_address">Address</string>
+    <string name="label_restaurant_postal">Postal code</string>
+    <string name="label_restaurant_city">City</string>
+    <string name="label_register_restaurant">Register Restaurant</string>
+    <string name="label_restaurant_lease">Lease agreement (optional)</string>
+    <string name="label_restaurant_license">Alcohol selling license (optional)</string>
+    <string name="label_restaurant_consent">Business consent</string>
+    <string name="label_restaurant_ownerId">ID Card</string>
+    <string name="label_add_to_group">Add to group</string>
+    <string name="error_unknown">Unknown error</string>
 </resources>

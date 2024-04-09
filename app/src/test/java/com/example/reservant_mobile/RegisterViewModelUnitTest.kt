@@ -11,23 +11,26 @@ class RegisterViewModelUnitTest {
     @Test
     fun `Form returns error code when username already taken`() = runTest {
         val result = RegisterViewModel().apply {
+            login = "john@doe.pl"
             firstName = "John"
             lastName = "Dope"
-            birthday = "21-02-2002"
+            birthday = "2020-02-20"
             email = "john@doe.pl"
             phoneNum = "123456789"
             password = "Password123@"
             confirmPassword = "Password123@"
         }.register()
-        assertThat(result).isNotEqualTo(-1)
+
+        assertThat(result).isEqualTo(R.string.error_register_username_taken)
     }
 
     @Test
     fun `Form returns no error when all fields are valid`() {
         val result = RegisterViewModel().apply {
+            login = "JohnDope"
             firstName = "John"
             lastName = "Dope"
-            birthday = "01-02-2002"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "Password123@"
@@ -37,11 +40,41 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when first name is empty`()  {
+    fun `Error when login is empty`()  {
+        val result = RegisterViewModel().apply {
+            login = ""
+            firstName = "John"
+            lastName = "Dope"
+            birthday = "2020-02-20"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "Password123"
+            confirmPassword = "Password123"
+        }.isLoginInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Error when login is invalid`()  {
+        val result = RegisterViewModel().apply {
+            login = "!@#%^&*()_-+="
+            firstName = "John"
+            lastName = "Dope"
+            birthday = "2020-02-20"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "Password123"
+            confirmPassword = "Password123"
+        }.isLoginInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Error when first name is empty`()  {
         val result = RegisterViewModel().apply {
             firstName = ""
             lastName = "Dope"
-            birthday = "20-02-2002"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "Password123"
@@ -51,11 +84,25 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when last name is empty`()  {
+    fun `Error when first name is invalid`()  {
+        val result = RegisterViewModel().apply {
+            firstName = "!@#%^&*()_-+="
+            lastName = "Dope"
+            birthday = "2020-02-20"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "Password123"
+            confirmPassword = "Password123"
+        }.isFirstNameInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Error when last name is empty`()  {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = ""
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "Password123"
@@ -65,7 +112,21 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when birthdate is empty`()  {
+    fun `Error when last name is invalid`()  {
+        val result = RegisterViewModel().apply {
+            firstName = "John"
+            lastName = "!@#%^&*()_-+="
+            birthday = "2020-02-20"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "Password123"
+            confirmPassword = "Password123"
+        }.isLastNameInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Error when birthdate is empty`()  {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
@@ -79,11 +140,11 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when birthdate has wrong format`() {
+    fun `Error when birthdate has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "invalid"
+            birthday = "20-02-2020"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "Password123"
@@ -97,7 +158,7 @@ class RegisterViewModelUnitTest {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = ""
             phoneNum = "123456789"
             password = "Password123"
@@ -107,11 +168,11 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when email has wrong format`() {
+    fun `Error when email has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "invalid"
             phoneNum = "123456789"
             password = "Password123"
@@ -121,11 +182,11 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when phone number is empty`(){
+    fun `Error when phone number is empty`(){
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = ""
             password = "Password123"
@@ -135,13 +196,13 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when phone number has wrong format`() {
+    fun `Error when phone number has wrong format`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "john@test.com"
-            phoneNum = "invalid"
+            phoneNum = "1234"
             password = "Password123"
             confirmPassword = "Password123"
         }.isPhoneInvalid()
@@ -149,11 +210,11 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when password is empty`() {
+    fun `Error when password is empty`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = ""
@@ -163,11 +224,25 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when confirm password is empty`() {
+    fun `Error when password is invalid`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
+            email = "john@test.com"
+            phoneNum = "123456789"
+            password = "invalid"
+            confirmPassword = "Password123"
+        }.isPasswordInvalid()
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `Error when confirm password is empty`() {
+        val result = RegisterViewModel().apply {
+            firstName = "John"
+            lastName = "Dope"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "Password123"
@@ -177,11 +252,11 @@ class RegisterViewModelUnitTest {
     }
 
     @Test
-    fun `Form returns error when passwords do not match`() {
+    fun `Error when passwords do not match`() {
         val result = RegisterViewModel().apply {
             firstName = "John"
             lastName = "Dope"
-            birthday = "2001-02-22"
+            birthday = "2020-02-20"
             email = "john@test.com"
             phoneNum = "123456789"
             password = "invalid"
