@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
+import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.GetFileFromURIUtil
 
 class RegisterRestaurantViewModel : ViewModel() {
@@ -53,8 +54,8 @@ class RegisterRestaurantViewModel : ViewModel() {
             idCard = idCardUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
         )
 
-        //return restaurantService.registerRestaurant(restaurant)[0]
-        return 0;
+        val rService = RestaurantService()
+        return rService.registerRestaurant(restaurant)[0]
     }
 
     fun isRestaurantRegistrationInvalid(): Boolean {
