@@ -24,4 +24,5 @@
     <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
     <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
     <string name="label_register_birthday_dialog">Otwórz dialog wyboru daty</string>
+    <string name="error_unknown">Nieznany błąd</string>
 </resources>
