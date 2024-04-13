@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
+import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.GetFileFromURIUtil
 
@@ -31,6 +32,10 @@ class RegisterRestaurantViewModel : ViewModel() {
             return R.string.error_register_invalid_request
         }
 
+//        !!! Example of FileUploadServiceUsage !!!
+//        val file = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
+//        val fileId = file?.let { FileUploadService().sendFile(FileUploadService.PDF, it) }
+
         val restaurant = RegisterRestaurantDTO(
             name = name,
             nip = nip,
@@ -38,20 +43,10 @@ class RegisterRestaurantViewModel : ViewModel() {
             address = address,
             postalCode = postalCode,
             city = city,
-            lease = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
-            license = licenseUri?.let {
-                GetFileFromURIUtil().getFileDataFromUri(
-                    context,
-                    it.toUri()
-                )
-            },
-            consent = consentUri?.let {
-                GetFileFromURIUtil().getFileDataFromUri(
-                    context,
-                    it.toUri()
-                )
-            },
-            idCard = idCardUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
+            lease = leaseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
+            license = licenseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri( context, it.toUri() },
+            consent = consentUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context,it.toUri() },
+            idCard = idCardUri?: ""//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
         )
 
         val rService = RestaurantService()
