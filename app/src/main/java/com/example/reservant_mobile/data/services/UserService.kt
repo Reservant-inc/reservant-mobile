@@ -9,12 +9,18 @@ import io.ktor.client.call.body
 
 
 interface IUserService{
+    suspend fun isLoginUnique(login: String): Boolean
     suspend fun registerUser(user: RegisterUserDTO): List<Int>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Int
     suspend fun test(): Int
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+    override suspend fun isLoginUnique(login: String): Boolean {
+        val res = api.post(login, Endpoints.REGISTER_CUSTOMER)
+            ?: return true
+        return res.status.value == 200
+    }
 
     /**
      * @return -1 if everything is ok. Otherwise id of error string
