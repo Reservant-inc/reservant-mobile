@@ -100,8 +100,8 @@ fun InputUserInfo(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .onFocusChanged {
-                        if (beginValidationOnNextFocus) beginValidation = true
-                        if (it.hasFocus) beginValidationOnNextFocus = true
+                        //if (beginValidationOnNextFocus) beginValidation = true
+                        beginValidation = it.isFocused
                     }
             },
             value = inputText,
@@ -121,7 +121,8 @@ fun InputUserInfo(
             shape = shape,
             isError = isError && beginValidation,
             maxLines = maxLines,
-            leadingIcon = leadingIcon
+            leadingIcon = leadingIcon,
+
         )
         if (isError && beginValidation) {
             Text(

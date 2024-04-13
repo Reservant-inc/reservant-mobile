@@ -1,28 +1,32 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.ui.constants.Endpoints
+import com.example.reservant_mobile.data.models.dtos.fields.Result
+import io.ktor.client.call.body
+import org.json.JSONObject
 
 
 interface IUserService{
-    suspend fun registerUser(user: RegisterUserDTO): List<Int>
+    suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Int
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
 
-    /**
-     * @return -1 if everything is ok. Otherwise id of error string
-     */
-    override suspend fun registerUser(user: RegisterUserDTO): List<Int> {
-        val res = api.post(user, Endpoints.REGISTER_CUSTOMER) ?: return listOf(R.string.error_connection_server)
-        if (res.status.value == 200) return listOf(-1)
-//        TODO: return string ids based on ErrCode
-//        val j = JSONObject(res.body() as String)
-//        if(j.has("ErrCode")) {}
-        return listOf(R.string.error_register_username_taken)
+    override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
+        //return errors in toast when connection error
+        val res = api.post(user, Endpoints.REGISTER_CUSTOMER)
+            ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
+
+        //return true if successful
+        if (res.status.value == 200) return Result(isError = false, value = true)
+
+        //return errors
+        val j = JSONObject(res.body() as String)
+        return Result(true, j, false)
     }
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Int {
