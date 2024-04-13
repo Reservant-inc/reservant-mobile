@@ -48,7 +48,6 @@ fun RegisterActivity(navController: NavHostController) {
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    var errorResourceId by remember { mutableIntStateOf(-1) }
 
     Column(
         modifier = Modifier
@@ -61,34 +60,34 @@ fun RegisterActivity(navController: NavHostController) {
         LogoWithReturn(navController)
 
         InputUserInfo(
-            inputText = registerViewModel.login,
-            onValueChange = { registerViewModel.login = it },
+            inputText = registerViewModel.login.value,
+            onValueChange = { registerViewModel.login.value = it },
             label = stringResource(R.string.label_login),
             isError = registerViewModel.isLoginInvalid(),
             errorText = stringResource(R.string.error_login_invalid)
         )
 
         InputUserInfo(
-            inputText = registerViewModel.firstName,
-            onValueChange = { registerViewModel.firstName = it },
+            inputText = registerViewModel.firstName.value,
+            onValueChange = { registerViewModel.firstName.value = it },
             label = stringResource(R.string.label_name),
             isError = registerViewModel.isFirstNameInvalid(),
             errorText = stringResource(R.string.error_register_invalid_name)
         )
 
         InputUserInfo(
-            inputText = registerViewModel.lastName,
-            onValueChange = { registerViewModel.lastName = it },
+            inputText = registerViewModel.lastName.value,
+            onValueChange = { registerViewModel.lastName.value = it },
             label = stringResource(R.string.label_lastname),
             isError = registerViewModel.isLastNameInvalid(),
             errorText = stringResource(R.string.error_register_invalid_lastname)
         )
 
-        MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday = birthday })
+        MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday.value = birthday })
 
         InputUserInfo(
-            inputText = registerViewModel.email,
-            onValueChange = { registerViewModel.email = it },
+            inputText = registerViewModel.email.value,
+            onValueChange = { registerViewModel.email.value = it },
             label = stringResource(R.string.label_email),
             isError = registerViewModel.isEmailInvalid(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -96,8 +95,8 @@ fun RegisterActivity(navController: NavHostController) {
         )
 
         InputUserInfo(
-            inputText = registerViewModel.phoneNum,
-            onValueChange = { registerViewModel.phoneNum = it },
+            inputText = registerViewModel.phoneNum.value,
+            onValueChange = { registerViewModel.phoneNum.value = it },
             label = stringResource(R.string.label_phone),
             leadingIcon = {
                 registerViewModel.mobileCountry?.let {
@@ -118,8 +117,8 @@ fun RegisterActivity(navController: NavHostController) {
 
 
         InputUserInfo(
-            inputText = registerViewModel.password,
-            onValueChange = { registerViewModel.password = it },
+            inputText = registerViewModel.password.value,
+            onValueChange = { registerViewModel.password.value = it },
             label = stringResource(R.string.label_password),
             leadingIcon = {
                 IconButton(onClick = {
@@ -144,8 +143,8 @@ fun RegisterActivity(navController: NavHostController) {
 
         )
         InputUserInfo(
-            inputText = registerViewModel.confirmPassword,
-            onValueChange = { registerViewModel.confirmPassword = it },
+            inputText = registerViewModel.confirmPassword.value,
+            onValueChange = { registerViewModel.confirmPassword.value = it },
             label = stringResource(R.string.label_register_repeat_password),
             leadingIcon = {
                 IconButton(onClick = {
@@ -170,21 +169,16 @@ fun RegisterActivity(navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.weight(1f))
-
-        ErrorResourceText(id = errorResourceId)
         
         UserButton(
             onClick = {
                 registerViewModel.viewModelScope.launch {
                     isLoading = true
 
-                    val registerCode = registerViewModel.register()
-
-                    if (registerCode == -1){
+                    if (registerViewModel.register()){
                         navController.navigate("home")
                     }
 
-                    errorResourceId = registerCode
                     isLoading = false
                 }
             },

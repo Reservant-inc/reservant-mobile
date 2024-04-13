@@ -2,14 +2,12 @@ package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import com.example.reservant_mobile.data.models.dtos.LoginResponseDTO
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
-import com.example.reservant_mobile.ui.constants.Endpoints
 import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
 import org.json.JSONObject
-import com.example.reservant_mobile.data.models.dtos.LoginResponseDTO
-import com.example.reservant_mobile.ui.constants.Endpoints
-import io.ktor.client.call.body
 
 
 interface IUserService{

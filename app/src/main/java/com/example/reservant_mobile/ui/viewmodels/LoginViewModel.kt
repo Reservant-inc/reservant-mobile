@@ -14,8 +14,7 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
 
 
 
-    //var login by mutableStateOf("")
-    var login: FormField = FormField(LoginCredentialsDTO::login.name)
+    var login by mutableStateOf("")
     var password by mutableStateOf("")
 
     suspend fun login(): Int{
@@ -26,7 +25,7 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
 
         return userService.loginUser(
             LoginCredentialsDTO(
-                login = login.value,
+                login = login,
                 password = password,
                 rememberMe = true
             )
@@ -34,7 +33,7 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
     }
 
     private fun isInvalidLogin(): Boolean {
-        return isInvalid(login.value) || isInvalid(password)
+        return isInvalid(login) || isInvalid(password)
     }
 
     private fun isInvalid(str: String) : Boolean{
