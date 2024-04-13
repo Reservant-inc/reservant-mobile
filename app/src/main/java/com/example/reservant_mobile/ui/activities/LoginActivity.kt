@@ -106,7 +106,7 @@ fun LoginActivity(navController: NavHostController) {
             }
         }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
 
-        ErrorResourceText(id = errorResourceId)
+        ErrorResourceText(id = errorResourceId , formSent = false)
 
         Spacer(modifier = Modifier.weight(1f))
 

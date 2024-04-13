@@ -48,6 +48,7 @@ fun RegisterActivity(navController: NavHostController) {
     val registerViewModel = viewModel<RegisterViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var formSent by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -64,7 +65,13 @@ fun RegisterActivity(navController: NavHostController) {
             onValueChange = { registerViewModel.login.value = it },
             label = stringResource(R.string.label_login),
             isError = registerViewModel.isLoginInvalid(),
-            errorText = stringResource(R.string.error_login_invalid)
+            errorText = stringResource(
+                if (registerViewModel.getLoginError() != -1)
+                    registerViewModel.getLoginError()
+                else
+                    R.string.error_login_invalid
+            ),
+            formSent = formSent
         )
 
         InputUserInfo(
@@ -72,7 +79,13 @@ fun RegisterActivity(navController: NavHostController) {
             onValueChange = { registerViewModel.firstName.value = it },
             label = stringResource(R.string.label_name),
             isError = registerViewModel.isFirstNameInvalid(),
-            errorText = stringResource(R.string.error_register_invalid_name)
+            errorText = stringResource(
+                if (registerViewModel.getFirstNameError() != -1)
+                    registerViewModel.getFirstNameError()
+                else
+                    R.string.error_register_invalid_name
+            ),
+            formSent = formSent
         )
 
         InputUserInfo(
@@ -80,7 +93,13 @@ fun RegisterActivity(navController: NavHostController) {
             onValueChange = { registerViewModel.lastName.value = it },
             label = stringResource(R.string.label_lastname),
             isError = registerViewModel.isLastNameInvalid(),
-            errorText = stringResource(R.string.error_register_invalid_lastname)
+            errorText = stringResource(
+                if (registerViewModel.getLastNameError() != -1)
+                    registerViewModel.getLastNameError()
+                else
+                    R.string.error_register_invalid_lastname
+            ),
+            formSent = formSent
         )
 
         MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday.value = birthday })
@@ -91,7 +110,13 @@ fun RegisterActivity(navController: NavHostController) {
             label = stringResource(R.string.label_email),
             isError = registerViewModel.isEmailInvalid(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            errorText = stringResource(R.string.error_register_invalid_email)
+            errorText = stringResource(
+                if (registerViewModel.getEmailError() != -1)
+                    registerViewModel.getEmailError()
+                else
+                    R.string.error_register_invalid_email
+            ),
+            formSent = formSent
         )
 
         InputUserInfo(
@@ -111,8 +136,14 @@ fun RegisterActivity(navController: NavHostController) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             isError = registerViewModel.isPhoneInvalid(),
-            errorText = stringResource(R.string.error_register_invalid_phone),
-            optional = true
+            errorText = stringResource(
+                if (registerViewModel.getPhoneError() != -1)
+                    registerViewModel.getPhoneError()
+                else
+                    R.string.error_register_invalid_phone
+            ),
+            optional = true,
+            formSent = formSent
         )
 
 
@@ -139,8 +170,13 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isError = registerViewModel.isPasswordInvalid(),
-            errorText = stringResource(R.string.error_register_invalid_password)
-
+            errorText = stringResource(
+                if (registerViewModel.getPasswordError() != -1)
+                    registerViewModel.getPasswordError()
+                else
+                    R.string.error_register_invalid_password
+            ),
+            formSent = formSent
         )
         InputUserInfo(
             inputText = registerViewModel.confirmPassword.value,
@@ -165,15 +201,19 @@ fun RegisterActivity(navController: NavHostController) {
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             isError = registerViewModel.isConfirmPasswordDiff(),
-            errorText = stringResource(R.string.error_register_password_match)
+            errorText = stringResource(R.string.error_register_password_match),
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.weight(1f))
+        
+        ErrorResourceText(id = registerViewModel.getToastError(), formSent = formSent)
         
         UserButton(
             onClick = {
                 registerViewModel.viewModelScope.launch {
                     isLoading = true
+                    formSent = true
 
                     if (registerViewModel.register()){
                         navController.navigate("home")
