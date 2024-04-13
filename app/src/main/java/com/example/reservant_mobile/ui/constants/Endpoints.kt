@@ -12,5 +12,7 @@ data object Endpoints {
     const val REGISTER_RESTAURANT_EMPLOYEE="/auth/register-restaurant-employee"
     const val REGISTER_RESTAURANT_OWNER="/auth/register-restaurant-owner"
     const val MY_RESTAURANTS="/my-restaurants"
+    const val MY_RESTAURANT="/my-restaurants/{id}"
+    const val FILE_UPLOADS="/uploads"
 
 }
