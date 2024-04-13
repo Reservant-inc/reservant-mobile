@@ -27,8 +27,11 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         if (res.status.value == 200) return Result(isError = false, value = true)
 
         //return errors
-        val j = JSONObject(res.body() as String).getJSONObject("errors")
-        return Result(true, j, false)
+
+        //TODO: JSON errors parse
+        //val j = JSONObject(res.body() as String).getJSONObject("errors")
+
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_unknown)), false)
     }
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
