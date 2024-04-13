@@ -18,7 +18,7 @@
     <string name="error_register_invalid_email">Invalid email address</string>
     <string name="label_phone">Phone</string>
     <string name="error_register_invalid_phone">Invalid phone number</string>
-    <string name="error_register_invalid_password">Invalid password</string>
+    <string name="error_register_invalid_password">Password must be 8 characters long, have 1 capital and lowercase letter, 1 digit and 1 special character</string>
     <string name="label_register_repeat_password">Repeat Password</string>
     <string name="error_register_password_match">Passwords must match</string>
     <string name="error_register_invalid_lastname">Invalid lastname</string>
