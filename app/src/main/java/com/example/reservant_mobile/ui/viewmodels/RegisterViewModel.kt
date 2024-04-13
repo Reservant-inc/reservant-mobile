@@ -68,41 +68,38 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
 
     fun isLoginInvalid(): Boolean{
         return isInvalidWithRegex(Regex.LOGIN, login.value) ||
-                (result.isError && result.errors!!.containsKey(login.name))
+                getFieldError(login.name) == -1
     }
 
-    fun isLoginInvalid(): Boolean{
-
-    }
-
-    fun getLoginErrorsFromResponse(): Int {
-        if (result.isError){
-            var error: Int? = result.errors!!.get(login.name) ?: return -1
-        }
-    }
 
     fun isFirstNameInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.NAME_REG, firstName.value)
+        return isInvalidWithRegex(Regex.NAME_REG, firstName.value) ||
+                getFieldError(firstName.name) == -1
     }
 
     fun isLastNameInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.NAME_REG, lastName.value)
+        return isInvalidWithRegex(Regex.NAME_REG, lastName.value) ||
+                getFieldError(lastName.name) == -1
     }
 
     fun isBirthDateInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.DATE_REG, birthday.value)
+        return isInvalidWithRegex(Regex.DATE_REG, birthday.value) ||
+                getFieldError(birthday.name) == -1
     }
 
     fun isEmailInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.EMAIL_REG, email.value)
+        return isInvalidWithRegex(Regex.EMAIL_REG, email.value) ||
+                getFieldError(email.name) == -1
     }
 
     fun isPhoneInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value)
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value) ||
+                getFieldError(phoneNum.name) == -1
     }
 
     fun isPasswordInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.PASSWORD_REG, password.value)
+        return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
+                getFieldError(password.name) == -1
     }
 
     fun isConfirmPasswordDiff() : Boolean{
@@ -111,5 +108,13 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
 
     private fun isInvalidWithRegex(regex: String, str: String): Boolean{
         return !Pattern.matches(regex, str)
+    }
+
+    private fun getFieldError(name: String): Int{
+        if(!result.isError){
+            return -1
+        }
+
+        return result.errors!!.getOrDefault(name, -1)
     }
 }
