@@ -7,11 +7,15 @@ import com.example.reservant_mobile.ui.constants.Endpoints
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import io.ktor.client.call.body
 import org.json.JSONObject
+import com.example.reservant_mobile.data.models.dtos.LoginResponseDTO
+import com.example.reservant_mobile.ui.constants.Endpoints
+import io.ktor.client.call.body
 
 
 interface IUserService{
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Int
+    suspend fun test(): Int
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
@@ -31,10 +35,26 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Int {
         val res = api.post(credentials, Endpoints.LOGIN) ?: return R.string.error_connection_server
-        return if(res.status.value == 200)
+
+        if(res.status.value != 200)
+            return R.string.error_login_wrong_credentials
+
+        return try {
+            val user: LoginResponseDTO = res.body()
+            LocalBearerService().saveBearerToken(user.token)
+
             -1
-        else
-            R.string.error_login_wrong_credentials
+        }
+        catch (e: Exception){
+            println("[LOGIN PARSING ERROR]: "+e.message)
+            R.string.error_unknown
+        }
+    }
+     override suspend fun test(): Int {
+        val res = api.get("/test/restaurant-owner-only") ?: return R.string.error_connection_server
+
+         return -1
+
     }
 
 
