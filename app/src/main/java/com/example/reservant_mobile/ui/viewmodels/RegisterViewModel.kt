@@ -117,7 +117,6 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
         return result.errors!!.getOrDefault(name, -1)
     }
 
-    //backend error resource getters
     fun getLoginError(): Int{
         return getFieldError(login.name)
     }

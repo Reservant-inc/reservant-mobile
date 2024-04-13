@@ -12,7 +12,7 @@ import org.json.JSONObject
 
 interface IUserService{
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
-    suspend fun loginUser(credentials: LoginCredentialsDTO): Int
+    suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun test(): Int
 }
 
@@ -27,26 +27,32 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         if (res.status.value == 200) return Result(isError = false, value = true)
 
         //return errors
-        val j = JSONObject(res.body() as String)
+        val j = JSONObject(res.body() as String).getJSONObject("errors")
         return Result(true, j, false)
     }
 
-    override suspend fun loginUser(credentials: LoginCredentialsDTO): Int {
-        val res = api.post(credentials, Endpoints.LOGIN) ?: return R.string.error_connection_server
+    override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
+        //return errors in toast when connection error
+        val res = api.post(credentials, Endpoints.LOGIN)
+            ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
-        if(res.status.value != 200)
-            return R.string.error_login_wrong_credentials
-
-        return try {
-            val user: LoginResponseDTO = res.body()
-            LocalBearerService().saveBearerToken(user.token)
-
-            -1
+        //return true if successful and save token
+        if(res.status.value == 200){
+            return try {
+                val user: LoginResponseDTO = res.body()
+                LocalBearerService().saveBearerToken(user.token)
+                Result(isError = false, value = true)
+            }
+            catch (e: Exception){
+                println("[LOGIN PARSING ERROR]: "+e.message)
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = false)
+            }
         }
-        catch (e: Exception){
-            println("[LOGIN PARSING ERROR]: "+e.message)
-            R.string.error_unknown
-        }
+
+        //return errors
+        //val j = JSONObject(res.body() as String)
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_login_wrong_credentials)), false)
     }
      override suspend fun test(): Int {
         val res = api.get("/test/restaurant-owner-only") ?: return R.string.error_connection_server
