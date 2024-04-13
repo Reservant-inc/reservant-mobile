@@ -25,6 +25,8 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
     val countriesList = getCountriesList()
     var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
+    var isLoginUnique by mutableStateOf(true)
+
     suspend fun register() : Int{
 
         if (isRegisterInvalid()){
@@ -43,6 +45,10 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
         if (!isPhoneInvalid()) user.phoneNumber = phoneNum
 
         return userService.registerUser(user)[0]
+    }
+
+    suspend fun checkLoginUnique(){
+        isLoginUnique = userService.isLoginUnique(login)
     }
 
     fun isRegisterInvalid(): Boolean {

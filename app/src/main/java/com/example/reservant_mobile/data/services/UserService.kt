@@ -17,7 +17,7 @@ interface IUserService{
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
     override suspend fun isLoginUnique(login: String): Boolean {
-        val res = api.post(login, Endpoints.REGISTER_CUSTOMER)
+        val res = api.post(login, Endpoints.LOGIN_UNIQUE)
             ?: return true
         return res.status.value == 200
     }

@@ -40,6 +40,7 @@ import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,10 +63,22 @@ fun RegisterActivity(navController: NavHostController) {
 
         InputUserInfo(
             inputText = registerViewModel.login,
-            onValueChange = { registerViewModel.login = it },
+            onValueChange = {
+                registerViewModel.login = it
+                registerViewModel.viewModelScope.launch {
+                    delay(1000)
+                    registerViewModel.checkLoginUnique()
+                }
+            },
             label = stringResource(R.string.label_login),
-            isError = registerViewModel.isLoginInvalid(),
-            errorText = stringResource(R.string.error_login_invalid)
+            isError = registerViewModel.isLoginInvalid() || !registerViewModel.isLoginUnique,
+            errorText = stringResource(
+                if (registerViewModel.isLoginInvalid()){
+                    R.string.error_login_invalid
+                } else {
+                    R.string.error_register_username_taken
+                }
+            )
         )
 
         InputUserInfo(

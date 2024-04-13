@@ -6,7 +6,7 @@
     <string name="label_signup">Zarejestruj się</string>
     <string name="label_password">Hasło</string>
     <string name="error_connection_server">Błąd podczas połączenia z serverem</string>
-    <string name="error_register_username_taken">Nazwa użytkownika zajęta</string>
+    <string name="error_register_username_taken">Login jest zajęty</string>
     <string name="error_register_invalid_request">Niepoprawne dane rejestracji</string>
     <string name="error_login_wrong_credentials">Niepoprawny login lub hasło</string>
     <string name="label_password_forgot">Nie pamiętam hasła</string>
