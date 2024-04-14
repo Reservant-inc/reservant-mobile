@@ -44,7 +44,7 @@ fun LoginActivity(navController: NavHostController) {
     val loginViewModel = viewModel<LoginViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    var errorResourceId by remember { mutableIntStateOf(-1) }
+    var formSent by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -56,16 +56,23 @@ fun LoginActivity(navController: NavHostController) {
         LogoWithReturn(navController)
 
         InputUserInfo(
-            inputText = loginViewModel.login,
-            onValueChange = { loginViewModel.login = it },
+            inputText = loginViewModel.login.value,
+            onValueChange = {
+                loginViewModel.login.value = it
+                formSent = false
+            },
             label = stringResource(R.string.label_login),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            isError = errorResourceId != -1
+            isError = loginViewModel.result.isError && formSent,
+            formSent = formSent
         )
 
         InputUserInfo(
-            inputText = loginViewModel.password,
-            onValueChange = { loginViewModel.password = it },
+            inputText = loginViewModel.password.value,
+            onValueChange = {
+                loginViewModel.password.value = it
+                formSent = false
+            },
             label = stringResource(R.string.label_password),
             leadingIcon = {
                 IconButton(onClick = {
@@ -85,28 +92,28 @@ fun LoginActivity(navController: NavHostController) {
             else
                 PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            isError = errorResourceId != -1
+            isError = loginViewModel.result.isError && formSent,
+            formSent = formSent
         )
 
 
         UserButton(onClick = {
             loginViewModel.viewModelScope.launch {
                 isLoading = true
-                errorResourceId = -1
+                formSent = true
 
-                val loginCode = loginViewModel.login()
-
-                if (loginCode == -1){
+                if (loginViewModel.login()){
                     navController.navigate("home")
                 }
 
-                errorResourceId = loginCode
                 isLoading = false
 
             }
         }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
 
-        ErrorResourceText(id = errorResourceId)
+        ErrorResourceText(id = loginViewModel.getToastError(),
+            formSent = formSent
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 

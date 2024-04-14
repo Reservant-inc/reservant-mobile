@@ -18,7 +18,7 @@
     <string name="error_register_invalid_email">Niepoprawny adres email</string>
     <string name="label_phone">Telefon</string>
     <string name="error_register_invalid_phone">Niepoprawny numer telefonu</string>
-    <string name="error_register_invalid_password">Niepoprawne hasło</string>
+    <string name="error_register_invalid_password">Hasło musi zawierać 8 znaków, mieć 1 małą i dużą literę, 1 cyfrę i 1 znak specjalny</string>
     <string name="label_register_repeat_password">Powtórz hasło</string>
     <string name="error_register_password_match">Hasła muszą się zgadzać</string>
     <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
