@@ -36,7 +36,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
@@ -305,7 +307,7 @@ fun DatePickerDialog(
     onDismiss: () -> Unit
 ) {
     fun convertMillisToDate(millis: Long): String {
-        val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return formatter.format(Date(millis))
     }
 
