@@ -15,7 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +31,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.ErrorResourceText
 import com.example.reservant_mobile.ui.components.InputUserInfo
@@ -39,7 +39,6 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
-import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -62,9 +61,9 @@ fun RegisterActivity(navController: NavHostController) {
         LogoWithReturn(navController)
 
         InputUserInfo(
-            inputText = registerViewModel.login,
+            inputText = registerViewModel.login.value,
             onValueChange = {
-                registerViewModel.login = it
+                registerViewModel.login.value = it
                 registerViewModel.viewModelScope.launch {
                     delay(1000)
                     registerViewModel.checkLoginUnique()
@@ -73,11 +72,12 @@ fun RegisterActivity(navController: NavHostController) {
             label = stringResource(R.string.label_login),
             isError = registerViewModel.isLoginInvalid() || !registerViewModel.isLoginUnique,
             errorText = stringResource(
-                if (registerViewModel.isLoginInvalid()){
-                    R.string.error_login_invalid
-                } else {
+                if (registerViewModel.getLoginError() != -1)
+                    registerViewModel.getLoginError()
+                else if (!registerViewModel.isLoginUnique)
                     R.string.error_register_username_taken
-                }
+                else
+                    R.string.error_login_invalid
             ),
             formSent = formSent
         )

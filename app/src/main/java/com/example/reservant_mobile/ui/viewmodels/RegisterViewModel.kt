@@ -59,7 +59,7 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
     }
 
     suspend fun checkLoginUnique(){
-        isLoginUnique = userService.isLoginUnique(login)
+        isLoginUnique = userService.isLoginUnique(login.value)
     }
 
     fun isRegisterInvalid(): Boolean {
