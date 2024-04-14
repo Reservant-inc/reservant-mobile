@@ -12,8 +12,8 @@ import org.json.JSONObject
 
 interface IUserService{
     suspend fun isLoginUnique(login: String): Boolean
-    suspend fun registerUser(user: RegisterUserDTO): List<Int>
-    suspend fun loginUser(credentials: LoginCredentialsDTO): Int
+    suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
+    suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun refreshToken(): Boolean
 }
 
