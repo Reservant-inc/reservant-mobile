@@ -34,7 +34,7 @@ class RegisterRestaurantViewModel : ViewModel() {
 
 //        !!! Example of FileUploadServiceUsage !!!
 //        val file = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-//        val fileId = file?.let { FileUploadService().sendFile(FileUploadService.PDF, it) }
+//        val fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(FileUploadService.PDF, it).value }
 
         val restaurant = RegisterRestaurantDTO(
             name = name,
@@ -50,7 +50,9 @@ class RegisterRestaurantViewModel : ViewModel() {
         )
 
         val rService = RestaurantService()
-        return rService.registerRestaurant(restaurant)[0]
+//        FIXME: Add restaurant service implementation
+//        return rService.registerRestaurant(restaurant)[0]
+        return -1
     }
 
     fun isRestaurantRegistrationInvalid(): Boolean {
