@@ -17,5 +17,10 @@ data class RestaurantDTO (
     val alcoholLicense: String = "",
     val businessPermission: String = "",
     val idCard: String = "",
-    val tables:List<TableDTO> = emptyList()
+    val tables:List<TableDTO> = emptyList(),
+    val provideDelivery:Boolean,
+    val logo:String,
+    val photos:List<String> = emptyList(),
+    val description:String,
+    val tags:List<String>
 )
