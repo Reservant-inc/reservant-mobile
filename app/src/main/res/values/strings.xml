@@ -5,7 +5,7 @@
     <string name="label_login">Login</string>
     <string name="label_password">Password</string>
     <string name="error_connection_server">Error while connecting to the server</string>
-    <string name="error_register_username_taken">Username is already taken</string>
+    <string name="error_register_username_taken">Login is already taken</string>
     <string name="error_register_invalid_request">Invalid register data</string>
     <string name="error_login_wrong_credentials">Incorrect login or password</string>
     <string name="label_password_visibility" translatable="false">Password Visibility</string>

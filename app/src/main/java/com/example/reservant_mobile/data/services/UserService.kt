@@ -11,12 +11,18 @@ import org.json.JSONObject
 
 
 interface IUserService{
+    suspend fun isLoginUnique(login: String): Boolean
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun test(): Int
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+    override suspend fun isLoginUnique(login: String): Boolean {
+        val res = api.post(login, Endpoints.LOGIN_UNIQUE)
+            ?: return true
+        return res.status.value == 200
+    }
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
         //return errors in toast when connection error
