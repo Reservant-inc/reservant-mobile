@@ -46,7 +46,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()) {
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
     suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>  {
-        val res = api.get(Endpoints.MY_RESTAURANT.replace("{id}",id.toString())) ?:
+        val res = api.get(Endpoints.MY_RESTAURANT(id.toString())) ?:
             return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
 
 
@@ -70,7 +70,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()) {
 
     private suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<Boolean>  {
 //        TODO: Implement edit (add put)
-        val res = api.post( restaurant ,Endpoints.MY_RESTAURANT.replace("{id}",id.toString())) ?:
+        val res = api.post( restaurant ,Endpoints.MY_RESTAURANT(id.toString())) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
@@ -86,7 +86,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()) {
 
     private suspend fun deleteRestaurant(id: Int): Result<Boolean>  {
 //        TODO: Implement delete
-        val res = api.get(Endpoints.MY_RESTAURANT.replace("{id}",id.toString())) ?:
+        val res = api.get(Endpoints.MY_RESTAURANT(id.toString())) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
