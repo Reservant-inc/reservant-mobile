@@ -11,8 +11,8 @@ data class RegisterRestaurantDTO (
     val address: String,
     val postalCode: String,
     val city: String,
-    val lease: ByteArray?,
-    val license: ByteArray?,
-    val consent: ByteArray?,
-    val idCard: ByteArray?
+    val lease: String,
+    val license: String,
+    val consent: String,
+    val idCard: String
 )

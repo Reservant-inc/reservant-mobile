@@ -11,4 +11,8 @@ data object Endpoints {
     const val REGISTER_CUSTOMER_SUPPORT_AGENT="/auth/register-customer-support-agent"
     const val REGISTER_RESTAURANT_EMPLOYEE="/auth/register-restaurant-employee"
     const val REGISTER_RESTAURANT_OWNER="/auth/register-restaurant-owner"
+    const val MY_RESTAURANTS="/my-restaurants"
+    fun MY_RESTAURANT(id: String) = "/my-restaurants/$id"
+    const val FILE_UPLOADS="/uploads"
+
 }
