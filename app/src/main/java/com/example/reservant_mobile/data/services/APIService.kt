@@ -50,7 +50,7 @@ class APIServiceImpl: APIService {
         }
         install(Logging) {
             logger = Logger.SIMPLE
-            level = LogLevel.HEADERS
+            level = LogLevel.ALL
         }
         install(Auth) {
             bearer {

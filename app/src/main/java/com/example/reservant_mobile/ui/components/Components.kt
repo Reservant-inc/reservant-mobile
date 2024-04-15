@@ -108,6 +108,7 @@ fun InputUserInfo(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorText: String = "",
+    formSent: Boolean = false,
     optional: Boolean = false,
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -118,9 +119,6 @@ fun InputUserInfo(
         mutableStateOf(false)
     }
 
-    var beginValidationOnNextFocus: Boolean by remember {
-        mutableStateOf(false)
-    }
 
     Column {
         OutlinedTextField(
@@ -134,8 +132,7 @@ fun InputUserInfo(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .onFocusChanged {
-                        if (beginValidationOnNextFocus) beginValidation = true
-                        if (it.hasFocus) beginValidationOnNextFocus = true
+                        if (it.hasFocus) beginValidation = true
                     }
             },
             value = inputText,
@@ -155,11 +152,12 @@ fun InputUserInfo(
                 else keyboardOptions.imeAction
             ),
             shape = shape,
-            isError = isError && beginValidation,
+            isError = isError && (beginValidation || formSent),
             maxLines = maxLines,
-            leadingIcon = leadingIcon
+            leadingIcon = leadingIcon,
+
         )
-        if (isError && beginValidation) {
+        if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
                 color = Color.Red

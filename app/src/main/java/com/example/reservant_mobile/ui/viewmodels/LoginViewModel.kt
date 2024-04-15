@@ -1,39 +1,66 @@
 package com.example.reservant_mobile.ui.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
+import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.services.IUserService
 import com.example.reservant_mobile.data.services.UserService
+import com.example.reservant_mobile.data.models.dtos.fields.Result
 
 class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
-    var login by mutableStateOf("")
-    var password by mutableStateOf("")
+    var result: Result<Boolean> = Result(isError = false, value = false)
+    var login: FormField = FormField(LoginCredentialsDTO::login.name)
+    var password: FormField = FormField(LoginCredentialsDTO::password.name)
 
-    suspend fun login(): Int{
+    suspend fun login(): Boolean{
 
-        if (isInvalidLogin()){
-            return R.string.error_login_wrong_credentials
+        if (isFormInvalid()){
+            return false
         }
 
-        return userService.loginUser(
+        result = userService.loginUser(
             LoginCredentialsDTO(
-                login = login,
-                password = password,
+                login = login.value,
+                password = password.value,
                 rememberMe = true
             )
         )
+
+        return result.value
     }
 
-    private fun isInvalidLogin(): Boolean {
-        return isInvalid(login) || isInvalid(password)
+    suspend fun refreshToken(): Boolean{
+        return userService.refreshToken()
+    }
+    
+    private fun isLoginInvalid(): Boolean{
+        return isInvalid(login.value) ||
+                getFieldError(login.name) != -1
+    }
+
+    private fun isPasswordInvalid(): Boolean{
+        return isInvalid(password.value) ||
+                getFieldError(password.name) != -1
+    }
+
+    private fun isFormInvalid(): Boolean {
+        return isLoginInvalid() || isPasswordInvalid()
     }
 
     private fun isInvalid(str: String) : Boolean{
         return str.isBlank()
+    }
+
+    private fun getFieldError(name: String): Int{
+        if(!result.isError){
+            return -1
+        }
+
+        return result.errors!!.getOrDefault(name, -1)
+    }
+
+    fun getToastError(): Int{
+        return getFieldError("TOAST")
     }
 }
