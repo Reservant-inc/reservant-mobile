@@ -14,7 +14,7 @@ interface IUserService{
     suspend fun isLoginUnique(login: String): Boolean
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
-    suspend fun test(): Int
+    suspend fun refreshToken(): Boolean
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
@@ -63,11 +63,10 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_login_wrong_credentials)), false)
     }
-     override suspend fun test(): Int {
-        val res = api.get("/test/restaurant-owner-only") ?: return R.string.error_connection_server
-
-         return -1
-
+     override suspend fun refreshToken(): Boolean {
+         if(LocalBearerService().getBearerToken().isEmpty()) return false
+         val res = api.get("/auth/refresh-token") ?: return false
+         return res.status.value == 200
     }
 
 

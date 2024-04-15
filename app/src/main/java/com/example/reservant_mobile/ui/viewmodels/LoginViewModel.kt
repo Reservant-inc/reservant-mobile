@@ -30,6 +30,10 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
         return result.value
     }
 
+    suspend fun refreshToken(): Boolean{
+        return userService.refreshToken()
+    }
+    
     private fun isLoginInvalid(): Boolean{
         return isInvalid(login.value) ||
                 getFieldError(login.name) != -1
