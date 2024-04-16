@@ -2,12 +2,17 @@ package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
+import com.example.reservant_mobile.data.utils.GetFileFromURIUtil
 
 class RegisterRestaurantViewModel : ViewModel() {
 
@@ -23,33 +28,61 @@ class RegisterRestaurantViewModel : ViewModel() {
     var consentUri by mutableStateOf<String?>(null)
     var idCardUri by mutableStateOf<String?>(null)
 
+    var description by mutableStateOf("")
+    var logoUri by mutableStateOf<String?>(null)
+    var delivery by mutableStateOf(true)
+    var selectedTags = mutableStateListOf<String>()
+
     suspend fun registerRestaurant(context: Context): Int {
 
         if (isRestaurantRegistrationInvalid()) {
             return R.string.error_register_invalid_request
         }
 
-//        !!! Example of FileUploadServiceUsage !!!
-//        val file = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-//        val fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(FileUploadService.PDF, it).value }
-
-        val restaurant = RegisterRestaurantDTO(
+        val restaurant = RestaurantDTO(
             name = name,
             nip = nip,
             restaurantType = restaurantType,
             address = address,
-            postalCode = postalCode,
+            postalIndex = postalCode,
             city = city,
-            lease = leaseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
-            license = licenseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri( context, it.toUri() },
-            consent = consentUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context,it.toUri() },
-            idCard = idCardUri?: ""//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
+            rentalContract = sendFile(leaseUri, context, FileUploadService.PDF),
+            alcoholLicense = sendFile(licenseUri, context, FileUploadService.PDF),
+            businessPermission = sendFile(consentUri, context, FileUploadService.PDF),
+            idCard = sendFile(idCardUri, context, FileUploadService.PDF),
+            logo = sendPhoto(logoUri, context),
+            provideDelivery = delivery,
+            tags = selectedTags,
+            description = description,
+            groupId = 0,
+            id = 0
         )
 
         val rService = RestaurantService()
 //        FIXME: Add restaurant service implementation
 //        return rService.registerRestaurant(restaurant)[0]
         return -1
+    }
+    suspend fun sendFile(uri: String?, context: Context, type: String): String {
+        val file = uri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
+        val fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(type, it).value }
+        if (fDto != null) {
+            return fDto.fileName
+        }
+        return ""
+    }
+
+    suspend fun sendPhoto(uri: String?, context: Context): String {
+        val file = uri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
+        var fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(FileUploadService.PNG, it).value }
+        if (fDto != null) {
+            return fDto.fileName
+        }
+        fDto = file?.let { FileUploadService().sendFile(FileUploadService.JPG, it).value }
+        if (fDto != null) {
+            return fDto.fileName
+        }
+        return ""
     }
 
     fun isRestaurantRegistrationInvalid(): Boolean {
@@ -58,10 +91,11 @@ class RegisterRestaurantViewModel : ViewModel() {
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
-                isValidUri(leaseUri) ||
-                isValidUri(licenseUri) ||
-                isValidUri(consentUri) ||
-                isValidUri(idCardUri)
+                isInvalidUri(leaseUri) ||
+                isInvalidUri(licenseUri) ||
+                isDescriptionInvalid() ||
+                areTagsInvalid() ||
+                isInvalidUri(logoUri)
     }
 
     private fun isNameInvalid(): Boolean {
@@ -103,7 +137,14 @@ class RegisterRestaurantViewModel : ViewModel() {
         return city.isBlank()
     }
 
-    private fun isValidUri(uri: String?): Boolean {
-        return uri != null
+    private fun isInvalidUri(uri: String?): Boolean {
+        return uri == null
+    }
+
+    private fun isDescriptionInvalid(): Boolean{
+        return description.isBlank()
+    }
+    private fun areTagsInvalid(): Boolean{
+        return selectedTags.isEmpty()
     }
 }
