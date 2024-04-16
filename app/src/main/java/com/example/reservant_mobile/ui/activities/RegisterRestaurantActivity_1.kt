@@ -27,15 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.components.InputUserFile
+import com.example.reservant_mobile.ui.components.DropdownMenuBox
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
-import com.example.reservant_mobile.ui.components.RestaurantTypeDropdown
+import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.UserButton
 
 // TODO: add restaurantType variable as resource
 @Composable
-fun RegisterRestaurantActivity(navController: NavHostController) {
+fun RegisterRestaurantActivity_1(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
     var nip by remember { mutableStateOf("") }
     var restaurantType by remember { mutableStateOf("Restaurant") }
@@ -43,10 +43,11 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
     var postalCode by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
 
-    var lease by remember { mutableStateOf<Uri?>(null)}
-    var license by remember { mutableStateOf<Uri?>(null)}
-    var consent by remember { mutableStateOf<Uri?>(null)}
-    var idCard by remember { mutableStateOf<Uri?>(null)}
+    val options = listOf(
+        stringResource(R.string.label_restaurant_type_restaurant),
+        stringResource(R.string.label_restaurant_type_bar),
+        stringResource(R.string.label_restaurant_type_cafe)
+    )
 
     Column(
         modifier = Modifier
@@ -73,8 +74,9 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
             optional = false
         )
 
-        RestaurantTypeDropdown(
+        OutLinedDropdownMenu(
             selectedOption = restaurantType,
+            itemsList = options,
             onOptionSelected = { option ->
                 restaurantType = option
             },
@@ -103,63 +105,20 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
             optional = false
         )
 
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_lease),
-            onFilePicked = { file ->
-                lease = file;
-            }
-        )
-
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_license),
-            onFilePicked = { file ->
-                license = file;
-            }
-        )
-
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_consent),
-            onFilePicked = { file ->
-                consent = file;
-            }
-        )
-
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_ownerId),
-            onFilePicked = { file ->
-                idCard = file;
-            }
-        )
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            UserButton(
-                label = stringResource(R.string.label_register_restaurant),
-                onClick = {
-                    // Handling registration
-                },
-                modifier = Modifier.weight(1f)
-            )
+        UserButton(
+            label = "Next",
+            onClick = {
+              navController.navigate("registerRestaurant_2");
+            }
+        )
 
-            Spacer(Modifier.width(16.dp))
-
-            UserButton(
-                label = stringResource(R.string.label_add_to_group),
-                onClick = {
-                    // Adding to group
-                },
-                modifier = Modifier.weight(1f)
-            )
-        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewRegisterRestaurant() {
-    RegisterRestaurantActivity(rememberNavController())
+fun PreviewRegisterRestaurant_1() {
+    RegisterRestaurantActivity_1(rememberNavController())
 }
