@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,9 +31,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.components.ErrorResourceText
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
@@ -110,9 +111,7 @@ fun LoginActivity(navController: NavHostController) {
             }
         }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
 
-        ErrorResourceText(id = loginViewModel.getToastError(),
-            formSent = formSent
-        )
+        ShowErrorToast(context = LocalContext.current, id = loginViewModel.getToastError())
 
         Spacer(modifier = Modifier.weight(1f))
 
