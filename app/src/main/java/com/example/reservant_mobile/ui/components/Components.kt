@@ -34,6 +34,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -178,6 +179,39 @@ fun InputUserInfo(
     }
 
 }
+
+@Composable
+fun TagsSelection(
+    tags: List<String>,
+    selectedTags: List<String>,
+    onTagSelected: (String, Boolean) -> Unit
+) {
+    Column {
+        tags.forEach { tag ->
+            val isChecked = selectedTags.contains(tag)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { isSelected ->
+                        onTagSelected(tag, isSelected)
+                    }
+                )
+                Text(
+                    text = tag,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .clickable { onTagSelected(tag, !isChecked) }
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun OutLinedDropdownMenu(
     selectedOption: String,

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,19 +52,9 @@ fun RegisterRestaurantActivity_2(navController: NavHostController) {
 
         LogoWithReturn(navController)
 
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_lease),
-            onFilePicked = { file ->
-                lease = file;
-            }
-        )
-
-        InputUserFile(
-            label = stringResource(R.string.label_restaurant_license),
-            onFilePicked = { file ->
-                license = file;
-            }
-        )
+        Spacer(modifier = Modifier.height(40.dp))
+        Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
+        Spacer(modifier = Modifier.height(40.dp))
 
         InputUserFile(
             label = stringResource(R.string.label_restaurant_consent),
@@ -78,7 +70,21 @@ fun RegisterRestaurantActivity_2(navController: NavHostController) {
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        InputUserFile(
+            label = stringResource(R.string.label_restaurant_lease),
+            onFilePicked = { file ->
+                lease = file;
+            }
+        )
+
+        InputUserFile(
+            label = stringResource(R.string.label_restaurant_license),
+            onFilePicked = { file ->
+                license = file;
+            }
+        )
+
+        Spacer(modifier = Modifier.height(80.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
