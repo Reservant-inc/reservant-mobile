@@ -179,20 +179,15 @@ fun InputUserInfo(
 
 }
 @Composable
-fun RestaurantTypeDropdown(
+fun OutLinedDropdownMenu(
     selectedOption: String,
+    itemsList: List<String>,
     onOptionSelected: (String) -> Unit,
+    shape: RoundedCornerShape = roundedShape,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
-
-    // Definicja opcji
-    val options = listOf(
-        stringResource(R.string.label_restaurant_type_restaurant),
-        stringResource(R.string.label_restaurant_type_bar),
-        stringResource(R.string.label_restaurant_type_cafe)
-    )
 
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -225,7 +220,7 @@ fun RestaurantTypeDropdown(
             onDismissRequest = { expanded = false },
             modifier = Modifier.fillMaxWidth()
         ) {
-            options.forEach { option ->
+            itemsList.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option) },
                     onClick = {
