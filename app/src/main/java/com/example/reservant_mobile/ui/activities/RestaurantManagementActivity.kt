@@ -77,7 +77,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
                 modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
-                label = stringResource(R.string.label_management_reviews),
+                label = stringResource(R.string.label_management_manage_employees),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
