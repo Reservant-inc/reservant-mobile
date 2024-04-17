@@ -30,7 +30,7 @@ import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
-
+    // TODO: add missing resources
     var restaurants = listOf("Restaurant 1", "Restaurant 2")
     var selectedRestaurant by remember { mutableStateOf("Choose a restaurant") }
 
@@ -43,6 +43,11 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         horizontalAlignment = Alignment.Start
     ) {
         LogoWithReturn(navController)
+
+        Text(
+            text = "Restaurant management",
+            style = MaterialTheme.typography.headlineMedium
+        )
         
         OutLinedDropdownMenu(
             selectedOption = selectedRestaurant,
@@ -51,40 +56,40 @@ fun RestaurantManagementActivity(navController: NavHostController) {
                 selectedRestaurant = restaurant
             },
             modifier = Modifier
-                .padding(top = 32.dp)
-                .padding(bottom = 32.dp)
+                .padding(top = 16.dp)
+                .padding(bottom = 16.dp)
         )
         
         if(selectedRestaurant != "Choose a restaurant"){
             UserButton(
                 label = stringResource(R.string.label_management_edit_local_data),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
                 label = stringResource(R.string.label_management_manage_menu),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
                 label = stringResource(R.string.label_management_reviews),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
                 label = stringResource(R.string.label_management_reviews),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
                 label = stringResource(R.string.label_management_manage_subscription),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
                 label = stringResource(R.string.label_management_delete_local),
                 onClick = { /*TODO*/ },
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
 
