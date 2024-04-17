@@ -47,7 +47,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         )
         
         OutLinedDropdownMenu(
-            selectedOption = "Choose a restaurant",
+            selectedOption = selectedRestaurant ?: stringResource(R.string.label_management_choose_restaurant),
             itemsList = restaurants,
             onOptionSelected = {restaurant ->
                 selectedRestaurant = restaurant
