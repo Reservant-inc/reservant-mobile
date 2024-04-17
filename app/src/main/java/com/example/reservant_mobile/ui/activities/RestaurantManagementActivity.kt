@@ -2,9 +2,7 @@ package com.example.reservant_mobile.ui.activities
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.components.DropdownMenuBox
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.UserButton
@@ -87,7 +84,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
                 modifier = Modifier.padding(top = 8.dp)
             )
             UserButton(
-                label = stringResource(R.string.label_management_delete_local),
+                label = stringResource(R.string.label_management_delete_restaurant),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
