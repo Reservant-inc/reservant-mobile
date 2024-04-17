@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.ui.activities
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,20 +41,17 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.TagsSelection
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 
 class RegisterRestaurantActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
+
             NavHost(navController = navController, startDestination = "register-restaurant-input") {
                 composable(route = "register-restaurant-input") {
-                    var name by remember { mutableStateOf("") }
-                    var nip by remember { mutableStateOf("") }
-                    var restaurantType by remember { mutableStateOf("Restaurant") }
-                    var address by remember { mutableStateOf("") }
-                    var postalCode by remember { mutableStateOf("") }
-                    var city by remember { mutableStateOf("") }
 
                     val options = listOf(
                         stringResource(R.string.label_restaurant_type_restaurant),
@@ -73,48 +70,45 @@ class RegisterRestaurantActivity : ComponentActivity() {
                         LogoWithReturn(navController)
 
                         InputUserInfo(
-                            inputText = name,
-                            onValueChange = { name = it },
-                            label = stringResource(R.string.label_restaurant_name),
+                            inputText = registerRestaurantViewModel.name,
+                            onValueChange = { registerRestaurantViewModel.name = it },
+                            label = stringResource(id = R.string.label_restaurant_name),
                             optional = false
                         )
 
                         InputUserInfo(
-                            inputText = nip,
-                            onValueChange = { nip = it },
-                            label = stringResource(R.string.label_restaurant_nip),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            inputText = registerRestaurantViewModel.nip,
+                            onValueChange = { registerRestaurantViewModel.nip = it },
+                            label = stringResource(id = R.string.label_restaurant_nip),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             optional = false
                         )
 
                         OutLinedDropdownMenu(
-                            selectedOption = restaurantType,
+                            selectedOption = registerRestaurantViewModel.restaurantType,
                             itemsList = options,
-                            onOptionSelected = { option ->
-                                restaurantType = option
-                            },
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            onOptionSelected = { registerRestaurantViewModel.restaurantType = it }
                         )
 
                         InputUserInfo(
-                            inputText = address,
-                            onValueChange = { address = it },
-                            label = stringResource(R.string.label_restaurant_address),
+                            inputText = registerRestaurantViewModel.address,
+                            onValueChange = { registerRestaurantViewModel.address = it },
+                            label = stringResource(id = R.string.label_restaurant_address),
                             optional = false
                         )
 
                         InputUserInfo(
-                            inputText = postalCode,
-                            onValueChange = { postalCode = it },
-                            label = stringResource(R.string.label_restaurant_postal),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            inputText = registerRestaurantViewModel.postalCode,
+                            onValueChange = { registerRestaurantViewModel.postalCode = it },
+                            label = stringResource(id = R.string.label_restaurant_postal),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             optional = false
                         )
 
                         InputUserInfo(
-                            inputText = city,
-                            onValueChange = { city = it },
-                            label = stringResource(R.string.label_restaurant_city),
+                            inputText = registerRestaurantViewModel.city,
+                            onValueChange = { registerRestaurantViewModel.city = it },
+                            label = stringResource(id = R.string.label_restaurant_city),
                             optional = false
                         )
 
@@ -123,18 +117,13 @@ class RegisterRestaurantActivity : ComponentActivity() {
                         UserButton(
                             label = "Next",
                             onClick = {
-                                navController.navigate("register-restaurant-files");
+                                navController.navigate("register-restaurant-files")
                             }
                         )
 
                     }
                 }
                 composable(route = "register-restaurant-files") {
-                    var lease by remember { mutableStateOf<Uri?>(null) }
-                    var license by remember { mutableStateOf<Uri?>(null) }
-                    var consent by remember { mutableStateOf<Uri?>(null) }
-                    var idCard by remember { mutableStateOf<Uri?>(null) }
-
 
                     Column(
                         modifier = Modifier
@@ -154,28 +143,28 @@ class RegisterRestaurantActivity : ComponentActivity() {
                         InputUserFile(
                             label = stringResource(R.string.label_restaurant_consent),
                             onFilePicked = { file ->
-                                consent = file;
+                                registerRestaurantViewModel.consentUri = file.toString();
                             }
                         )
 
                         InputUserFile(
                             label = stringResource(R.string.label_restaurant_ownerId),
                             onFilePicked = { file ->
-                                idCard = file;
+                                registerRestaurantViewModel.idCardUri = file.toString();
                             }
                         )
 
                         InputUserFile(
                             label = stringResource(R.string.label_restaurant_lease),
                             onFilePicked = { file ->
-                                lease = file;
+                                registerRestaurantViewModel.leaseUri = file.toString();
                             }
                         )
 
                         InputUserFile(
                             label = stringResource(R.string.label_restaurant_license),
                             onFilePicked = { file ->
-                                license = file;
+                                registerRestaurantViewModel.licenseUri = file.toString();
                             }
                         )
 
