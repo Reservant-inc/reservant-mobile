@@ -1,8 +1,5 @@
 package com.example.reservant_mobile.ui.activities
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -43,256 +42,251 @@ import com.example.reservant_mobile.ui.components.TagsSelection
 import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 
-class RegisterRestaurantActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val navController = rememberNavController()
-            val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
+@Composable
+fun RegisterRestaurantActivity(navController: NavHostController) {
 
-            NavHost(navController = navController, startDestination = "register-restaurant-input") {
-                composable(route = "register-restaurant-input") {
+    val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
 
-                    val options = listOf(
-                        stringResource(R.string.label_restaurant_type_restaurant),
-                        stringResource(R.string.label_restaurant_type_bar),
-                        stringResource(R.string.label_restaurant_type_cafe)
+    NavHost(navController = navController, startDestination = "register-restaurant-input") {
+        composable(route = "register-restaurant-input") {
+
+            val options = listOf(
+                stringResource(R.string.label_restaurant_type_restaurant),
+                stringResource(R.string.label_restaurant_type_bar),
+                stringResource(R.string.label_restaurant_type_cafe)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                LogoWithReturn(navController)
+
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.name,
+                    onValueChange = { registerRestaurantViewModel.name = it },
+                    label = stringResource(id = R.string.label_restaurant_name),
+                    optional = false
+                )
+
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.nip,
+                    onValueChange = { registerRestaurantViewModel.nip = it },
+                    label = stringResource(id = R.string.label_restaurant_nip),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    optional = false
+                )
+
+                OutLinedDropdownMenu(
+                    selectedOption = registerRestaurantViewModel.restaurantType,
+                    itemsList = options,
+                    onOptionSelected = { registerRestaurantViewModel.restaurantType = it }
+                )
+
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.address,
+                    onValueChange = { registerRestaurantViewModel.address = it },
+                    label = stringResource(id = R.string.label_restaurant_address),
+                    optional = false
+                )
+
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.postalCode,
+                    onValueChange = { registerRestaurantViewModel.postalCode = it },
+                    label = stringResource(id = R.string.label_restaurant_postal),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    optional = false
+                )
+
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.city,
+                    onValueChange = { registerRestaurantViewModel.city = it },
+                    label = stringResource(id = R.string.label_restaurant_city),
+                    optional = false
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                UserButton(
+                    label = "Next",
+                    onClick = {
+                        navController.navigate("register-restaurant-files")
+                    }
+                )
+
+            }
+        }
+        composable(route = "register-restaurant-files") {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+
+                LogoWithReturn(navController)
+                Spacer(modifier = Modifier.height(40.dp))
+                Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(40.dp))
+
+                InputUserFile(
+                    label = stringResource(R.string.label_restaurant_consent),
+                    onFilePicked = { file ->
+                        registerRestaurantViewModel.consentUri = file.toString();
+                    }
+                )
+
+                InputUserFile(
+                    label = stringResource(R.string.label_restaurant_ownerId),
+                    onFilePicked = { file ->
+                        registerRestaurantViewModel.idCardUri = file.toString();
+                    }
+                )
+
+                InputUserFile(
+                    label = stringResource(R.string.label_restaurant_lease),
+                    onFilePicked = { file ->
+                        registerRestaurantViewModel.leaseUri = file.toString();
+                    }
+                )
+
+                InputUserFile(
+                    label = stringResource(R.string.label_restaurant_license),
+                    onFilePicked = { file ->
+                        registerRestaurantViewModel.licenseUri = file.toString();
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(80.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    UserButton(
+                        label = stringResource(R.string.label_register_restaurant),
+                        onClick = {
+                            navController.navigate("register-restaurant-desc");
+                        },
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        LogoWithReturn(navController)
+                    Spacer(Modifier.width(16.dp))
 
-                        InputUserInfo(
-                            inputText = registerRestaurantViewModel.name,
-                            onValueChange = { registerRestaurantViewModel.name = it },
-                            label = stringResource(id = R.string.label_restaurant_name),
-                            optional = false
-                        )
-
-                        InputUserInfo(
-                            inputText = registerRestaurantViewModel.nip,
-                            onValueChange = { registerRestaurantViewModel.nip = it },
-                            label = stringResource(id = R.string.label_restaurant_nip),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            optional = false
-                        )
-
-                        OutLinedDropdownMenu(
-                            selectedOption = registerRestaurantViewModel.restaurantType,
-                            itemsList = options,
-                            onOptionSelected = { registerRestaurantViewModel.restaurantType = it }
-                        )
-
-                        InputUserInfo(
-                            inputText = registerRestaurantViewModel.address,
-                            onValueChange = { registerRestaurantViewModel.address = it },
-                            label = stringResource(id = R.string.label_restaurant_address),
-                            optional = false
-                        )
-
-                        InputUserInfo(
-                            inputText = registerRestaurantViewModel.postalCode,
-                            onValueChange = { registerRestaurantViewModel.postalCode = it },
-                            label = stringResource(id = R.string.label_restaurant_postal),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            optional = false
-                        )
-
-                        InputUserInfo(
-                            inputText = registerRestaurantViewModel.city,
-                            onValueChange = { registerRestaurantViewModel.city = it },
-                            label = stringResource(id = R.string.label_restaurant_city),
-                            optional = false
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        UserButton(
-                            label = "Next",
-                            onClick = {
-                                navController.navigate("register-restaurant-files")
-                            }
-                        )
-
-                    }
+                    UserButton(
+                        label = stringResource(R.string.label_add_to_group),
+                        onClick = {
+                            navController.navigate("register-restaurant-desc");
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-                composable(route = "register-restaurant-files") {
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start
-                    ) {
+            }
+        }
+        composable(route = "register-restaurant-desc") {
+            // TODO: resources
+            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
+            val selectedTags = remember { mutableStateListOf<String>() }
+            var delivery by remember { mutableStateOf(true) }
 
-                        LogoWithReturn(navController)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
 
-                        Spacer(modifier = Modifier.height(40.dp))
-                        Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
-                        Spacer(modifier = Modifier.height(40.dp))
+                ) {
 
-                        InputUserFile(
-                            label = stringResource(R.string.label_restaurant_consent),
-                            onFilePicked = { file ->
-                                registerRestaurantViewModel.consentUri = file.toString();
-                            }
-                        )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                        InputUserFile(
-                            label = stringResource(R.string.label_restaurant_ownerId),
-                            onFilePicked = { file ->
-                                registerRestaurantViewModel.idCardUri = file.toString();
-                            }
-                        )
+                Text(text = "Wybierz tagi, które opisują twój lokal", style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(16.dp))
 
-                        InputUserFile(
-                            label = stringResource(R.string.label_restaurant_lease),
-                            onFilePicked = { file ->
-                                registerRestaurantViewModel.leaseUri = file.toString();
-                            }
-                        )
-
-                        InputUserFile(
-                            label = stringResource(R.string.label_restaurant_license),
-                            onFilePicked = { file ->
-                                registerRestaurantViewModel.licenseUri = file.toString();
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(80.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            UserButton(
-                                label = stringResource(R.string.label_register_restaurant),
-                                onClick = {
-                                    navController.navigate("register-restaurant-desc");
-                                },
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            Spacer(Modifier.width(16.dp))
-
-                            UserButton(
-                                label = stringResource(R.string.label_add_to_group),
-                                onClick = {
-                                    navController.navigate("register-restaurant-desc");
-                                },
-                                modifier = Modifier.weight(1f)
-                            )
+                TagsSelection(
+                    tags = tags,
+                    selectedTags = selectedTags,
+                    onTagSelected = { tag, isSelected ->
+                        if (isSelected) {
+                            selectedTags.add(tag)
+                        } else {
+                            selectedTags.remove(tag)
                         }
-
                     }
-                }
-                composable(route = "register-restaurant-desc") {
-                    // TODO: resources
-                    val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
-                    val selectedTags = remember { mutableStateListOf<String>() }
-                    var delivery by remember { mutableStateOf(true) }
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                Spacer(modifier = Modifier.height(16.dp))
 
-                        ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Dostawa na naszym pośrednictwem:",
+                        modifier = Modifier.weight(1f)
+                    )
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(text = "Wybierz tagi, które opisują twój lokal", style = MaterialTheme.typography.bodyLarge)
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        TagsSelection(
-                            tags = tags,
-                            selectedTags = selectedTags,
-                            onTagSelected = { tag, isSelected ->
-                                if (isSelected) {
-                                    selectedTags.add(tag)
-                                } else {
-                                    selectedTags.remove(tag)
-                                }
-                            }
+                    Row {
+                        RadioButton(
+                            selected = delivery,
+                            onClick = { delivery = true }
                         )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Row(
+                        Text(
+                            text = "tak",
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Dostawa na naszym pośrednictwem:",
-                                modifier = Modifier.weight(1f)
-                            )
+                                .clickable { delivery = true }
+                                .padding(end = 8.dp)
+                                .padding(top = 16.dp)
+                        )
 
-                            Row {
-                                RadioButton(
-                                    selected = delivery,
-                                    onClick = { delivery = true }
-                                )
-                                Text(
-                                    text = "tak",
-                                    modifier = Modifier
-                                        .clickable { delivery = true }
-                                        .padding(end = 8.dp)
-                                        .padding(top = 16.dp)
-                                )
+                        Spacer(modifier = Modifier.width(16.dp))
 
-                                Spacer(modifier = Modifier.width(16.dp))
-
-                                RadioButton(
-                                    selected = !delivery,
-                                    onClick = { delivery = false }
-                                )
-                                Text(
-                                    text = "nie",
-                                    modifier = Modifier
-                                        .clickable { delivery = false }
-                                        .padding(start = 8.dp)
-                                        .padding(top = 16.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // File upload and description
-                        Column {
-                            InputUserFile(
-                                label = "Logo, zdjęcia lokalu",
-                                onFilePicked = {
-                                    // ...
-                                }
-                            )
-                            TextField(
-                                value = "Opis lokalu",
-                                onValueChange = { /* Handle description input */ },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        UserButton(
-                            label = "Zapisz",
-                            onClick = { /* Handle file add */ }
+                        RadioButton(
+                            selected = !delivery,
+                            onClick = { delivery = false }
+                        )
+                        Text(
+                            text = "nie",
+                            modifier = Modifier
+                                .clickable { delivery = false }
+                                .padding(start = 8.dp)
+                                .padding(top = 16.dp)
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // File upload and description
+                Column {
+                    InputUserFile(
+                        label = "Logo, zdjęcia lokalu",
+                        onFilePicked = {
+                            // ...
+                        }
+                    )
+                    TextField(
+                        value = "Opis lokalu",
+                        onValueChange = { /* Handle description input */ },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                UserButton(
+                    label = "Zapisz",
+                    onClick = { /* Handle file add */ }
+                )
             }
         }
     }

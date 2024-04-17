@@ -1,11 +1,9 @@
 package com.example.reservant_mobile.ui.activities
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +43,7 @@ class MainActivity : ComponentActivity() {
                         HomeActivity(navController = navController)
                     }
                     composable(route = "register-restaurant") {
-                        val context = LocalContext.current;
-                        val intent = Intent(context, RegisterRestaurantActivity::class.java)
-                        context.startActivity(intent)
+                        RegisterRestaurantActivity(navController = navController)
                     }
 
                 }
