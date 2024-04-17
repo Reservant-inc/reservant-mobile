@@ -33,9 +33,9 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         horizontalAlignment = Alignment.Start
     ) {
         LogoWithReturn(navController)
-        
+
         Text(
-            text = "Nazwa restauracji",
+            text = "Restaurant name",
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier
             .padding(top = 32.dp)
@@ -73,13 +73,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
             modifier = Modifier.padding(top = 16.dp)
         )
 
-
     }
-
-
-
-
-
 
 }
 
