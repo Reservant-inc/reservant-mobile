@@ -27,8 +27,8 @@ import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
-    // TODO: add missing resources
-    var restaurants = listOf("Restaurant 1", "Restaurant 2")
+    // TODO: get list of restaurants from API
+    val restaurants = listOf("Restaurant 1", "Restaurant 2")
     var selectedRestaurant by remember { mutableStateOf<String?>(null) }
 
     Column(
@@ -42,7 +42,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         LogoWithReturn(navController)
 
         Text(
-            text = "Restaurant management",
+            text = stringResource(R.string.label_management_manage),
             style = MaterialTheme.typography.headlineMedium
         )
         
