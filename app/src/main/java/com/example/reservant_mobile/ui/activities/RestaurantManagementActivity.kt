@@ -21,13 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
-    // TODO: get list of restaurants from API
+    // TODO: get list of restaurants from viewModel
     val restaurants = listOf("Restaurant 1", "Restaurant 2")
     var selectedRestaurant by remember { mutableStateOf<String?>(null) }
 
