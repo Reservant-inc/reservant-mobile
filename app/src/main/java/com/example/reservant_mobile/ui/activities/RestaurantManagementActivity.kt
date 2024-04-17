@@ -47,8 +47,8 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         OutLinedDropdownMenu(
             selectedOption = selectedRestaurant,
             itemsList = restaurants,
-            onOptionSelected = {
-
+            onOptionSelected = {restaurant ->
+                selectedRestaurant = restaurant
             },
             modifier = Modifier
                 .padding(top = 32.dp)
