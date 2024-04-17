@@ -1,9 +1,11 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +44,11 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = "home") {
                         HomeActivity(navController = navController)
+                    }
+                    composable(route = "register-restaurant") {
+                        val context = LocalContext.current;
+                        val intent = Intent(context, RegisterRestaurantActivity::class.java)
+                        context.startActivity(intent)
                     }
 
                 }

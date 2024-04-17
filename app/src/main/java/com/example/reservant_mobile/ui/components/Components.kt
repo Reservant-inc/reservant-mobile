@@ -193,7 +193,7 @@ fun TagsSelection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp)
+                    .padding(2.dp)
             ) {
                 Checkbox(
                     checked = isChecked,
@@ -204,7 +204,7 @@ fun TagsSelection(
                 Text(
                     text = tag,
                     modifier = Modifier
-                        .padding(start = 4.dp)
+                        .padding(start = 2.dp)
                         .clickable { onTagSelected(tag, !isChecked) }
                 )
             }
