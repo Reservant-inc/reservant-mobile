@@ -4,12 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,11 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.DropdownMenuBox
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.UserButton
 
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
+
+    var restaurants = listOf("Restaurant 1", "Restaurant 2")
+    var selectedRestaurant by remember { mutableStateOf("Choose a restaurant") }
 
     Column(
         modifier = Modifier
@@ -34,13 +43,23 @@ fun RestaurantManagementActivity(navController: NavHostController) {
     ) {
         LogoWithReturn(navController)
 
-        Text(
-            text = "Restaurant name",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier
-            .padding(top = 32.dp)
-            .padding(bottom = 32.dp)
+
+        DropdownMenuBox(
+            label = selectedRestaurant,
+            itemsList = restaurants,
+            onItemSelected = {
+
+            },
+            modifier = Modifier.fillMaxWidth()
         )
+
+//        Text(
+//            text = "Restaurant name",
+//            style = MaterialTheme.typography.headlineLarge,
+//            modifier = Modifier
+//            .padding(top = 32.dp)
+//            .padding(bottom = 32.dp)
+//        )
 
         UserButton(
             label = stringResource(R.string.label_management_edit_local_data),
