@@ -29,7 +29,7 @@ import com.example.reservant_mobile.ui.components.UserButton
 fun RestaurantManagementActivity(navController: NavHostController) {
     // TODO: add missing resources
     var restaurants = listOf("Restaurant 1", "Restaurant 2")
-    var selectedRestaurant by remember { mutableStateOf("Choose a restaurant") }
+    var selectedRestaurant by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -47,7 +47,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         )
         
         OutLinedDropdownMenu(
-            selectedOption = selectedRestaurant,
+            selectedOption = "Choose a restaurant",
             itemsList = restaurants,
             onOptionSelected = {restaurant ->
                 selectedRestaurant = restaurant
@@ -57,7 +57,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
                 .padding(bottom = 16.dp)
         )
         
-        if(selectedRestaurant != "Choose a restaurant"){
+        if(selectedRestaurant != null){
             UserButton(
                 label = stringResource(R.string.label_management_edit_local_data),
                 onClick = { /*TODO*/ },
