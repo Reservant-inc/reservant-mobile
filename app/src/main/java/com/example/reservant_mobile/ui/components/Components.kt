@@ -398,7 +398,7 @@ fun OutLinedDropdownMenu(
             trailingIcon = {
                 Icon(
                     imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Zwiń" else "Rozwiń"
+                    contentDescription = if (expanded) "Hide" else "Show"
                 )
             }
         )
