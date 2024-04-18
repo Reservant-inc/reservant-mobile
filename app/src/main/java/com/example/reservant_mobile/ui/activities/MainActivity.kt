@@ -14,6 +14,11 @@ import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    companion object{
+        const val ACTIVITY_HOME = "home"
+        const val ACTIVITY_LANDING = "landing"
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -23,9 +28,9 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             startPoint = if(LoginViewModel().refreshToken())
-                "home"
+                ACTIVITY_HOME
             else
-                "landing"
+                ACTIVITY_LANDING
 
             setContent {
                 val navController = rememberNavController()
