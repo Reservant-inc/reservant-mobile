@@ -40,15 +40,17 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.TagsSelection
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 
 @Composable
-fun RegisterRestaurantActivity(navController: NavHostController) {
+fun RegisterRestaurantActivity() {
 
     val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
+    val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "register-restaurant-input") {
-        composable(route = "register-restaurant-input") {
+    NavHost(navController = navController, startDestination = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
+        composable(route = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
 
             val options = listOf(
                 stringResource(R.string.label_restaurant_type_restaurant),
@@ -114,13 +116,14 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
                 UserButton(
                     label = "Next",
                     onClick = {
-                        navController.navigate("register-restaurant-files")
+                        //TODO: send validate inputs
+                        navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
                     }
                 )
 
             }
         }
-        composable(route = "register-restaurant-files") {
+        composable(route = RegisterRestaurantRoutes.ACTIVITY_FILES) {
 
             Column(
                 modifier = Modifier
@@ -173,7 +176,7 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
                     UserButton(
                         label = stringResource(R.string.label_register_restaurant),
                         onClick = {
-                            navController.navigate("register-restaurant-desc");
+                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -183,7 +186,7 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
                     UserButton(
                         label = stringResource(R.string.label_add_to_group),
                         onClick = {
-                            navController.navigate("register-restaurant-desc");
+                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -191,7 +194,7 @@ fun RegisterRestaurantActivity(navController: NavHostController) {
 
             }
         }
-        composable(route = "register-restaurant-desc") {
+        composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
             // TODO: resources
             val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
             val selectedTags = remember { mutableStateListOf<String>() }

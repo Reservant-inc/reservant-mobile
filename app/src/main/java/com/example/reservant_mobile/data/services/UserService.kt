@@ -7,6 +7,7 @@ import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import org.json.JSONObject
 
 
@@ -21,7 +22,12 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
     override suspend fun isLoginUnique(login: String): Boolean {
         val res = api.post(login, Endpoints.LOGIN_UNIQUE)
             ?: return true
-        return res.status.value == 200
+
+        return if (res.status == HttpStatusCode.OK){
+            res.body<Boolean>()
+        } else {
+            true
+        }
     }
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
@@ -30,7 +36,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
             ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
         //return true if successful
-        if (res.status.value == 200) return Result(isError = false, value = true)
+        if (res.status == HttpStatusCode.OK) return Result(isError = false, value = true)
 
         //return errors
 
@@ -46,7 +52,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
             ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
         //return true if successful and save token
-        if(res.status.value == 200){
+        if(res.status == HttpStatusCode.OK){
             return try {
                 val user: LoginResponseDTO = res.body()
                 LocalBearerService().saveBearerToken(user.token)
@@ -66,7 +72,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
      override suspend fun refreshToken(): Boolean {
          if(LocalBearerService().getBearerToken().isEmpty()) return false
          val res = api.get("/auth/refresh-token") ?: return false
-         return res.status.value == 200
+         return res.status == HttpStatusCode.OK
     }
 
 
