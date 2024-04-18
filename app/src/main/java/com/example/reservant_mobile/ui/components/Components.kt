@@ -34,6 +34,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -166,21 +168,49 @@ fun InputUserInfo(
     }
 
 }
+
 @Composable
-fun RestaurantTypeDropdown(
+fun TagsSelection(
+    tags: List<String>,
+    selectedTags: List<String>,
+    onTagSelected: (String, Boolean) -> Unit
+) {
+    Column {
+        tags.forEach { tag ->
+            val isChecked = selectedTags.contains(tag)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp)
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { isSelected ->
+                        onTagSelected(tag, isSelected)
+                    }
+                )
+                Text(
+                    text = tag,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                        .clickable { onTagSelected(tag, !isChecked) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OutLinedDropdownMenu(
     selectedOption: String,
+    itemsList: List<String>,
     onOptionSelected: (String) -> Unit,
+    shape: RoundedCornerShape = roundedShape,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
-
-    // Definicja opcji
-    val options = listOf(
-        stringResource(R.string.label_restaurant_type_restaurant),
-        stringResource(R.string.label_restaurant_type_bar),
-        stringResource(R.string.label_restaurant_type_cafe)
-    )
 
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -213,7 +243,7 @@ fun RestaurantTypeDropdown(
             onDismissRequest = { expanded = false },
             modifier = Modifier.fillMaxWidth()
         ) {
-            options.forEach { option ->
+            itemsList.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option) },
                     onClick = {
