@@ -4,13 +4,10 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
-import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
-import com.example.reservant_mobile.data.utils.GetFileFromURIUtil
 
 class RegisterRestaurantViewModel : ViewModel() {
 
