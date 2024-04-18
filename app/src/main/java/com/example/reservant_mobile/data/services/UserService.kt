@@ -36,7 +36,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
             ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
         //return true if successful
-        if (res.status.value == 200) return Result(isError = false, value = true)
+        if (res.status == HttpStatusCode.OK) return Result(isError = false, value = true)
 
         //return errors
 
@@ -52,7 +52,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
             ?: return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
         //return true if successful and save token
-        if(res.status.value == 200){
+        if(res.status == HttpStatusCode.OK){
             return try {
                 val user: LoginResponseDTO = res.body()
                 LocalBearerService().saveBearerToken(user.token)
@@ -72,7 +72,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
      override suspend fun refreshToken(): Boolean {
          if(LocalBearerService().getBearerToken().isEmpty()) return false
          val res = api.get("/auth/refresh-token") ?: return false
-         return res.status.value == 200
+         return res.status == HttpStatusCode.OK
     }
 
 
