@@ -43,9 +43,10 @@ import com.example.reservant_mobile.ui.components.UserButton
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 
 @Composable
-fun RegisterRestaurantActivity(navController: NavHostController) {
+fun RegisterRestaurantActivity() {
 
     val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
+    val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "register-restaurant-input") {
         composable(route = "register-restaurant-input") {

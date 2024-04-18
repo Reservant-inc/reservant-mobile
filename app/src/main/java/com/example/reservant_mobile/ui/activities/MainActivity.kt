@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         HomeActivity(navController = navController)
                     }
                     composable(route = "register-restaurant") {
-                        RegisterRestaurantActivity(navController = navController)
+                        RegisterRestaurantActivity()
                     }
 
                 }

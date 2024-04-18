@@ -43,7 +43,6 @@ import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun RegisterActivity(navController: NavHostController) {

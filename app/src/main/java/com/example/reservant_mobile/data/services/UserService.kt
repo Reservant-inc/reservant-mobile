@@ -7,6 +7,7 @@ import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import org.json.JSONObject
 
 
@@ -21,7 +22,12 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
     override suspend fun isLoginUnique(login: String): Boolean {
         val res = api.post(login, Endpoints.LOGIN_UNIQUE)
             ?: return true
-        return res.status.value == 200
+
+        return if (res.status == HttpStatusCode.OK){
+            res.body<Boolean>()
+        } else {
+            true
+        }
     }
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
