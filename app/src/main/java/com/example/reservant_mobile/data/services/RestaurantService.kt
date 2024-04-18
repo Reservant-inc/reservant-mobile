@@ -6,6 +6,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RegisterRestaurantDTO): Result<Boolean>
@@ -22,10 +23,10 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         val res = api.post(restaurant, Endpoints.MY_RESTAURANTS) ?:
             return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
-        if (res.status.value == 200)
+        if (res.status == HttpStatusCode.OK)
             return Result(isError = false, value = true)
 
-        if (res.status.value == 401)
+        if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
 
 
@@ -38,7 +39,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
             return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
 
 
-        if (res.status.value == 200){
+        if (res.status == HttpStatusCode.OK){
             return try {
                 val j:List<RestaurantDTO> = res.body()
                 Result(isError = false, value = j)
@@ -48,7 +49,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
             }
         }
 
-        if (res.status.value == 401)
+        if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
 
@@ -59,7 +60,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
             return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
 
 
-        if (res.status.value == 200){
+        if (res.status == HttpStatusCode.OK){
             return try {
                 val j:RestaurantDTO = res.body()
                 Result(isError = false, value = j)
@@ -69,7 +70,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
             }
         }
 
-        if (res.status.value == 401)
+        if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
 
@@ -83,10 +84,10 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
-        if (res.status.value == 200)
+        if (res.status == HttpStatusCode.OK)
             return Result(isError = false, value = true)
 
-        if (res.status.value == 401)
+        if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
 
 
@@ -99,10 +100,10 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
-        if (res.status.value == 200)
+        if (res.status == HttpStatusCode.OK)
             return Result(isError = false, value = true)
 
-        if (res.status.value == 401)
+        if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
 
 
