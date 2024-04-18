@@ -12,18 +12,18 @@ import io.ktor.http.HttpHeaders
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 
 
+enum class DataType(val dType: String) {
+    PDF("application/pdf"),
+    JPG("image/jpeg"),
+    PNG("image/png")
+}
 class FileUploadService(private var api: APIService = APIServiceImpl()) {
-    companion object{
-        const val PDF = "application/pdf"
-        const val PNG = "image/png"
-        const val JPG = "image/jpeg"
-    }
 
-     suspend fun sendFile(contentType: String, f: ByteArray): Result<FileUploadDTO?> {
+     suspend fun sendFile(contentType: DataType, f: ByteArray): Result<FileUploadDTO?> {
         val content = MultiPartFormDataContent(
              formData {
              append("file", f, Headers.build {
-                 append(HttpHeaders.ContentType, contentType)
+                 append(HttpHeaders.ContentType, contentType.dType)
                  append(HttpHeaders.ContentDisposition, "filename=\"${contentType}_file\"")
              })
          }
