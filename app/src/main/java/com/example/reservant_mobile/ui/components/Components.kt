@@ -34,6 +34,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -212,7 +213,7 @@ fun InputUserFile(
         onFilePicked(uri)
     }
 
-    ButtonComponent(
+    UserButton(
         label = label,
         onClick = {
             pickFileLauncher.launch("*/*")
@@ -222,7 +223,7 @@ fun InputUserFile(
 }
 
 @Composable
-fun ButtonComponent(
+fun UserButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
@@ -602,14 +603,14 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Home,
         BottomNavItem.Landing,
         BottomNavItem.Login,
-        BottomNavItem.Profile
+        BottomNavItem.Register
     )
 
     NavigationBar {
         for (i in items) {
             AddItem(
                 screen = i,
-                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
+                onClick = { navController.navigate(i.title.lowercase()) }
             )
         }
     }
@@ -621,14 +622,14 @@ fun RowScope.AddItem(
     onClick: () -> Unit,
 ) {
     NavigationBarItem(
-        /*label = {
+        label = {
             Text(text = screen.title)
-        },*/
+        },
 
         icon = {
             Icon(
                 screen.icon,
-                contentDescription = screen.route,
+                contentDescription = screen.title,
             )
         },
 
@@ -701,4 +702,10 @@ fun Content() {
     ) {
         Text(text = "Zgłodniałeś?")
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    HomeActivity(rememberNavController())
 }
