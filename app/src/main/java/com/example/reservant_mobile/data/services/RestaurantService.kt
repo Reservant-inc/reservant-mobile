@@ -3,6 +3,7 @@ package com.example.reservant_mobile.data.services
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
@@ -20,8 +21,9 @@ interface IRestaurantService{
     suspend fun addGroup(group: RestaurantGroupDTO): Result<Boolean>
     suspend fun editGroup(id: Any, newName: String): Result<Boolean>
     suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<Boolean>
-
-
+    suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
+    suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>
+    suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
     }
 
 class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
@@ -202,6 +204,61 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
 
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+    }
+
+    override suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>{
+        val res = api.post(emp, Endpoints.REGISTER_RESTAURANT_EMPLOYEE) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
+
+        if (res.status == HttpStatusCode.OK){
+            return try {
+                val j:RestaurantEmployeeDTO = res.body()
+                Result(isError = false, value = j)
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+    override suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>{
+        val res = api.post(emp, Endpoints.MY_RESTAURANT_EMPLOYEES(id.toString())) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
+
+        if (res.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+    }
+    override suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>{
+        val res = api.get(Endpoints.MY_RESTAURANT_EMPLOYEES(restaurantId.toString())) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
+
+
+        if (res.status == HttpStatusCode.OK){
+            return try {
+                val j:List<RestaurantEmployeeDTO> = res.body()
+                Result(isError = false, value = j)
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
 }
