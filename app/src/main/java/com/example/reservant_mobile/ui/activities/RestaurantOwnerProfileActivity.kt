@@ -4,36 +4,40 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.MainRoutes
 
 @Composable
-fun LandingActivity(navController: NavHostController) {
+fun RestaurantOwnerProfileActivity(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Logo()
-
-        ButtonComponent(onClick = { navController.navigate(MainRoutes.ACTIVITY_LOGIN) }, label = "Login")
-
-        ButtonComponent(onClick = { navController.navigate(MainRoutes.ACTIVITY_REGISTER) }, label = "Sign up")
+        ButtonComponent(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(16.dp),
+            label = stringResource(id = R.string.label_register_restaurant),
+            onClick = { navController.navigate(MainRoutes.ACTIVITY_REGISTER_RESTAURANT) },
+        )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun PreviewNew() {
-    LandingActivity(rememberNavController())
+@Preview
+fun Preview(){
+    RestaurantOwnerProfileActivity(navController = rememberNavController())
 }

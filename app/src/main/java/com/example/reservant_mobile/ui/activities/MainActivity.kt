@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
             else
                 MainRoutes.ACTIVITY_LANDING
 
-
             setContent {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = startPoint) {
@@ -46,17 +45,16 @@ class MainActivity : ComponentActivity() {
                     composable(route = MainRoutes.ACTIVITY_HOME) {
                         HomeActivity(navController = navController)
                     }
+                    composable(route = MainRoutes.ACTIVITY_PROFILE) {
+                        RestaurantOwnerProfileActivity(navController = navController)
+                    }
+                    composable(route = MainRoutes.ACTIVITY_REGISTER_RESTAURANT) {
+                        RegisterRestaurantActivity()
+                    }
 
                 }
 
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    //preview if needed
 }

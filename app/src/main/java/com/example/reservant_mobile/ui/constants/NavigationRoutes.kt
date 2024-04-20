@@ -5,6 +5,8 @@ data object MainRoutes {
     val ACTIVITY_LANDING = "${MainRoutes::class.simpleName}/landing"
     val ACTIVITY_LOGIN = "${MainRoutes::class.simpleName}/login"
     val ACTIVITY_REGISTER = "${MainRoutes::class.simpleName}/register"
+    val ACTIVITY_REGISTER_RESTAURANT = "${MainRoutes::class.simpleName}/register-restaurant"
+    val ACTIVITY_PROFILE = "${MainRoutes::class.simpleName}/profile"
 }
 
 data object RegisterRestaurantRoutes {

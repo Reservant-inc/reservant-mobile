@@ -34,7 +34,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -213,7 +212,7 @@ fun InputUserFile(
         onFilePicked(uri)
     }
 
-    UserButton(
+    ButtonComponent(
         label = label,
         onClick = {
             pickFileLauncher.launch("*/*")
@@ -223,7 +222,7 @@ fun InputUserFile(
 }
 
 @Composable
-fun UserButton(
+fun ButtonComponent(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",

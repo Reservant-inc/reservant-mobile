@@ -21,10 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
-import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.components.ButtonComponent
 
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
@@ -59,32 +58,32 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         )
         
         if(selectedRestaurant != null){
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_edit_local_data),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_manage_menu),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_reviews),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_manage_employees),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_manage_subscription),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
             )
-            UserButton(
+            ButtonComponent(
                 label = stringResource(R.string.label_management_delete_restaurant),
                 onClick = { /*TODO*/ },
                 modifier = Modifier.padding(top = 8.dp)
