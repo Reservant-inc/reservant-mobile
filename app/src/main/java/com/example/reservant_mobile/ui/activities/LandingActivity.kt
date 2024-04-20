@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.constants.MainRoutes
 
 @Composable
 fun LandingActivity(navController: NavHostController) {
@@ -25,9 +26,9 @@ fun LandingActivity(navController: NavHostController) {
     ) {
         Logo()
 
-        UserButton(onClick = { navController.navigate("login") }, label = "Login")
+        UserButton(onClick = { navController.navigate(MainRoutes.ACTIVITY_LOGIN) }, label = "Login")
 
-        UserButton(onClick = { navController.navigate("register") }, label = "Sign up")
+        UserButton(onClick = { navController.navigate(MainRoutes.ACTIVITY_REGISTER) }, label = "Sign up")
     }
 }
 
