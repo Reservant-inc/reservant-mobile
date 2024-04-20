@@ -18,6 +18,7 @@ interface IRestaurantService{
     suspend fun getGroups(): Result<List<RestaurantGroupDTO>?>
     suspend fun getGroup(id:Any): Result<RestaurantGroupDTO?>
     suspend fun editGroup(id: Any, newName: String): Result<Boolean>
+    suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<Boolean>
 
 
     }
@@ -158,6 +159,23 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
     override suspend fun editGroup(id: Any, newName: String): Result<Boolean>{
         val newGroup: HashMap<String, String> = hashMapOf("name" to newName)
         val res = api.put( newGroup ,Endpoints.MY_RESTAURANT_GROUP(id.toString())) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
+
+
+        if (res.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+    }
+
+    override suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<Boolean> {
+
+    val newGroup: HashMap<String, String> = hashMapOf("groupId" to groupId.toString())
+        val res = api.post( newGroup ,Endpoints.MOVE_RESTAURANT_TO_GROUP(restaurantId.toString())) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
