@@ -34,6 +34,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -166,66 +168,38 @@ fun InputUserInfo(
     }
 
 }
+
 @Composable
-fun RestaurantTypeDropdown(
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+fun TagsSelection(
+    tags: List<String>,
+    selectedTags: List<String>,
+    onTagSelected: (String, Boolean) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-
-    // Definicja opcji
-    val options = listOf(
-        stringResource(R.string.label_restaurant_type_restaurant),
-        stringResource(R.string.label_restaurant_type_bar),
-        stringResource(R.string.label_restaurant_type_cafe)
-    )
-
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(stringResource(R.string.label_restaurant_type)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            interactionSource = interactionSource,
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Zwiń" else "Rozwiń"
-                )
-            }
-        )
-
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                if (interaction is PressInteraction.Release) {
-                    expanded = true
-                }
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
+    Column {
+        tags.forEach { tag ->
+            val isChecked = selectedTags.contains(tag)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp)
+            ) {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { isSelected ->
+                        onTagSelected(tag, isSelected)
                     }
+                )
+                Text(
+                    text = tag,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                        .clickable { onTagSelected(tag, !isChecked) }
                 )
             }
         }
     }
 }
-
 
 @Composable
 fun InputUserFile(

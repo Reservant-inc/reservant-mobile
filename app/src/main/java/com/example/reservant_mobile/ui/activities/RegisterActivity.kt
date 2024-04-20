@@ -39,7 +39,9 @@ import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -65,6 +67,7 @@ fun RegisterActivity(navController: NavHostController) {
             inputText = registerViewModel.login.value,
             onValueChange = {
                 registerViewModel.login.value = it
+                registerViewModel.viewModelScope.coroutineContext.cancelChildren()
                 registerViewModel.viewModelScope.launch {
                     delay(1000)
                     registerViewModel.checkLoginUnique()
@@ -225,7 +228,7 @@ fun RegisterActivity(navController: NavHostController) {
                     formSent = true
 
                     if (registerViewModel.register()){
-                        navController.navigate("home")
+                        navController.navigate(MainRoutes.ACTIVITY_HOME)
                     }
 
                     isLoading = false
