@@ -65,7 +65,6 @@ fun RegisterRestaurantActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
-                LogoWithReturn(navController)
 
                 InputUserInfo(
                     inputText = registerRestaurantViewModel.name,
@@ -133,7 +132,6 @@ fun RegisterRestaurantActivity() {
                 horizontalAlignment = Alignment.Start
             ) {
 
-                LogoWithReturn(navController)
                 Spacer(modifier = Modifier.height(40.dp))
                 Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(40.dp))

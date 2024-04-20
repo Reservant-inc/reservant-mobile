@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,9 @@ fun RestaurantOwnerProfileActivity(navController: NavController){
                 .wrapContentSize()
                 .padding(16.dp),
             label = stringResource(id = R.string.label_register_restaurant),
-            onClick = {navController.navigate(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT) },
+            onClick = {
+                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT)
+            },
         )
     }
 }

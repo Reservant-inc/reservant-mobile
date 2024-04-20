@@ -8,35 +8,31 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
-import com.example.reservant_mobile.ui.components.Heading
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeActivity() {
-    val navController = rememberNavController()
+    val innerNavController = rememberNavController()
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController)
-        },
-        topBar = {
-            Heading()
-        },
-        content = {
-            NavHost(navController = navController, startDestination = MainRoutes.ACTIVITY_HOME){
-                composable(MainRoutes.ACTIVITY_HOME){
-                    Content()
-                }
-                composable(MainRoutes.ACTIVITY_PROFILE){
-                    RestaurantOwnerProfileActivity(navController = navController)
-                }
-                composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
-                    RegisterRestaurantActivity()
-                }
-            }
-
+            BottomNavigation(innerNavController)
         }
-    )
+    ){
+        NavHost(navController = innerNavController, startDestination = MainRoutes.ACTIVITY_HOME){
+            composable(MainRoutes.ACTIVITY_HOME){
+                Content()
+            }
+            composable(MainRoutes.ACTIVITY_PROFILE){
+                RestaurantOwnerProfileActivity(navController = innerNavController)
+            }
+            composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
+                RegisterRestaurantActivity()
+            }
+        }
+
+    }
+
 }
