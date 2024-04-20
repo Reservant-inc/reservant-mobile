@@ -12,3 +12,7 @@ data object RegisterRestaurantRoutes {
     val ACTIVITY_FILES = "${RegisterRestaurantRoutes::class.simpleName}/files"
     val ACTIVITY_DESC = "${RegisterRestaurantRoutes::class.simpleName}/desc"
 }
+
+data object RestaurantManagementRoutes {
+    val ACTIVITY_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manage"
+}
