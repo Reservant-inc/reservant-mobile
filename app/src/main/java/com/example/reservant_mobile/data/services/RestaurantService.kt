@@ -79,8 +79,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
     }
 
     override suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<Boolean>  {
-//        TODO: Implement edit (add put)
-        val res = api.post( restaurant ,Endpoints.MY_RESTAURANT(id.toString())) ?:
+        val res = api.put( restaurant ,Endpoints.MY_RESTAURANT(id.toString())) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
@@ -95,8 +94,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
     }
 
     override suspend fun deleteRestaurant(id: Int): Result<Boolean>  {
-//        TODO: Implement delete
-        val res = api.get(Endpoints.MY_RESTAURANT(id.toString())) ?:
+        val res = api.delete(Endpoints.MY_RESTAURANT(id.toString())) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
 
 
