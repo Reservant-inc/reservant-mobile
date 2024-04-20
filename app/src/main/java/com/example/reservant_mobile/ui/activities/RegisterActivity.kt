@@ -38,7 +38,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import kotlinx.coroutines.cancelChildren
@@ -221,7 +221,7 @@ fun RegisterActivity(navController: NavHostController) {
 
         ShowErrorToast(context = LocalContext.current, id = registerViewModel.getToastError())
         
-        UserButton(
+        ButtonComponent(
             onClick = {
                 registerViewModel.viewModelScope.launch {
                     isLoading = true

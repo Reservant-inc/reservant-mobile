@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,7 +38,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.TagsSelection
-import com.example.reservant_mobile.ui.components.UserButton
+import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 
@@ -66,7 +65,6 @@ fun RegisterRestaurantActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
-                LogoWithReturn(navController)
 
                 InputUserInfo(
                     inputText = registerRestaurantViewModel.name,
@@ -113,7 +111,7 @@ fun RegisterRestaurantActivity() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                UserButton(
+                ButtonComponent(
                     label = "Next",
                     onClick = {
                         //TODO: send validate inputs
@@ -134,7 +132,6 @@ fun RegisterRestaurantActivity() {
                 horizontalAlignment = Alignment.Start
             ) {
 
-                LogoWithReturn(navController)
                 Spacer(modifier = Modifier.height(40.dp))
                 Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(40.dp))
@@ -173,7 +170,7 @@ fun RegisterRestaurantActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    UserButton(
+                    ButtonComponent(
                         label = stringResource(R.string.label_register_restaurant),
                         onClick = {
                             navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
@@ -183,7 +180,7 @@ fun RegisterRestaurantActivity() {
 
                     Spacer(Modifier.width(16.dp))
 
-                    UserButton(
+                    ButtonComponent(
                         label = stringResource(R.string.label_add_to_group),
                         onClick = {
                             navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
@@ -286,7 +283,7 @@ fun RegisterRestaurantActivity() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                UserButton(
+                ButtonComponent(
                     label = "Zapisz",
                     onClick = { /* Handle file add */ }
                 )
