@@ -9,14 +9,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.components.ButtonComponent
-import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.components.Logo
+import com.example.reservant_mobile.ui.constants.AuthRoutes
 
 @Composable
-fun LandingActivity(navController: NavHostController) {
+fun LandingActivity(navController: NavController) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -26,9 +27,9 @@ fun LandingActivity(navController: NavHostController) {
     ) {
         Logo()
 
-        ButtonComponent(onClick = { navController.navigate(MainRoutes.ACTIVITY_LOGIN) }, label = "Login")
+        ButtonComponent(onClick = { navController.navigate(AuthRoutes.ACTIVITY_LOGIN) }, label = "Login")
 
-        ButtonComponent(onClick = { navController.navigate(MainRoutes.ACTIVITY_REGISTER) }, label = "Sign up")
+        ButtonComponent(onClick = { navController.navigate(AuthRoutes.ACTIVITY_REGISTER) }, label = "Sign up")
     }
 }
 

@@ -602,14 +602,14 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Home,
         BottomNavItem.Landing,
         BottomNavItem.Login,
-        BottomNavItem.Register
+        BottomNavItem.Profile
     )
 
     NavigationBar {
         for (i in items) {
             AddItem(
                 screen = i,
-                onClick = { navController.navigate(i.title.lowercase()) }
+                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
             )
         }
     }
@@ -621,14 +621,14 @@ fun RowScope.AddItem(
     onClick: () -> Unit,
 ) {
     NavigationBarItem(
-        label = {
+        /*label = {
             Text(text = screen.title)
-        },
+        },*/
 
         icon = {
             Icon(
                 screen.icon,
-                contentDescription = screen.title,
+                contentDescription = screen.route,
             )
         },
 
@@ -701,10 +701,4 @@ fun Content() {
     ) {
         Text(text = "Zgłodniałeś?")
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    HomeActivity(rememberNavController())
 }

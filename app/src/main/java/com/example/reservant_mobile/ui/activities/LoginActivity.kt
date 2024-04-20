@@ -35,6 +35,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.constants.AuthRoutes
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
@@ -116,7 +117,7 @@ fun LoginActivity(navController: NavHostController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        ButtonComponent(onClick = { if (!isLoading) navController.navigate(MainRoutes.ACTIVITY_REGISTER) },
+        ButtonComponent(onClick = { if (!isLoading) navController.navigate(AuthRoutes.ACTIVITY_REGISTER) },
             label = stringResource(R.string.label_signup))
 
         ButtonComponent(onClick = { if (!isLoading) return@ButtonComponent /* Handle Password Recovery */ },
