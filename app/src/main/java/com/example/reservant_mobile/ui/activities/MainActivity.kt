@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -45,6 +46,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = MainRoutes.ACTIVITY_HOME) {
                         HomeActivity(navController = navController)
+                    }
+                    composable(route = RestaurantManagementRoutes.ACTIVITY_MANAGE) {
+                        RestaurantManagementActivity(navController = navController)
                     }
 
                 }

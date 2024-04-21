@@ -15,7 +15,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
 
 
     var restaurants: List<RestaurantDTO>? by mutableStateOf(listOf())
-    var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
+    private var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
 
     init {
         loadRestaurants()
@@ -31,12 +31,11 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
         selectedRestaurant = restaurant
     }
 
-    fun getSingleRestaurant(id: Int) {
-        viewModelScope.launch {
-            selectedRestaurant = restaurantService.getRestaurant(id).value
-        }
+    suspend fun getSingleRestaurant(id: Int): RestaurantDTO? {
+        return restaurantService.getRestaurant(id).value
     }
 
+    // TODO: implement delete
     fun deleteSelectedRestaurant() {
         selectedRestaurant?.let { restaurant ->
             viewModelScope.launch {

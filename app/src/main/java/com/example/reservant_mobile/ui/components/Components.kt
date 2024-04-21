@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -87,6 +90,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
@@ -647,6 +651,84 @@ fun RowScope.AddItem(
     )
 }
 
+@Composable
+fun RestaurantInfoView(restaurant: RestaurantDTO) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .border(
+                1.dp,
+                Color.LightGray,
+                RoundedCornerShape(8.dp)
+            ),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("${restaurant.name} - ${restaurant.restaurantType}", style = MaterialTheme.typography.headlineSmall)
+            }
+            DetailItem(label = "NIP", value = restaurant.nip)
+            DetailItem(label = "Address", value = "${restaurant.address}, ${restaurant.postalIndex}")
+            DetailItem(label = "City", value = restaurant.city)
+            DetailItem(label = "Delivery", value = if (restaurant.provideDelivery) "Available" else "Not Available")
+            DetailItem(label = "Description", value = restaurant.description)
+            TagsView(tags = restaurant.tags)
+            DetailItem(label = "Tables", value = "${restaurant.tables.size}")
+        }
+    }
+}
+
+@Composable
+fun DetailItem(label: String, value: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Text("$label:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.width(8.dp))
+        Text(value, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+@Composable
+fun TagsView(tags: List<String>) {
+    Column(modifier = Modifier.padding(top = 8.dp)) {
+        Text("Tags:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.height(4.dp))
+        tags.forEach { tag ->
+            TagView(tag)
+        }
+    }
+}
+@Composable
+fun TagView(tag: String) {
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(50)
+            )
+            .padding(
+                horizontal = 8.dp,
+                vertical = 4.dp
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(tag, style = MaterialTheme.typography.bodySmall)
+    }
+}
 
 @Composable
 fun Heading() {
