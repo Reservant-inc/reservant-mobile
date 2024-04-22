@@ -37,11 +37,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -81,7 +79,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
@@ -90,8 +87,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
+import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.activities.HomeActivity
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -159,7 +156,7 @@ fun InputUserInfo(
             maxLines = maxLines,
             leadingIcon = leadingIcon,
 
-        )
+            )
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
@@ -205,21 +202,36 @@ fun TagsSelection(
 @Composable
 fun InputUserFile(
     label: String = "",
+    onFilePicked: (Uri?) -> Unit,
     modifier: Modifier = Modifier,
-    onFilePicked: (Uri?) -> Unit
+    context: Context
 ) {
+    var fileName by remember { mutableStateOf<String?>(null) }
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
+        fileName = uri?.let { getFileName(context, it) }
         onFilePicked(uri)
     }
 
-    ButtonComponent(
-        label = label,
-        onClick = {
-            pickFileLauncher.launch("*/*")
-        },
-        modifier = modifier
+    OutlinedTextField(
+        modifier = modifier.fillMaxWidth(),
+        value = fileName ?: "",
+        onValueChange = { },
+        label = { Text(label) },
+        readOnly = true,
+        visualTransformation = VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default,
+        interactionSource = remember { MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is PressInteraction.Release) {
+                            pickFileLauncher.launch("*/*")
+                        }
+                    }
+                }
+            }
     )
 }
 

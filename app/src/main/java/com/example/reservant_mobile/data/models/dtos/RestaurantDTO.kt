@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class RestaurantDTO (
     val id: Int = Int.MIN_VALUE,
     val name: String,
-    val restaurantType: String,
+    val restaurantType: String = "Restaurant",
     val nip: String = "",
     val address: String,
     val postalIndex: String = "",

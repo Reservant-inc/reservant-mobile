@@ -47,4 +47,5 @@
     <string name="label_management_delete_restaurant">Usuń lokal</string>
     <string name="label_management_choose_restaurant">Wybierz lokal</string>
     <string name="label_management_manage">Zarządzanie restauracją</string>
+    <string name="label_restaurant_description">Opis</string>
 </resources>

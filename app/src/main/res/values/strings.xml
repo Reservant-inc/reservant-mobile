@@ -32,6 +32,7 @@
     <string name="label_restaurant_type_cafe">Cafe</string>
     <string name="label_restaurant_address">Address</string>
     <string name="label_restaurant_postal">Postal code</string>
+    <string name="label_restaurant_description">Description</string>
     <string name="label_restaurant_city">City</string>
     <string name="label_register_restaurant">Register Restaurant</string>
     <string name="label_restaurant_lease">Lease agreement (optional)</string>

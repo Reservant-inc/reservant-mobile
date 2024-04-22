@@ -1,88 +1,87 @@
 package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.core.net.toUri
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.fields.FormField
+import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.services.DataType
 import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
-import com.example.reservant_mobile.data.utils.GetFileFromURIUtil
+import com.example.reservant_mobile.data.utils.getFileFromUri
+import androidx.core.net.toUri
+import com.example.reservant_mobile.data.services.IRestaurantService
 
-class RegisterRestaurantViewModel : ViewModel() {
+class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
 
-    var name by mutableStateOf("")
-    var nip by mutableStateOf("")
-    var restaurantType by mutableStateOf("Restaurant")
-    var address by mutableStateOf("")
-    var postalCode by mutableStateOf("")
-    var city by mutableStateOf("")
+    // Wynik rejestracji
+    var result by mutableStateOf(Result(isError = false, value = false))
 
-    var leaseUri by mutableStateOf<String?>(null)
-    var licenseUri by mutableStateOf<String?>(null)
-    var consentUri by mutableStateOf<String?>(null)
-    var idCardUri by mutableStateOf<String?>(null)
+    // Pola do walidacji
+    val name: FormField = FormField(RestaurantDTO::name.name)
+    val restaurantType: FormField = FormField(RestaurantDTO::restaurantType.name)
+    val nip: FormField = FormField(RestaurantDTO::nip.name)
+    val address: FormField = FormField(RestaurantDTO::address.name)
+    val postalCode: FormField = FormField(RestaurantDTO::postalIndex.name)
+    val city: FormField = FormField(RestaurantDTO::city.name)
+    val description: FormField = FormField(RestaurantDTO::description.name)
 
-    var description by mutableStateOf("")
-    var logoUri by mutableStateOf<String?>(null)
-    var delivery by mutableStateOf(true)
+    // Pliki do załączenia
+    val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
+    val alcoholLicense: FormField = FormField(RestaurantDTO::alcoholLicense.name)
+    val businessPermission: FormField = FormField(RestaurantDTO::businessPermission.name)
+    val idCard: FormField = FormField(RestaurantDTO::idCard.name)
+    val logo: FormField = FormField(RestaurantDTO::logo.name)
+
+    // Tagowanie i inne
     var selectedTags = mutableStateListOf<String>()
+    var delivery by mutableStateOf(true)
 
-    suspend fun registerRestaurant(context: Context): Int {
-
+    suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid()) {
-            return R.string.error_register_invalid_request
+            return false
         }
 
         val restaurant = RestaurantDTO(
-            name = name,
-            nip = nip,
-            restaurantType = restaurantType,
-            address = address,
-            postalIndex = postalCode,
-            city = city,
-            rentalContract = sendFile(leaseUri, context, FileUploadService.PDF),
-            alcoholLicense = sendFile(licenseUri, context, FileUploadService.PDF),
-            businessPermission = sendFile(consentUri, context, FileUploadService.PDF),
-            idCard = sendFile(idCardUri, context, FileUploadService.PDF),
-            logo = sendPhoto(logoUri, context),
+            name = name.value,
+            restaurantType = restaurantType.value,
+            nip = nip.value,
+            address = address.value,
+            postalIndex = postalCode.value,
+            city = city.value,
+            rentalContract = sendFile(rentalContract.value, context, DataType.PDF),
+            alcoholLicense = sendFile(alcoholLicense.value, context, DataType.PDF),
+            businessPermission = sendFile(businessPermission.value, context, DataType.PDF),
+            idCard = sendFile(idCard.value, context, DataType.PDF),
+            logo = sendPhoto(logo.value, context),
+            description = description.value,
             provideDelivery = delivery,
-            tags = selectedTags,
-            description = description,
-            groupId = 0,
-            id = 0
+            tags = selectedTags.toList(),
+            groupId = null,
+            photos = emptyList(),
+            tables = emptyList()
         )
 
-        val rService = RestaurantService()
-//        FIXME: Add restaurant service implementation
-//        return rService.registerRestaurant(restaurant)[0]
-        return -1
+        // Rejestracja restauracji
+        result = restaurantService.registerRestaurant(restaurant)
+
+        return result.value
     }
-    suspend fun sendFile(uri: String?, context: Context, type: String): String {
-        val file = uri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-        val fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(type, it).value }
-        if (fDto != null) {
-            return fDto.fileName
-        }
-        return ""
+
+    suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        val fDto = file?.let { FileUploadService().sendFile(type, it).value }
+        return fDto?.fileName ?: ""
     }
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
-        val file = uri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-        var fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(FileUploadService.PNG, it).value }
-        if (fDto != null) {
-            return fDto.fileName
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        var fDto = file?.let { FileUploadService().sendFile(DataType.PNG, it).value }
+        if (fDto == null) {
+            fDto = file?.let { FileUploadService().sendFile(DataType.JPG, it).value }
         }
-        fDto = file?.let { FileUploadService().sendFile(FileUploadService.JPG, it).value }
-        if (fDto != null) {
-            return fDto.fileName
-        }
-        return ""
+        return fDto?.fileName ?: ""
     }
 
     fun isRestaurantRegistrationInvalid(): Boolean {
@@ -91,60 +90,73 @@ class RegisterRestaurantViewModel : ViewModel() {
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
-                isInvalidUri(leaseUri) ||
-                isInvalidUri(licenseUri) ||
                 isDescriptionInvalid() ||
-                areTagsInvalid() ||
-                isInvalidUri(logoUri)
+                isRentalContractInvalid() ||
+                isAlcoholLicenseInvalid() ||
+                isBusinessPermissionInvalid() ||
+                isIdCardInvalid() ||
+                isLogoInvalid()// ||
+//                areTagsInvalid()
     }
 
     private fun isNameInvalid(): Boolean {
-        return name.isBlank()
+        return name.value.isBlank()
     }
 
     private fun isNipInvalid(): Boolean {
-        // Sprawdzenie czy NIP składa się z 10 cyfr
-        if (nip.length != 10 || !nip.all { it.isDigit() }) {
+        if (nip.value.length != 10 || !nip.value.all { it.isDigit() }) {
             return true
         }
 
-        // Wagi dla poszczególnych cyfr NIP
         val weights = listOf(6, 5, 7, 2, 3, 4, 5, 6, 7)
-
-        // Obliczanie sumy iloczynów
-        var sum = 0
-        for (i in 0 until 9) {
-            sum += Character.getNumericValue(nip[i]) * weights[i]
-        }
-
-        // Sprawdzenie poprawności ostatniej cyfry kontrolnej
+        val sum = (0 until 9).sumOf { Character.getNumericValue(nip.value[it]) * weights[it] }
         val controlDigit = if (sum % 11 == 10) 0 else sum % 11
-        val lastDigit = Character.getNumericValue(nip[9])
+        val lastDigit = Character.getNumericValue(nip.value[9])
+
         return controlDigit != lastDigit
     }
 
     private fun isAddressInvalid(): Boolean {
-        return address.isBlank()
+        return address.value.isBlank()
     }
 
     private fun isPostalCodeInvalid(): Boolean {
-        return postalCode.length != 6 || !postalCode.take(2)
-            .all { it.isDigit() } || postalCode[2] != '-' || !postalCode.substring(3)
-            .all { it.isDigit() }
+        val postalCode = postalCode.value
+        return postalCode.length != 6 ||
+                !postalCode.take(2).all { it.isDigit() } ||
+                postalCode[2] != '-' ||
+                !postalCode.substring(3).all { it.isDigit()}
     }
 
     private fun isCityInvalid(): Boolean {
-        return city.isBlank()
+        return city.value.isBlank()
     }
 
-    private fun isInvalidUri(uri: String?): Boolean {
-        return uri == null
+    private fun isDescriptionInvalid(): Boolean {
+        return description.value.isBlank()
     }
 
-    private fun isDescriptionInvalid(): Boolean{
-        return description.isBlank()
+    private fun isRentalContractInvalid(): Boolean {
+        return rentalContract.value.isBlank()
     }
-    private fun areTagsInvalid(): Boolean{
+
+    private fun isAlcoholLicenseInvalid(): Boolean {
+        return alcoholLicense.value.isBlank()
+    }
+
+    private fun isBusinessPermissionInvalid(): Boolean {
+        return businessPermission.value.isBlank()
+    }
+
+    private fun isIdCardInvalid(): Boolean {
+        return idCard.value.isBlank()
+    }
+
+    private fun isLogoInvalid(): Boolean {
+        return logo.value.isBlank()
+    }
+
+    private fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
 }

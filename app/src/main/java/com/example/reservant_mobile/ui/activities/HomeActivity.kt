@@ -29,7 +29,7 @@ fun HomeActivity() {
                 RestaurantOwnerProfileActivity(navController = innerNavController)
             }
             composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
-                RegisterRestaurantActivity()
+                RegisterRestaurantActivity(navControllerHome = innerNavController)
             }
         }
 
