@@ -134,16 +134,12 @@ fun RestaurantManagementActivity(navController: NavHostController) {
                 )
             }
 
-
             currentRestaurant?.let { restaurant ->
                 RestaurantInfoView(restaurant)
             }
         }
     }
-
-
-
-    }
+}
 
 
     @Preview(showBackground = true)
