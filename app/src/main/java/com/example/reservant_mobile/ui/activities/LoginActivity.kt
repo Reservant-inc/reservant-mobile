@@ -37,6 +37,7 @@ import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.AuthRoutes
 import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -105,7 +106,7 @@ fun LoginActivity(navController: NavHostController) {
                 formSent = true
 
                 if (loginViewModel.login()){
-                    navController.navigate(MainRoutes.ACTIVITY_HOME)
+                    navController.navigate(RestaurantManagementRoutes.ACTIVITY_MANAGE)
                 }
 
                 isLoading = false
