@@ -1,4 +1,5 @@
 package com.example.reservant_mobile.ui.activities
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,110 +38,117 @@ import com.example.reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantManagementActivity(navController: NavHostController) {
 
     val restaurantManageVM = viewModel<RestaurantManagementViewModel>()
 
-        val restaurants = restaurantManageVM.restaurants // TODO: make restaurants live data
-        var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
-        var currentRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
-        var showMenu by remember { mutableStateOf(false) }
+    val restaurants = restaurantManageVM.restaurants
+    var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
+    var currentRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
+    var showMenu by remember { mutableStateOf(false) }
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.label_management_manage)) },
-                    actions = {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false }
-                            ) {
-                                if(currentRestaurant != null){
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            restaurantManageVM.deleteSelectedRestaurant()
-                                            showMenu = false
-                                        },
-                                        text = {Text(stringResource(R.string.label_management_edit_local_data))}
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            showMenu = false
-                                        },
-                                        text = {Text(stringResource(R.string.label_management_manage_employees))}
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            showMenu = false
-                                        },
-                                        text = {Text(stringResource(R.string.label_management_manage_menu))}
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            showMenu = false
-                                        },
-                                        text = {Text(stringResource(R.string.label_management_manage_subscription))}
-                                    )
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            restaurantManageVM.deleteSelectedRestaurant()
-                                            showMenu = false
-                                        },
-                                        text = {Text(stringResource(R.string.label_management_delete_restaurant))}
-                                    )
-                                }
+    // loading restaurants
+    restaurantManageVM.viewModelScope.launch {
+        restaurantManageVM.loadRestaurants()
+    }
+
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.label_management_manage)) },
+                actions = {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            if(currentRestaurant != null){
+                                DropdownMenuItem(
+                                    onClick = {
+                                        restaurantManageVM.deleteSelectedRestaurant()
+                                        showMenu = false
+                                    },
+                                    text = {Text(stringResource(R.string.label_management_edit_local_data))}
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                    },
+                                    text = {Text(stringResource(R.string.label_management_manage_employees))}
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                    },
+                                    text = {Text(stringResource(R.string.label_management_manage_menu))}
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                    },
+                                    text = {Text(stringResource(R.string.label_management_manage_subscription))}
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        restaurantManageVM.deleteSelectedRestaurant()
+                                        showMenu = false
+                                    },
+                                    text = {Text(stringResource(R.string.label_management_delete_restaurant))}
+                                )
                             }
                         }
                     }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+
+            if (restaurants != null) {
+                OutLinedDropdownMenu(
+                    selectedOption = selectedRestaurant?.name ?: stringResource(R.string.label_management_choose_restaurant),
+                    itemsList = restaurants.map { it.name },
+                    onOptionSelected = { name ->
+                        selectedRestaurant = restaurants.find { it.name == name }
+                        restaurantManageVM.viewModelScope.launch {
+                            currentRestaurant =
+                                selectedRestaurant?.let { restaurantManageVM.getSingleRestaurant(it.id) }
+                        }
+                    },
+                    modifier = Modifier.padding(
+                        top = 32.dp,
+                        bottom = 80.dp
+                    )
                 )
             }
-        ) { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-
-                if (restaurants != null) {
-                    OutLinedDropdownMenu(
-                        selectedOption = selectedRestaurant?.name ?: stringResource(R.string.label_management_choose_restaurant),
-                        itemsList = restaurants.map { it.name },
-                        onOptionSelected = { name ->
-                            selectedRestaurant = restaurants.find { it.name == name }
-                            restaurantManageVM.viewModelScope.launch {
-                                currentRestaurant =
-                                    selectedRestaurant?.let { restaurantManageVM.getSingleRestaurant(it.id) }
-                            }
-                        },
-                        modifier = Modifier.padding(
-                            top = 32.dp,
-                            bottom = 80.dp
-                        )
-                    )
-                }
 
 
-                currentRestaurant?.let { restaurant ->
-                    RestaurantInfoView(restaurant)
-                }
+            currentRestaurant?.let { restaurant ->
+                RestaurantInfoView(restaurant)
             }
         }
+    }
 
 
 
-        }
+    }
 
 
-        @Preview(showBackground = true)
-        @Composable
-        fun PreviewManage() {
-            RestaurantManagementActivity(rememberNavController())
-        }
+    @Preview(showBackground = true)
+    @Composable
+    fun PreviewManage() {
+        RestaurantManagementActivity(rememberNavController())
+    }

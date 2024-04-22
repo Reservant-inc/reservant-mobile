@@ -17,13 +17,8 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
     var restaurants: List<RestaurantDTO>? by mutableStateOf(listOf())
     private var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
 
-    init {
-        viewModelScope.launch {
-            loadRestaurants()
-        }
-    }
 
-    private suspend fun loadRestaurants() {
+    suspend fun loadRestaurants() {
         restaurants = restaurantService.getRestaurants().value
     }
 
