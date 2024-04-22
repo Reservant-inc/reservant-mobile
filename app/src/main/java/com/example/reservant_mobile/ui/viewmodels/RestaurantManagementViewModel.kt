@@ -30,7 +30,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
         return restaurantService.getRestaurant(id).value
     }
 
-    // TODO: implement delete
+
     fun deleteSelectedRestaurant() {
         selectedRestaurant?.let { restaurant ->
             viewModelScope.launch {
