@@ -16,9 +16,11 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.accept
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
@@ -31,6 +33,9 @@ import kotlin.Exception
 interface APIService{
     suspend fun get(endpoint: String = ""): HttpResponse?
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): HttpResponse?
+    suspend fun put(obj: @Serializable Any, endpoint: String): HttpResponse?
+    suspend fun delete(endpoint: String): HttpResponse?
+
     suspend fun getHttpClient(): HttpClient
 }
 
@@ -98,6 +103,26 @@ class APIServiceImpl: APIService {
             }
         } catch (e: Exception){
             println("[POST ERROR]: "+e.message)
+            null
+        }
+    }
+
+    override suspend fun put(obj: @Serializable Any, endpoint: String): HttpResponse? {
+        return try {
+            client.put(endpoint) {
+                setBody(obj)
+            }
+        } catch (e: Exception){
+            println("[PUT ERROR]: "+e.message)
+            null
+        }
+    }
+
+    override suspend fun delete(endpoint: String): HttpResponse? {
+        return try {
+            client.delete(endpoint)
+        } catch (e: Exception){
+            println("[DELETE ERROR]: "+e.message)
             null
         }
     }
