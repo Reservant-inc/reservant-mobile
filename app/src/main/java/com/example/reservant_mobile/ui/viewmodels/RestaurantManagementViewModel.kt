@@ -18,13 +18,13 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
     private var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
 
     init {
-        loadRestaurants()
+        viewModelScope.launch {
+            loadRestaurants()
+        }
     }
 
-    private fun loadRestaurants() {
-        viewModelScope.launch {
-            restaurants = restaurantService.getRestaurants().value
-        }
+    private suspend fun loadRestaurants() {
+        restaurants = restaurantService.getRestaurants().value
     }
 
     fun selectRestaurant(restaurant: RestaurantDTO) {
