@@ -35,6 +35,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -351,37 +352,93 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
         )
     }
 }
-
 @Composable
-fun RestaurantInfoView(restaurant: RestaurantDTO) {
+fun RestaurantInfoView(
+    restaurant: RestaurantDTO,
+    onEditClick: () -> Unit,
+    onManageEmployeeClick: () -> Unit,
+    onManageMenuClick: () -> Unit,
+    onManageSubscriptionClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .border(
-                1.dp,
-                Color.LightGray,
-                RoundedCornerShape(8.dp)
-            ),
+            .padding(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("${restaurant.name} - ${restaurant.restaurantType}", style = MaterialTheme.typography.headlineSmall)
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("${restaurant.name} - ${restaurant.restaurantType}", style = MaterialTheme.typography.headlineSmall)
+                }
+                DetailItem(label = "NIP", value = restaurant.nip)
+                DetailItem(label = "Address", value = "${restaurant.address}, ${restaurant.postalIndex}")
+                DetailItem(label = "City", value = restaurant.city)
+                DetailItem(label = "Delivery", value = if (restaurant.provideDelivery) "Available" else "Not Available")
+                DetailItem(label = "Description", value = restaurant.description)
+                TagsDetailView(tags = restaurant.tags)
+                DetailItem(label = "Tables", value = "${restaurant.tables.size}")
             }
-            DetailItem(label = "NIP", value = restaurant.nip)
-            DetailItem(label = "Address", value = "${restaurant.address}, ${restaurant.postalIndex}")
-            DetailItem(label = "City", value = restaurant.city)
-            DetailItem(label = "Delivery", value = if (restaurant.provideDelivery) "Available" else "Not Available")
-            DetailItem(label = "Description", value = restaurant.description)
-            TagsDetailView(tags = restaurant.tags)
-            DetailItem(label = "Tables", value = "${restaurant.tables.size}")
+
+            IconButton(
+                onClick = { showMenu = !showMenu },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+            ) {
+                Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+            ) {
+                DropdownMenuItem(
+                    onClick = {
+                        onEditClick()
+                        showMenu = false
+                    },
+                    text = {Text(stringResource(R.string.label_management_edit_local_data))}
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onManageEmployeeClick()
+                        showMenu = false
+                    },
+                    text = {Text(stringResource(R.string.label_management_manage_employees))}
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onManageMenuClick()
+                        showMenu = false
+                    },
+                    text = {Text(stringResource(R.string.label_management_manage_menu))}
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onManageSubscriptionClick()
+                        showMenu = false
+                    },
+                    text = {Text(stringResource(R.string.label_management_manage_subscription))}
+                )
+                DropdownMenuItem(
+                    onClick = {
+                        onDeleteClick()
+                        showMenu = false
+                    },
+                    text = {Text(stringResource(R.string.label_management_delete_restaurant))}
+                )
+            }
         }
     }
 }
