@@ -12,6 +12,7 @@ import io.ktor.http.HttpStatusCode
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RegisterRestaurantDTO): Result<Boolean>
+    suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean>
     suspend fun getRestaurants():Result<List<RestaurantDTO>?>
     suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>
     suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<Boolean>
@@ -41,6 +42,20 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
 
+    }
+
+    override suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean> {
+        val res = api.post(restaurant, Endpoints.RESTAURANT_VALIDATE_STEP) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), false)
+
+        if (res.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = false)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
     }
 
     override suspend fun getRestaurants():Result<List<RestaurantDTO>?>  {
