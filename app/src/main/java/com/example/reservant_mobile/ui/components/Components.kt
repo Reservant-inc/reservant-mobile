@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -378,7 +380,7 @@ fun RestaurantInfoView(restaurant: RestaurantDTO) {
             DetailItem(label = "City", value = restaurant.city)
             DetailItem(label = "Delivery", value = if (restaurant.provideDelivery) "Available" else "Not Available")
             DetailItem(label = "Description", value = restaurant.description)
-            TagsView(tags = restaurant.tags)
+            TagsDetailView(tags = restaurant.tags)
             DetailItem(label = "Tables", value = "${restaurant.tables.size}")
         }
     }
@@ -399,33 +401,10 @@ fun DetailItem(label: String, value: String) {
 }
 
 @Composable
-fun TagsView(tags: List<String>) {
-    Column(modifier = Modifier.padding(top = 8.dp)) {
-        Text("Tags:",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(Modifier.height(4.dp))
-        tags.forEach { tag ->
-            TagView(tag)
-        }
-    }
-}
-@Composable
-fun TagView(tag: String) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(50)
-            )
-            .padding(
-                horizontal = 8.dp,
-                vertical = 4.dp
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(tag, style = MaterialTheme.typography.bodySmall)
+fun TagsDetailView(tags: List<String>) {
+    if (tags.isNotEmpty()) {
+        val tagsString = tags.joinToString(separator = ", ")
+        DetailItem(label = "Tags", value = tagsString)
     }
 }
 

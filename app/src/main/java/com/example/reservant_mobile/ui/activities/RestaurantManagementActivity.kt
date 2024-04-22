@@ -55,7 +55,6 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         restaurantManageVM.loadRestaurants()
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
