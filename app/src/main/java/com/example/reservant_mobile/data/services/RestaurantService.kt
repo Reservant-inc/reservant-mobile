@@ -5,6 +5,7 @@ import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
@@ -26,7 +27,7 @@ interface IRestaurantService{
     suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>
     suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
     suspend fun getRestaurantTags(): Result<List<String>?>
-
+    suspend fun getEmployees():  Result<List<UserDTO>?>
     }
 
 class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
@@ -278,6 +279,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
+
     override suspend fun getRestaurantTags(): Result<List<String>?> {
         val res = api.get(Endpoints.RESTAURANT_TAGS) ?:
         return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
@@ -296,6 +298,27 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
 
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)    }
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+    override suspend fun getEmployees(): Result<List<UserDTO>?> {
+        val res = api.get(Endpoints.USER_EMPLOYEES) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
+
+
+        if (res.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
 
 }
