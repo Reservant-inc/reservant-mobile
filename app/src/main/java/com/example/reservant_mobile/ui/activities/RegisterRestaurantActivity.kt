@@ -78,7 +78,15 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     inputText = registerRestaurantViewModel.name.value,
                     onValueChange = { registerRestaurantViewModel.name.value = it },
                     label = stringResource(id = R.string.label_restaurant_name),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isNameInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getNameError() != -1)
+                            registerRestaurantViewModel.getNameError()
+                        else
+                            R.string.error_registerRestaurant_invalid_name
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
@@ -86,7 +94,15 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onValueChange = { registerRestaurantViewModel.nip.value = it },
                     label = stringResource(id = R.string.label_restaurant_nip),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isNipInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getNipError() != -1)
+                            registerRestaurantViewModel.getNipError()
+                        else
+                            R.string.error_registerRestaurant_invalid_nip
+                    ),
+                    formSent = formSent
                 )
 
                 OutLinedDropdownMenu(
@@ -99,7 +115,15 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     inputText = registerRestaurantViewModel.address.value,
                     onValueChange = { registerRestaurantViewModel.address.value = it },
                     label = stringResource(id = R.string.label_restaurant_address),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isAddressInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getAdressError() != -1)
+                            registerRestaurantViewModel.getAdressError()
+                        else
+                            R.string.error_registerRestaurant_invalid_adress
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
@@ -107,14 +131,30 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onValueChange = { registerRestaurantViewModel.postalCode.value = it },
                     label = stringResource(id = R.string.label_restaurant_postal),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isPostalCodeInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getPostalError() != -1)
+                            registerRestaurantViewModel.getPostalError()
+                        else
+                            R.string.error_registerRestaurant_invalid_postal
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
                     inputText = registerRestaurantViewModel.city.value,
                     onValueChange = { registerRestaurantViewModel.city.value = it },
                     label = stringResource(id = R.string.label_restaurant_city),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isCityInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getCityError() != -1)
+                            registerRestaurantViewModel.getCityError()
+                        else
+                            R.string.error_registerRestaurant_invalid_city
+                    ),
+                    formSent = formSent
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

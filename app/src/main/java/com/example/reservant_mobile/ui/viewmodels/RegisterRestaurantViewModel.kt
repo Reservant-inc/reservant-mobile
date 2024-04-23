@@ -36,7 +36,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     // Tagowanie i inne
     var selectedTags = mutableStateListOf<String>()
-    var delivery by mutableStateOf(true)
+    var delivery by mutableStateOf(false)
 
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid()) {
@@ -91,19 +91,17 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
                 isDescriptionInvalid() ||
-                isRentalContractInvalid() ||
-                isAlcoholLicenseInvalid() ||
                 isBusinessPermissionInvalid() ||
                 isIdCardInvalid() ||
                 isLogoInvalid()// ||
 //                areTagsInvalid()
     }
 
-    private fun isNameInvalid(): Boolean {
+    fun isNameInvalid(): Boolean {
         return name.value.isBlank()
     }
 
-    private fun isNipInvalid(): Boolean {
+    fun isNipInvalid(): Boolean {
         if (nip.value.length != 10 || !nip.value.all { it.isDigit() }) {
             return true
         }
@@ -116,11 +114,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return controlDigit != lastDigit
     }
 
-    private fun isAddressInvalid(): Boolean {
+    fun isAddressInvalid(): Boolean {
         return address.value.isBlank()
     }
 
-    private fun isPostalCodeInvalid(): Boolean {
+    fun isPostalCodeInvalid(): Boolean {
         val postalCode = postalCode.value
         return postalCode.length != 6 ||
                 !postalCode.take(2).all { it.isDigit() } ||
@@ -128,35 +126,75 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 !postalCode.substring(3).all { it.isDigit()}
     }
 
-    private fun isCityInvalid(): Boolean {
+    fun isCityInvalid(): Boolean {
         return city.value.isBlank()
     }
 
-    private fun isDescriptionInvalid(): Boolean {
+    fun isDescriptionInvalid(): Boolean {
         return description.value.isBlank()
     }
 
-    private fun isRentalContractInvalid(): Boolean {
-        return rentalContract.value.isBlank()
-    }
-
-    private fun isAlcoholLicenseInvalid(): Boolean {
-        return alcoholLicense.value.isBlank()
-    }
-
-    private fun isBusinessPermissionInvalid(): Boolean {
+    fun isBusinessPermissionInvalid(): Boolean {
         return businessPermission.value.isBlank()
     }
 
-    private fun isIdCardInvalid(): Boolean {
+    fun isIdCardInvalid(): Boolean {
         return idCard.value.isBlank()
     }
 
-    private fun isLogoInvalid(): Boolean {
+    fun isLogoInvalid(): Boolean {
         return logo.value.isBlank()
     }
 
-    private fun areTagsInvalid(): Boolean {
+    fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
+    }
+
+    private fun getFieldError(name: String): Int{
+        if(!result.isError){
+            return -1
+        }
+
+        return result.errors!!.getOrDefault(name, -1)
+    }
+
+    fun getNameError(): Int{
+        return getFieldError(name.name)
+    }
+
+    fun getRestaurantTypeError(): Int{
+        return getFieldError(restaurantType.name)
+    }
+
+    fun getNipError(): Int{
+        return getFieldError(nip.name)
+    }
+
+    fun getAdressError(): Int{
+        return getFieldError(address.name)
+    }
+
+    fun getPostalError(): Int{
+        return getFieldError(postalCode.name)
+    }
+
+    fun getCityError(): Int{
+        return getFieldError(city.name)
+    }
+
+    fun getRentalContractError(): Int{
+        return getFieldError(rentalContract.name)
+    }
+    fun getAlcoholLicenseError(): Int{
+        return getFieldError(alcoholLicense.name)
+    }
+    fun getBusinessPermissionError(): Int{
+        return getFieldError(businessPermission.name)
+    }
+    fun getLogoError(): Int{
+        return getFieldError(logo.name)
+    }
+    fun getDescriptionError(): Int{
+        return getFieldError(description.name)
     }
 }
