@@ -25,6 +25,8 @@ interface IRestaurantService{
     suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>
     suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getRestaurantTags(): Result<List<String>?>
+
     }
 
 class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
@@ -275,5 +277,25 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
+
+    override suspend fun getRestaurantTags(): Result<List<String>?> {
+        val res = api.get(Endpoints.RESTAURANT_TAGS) ?:
+        return Result(true, mapOf(pair= Pair("TOAST", R.string.error_connection_server)), null)
+
+
+        if (res.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        if (res.status == HttpStatusCode.Unauthorized)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)    }
 
 }

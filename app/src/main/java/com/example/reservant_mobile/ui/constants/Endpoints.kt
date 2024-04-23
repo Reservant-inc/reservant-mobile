@@ -22,4 +22,5 @@ data object Endpoints {
     fun MOVE_RESTAURANT_TO_GROUP(id: String) = "/my-restaurants/$id/move-to-group"
     const val MY_RESTAURANT_GROUPS="/my-restaurant-groups"
     fun MY_RESTAURANT_GROUP(id: String) = "/my-restaurant-groups/$id"
+    const val RESTAURANT_TAGS="/restaurant-tags"
 }
