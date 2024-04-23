@@ -132,9 +132,6 @@ class APIServiceImpl: APIService {
         if (res.status == HttpStatusCode.Unauthorized)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
-        if (res.status == HttpStatusCode.BadRequest)
-            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
-
         if (res.status == HttpStatusCode.NotFound)
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
