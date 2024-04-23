@@ -41,7 +41,7 @@
     <string name="label_add_to_group">Add to group</string>
     <string name="error_unknown">Unknown error</string>
     <string name="error_unauthorized_access">Unauthorized access</string>
-    <string name="label_management_edit_local_data">Edit local data</string>
+    <string name="label_management_edit_local_data">Manage local data</string>
     <string name="label_management_manage_menu">Manage menu</string>
     <string name="label_management_reviews">Reviews</string>
     <string name="label_management_manage_employees">Manage employees</string>
@@ -49,4 +49,10 @@
     <string name="label_management_delete_restaurant">Delete local</string>
     <string name="label_management_choose_restaurant">Choose a restaurant</string>
     <string name="label_management_manage">Restaurant management</string>
+    <string name="label_restaurant_delivery">Delivery</string>
+    <string name="label_restaurant_description">Description</string>
+    <string name="label_restaurant_tables">Tables</string>
+    <string name="label_restaurant_delivery_available">Available</string>
+    <string name="label_restaurant_delivery_not_available">Not Available</string>
+    <string name="label_restaurant_tags">Tags</string>
 </resources>
