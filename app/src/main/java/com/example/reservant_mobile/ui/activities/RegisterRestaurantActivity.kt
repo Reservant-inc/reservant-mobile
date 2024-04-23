@@ -38,6 +38,7 @@ import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagsSelection
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
@@ -70,7 +71,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
 
@@ -108,7 +109,16 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 OutLinedDropdownMenu(
                     selectedOption = registerRestaurantViewModel.restaurantType.value,
                     itemsList = options,
-                    onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it }
+                    onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it },
+                    label = stringResource(id = R.string.label_restaurant_type),
+                    isError = registerRestaurantViewModel.isRestaurantTypeInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getRestaurantTypeError() != -1)
+                            registerRestaurantViewModel.getRestaurantTypeError()
+                        else
+                            R.string.error_registerRestaurant_invalid_restaurantType
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
@@ -160,10 +170,19 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 ButtonComponent(
-                    label = "Next",
+                    label = stringResource(id = R.string.label_next),
                     onClick = {
-                        //TODO: send validate inputs
-                        navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                        registerRestaurantViewModel.viewModelScope.launch {
+                            isLoading = true
+
+                            val result = registerRestaurantViewModel.validateFirstStep(context)
+
+                            if (result) {
+                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                            }
+
+                            isLoading = false
+                        }
                     }
                 )
 
@@ -181,7 +200,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             ) {
 
                 Spacer(modifier = Modifier.height(40.dp))
-                Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(id = R.string.label_uploadFiles), style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 InputUserFile(
@@ -189,7 +208,16 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onFilePicked = { file ->
                         registerRestaurantViewModel.businessPermission.value = file.toString();
                     },
-                    context = context
+                    context = context,
+                    optional = false,
+                    isError = registerRestaurantViewModel.isBusinessPermissionInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getBusinessPermissionError() != -1)
+                            registerRestaurantViewModel.getBusinessPermissionError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserFile(
@@ -197,7 +225,16 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onFilePicked = { file ->
                         registerRestaurantViewModel.idCard.value = file.toString();
                     },
-                    context = context
+                    context = context,
+                    optional = false,
+                    isError = registerRestaurantViewModel.isIdCardInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getIdCardError() != -1)
+                            registerRestaurantViewModel.getIdCardError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserFile(
@@ -205,7 +242,17 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onFilePicked = { file ->
                         registerRestaurantViewModel.rentalContract.value = file.toString();
                     },
-                    context = context
+                    context = context,
+                    optional = true,
+                    isError = registerRestaurantViewModel.isRentalContractInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getRentalContractError() != -1)
+                            registerRestaurantViewModel.getRentalContractError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent,
+                    deletable = true
                 )
 
                 InputUserFile(
@@ -213,7 +260,17 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     onFilePicked = { file ->
                         registerRestaurantViewModel.alcoholLicense.value = file.toString();
                     },
-                    context = context
+                    context = context,
+                    optional = true,
+                    isError = registerRestaurantViewModel.isAlcoholLicenseInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getAlcoholLicenseError() != -1)
+                            registerRestaurantViewModel.getAlcoholLicenseError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent,
+                    deletable = true
                 )
 
                 Spacer(modifier = Modifier.height(80.dp))
@@ -232,6 +289,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                     Spacer(Modifier.width(16.dp))
 
+                    // TODO: 2nd step validation
                     ButtonComponent(
                         label = stringResource(R.string.label_add_to_group),
                         onClick = {
@@ -244,7 +302,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             }
         }
         composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
-            // TODO: resources
+            // TODO: tags
             val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
 
             Column(
@@ -258,7 +316,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Wybierz tagi, które opisują twój lokal",
+                    text = stringResource(id = R.string.label_registerRestaurant_choseTags),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -284,7 +342,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Dostawa na naszym pośrednictwem:",
+                        text = stringResource(id = R.string.label_registerRestaurant_delivery),
                         modifier = Modifier.weight(1f)
                     )
 
@@ -294,7 +352,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             onClick = { registerRestaurantViewModel.delivery = true }
                         )
                         Text(
-                            text = "tak",
+                            text = stringResource(id = R.string.label_yes),
                             modifier = Modifier
                                 .clickable { registerRestaurantViewModel.delivery = true }
                                 .padding(end = 8.dp)
@@ -308,7 +366,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             onClick = { registerRestaurantViewModel.delivery = false }
                         )
                         Text(
-                            text = "nie",
+                            text = stringResource(id = R.string.label_no),
                             modifier = Modifier
                                 .clickable { registerRestaurantViewModel.delivery = false }
                                 .padding(start = 8.dp)
@@ -322,24 +380,41 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 // File upload and description
                 Column {
                     InputUserFile(
-                        label = "Logo, zdjęcia lokalu",
+                        label = stringResource(id = R.string.label_restaurant_logo),
                         onFilePicked = { file ->
                             registerRestaurantViewModel.logo.value = file.toString();
                         },
-                        context = context
+                        context = context,
+                        isError = registerRestaurantViewModel.isLogoInvalid(context),
+                        errorText = stringResource(
+                            if (registerRestaurantViewModel.getIdCardError() != -1)
+                                registerRestaurantViewModel.getIdCardError()
+                            else
+                                R.string.error_registerRestaurant_invalid_file
+                        ),
+                        formSent = formSent
                     )
                     InputUserInfo(
                         inputText = registerRestaurantViewModel.description.value,
                         onValueChange = { registerRestaurantViewModel.description.value = it },
                         label = stringResource(id = R.string.label_restaurant_description),
-                        optional = false
+                        isError = registerRestaurantViewModel.isDescriptionInvalid(),
+                        errorText = stringResource(
+                            if (registerRestaurantViewModel.getDescriptionError() != -1)
+                                registerRestaurantViewModel.getDescriptionError()
+                            else
+                                R.string.error_registerRestaurant_invalid_description
+                        ),
+                        formSent = formSent
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                ShowErrorToast(context = LocalContext.current, id = registerRestaurantViewModel.getToastError())
+
                 ButtonComponent(
-                    label = "Zapisz",
+                    label = stringResource(id = R.string.label_register_restaurant),
                     onClick = {
                         registerRestaurantViewModel.viewModelScope.launch {
                             isLoading = true

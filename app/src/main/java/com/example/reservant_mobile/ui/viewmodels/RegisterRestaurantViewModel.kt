@@ -12,8 +12,10 @@ import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import androidx.core.net.toUri
 import com.example.reservant_mobile.data.services.IRestaurantService
+import com.example.reservant_mobile.data.utils.getFileName
 
-class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
+class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :
+    ViewModel() {
 
     // Wynik rejestracji
     var result by mutableStateOf(Result(isError = false, value = false))
@@ -39,11 +41,31 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     var delivery by mutableStateOf(false)
 
     suspend fun registerRestaurant(context: Context): Boolean {
-        if (isRestaurantRegistrationInvalid()) {
+        if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
 
-        val restaurant = RestaurantDTO(
+        val restaurant = getRestaurantData(context)
+
+        result = restaurantService.registerRestaurant(restaurant)
+
+        return result.value
+    }
+
+    suspend fun validateFirstStep(context: Context): Boolean {
+        if (isRestaurantRegistrationFirstStepInvalid()) {
+            return false
+        }
+
+        val restaurant = getRestaurantData(context)
+
+        result = restaurantService.validateFirstStep(restaurant)
+
+        return result.value
+    }
+
+    suspend fun getRestaurantData(context: Context): RestaurantDTO {
+        return RestaurantDTO(
             name = name.value,
             restaurantType = restaurantType.value,
             nip = nip.value,
@@ -62,11 +84,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             photos = emptyList(),
             tables = emptyList()
         )
-
-        // Rejestracja restauracji
-        result = restaurantService.registerRestaurant(restaurant)
-
-        return result.value
     }
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
@@ -84,21 +101,35 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return fDto?.fileName ?: ""
     }
 
-    fun isRestaurantRegistrationInvalid(): Boolean {
+    fun isRestaurantRegistrationInvalid(context: Context): Boolean {
         return isNameInvalid() ||
                 isNipInvalid() ||
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
                 isDescriptionInvalid() ||
-                isBusinessPermissionInvalid() ||
-                isIdCardInvalid() ||
-                isLogoInvalid()// ||
+                isBusinessPermissionInvalid(context) ||
+                isIdCardInvalid(context) ||
+                isLogoInvalid(context) ||
+                isRestaurantTypeInvalid()// ||
 //                areTagsInvalid()
+    }
+
+    fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
+        return isNameInvalid() ||
+                isNipInvalid() ||
+                isAddressInvalid() ||
+                isPostalCodeInvalid() ||
+                isCityInvalid() ||
+                isRestaurantTypeInvalid()
     }
 
     fun isNameInvalid(): Boolean {
         return name.value.isBlank()
+    }
+
+    fun isRestaurantTypeInvalid(): Boolean {
+        return restaurantType.value.isBlank()
     }
 
     fun isNipInvalid(): Boolean {
@@ -123,7 +154,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return postalCode.length != 6 ||
                 !postalCode.take(2).all { it.isDigit() } ||
                 postalCode[2] != '-' ||
-                !postalCode.substring(3).all { it.isDigit()}
+                !postalCode.substring(3).all { it.isDigit() }
     }
 
     fun isCityInvalid(): Boolean {
@@ -134,67 +165,111 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return description.value.isBlank()
     }
 
-    fun isBusinessPermissionInvalid(): Boolean {
-        return businessPermission.value.isBlank()
+    fun isBusinessPermissionInvalid(context: Context): Boolean {
+        val value = businessPermission.value
+        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+            ".pdf",
+            ignoreCase = true
+        )
     }
 
-    fun isIdCardInvalid(): Boolean {
-        return idCard.value.isBlank()
+    fun isIdCardInvalid(context: Context): Boolean {
+        val value = idCard.value
+        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+            ".pdf",
+            ignoreCase = true
+        )
     }
 
-    fun isLogoInvalid(): Boolean {
-        return logo.value.isBlank()
+    fun isAlcoholLicenseInvalid(context: Context): Boolean {
+        val value = alcoholLicense.value
+        return if (value.isBlank())
+            false
+        else
+            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
     }
+
+    fun isRentalContractInvalid(context: Context): Boolean {
+        val value = rentalContract.value
+        return if (value.isBlank())
+            false
+        else
+            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+    }
+
+
+    fun isLogoInvalid(context: Context): Boolean {
+        val value = logo.value
+        return if (value.isBlank()) {
+            false
+        } else {
+            val fileName = getFileName(context, value.toUri())
+            !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(".jpg", ignoreCase = true))
+        }
+    }
+
 
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
 
-    private fun getFieldError(name: String): Int{
-        if(!result.isError){
+    private fun getFieldError(name: String): Int {
+        if (!result.isError) {
             return -1
         }
 
         return result.errors!!.getOrDefault(name, -1)
     }
 
-    fun getNameError(): Int{
+    fun getNameError(): Int {
         return getFieldError(name.name)
     }
 
-    fun getRestaurantTypeError(): Int{
+    fun getRestaurantTypeError(): Int {
         return getFieldError(restaurantType.name)
     }
 
-    fun getNipError(): Int{
+    fun getNipError(): Int {
         return getFieldError(nip.name)
     }
 
-    fun getAdressError(): Int{
+    fun getAdressError(): Int {
         return getFieldError(address.name)
     }
 
-    fun getPostalError(): Int{
+    fun getPostalError(): Int {
         return getFieldError(postalCode.name)
     }
 
-    fun getCityError(): Int{
+    fun getCityError(): Int {
         return getFieldError(city.name)
     }
 
-    fun getRentalContractError(): Int{
+    fun getRentalContractError(): Int {
         return getFieldError(rentalContract.name)
     }
-    fun getAlcoholLicenseError(): Int{
+
+    fun getAlcoholLicenseError(): Int {
         return getFieldError(alcoholLicense.name)
     }
-    fun getBusinessPermissionError(): Int{
+
+    fun getBusinessPermissionError(): Int {
         return getFieldError(businessPermission.name)
     }
-    fun getLogoError(): Int{
+
+    fun getIdCardError(): Int {
+        return getFieldError(idCard.name)
+    }
+
+    fun getLogoError(): Int {
         return getFieldError(logo.name)
     }
-    fun getDescriptionError(): Int{
+
+    fun getDescriptionError(): Int {
         return getFieldError(description.name)
+    }
+
+    fun getToastError(): Int {
+        return getFieldError("TOAST")
     }
 }
