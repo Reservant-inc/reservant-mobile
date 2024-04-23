@@ -385,7 +385,9 @@ fun RestaurantInfoView(
                 DetailItem(label = "City", value = restaurant.city)
                 DetailItem(label = "Delivery", value = if (restaurant.provideDelivery) "Available" else "Not Available")
                 DetailItem(label = "Description", value = restaurant.description)
-                TagsDetailView(tags = restaurant.tags)
+                if(restaurant.tags.isNotEmpty()){
+                    TagsDetailView(tags = restaurant.tags)
+                }
                 DetailItem(label = "Tables", value = "${restaurant.tables.size}")
             }
 
