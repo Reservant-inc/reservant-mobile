@@ -1,14 +1,15 @@
 package com.example.reservant_mobile.data.services
 
+import androidx.collection.emptyIntSet
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
-import com.example.reservant_mobile.data.models.dtos.LoginResponseDTO
+import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
-import org.json.JSONObject
 
 
 interface IUserService{
@@ -16,6 +17,7 @@ interface IUserService{
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun refreshToken(): Boolean
+
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
@@ -54,7 +56,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         //return true if successful and save token
         if(res.status == HttpStatusCode.OK){
             return try {
-                val user: LoginResponseDTO = res.body()
+                val user: UserDTO = res.body()
                 LocalBearerService().saveBearerToken(user.token)
                 Result(isError = false, value = true)
             }
@@ -71,8 +73,18 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
     }
      override suspend fun refreshToken(): Boolean {
          if(LocalBearerService().getBearerToken().isEmpty()) return false
-         val res = api.get("/auth/refresh-token") ?: return false
-         return res.status == HttpStatusCode.OK
+         val res = api.post("",Endpoints.REFRESH_ACCESS_TOKEN) ?: return false
+         return if(res.status == HttpStatusCode.OK){
+             try{
+                 val user: UserDTO = res.body()
+                 LocalBearerService().saveBearerToken(user.token)
+                 true
+             }
+             catch (e: Exception) {
+                false
+             }
+         }
+         else false
     }
 
 

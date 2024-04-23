@@ -6,7 +6,7 @@ data object Endpoints {
     const val LOGIN="/auth/login"
     const val LOGOUT="/auth/logout"
     const val LOGIN_UNIQUE="/auth/is-unique-login"
-    const val REFRESH_ACCESS_TOKEN="/refresh-token"
+    const val REFRESH_ACCESS_TOKEN="/auth/refresh-token"
     const val REGISTER_CUSTOMER="/auth/register-customer"
     const val REGISTER_CUSTOMER_SUPPORT_AGENT="/auth/register-customer-support-agent"
     const val REGISTER_RESTAURANT_EMPLOYEE="/auth/register-restaurant-employee"
