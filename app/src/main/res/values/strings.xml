@@ -49,4 +49,10 @@
     <string name="label_management_delete_restaurant">Delete local</string>
     <string name="label_management_choose_restaurant">Choose a restaurant</string>
     <string name="label_management_manage">Restaurant management</string>
+    <string name="label_restaurant_delivery">Delivery</string>
+    <string name="label_restaurant_description">Description</string>
+    <string name="label_restaurant_tables">Tables</string>
+    <string name="label_restaurant_delivery_available">Available</string>
+    <string name="label_restaurant_delivery_not_available">Not Available</string>
+    <string name="label_restaurant_tags">Tags</string>
 </resources>
