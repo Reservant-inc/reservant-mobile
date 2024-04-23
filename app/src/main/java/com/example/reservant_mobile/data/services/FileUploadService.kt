@@ -30,24 +30,18 @@ class FileUploadService(private var api: APIService = APIServiceImpl()) {
          }
         )
 
-        val res = api.post(content, Endpoints.FILE_UPLOADS) ?:
-            return Result(true, mapOf(pair = Pair("TOAST", R.string.error_connection_server)), null)
+        val res = api.post(content, Endpoints.FILE_UPLOADS)
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
 
-
-        if (res.status == HttpStatusCode.OK){
+        if (res.value!!.status == HttpStatusCode.OK){
             return try {
-                val r:FileUploadDTO = res.body()
-                Result(isError = false, value = r)
+                Result(isError = false, value = res.value.body())
             }
             catch (e: Exception){
                 Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
             }
         }
-
-         if (res.status == HttpStatusCode.Unauthorized){
-             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
-         }
-
 
          return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
