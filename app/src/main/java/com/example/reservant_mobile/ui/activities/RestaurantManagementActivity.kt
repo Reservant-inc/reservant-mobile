@@ -69,7 +69,7 @@ fun RestaurantManagementActivity(navController: NavHostController) {
         )
         if (restaurants != null) {
             OutLinedDropdownMenu(
-                selectedOption = currentRestaurant?.name ?: "Choose a restaurant",
+                selectedOption = currentRestaurant?.name ?: stringResource(R.string.label_management_choose_restaurant),
                 itemsList = restaurants.map { it.name },
                 onOptionSelected = { name ->
                     selectedRestaurant = restaurants.find { it.name == name }
