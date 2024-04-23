@@ -44,9 +44,6 @@ class MainActivity : ComponentActivity() {
                     composable(route = MainRoutes.ACTIVITY_HOME) {
                         HomeActivity()
                     }
-                    composable(route = RestaurantManagementRoutes.ACTIVITY_MANAGE){
-                        RestaurantManagementActivity(navController = navController)
-                    }
 
                 }
 
