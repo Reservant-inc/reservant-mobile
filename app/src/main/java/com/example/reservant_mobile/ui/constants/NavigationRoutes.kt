@@ -13,6 +13,9 @@ data object MainRoutes {
 
     val ACTIVITY_PROFILE = "${MainRoutes::class.simpleName}/profile"
 }
+data object Management {
+    val ACTIVITY_EMPLOYEE = "${MainRoutes::class.simpleName}/employee"
+}
 
 data object RegisterRestaurantRoutes {
     val ACTIVITY_REGISTER_RESTAURANT = "${RegisterRestaurantRoutes::class.simpleName}/register-restaurant"
