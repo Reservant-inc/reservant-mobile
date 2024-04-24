@@ -65,6 +65,8 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     }
 
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
+        val rental = if (rentalContract.value.isBlank()) null else sendFile(rentalContract.value, context, DataType.PDF)
+        val alcohol = if (alcoholLicense.value.isBlank()) null else sendFile(alcoholLicense.value, context, DataType.PDF)
         return RestaurantDTO(
             name = name.value,
             restaurantType = restaurantType.value,
@@ -72,8 +74,8 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             address = address.value,
             postalIndex = postalCode.value,
             city = city.value,
-            rentalContract = sendFile(rentalContract.value, context, DataType.PDF),
-            alcoholLicense = sendFile(alcoholLicense.value, context, DataType.PDF),
+            rentalContract = rental,
+            alcoholLicense = alcohol,
             businessPermission = sendFile(businessPermission.value, context, DataType.PDF),
             idCard = sendFile(idCard.value, context, DataType.PDF),
             logo = sendPhoto(logo.value, context),
