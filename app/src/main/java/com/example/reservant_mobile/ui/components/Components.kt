@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -57,6 +58,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -112,6 +116,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.EmployeeDTO
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -1000,6 +1005,55 @@ fun ShowErrorToast(context: Context, id: Int) {
         val msg = stringResource(id)
         println("[TOAST] '$msg'")
         Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
+    }
+}
+
+@Composable
+fun EmployeeCard(employee: EmployeeDTO) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            BasicText(
+                text = "${employee.firstName} ${employee.lastName}",
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
+            )
+            BasicText(
+                text = "Login: ${employee.login}",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
+            )
+            BasicText(
+                text = "Phone: ${employee.phoneNumber}",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
+            )
+
+            HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+
+            employee.employments.forEach { employment ->
+                BasicText(
+                    text = "Restaurant ID: ${employment.restaurantId}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                BasicText(
+                    text = "Backdoor Employee: ${employment.isBackdoorEmployee}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                BasicText(
+                    text = "Hall Employee: ${employment.isHallEmployee}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+            }
+        }
     }
 }
 
