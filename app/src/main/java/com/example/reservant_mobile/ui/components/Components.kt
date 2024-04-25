@@ -940,13 +940,14 @@ fun IconWithHeader(
             Image(
                 icon,
                 contentDescription = icon.name,
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(82.dp)
+                    .padding(top = 16.dp)
             )
             Text(
                 text = text,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(4.dp,24.dp,8.dp,4.dp).fillMaxWidth()
+                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
             )
         }
     }
