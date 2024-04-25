@@ -65,7 +65,7 @@ fun RestaurantManagementActivity() {
 
                 if (groups != null) {
                     // Displaying multiple groups
-                    if(groups.size >= 1){
+                    if(groups.size > 1){
                         OutLinedDropdownMenu(
                             label = stringResource(R.string.label_group),
                             selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
