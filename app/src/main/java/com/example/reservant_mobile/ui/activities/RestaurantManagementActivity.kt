@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,10 +84,14 @@ fun RestaurantManagementActivity() {
                             modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                         )
                     // Displaying single group
-                    }else{
+                    }else if(groups.size == 1){
                         restaurantManageVM.viewModelScope.launch {
                             selectedGroup = restaurantManageVM.getGroup(groups[0].id)
                         }
+                    }else{
+                        Text(
+                            text = "You have no restaurants :("
+                        )
                     }
                 }
 
