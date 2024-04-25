@@ -85,6 +85,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -870,19 +871,25 @@ fun CountryCodePickerDialog(
 }
 
 @Composable
-fun LogoWithHeader(
-    text: String
+fun IconWithHeader(
+    icon: ImageVector,
+    text: String,
+    scale: Float = 1F
 ){
     Box(modifier = Modifier.fillMaxWidth()
-        .scale(0.8F)
+        .scale(scale)
     ){
         Row(){
-            Logo()
+            Image(
+                icon,
+                contentDescription = icon.name,
+                modifier = Modifier.size(120.dp)
+            )
             Text(
                 text = text,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
+                modifier = Modifier.padding(4.dp,24.dp,8.dp,4.dp).fillMaxWidth()
             )
         }
     }

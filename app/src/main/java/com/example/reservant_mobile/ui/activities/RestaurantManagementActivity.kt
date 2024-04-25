@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import com.example.reservant_mobile.ui.components.LogoWithHeader
+import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.RestaurantInfoView
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
@@ -55,8 +57,10 @@ fun RestaurantManagementActivity() {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-                LogoWithHeader(
-                    text = stringResource(R.string.label_management_manage)
+                IconWithHeader(
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_management_manage),
+                    scale = 0.9F
                 )
 
                 if (groups != null) {
