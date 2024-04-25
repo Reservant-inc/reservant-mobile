@@ -43,13 +43,15 @@ fun RestaurantManagementActivity() {
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.ACTIVITY_MANAGE) {
         composable(route = RestaurantManagementRoutes.ACTIVITY_MANAGE) {
 
-
+            val groups = restaurantManageVM.groups
             val restaurants = restaurantManageVM.restaurants
+
             var currentRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
             var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
 
+
             restaurantManageVM.viewModelScope.launch {
-                restaurantManageVM.loadRestaurants()
+                restaurantManageVM.initialize()
             }
 
             Column(
