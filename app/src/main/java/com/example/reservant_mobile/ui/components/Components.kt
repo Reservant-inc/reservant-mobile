@@ -874,16 +874,15 @@ fun LogoWithHeader(
     text: String
 ){
     Box(modifier = Modifier.fillMaxWidth()
-        .scale(0.9F)
+        .scale(0.8F)
     ){
-        Row(
-        ){
+        Row(){
             Logo()
             Text(
                 text = text,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(all = 4.dp).fillMaxWidth()
+                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
             )
         }
     }

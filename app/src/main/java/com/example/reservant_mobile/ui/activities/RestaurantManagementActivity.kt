@@ -22,7 +22,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.LogoWithHeader
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
@@ -51,7 +50,7 @@ fun RestaurantManagementActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
@@ -78,7 +77,6 @@ fun RestaurantManagementActivity() {
                     )
                 }
 
-
                 selectedGroup?.restaurants?.forEach { restaurant ->
                     RestaurantInfoView(
                         restaurant = restaurant,
@@ -86,11 +84,11 @@ fun RestaurantManagementActivity() {
                         onManageEmployeeClick = { /*TODO*/ },
                         onManageMenuClick = { /*TODO*/ },
                         onManageSubscriptionClick = { /*TODO*/ }) {
-                        
+
                     }
                 }
                 Spacer(
-                    modifier = Modifier.padding(bottom = 48.dp)
+                    modifier = Modifier.padding(bottom = 64.dp)
                 )
             }
         }
