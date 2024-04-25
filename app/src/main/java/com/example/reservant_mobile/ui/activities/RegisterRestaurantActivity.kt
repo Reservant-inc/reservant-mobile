@@ -108,6 +108,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 OutLinedDropdownMenu(
                     selectedOption = registerRestaurantViewModel.restaurantType.value,
+                    label = stringResource(R.string.label_restaurant_type),
                     itemsList = options,
                     onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it },
                     label = stringResource(id = R.string.label_restaurant_type),

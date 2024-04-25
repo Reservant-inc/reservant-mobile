@@ -707,6 +707,63 @@ fun TagsDetailView(tags: List<String>) {
     }
 }
 
+@Composable
+fun OutLinedDropdownMenu(
+    selectedOption: String,
+    itemsList: List<String>,
+    onOptionSelected: (String) -> Unit,
+    label: String,
+    shape: RoundedCornerShape = roundedShape,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = selectedOption,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text(label) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            interactionSource = interactionSource,
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = if (expanded) "Hide" else "Show"
+                )
+            }
+        )
+
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                if (interaction is PressInteraction.Release) {
+                    expanded = true
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            itemsList.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuBox(

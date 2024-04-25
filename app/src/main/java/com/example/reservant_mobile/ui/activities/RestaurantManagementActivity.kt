@@ -65,6 +65,7 @@ fun RestaurantManagementActivity() {
 
                 if (groups != null) {
                     OutLinedDropdownMenu(
+                        label = stringResource(R.string.label_group),
                         selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
                         itemsList = groups.map { it.name },
                         onOptionSelected = { name ->
