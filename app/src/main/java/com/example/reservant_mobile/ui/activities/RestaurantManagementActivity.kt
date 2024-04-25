@@ -64,24 +64,32 @@ fun RestaurantManagementActivity() {
                 )
 
                 if (groups != null) {
-                    OutLinedDropdownMenu(
-                        label = stringResource(R.string.label_group),
-                        selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
-                        itemsList = groups.map { it.name },
-                        onOptionSelected = { name ->
-                            selectedGroup = groups.find { it.name == name }
-                            restaurantManageVM.viewModelScope.launch {
-                                selectedGroup = selectedGroup?.let { group ->
-                                    restaurantManageVM.getGroup(
-                                        group.id
-                                    )
+                    // Displaying multiple groups
+                    if(groups.size > 1){
+                        OutLinedDropdownMenu(
+                            label = stringResource(R.string.label_group),
+                            selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
+                            itemsList = groups.map { it.name },
+                            onOptionSelected = { name ->
+                                selectedGroup = groups.find { it.name == name }
+                                restaurantManageVM.viewModelScope.launch {
+                                    selectedGroup = selectedGroup?.let { group ->
+                                        restaurantManageVM.getGroup(
+                                            group.id
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                            },
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    // Displaying single group
+                    }else{
+                        restaurantManageVM.viewModelScope.launch {
+                            selectedGroup = restaurantManageVM.getGroup(groups[0].id)
+                        }
+                    }
                 }
-
+                
                 selectedGroup?.restaurants?.forEach { restaurant ->
                     RestaurantInfoView(
                         restaurant = restaurant,
