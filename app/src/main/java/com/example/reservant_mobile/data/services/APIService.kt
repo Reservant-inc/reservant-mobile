@@ -1,11 +1,9 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.TokenDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -19,11 +17,9 @@ import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.accept
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
-import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
-import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
