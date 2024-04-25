@@ -903,7 +903,7 @@ fun BottomNavigation(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Login,
+        BottomNavItem.Management,
         BottomNavItem.Profile
     )
 
