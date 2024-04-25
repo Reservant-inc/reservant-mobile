@@ -54,7 +54,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         if(res.value!!.status == HttpStatusCode.OK){
             return try {
                 val user: UserDTO = res.value.body()
-                LocalBearerService().saveBearerToken(user.token)
+                LocalBearerService().saveBearerToken(user.token!!)
                 Result(isError = false, value = true)
             }
             catch (e: Exception){
@@ -72,7 +72,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
          return if(res.value!!.status == HttpStatusCode.OK){
              try{
                  val user: UserDTO = res.value.body()
-                 LocalBearerService().saveBearerToken(user.token)
+                 LocalBearerService().saveBearerToken(user.token!!)
                  true
              }
              catch (e: Exception) {
