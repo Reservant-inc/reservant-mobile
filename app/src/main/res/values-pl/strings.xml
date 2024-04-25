@@ -69,4 +69,5 @@
     <string name="label_restaurant_delivery_not_available">Nie Dostępna</string>
     <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
+    <string name="label_group">Grupa</string>
 </resources>
