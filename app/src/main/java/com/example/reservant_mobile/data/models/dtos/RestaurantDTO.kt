@@ -21,7 +21,7 @@ data class RestaurantDTO (
     val provideDelivery:Boolean = false,
     val logo:String = "",
     val photos:List<String> = emptyList(),
-    val isVerified:Boolean = false
+    val isVerified:Boolean = false,
     val description:String = "",
     val tags:List<String> = emptyList()
 )
