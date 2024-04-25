@@ -15,20 +15,18 @@ import kotlinx.coroutines.launch
 class RestaurantManagementViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
 
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
-    var restaurants: List<RestaurantDTO>? by mutableStateOf(listOf())
     private var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
 
     suspend fun initialize() {
         loadGroups()
-        loadRestaurants()
     }
 
     private suspend fun loadGroups(){
         groups = restaurantService.getGroups().value;
     }
 
-    private suspend fun loadRestaurants() {
-        restaurants = restaurantService.getRestaurants().value
+    suspend fun getGroup(groupId: Int): RestaurantGroupDTO? {
+        return restaurantService.getGroup(groupId).value
     }
 
     fun selectRestaurant(restaurant: RestaurantDTO) {
@@ -44,7 +42,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
         selectedRestaurant?.let { restaurant ->
             viewModelScope.launch {
                 restaurantService.deleteRestaurant(restaurant.id)
-                loadRestaurants()
+//                loadRestaurants()
             }
         }
     }
