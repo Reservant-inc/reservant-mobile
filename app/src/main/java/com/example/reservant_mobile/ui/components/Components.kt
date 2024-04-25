@@ -81,6 +81,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -868,6 +869,25 @@ fun CountryCodePickerDialog(
     }
 }
 
+@Composable
+fun LogoWithHeader(
+    text: String
+){
+    Box(modifier = Modifier.fillMaxWidth()
+        .scale(0.9F)
+    ){
+        Row(
+        ){
+            Logo()
+            Text(
+                text = text,
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(all = 4.dp).fillMaxWidth()
+            )
+        }
+    }
+}
 
 @Composable
 fun LogoWithReturn(navController: NavController = rememberNavController()) {
