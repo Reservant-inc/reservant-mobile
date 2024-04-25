@@ -3,18 +3,18 @@ package com.example.reservant_mobile.data.models.dtos
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RestaurantEmployeeDTO(
-    val id: String = "",
-    val restaurantId: String = "",
-    val login: String = "",
-    val firstName: String = "",
-    val lastName: String = "",
-    val phoneNumber: String = "",
-    val password: String = "",
-    val roles: List<String> = emptyList(),
-    val isHallEmployee:Boolean = false,
-    val isBackdoorEmployee:Boolean = false,
-    val dateFrom: String = "",
+data class RestaurantEmployeeDTO (
+    val id: String? = null,
+    val login: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val phoneNumber: String? = null,
+    val password: String? = null,
+    val roles: List<String>? = null,
+    val isHallEmployee:Boolean? = null,
+    val isBackdoorEmployee:Boolean? = null,
+    val restaurantId: String = null,
+    val dateFrom: String = null,
     val dateUntil: String? = null,
     val employmentId: String? = null
 )
