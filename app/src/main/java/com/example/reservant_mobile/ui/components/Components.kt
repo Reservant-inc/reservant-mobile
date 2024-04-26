@@ -7,9 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +33,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -58,8 +55,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
@@ -116,7 +111,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.EmployeeDTO
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -125,6 +119,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.theme.AppTheme
+import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -1009,7 +1004,7 @@ fun ShowErrorToast(context: Context, id: Int) {
 }
 
 @Composable
-fun EmployeeCard(employee: EmployeeDTO) {
+fun EmployeeCard(employee: RestaurantEmployeeDTO) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1023,39 +1018,33 @@ fun EmployeeCard(employee: EmployeeDTO) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            BasicText(
+            Text(
                 text = "${employee.firstName} ${employee.lastName}",
                 style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
             )
-            BasicText(
+            Text(
                 text = "Login: ${employee.login}",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
             )
-            BasicText(
+            Text(
                 text = "Phone: ${employee.phoneNumber}",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
             )
 
             HorizontalDivider(thickness = 1.dp, color = Color.Gray)
 
-            employee.employments.forEach { employment ->
-                BasicText(
-                    text = "Restaurant ID: ${employment.restaurantId}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                BasicText(
-                    text = "Backdoor Employee: ${employment.isBackdoorEmployee}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                BasicText(
-                    text = "Hall Employee: ${employment.isHallEmployee}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                HorizontalDivider(thickness = 1.dp, color = Color.Gray)
-            }
+            Text(
+                text = "Hall Employee: ${employee.isHallEmployee}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Backdoor Employee: ${employee.isBackdoorEmployee}",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }
+
 
 @Composable
 fun BottomNavigation(navController: NavHostController) {
