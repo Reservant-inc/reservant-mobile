@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -1048,6 +1047,7 @@ fun EmployeeCard(employee: RestaurantEmployeeDTO) {
         }
     }
 }
+
 
 @Composable
 fun BottomNavigation(navController: NavHostController) {
