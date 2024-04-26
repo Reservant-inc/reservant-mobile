@@ -6,7 +6,7 @@ data object Endpoints {
     const val LOGIN="/auth/login"
     const val LOGOUT="/auth/logout"
     const val LOGIN_UNIQUE="/auth/is-unique-login"
-    const val REFRESH_ACCESS_TOKEN="/refresh-token"
+    const val REFRESH_ACCESS_TOKEN="/auth/refresh-token"
     const val REGISTER_CUSTOMER="/auth/register-customer"
     const val REGISTER_CUSTOMER_SUPPORT_AGENT="/auth/register-customer-support-agent"
     const val REGISTER_RESTAURANT_EMPLOYEE="/auth/register-restaurant-employee"
@@ -22,4 +22,6 @@ data object Endpoints {
     fun MOVE_RESTAURANT_TO_GROUP(id: String) = "/my-restaurants/$id/move-to-group"
     const val MY_RESTAURANT_GROUPS="/my-restaurant-groups"
     fun MY_RESTAURANT_GROUP(id: String) = "/my-restaurant-groups/$id"
+    const val RESTAURANT_TAGS="/restaurant-tags"
+    const val USER_EMPLOYEES="/user/employees"
 }
