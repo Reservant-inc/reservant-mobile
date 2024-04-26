@@ -1,22 +1,45 @@
 package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
+import com.example.reservant_mobile.ui.components.ReservantTopAppBar
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import io.ktor.websocket.Frame
+import java.lang.reflect.Modifier
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeActivity() {
     val innerNavController = rememberNavController()
 
     Scaffold(
+        topBar = {
+            ReservantTopAppBar(title = {
+                Text(text = "Reservant", fontWeight = FontWeight.Bold)
+            })},
         bottomBar = {
             BottomNavigation(innerNavController)
         }
@@ -35,4 +58,10 @@ fun HomeActivity() {
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHome() {
+    HomeActivity()
 }
