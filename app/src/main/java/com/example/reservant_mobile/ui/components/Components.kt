@@ -790,7 +790,9 @@ fun ReservantTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable (RowScope.() -> Unit) = {},
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
+        //containerColor = Color.Cyan
+    ),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
