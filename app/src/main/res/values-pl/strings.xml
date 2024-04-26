@@ -47,5 +47,11 @@
     <string name="label_management_delete_restaurant">Usuń lokal</string>
     <string name="label_management_choose_restaurant">Wybierz lokal</string>
     <string name="label_management_manage">Zarządzanie restauracją</string>
+    <string name="label_restaurant_delivery">Dostawa</string>
+    <string name="label_restaurant_description">Opis</string>
+    <string name="label_restaurant_tables">Stoliki</string>
+    <string name="label_restaurant_delivery_available">Dostępna</string>
+    <string name="label_restaurant_delivery_not_available">Nie Dostępna</string>
+    <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
 </resources>
