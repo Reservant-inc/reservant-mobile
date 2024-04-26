@@ -19,6 +19,8 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     // Wynik rejestracji
     var result by mutableStateOf(Result(isError = false, value = false))
+    var result2 by mutableStateOf(Result(isError = false, value = false))
+    var result3 by mutableStateOf(Result(isError = false, value = false))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
@@ -215,63 +217,64 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return selectedTags.isEmpty()
     }
 
-    private fun getFieldError(name: String): Int {
+    private fun <T> getFieldError(result: Result<T>, name: String): Int {
         if (!result.isError) {
             return -1
         }
 
-        return result.errors!!.getOrDefault(name, -1)
+        return result.errors?.getOrDefault(name, -1) ?: -1
     }
 
+
     fun getNameError(): Int {
-        return getFieldError(name.name)
+        return getFieldError(result, name.name)
     }
 
     fun getRestaurantTypeError(): Int {
-        return getFieldError(restaurantType.name)
+        return getFieldError(result, restaurantType.name)
     }
 
     fun getNipError(): Int {
-        return getFieldError(nip.name)
+        return getFieldError(result, nip.name)
     }
 
     fun getAdressError(): Int {
-        return getFieldError(address.name)
+        return getFieldError(result, address.name)
     }
 
     fun getPostalError(): Int {
-        return getFieldError(postalCode.name)
+        return getFieldError(result, postalCode.name)
     }
 
     fun getCityError(): Int {
-        return getFieldError(city.name)
+        return getFieldError(result, city.name)
     }
 
     fun getRentalContractError(): Int {
-        return getFieldError(rentalContract.name)
+        return getFieldError(result2, rentalContract.name)
     }
 
     fun getAlcoholLicenseError(): Int {
-        return getFieldError(alcoholLicense.name)
+        return getFieldError(result2, alcoholLicense.name)
     }
 
     fun getBusinessPermissionError(): Int {
-        return getFieldError(businessPermission.name)
+        return getFieldError(result2, businessPermission.name)
     }
 
     fun getIdCardError(): Int {
-        return getFieldError(idCard.name)
+        return getFieldError(result2, idCard.name)
     }
 
     fun getLogoError(): Int {
-        return getFieldError(logo.name)
+        return getFieldError(result3, logo.name)
     }
 
     fun getDescriptionError(): Int {
-        return getFieldError(description.name)
+        return getFieldError(result3, description.name)
     }
 
-    fun getToastError(): Int {
-        return getFieldError("TOAST")
+    fun <T> getToastError(result: Result<T>): Int {
+        return getFieldError(result, "TOAST")
     }
 }

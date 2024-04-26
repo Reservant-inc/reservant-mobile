@@ -169,6 +169,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result)
+                )
+
                 ButtonComponent(
                     label = stringResource(id = R.string.label_next),
                     onClick = {
@@ -200,7 +205,10 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             ) {
 
                 Spacer(modifier = Modifier.height(40.dp))
-                Text(text = stringResource(id = R.string.label_uploadFiles), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(id = R.string.label_uploadFiles),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 Spacer(modifier = Modifier.height(40.dp))
 
                 InputUserFile(
@@ -290,6 +298,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     Spacer(Modifier.width(16.dp))
 
                     // TODO: 2nd step validation
+                    ShowErrorToast(
+                        context = LocalContext.current,
+                        id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                    )
+
                     ButtonComponent(
                         label = stringResource(R.string.label_add_to_group),
                         onClick = {
@@ -377,7 +390,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // File upload and description
                 Column {
                     InputUserFile(
                         label = stringResource(id = R.string.label_restaurant_logo),
@@ -411,7 +423,10 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ShowErrorToast(context = LocalContext.current, id = registerRestaurantViewModel.getToastError())
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result3)
+                )
 
                 ButtonComponent(
                     label = stringResource(id = R.string.label_register_restaurant),
