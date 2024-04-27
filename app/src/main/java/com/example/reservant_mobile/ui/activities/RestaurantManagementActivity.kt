@@ -40,75 +40,70 @@ fun RestaurantManagementActivity() {
     val restaurantManageVM = viewModel<RestaurantManagementViewModel>()
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = RestaurantManagementRoutes.ACTIVITY_MANAGE) {
-        composable(route = RestaurantManagementRoutes.ACTIVITY_MANAGE) {
+    val groups = restaurantManageVM.groups
+    var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
 
-            val groups = restaurantManageVM.groups
-            var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
+    restaurantManageVM.viewModelScope.launch {
+        restaurantManageVM.initialize()
+    }
 
-            restaurantManageVM.viewModelScope.launch {
-                restaurantManageVM.initialize()
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp, 8.dp, 16.dp, 8.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
+        IconWithHeader(
+            icon = Icons.Rounded.RestaurantMenu,
+            text = stringResource(R.string.label_management_manage),
+            scale = 0.9F
+        )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-                IconWithHeader(
-                    icon = Icons.Rounded.RestaurantMenu,
-                    text = stringResource(R.string.label_management_manage),
-                    scale = 0.9F
-                )
-
-                if (groups != null) {
-                    // Displaying multiple groups
-                    if(groups.size > 1){
-                        OutLinedDropdownMenu(
-                            label = stringResource(R.string.label_group),
-                            selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
-                            itemsList = groups.map { it.name },
-                            onOptionSelected = { name ->
-                                selectedGroup = groups.find { it.name == name }
-                                restaurantManageVM.viewModelScope.launch {
-                                    selectedGroup = selectedGroup?.let { group ->
-                                        restaurantManageVM.getGroup(
-                                            group.id
-                                        )
-                                    }
-                                }
-                            },
-                            modifier = Modifier.padding(start = 4.dp, end = 4.dp)
-                        )
-                    // Displaying single group
-                    }else if(groups.size == 1){
+        if (groups != null) {
+            // Displaying multiple groups
+            if(groups.size > 1){
+                OutLinedDropdownMenu(
+                    label = stringResource(R.string.label_group),
+                    selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
+                    itemsList = groups.map { it.name },
+                    onOptionSelected = { name ->
+                        selectedGroup = groups.find { it.name == name }
                         restaurantManageVM.viewModelScope.launch {
-                            selectedGroup = restaurantManageVM.getGroup(groups[0].id)
+                            selectedGroup = selectedGroup?.let { group ->
+                                restaurantManageVM.getGroup(
+                                    group.id
+                                )
+                            }
                         }
-                    }else{
-                        Text(
-                            text = "You have no restaurants :("
-                        )
-                    }
+                    },
+                    modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                )
+                // Displaying single group
+            }else if(groups.size == 1){
+                restaurantManageVM.viewModelScope.launch {
+                    selectedGroup = restaurantManageVM.getGroup(groups[0].id)
                 }
-
-                selectedGroup?.restaurants?.forEach { restaurant ->
-                    RestaurantInfoView(
-                        restaurant = restaurant,
-                        onEditClick = { /*TODO*/ },
-                        onManageEmployeeClick = { /*TODO*/ },
-                        onManageMenuClick = { /*TODO*/ },
-                        onManageSubscriptionClick = { /*TODO*/ }) {
-
-                    }
-                }
-                Spacer(
-                    modifier = Modifier.padding(bottom = 64.dp)
+            }else{
+                Text(
+                    text = "You have no restaurants :("
                 )
             }
         }
+
+        selectedGroup?.restaurants?.forEach { restaurant ->
+            RestaurantInfoView(
+                restaurant = restaurant,
+                onEditClick = { /*TODO*/ },
+                onManageEmployeeClick = { /*TODO*/ },
+                onManageMenuClick = { /*TODO*/ },
+                onManageSubscriptionClick = { /*TODO*/ }) {
+
+            }
+        }
+        Spacer(
+            modifier = Modifier.padding(bottom = 64.dp)
+        )
     }
 }
