@@ -62,7 +62,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
         //return errors in toast when connection error
-        val res = api.post(credentials, Endpoints.REGISTER_CUSTOMER)
+        val res = api.post(credentials, Endpoints.LOGIN)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
