@@ -67,7 +67,6 @@
     <string name="label_next">Next</string>
     <string name="label_uploadFiles">Upload the necessary files:</string>
     <string name="label_restaurant_delivery">Delivery</string>
-    <string name="label_restaurant_description">Description</string>
     <string name="label_restaurant_tables">Tables</string>
     <string name="label_restaurant_delivery_available">Available</string>
     <string name="label_restaurant_delivery_not_available">Not Available</string>
