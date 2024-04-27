@@ -32,7 +32,7 @@ interface IRestaurantService{
 
 class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
 
-    override suspend fun registerRestaurant(restaurant: RegisterRestaurantDTO): Result<Boolean> {
+    override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<Boolean> {
         val res = api.post(restaurant, Endpoints.MY_RESTAURANTS)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
