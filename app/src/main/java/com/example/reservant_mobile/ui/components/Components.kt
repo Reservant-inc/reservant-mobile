@@ -7,7 +7,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -15,12 +17,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
@@ -33,6 +39,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -95,6 +102,7 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -538,6 +546,161 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
                 onBirthdayChange(it)
             },
             onDismiss = { showDatePicker = false }
+        )
+    }
+}
+@Composable
+fun RestaurantInfoView(
+    restaurant: RestaurantDTO,
+    onEditClick: () -> Unit,
+    onManageEmployeeClick: () -> Unit,
+    onManageMenuClick: () -> Unit,
+    onManageSubscriptionClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "${restaurant.name} - ${restaurant.restaurantType}",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_nip),
+                    value = restaurant.nip
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_address),
+                    value = "${restaurant.address}, ${restaurant.postalIndex}"
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_city),
+                    value = restaurant.city
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_delivery),
+                    value =
+                        if (restaurant.provideDelivery)
+                            stringResource(R.string.label_restaurant_delivery_available)
+                        else
+                            stringResource(R.string.label_restaurant_delivery_not_available)
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_description),
+                    value = restaurant.description
+                )
+                if(restaurant.tags.isNotEmpty()){
+                    TagsDetailView(tags = restaurant.tags)
+                }
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_tables),
+                    value = "${restaurant.tables.size}"
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopEnd)
+                    .offset(x = 16.dp)
+                    .offset(y = (-12).dp)
+            ) {
+                IconButton(
+                    onClick = { showMenu = !showMenu },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onEditClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_edit_local_data))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageEmployeeClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_employees))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageMenuClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_menu))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageSubscriptionClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_subscription))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onDeleteClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_delete_restaurant))}
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailItem(label: String, value: String) {
+    Column(
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Text(
+            "$label:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun TagsDetailView(tags: List<String>) {
+    if (tags.isNotEmpty()) {
+        val tagsString = tags.joinToString(separator = ", ")
+        DetailItem(
+            label = stringResource(R.string.label_restaurant_tags),
+            value = tagsString
         )
     }
 }

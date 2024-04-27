@@ -6,6 +6,7 @@ import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.services.IUserService
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.services.LocalBearerService
 
 class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 
@@ -31,7 +32,7 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
     }
 
     suspend fun refreshToken(): Boolean{
-        return userService.refreshToken()
+        return LocalBearerService().getBearerToken().isNotEmpty() && userService.refreshToken()
     }
     
     private fun isLoginInvalid(): Boolean{
