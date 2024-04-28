@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import java.io.File
 
 @Serializable
-data class RegisterRestaurantDTO (
+data class RegisterRestaurantDTO(
     val name: String,
     val nip: String,
     val restaurantType: String,
@@ -14,5 +14,9 @@ data class RegisterRestaurantDTO (
     val lease: String,
     val license: String,
     val consent: String,
-    val idCard: String
+    val idCard: String,
+    val description: String,
+    val delivery: Boolean,
+    val tags: List<String>,
+    val logo: String
 )

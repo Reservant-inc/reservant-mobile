@@ -29,26 +29,28 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -78,7 +80,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -96,6 +100,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
+import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import kotlinx.coroutines.launch
@@ -128,6 +133,11 @@ fun InputUserInfo(
         mutableStateOf(false)
     }
 
+    if (inputText.isNotEmpty())
+        beginValidation = true
+
+    if (inputText.isEmpty() && optional)
+        beginValidation = false
 
     Column {
         OutlinedTextField(
@@ -150,7 +160,7 @@ fun InputUserInfo(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+                        Text(text = stringResource(id = R.string.label_optional), color = Color.Gray, fontStyle = FontStyle.Italic)
                 }
             },
             placeholder = { Text(text = placeholder) },
@@ -165,7 +175,7 @@ fun InputUserInfo(
             maxLines = maxLines,
             leadingIcon = leadingIcon,
 
-        )
+            )
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
@@ -177,10 +187,242 @@ fun InputUserInfo(
 }
 
 @Composable
+fun InputUserFile(
+    label: String = "",
+    onFilePicked: (Uri?) -> Unit,
+    modifier: Modifier = Modifier,
+    context: Context,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    isError: Boolean = false,
+    errorText: String = "",
+    formSent: Boolean = false,
+    optional: Boolean = false,
+    deletable: Boolean = false
+) {
+    var fileName by remember { mutableStateOf<String?>(null) }
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        fileName = uri?.let { getFileName(context, it) }
+        onFilePicked(uri)
+    }
+    var beginValidation: Boolean by remember { mutableStateOf(false) }
+
+    if (fileName != null) {
+        beginValidation = true
+    }
+    if (fileName == null && optional) {
+        beginValidation = false
+    }
+
+    OutlinedTextField(
+        modifier =
+        if (optional) {
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        } else {
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .onFocusChanged {
+                    if (it.hasFocus) {
+                        beginValidation = true
+                    }
+                }
+        },
+        value = fileName ?: "",
+        onValueChange = { },
+        label = {
+            Row {
+                Text(text = label)
+                if (optional) {
+                    Text(
+                        text = stringResource(R.string.label_optional),
+                        color = Color.Gray,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            }
+        },
+        readOnly = true,
+        visualTransformation = VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default,
+        interactionSource = remember { MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is PressInteraction.Release) {
+                            pickFileLauncher.launch("*/*")
+                        }
+                    }
+                }
+            },
+        trailingIcon = {
+            if (deletable && fileName != null) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete file",
+                    modifier = Modifier.clickable {
+                        fileName = null
+                        onFilePicked(null)
+                    }
+                )
+            } else if (fileName == null) {
+                Icon(
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = "Attach file"
+                )
+            }
+        },
+        shape = shape,
+        isError = isError && (beginValidation || formSent),
+    )
+
+    if (isError && (beginValidation || formSent)) {
+        Text(
+            text = errorText,
+            color = Color.Red
+        )
+    }
+}
+
+
+@Composable
+fun OutLinedDropdownMenu(
+    selectedOption: String,
+    itemsList: List<String>,
+    onOptionSelected: (String) -> Unit,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    errorText: String = "",
+    formSent: Boolean = false,
+    label: String = "",
+    optional: Boolean = false
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    var beginValidation: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    if (selectedOption.isNotEmpty())
+        beginValidation = true
+    if (selectedOption.isEmpty() && optional)
+        beginValidation = false
+
+    Column {
+        OutlinedTextField(
+            modifier =
+            if (optional) {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            } else {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .onFocusChanged {
+                        if (it.hasFocus) beginValidation = true
+                    }
+            },
+            value = selectedOption,
+            onValueChange = { },
+            readOnly = true,
+            label = {
+                Row {
+                    Text(text = label)
+                    if (optional)
+                        Text(text = stringResource(id = R.string.label_optional), color = Color.Gray, fontStyle = FontStyle.Italic)
+                }
+            },
+            interactionSource = interactionSource,
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = if (expanded) "Hide" else "Show"
+                )
+            },
+            shape = shape,
+            isError = isError && (beginValidation || formSent),
+        )
+        if (isError && (beginValidation || formSent)) {
+            Text(
+                text = errorText,
+                color = Color.Red
+            )
+        }
+
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                if (interaction is PressInteraction.Release) {
+                    expanded = true
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            itemsList.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ButtonComponent(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    label: String = "",
+    isLoading: Boolean = false
+) {
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.secondary
+        )
+    )
+
+    Button(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(gradientBrush, RoundedCornerShape(16.dp)),  // Gradient tła
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,  // Transparentny, by pokazać gradient
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        } else {
+            Text(text = label)
+        }
+    }
+}
+
+
+@Composable
 fun TagsSelection(
     tags: List<String>,
     selectedTags: List<String>,
-    onTagSelected: (String, Boolean) -> Unit
+    onTagSelected: (String, Boolean) -> Unit,
 ) {
     Column {
         tags.forEach { tag ->
@@ -206,53 +448,6 @@ fun TagsSelection(
             }
         }
     }
-}
-
-@Composable
-fun InputUserFile(
-    label: String = "",
-    modifier: Modifier = Modifier,
-    onFilePicked: (Uri?) -> Unit
-) {
-    val pickFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        onFilePicked(uri)
-    }
-
-    ButtonComponent(
-        label = label,
-        onClick = {
-            pickFileLauncher.launch("*/*")
-        },
-        modifier = modifier
-    )
-}
-
-@Composable
-fun ButtonComponent(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    label: String = "",
-    isLoading: Boolean = false
-) {
-    Button(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .testTag("Button"),
-        onClick = onClick,
-        content = {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp),
-                    trackColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            } else {
-                Text(text = label)
-            }
-        }
-    )
 }
 
 @Composable
@@ -509,62 +704,6 @@ fun TagsDetailView(tags: List<String>) {
         )
     }
 }
-
-@Composable
-fun OutLinedDropdownMenu(
-    selectedOption: String,
-    itemsList: List<String>,
-    onOptionSelected: (String) -> Unit,
-    shape: RoundedCornerShape = roundedShape,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(stringResource(R.string.label_restaurant_type)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            interactionSource = interactionSource,
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Hide" else "Show"
-                )
-            }
-        )
-
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                if (interaction is PressInteraction.Release) {
-                    expanded = true
-                }
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsList.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

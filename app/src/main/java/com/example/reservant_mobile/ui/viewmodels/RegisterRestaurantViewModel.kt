@@ -1,109 +1,280 @@
 package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.fields.FormField
+import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.services.DataType
+import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
+import com.example.reservant_mobile.data.utils.getFileFromUri
+import androidx.core.net.toUri
+import com.example.reservant_mobile.data.services.IRestaurantService
+import com.example.reservant_mobile.data.utils.getFileName
 
-class RegisterRestaurantViewModel : ViewModel() {
+class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :
+    ViewModel() {
 
-    var name by mutableStateOf("")
-    var nip by mutableStateOf("")
-    var restaurantType by mutableStateOf("Restaurant")
-    var address by mutableStateOf("")
-    var postalCode by mutableStateOf("")
-    var city by mutableStateOf("")
+    // Wynik rejestracji
+    var result by mutableStateOf(Result(isError = false, value = false))
+    var result2 by mutableStateOf(Result(isError = false, value = false))
+    var result3 by mutableStateOf(Result(isError = false, value = false))
 
-    var leaseUri by mutableStateOf<String?>(null)
-    var licenseUri by mutableStateOf<String?>(null)
-    var consentUri by mutableStateOf<String?>(null)
-    var idCardUri by mutableStateOf<String?>(null)
+    // Pola do walidacji
+    val name: FormField = FormField(RestaurantDTO::name.name)
+    val restaurantType: FormField = FormField(RestaurantDTO::restaurantType.name)
+    val nip: FormField = FormField(RestaurantDTO::nip.name)
+    val address: FormField = FormField(RestaurantDTO::address.name)
+    val postalCode: FormField = FormField(RestaurantDTO::postalIndex.name)
+    val city: FormField = FormField(RestaurantDTO::city.name)
+    val description: FormField = FormField(RestaurantDTO::description.name)
 
-    suspend fun registerRestaurant(context: Context): Int {
+    // Pliki do załączenia
+    val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
+    val alcoholLicense: FormField = FormField(RestaurantDTO::alcoholLicense.name)
+    val businessPermission: FormField = FormField(RestaurantDTO::businessPermission.name)
+    val idCard: FormField = FormField(RestaurantDTO::idCard.name)
+    val logo: FormField = FormField(RestaurantDTO::logo.name)
 
-        if (isRestaurantRegistrationInvalid()) {
-            return R.string.error_register_invalid_request
+    // Tagowanie i inne
+    var selectedTags = mutableStateListOf<String>()
+    var delivery by mutableStateOf(false)
+
+    suspend fun registerRestaurant(context: Context): Boolean {
+        if (isRestaurantRegistrationInvalid(context)) {
+            return false
         }
 
-//        !!! Example of FileUploadServiceUsage !!!
-//        val file = leaseUri?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-//        val fDto: FileUploadDTO? = file?.let { FileUploadService().sendFile(FileUploadService.PDF, it).value }
+        val restaurant = getRestaurantData(context)
 
-        val restaurant = RegisterRestaurantDTO(
-            name = name,
-            nip = nip,
-            restaurantType = restaurantType,
-            address = address,
-            postalCode = postalCode,
-            city = city,
-            lease = leaseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) },
-            license = licenseUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri( context, it.toUri() },
-            consent = consentUri?: "",//?.let { GetFileFromURIUtil().getFileDataFromUri(context,it.toUri() },
-            idCard = idCardUri?: ""//?.let { GetFileFromURIUtil().getFileDataFromUri(context, it.toUri()) }
-        )
+        result = restaurantService.registerRestaurant(restaurant)
 
-        val rService = RestaurantService()
-//        FIXME: Add restaurant service implementation
-//        return rService.registerRestaurant(restaurant)[0]
-        return -1
+        return result.value
     }
 
-    fun isRestaurantRegistrationInvalid(): Boolean {
+    suspend fun validateFirstStep(context: Context): Boolean {
+        if (isRestaurantRegistrationFirstStepInvalid()) {
+            return false
+        }
+
+        val restaurant = getRestaurantData(context)
+
+        result = restaurantService.validateFirstStep(restaurant)
+
+        return result.value
+    }
+
+    suspend fun getRestaurantData(context: Context): RestaurantDTO {
+        val rental = if (rentalContract.value.isBlank()) null else sendFile(rentalContract.value, context, DataType.PDF)
+        val alcohol = if (alcoholLicense.value.isBlank()) null else sendFile(alcoholLicense.value, context, DataType.PDF)
+        return RestaurantDTO(
+            name = name.value,
+            restaurantType = restaurantType.value,
+            nip = nip.value,
+            address = address.value,
+            postalIndex = postalCode.value,
+            city = city.value,
+            rentalContract = rental,
+            alcoholLicense = alcohol,
+            businessPermission = sendFile(businessPermission.value, context, DataType.PDF),
+            idCard = sendFile(idCard.value, context, DataType.PDF),
+            logo = sendPhoto(logo.value, context),
+            description = description.value,
+            provideDelivery = delivery,
+            tags = selectedTags.toList(),
+            groupId = null,
+            photos = emptyList(),
+            tables = emptyList()
+        )
+    }
+
+    suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        val fDto = file?.let { FileUploadService().sendFile(type, it).value }
+        return fDto?.fileName ?: ""
+    }
+
+    suspend fun sendPhoto(uri: String?, context: Context): String {
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        var fDto = file?.let { FileUploadService().sendFile(DataType.PNG, it).value }
+        if (fDto == null) {
+            fDto = file?.let { FileUploadService().sendFile(DataType.JPG, it).value }
+        }
+        return fDto?.fileName ?: ""
+    }
+
+    fun isRestaurantRegistrationInvalid(context: Context): Boolean {
         return isNameInvalid() ||
                 isNipInvalid() ||
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
-                isValidUri(leaseUri) ||
-                isValidUri(licenseUri) ||
-                isValidUri(consentUri) ||
-                isValidUri(idCardUri)
+                isDescriptionInvalid() ||
+                isBusinessPermissionInvalid(context) ||
+                isIdCardInvalid(context) ||
+                isLogoInvalid(context) ||
+                isRestaurantTypeInvalid()// ||
+//                areTagsInvalid()
     }
 
-    private fun isNameInvalid(): Boolean {
-        return name.isBlank()
+    fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
+        return isNameInvalid() ||
+                isNipInvalid() ||
+                isAddressInvalid() ||
+                isPostalCodeInvalid() ||
+                isCityInvalid() ||
+                isRestaurantTypeInvalid()
     }
 
-    private fun isNipInvalid(): Boolean {
-        // Sprawdzenie czy NIP składa się z 10 cyfr
-        if (nip.length != 10 || !nip.all { it.isDigit() }) {
+    fun isNameInvalid(): Boolean {
+        return name.value.isBlank()
+    }
+
+    fun isRestaurantTypeInvalid(): Boolean {
+        return restaurantType.value.isBlank()
+    }
+
+    fun isNipInvalid(): Boolean {
+        if (nip.value.length != 10 || !nip.value.all { it.isDigit() }) {
             return true
         }
 
-        // Wagi dla poszczególnych cyfr NIP
         val weights = listOf(6, 5, 7, 2, 3, 4, 5, 6, 7)
-
-        // Obliczanie sumy iloczynów
-        var sum = 0
-        for (i in 0 until 9) {
-            sum += Character.getNumericValue(nip[i]) * weights[i]
-        }
-
-        // Sprawdzenie poprawności ostatniej cyfry kontrolnej
+        val sum = (0 until 9).sumOf { Character.getNumericValue(nip.value[it]) * weights[it] }
         val controlDigit = if (sum % 11 == 10) 0 else sum % 11
-        val lastDigit = Character.getNumericValue(nip[9])
+        val lastDigit = Character.getNumericValue(nip.value[9])
+
         return controlDigit != lastDigit
     }
 
-    private fun isAddressInvalid(): Boolean {
-        return address.isBlank()
+    fun isAddressInvalid(): Boolean {
+        return address.value.isBlank()
     }
 
-    private fun isPostalCodeInvalid(): Boolean {
-        return postalCode.length != 6 || !postalCode.take(2)
-            .all { it.isDigit() } || postalCode[2] != '-' || !postalCode.substring(3)
-            .all { it.isDigit() }
+    fun isPostalCodeInvalid(): Boolean {
+        val postalCode = postalCode.value
+        return postalCode.length != 6 ||
+                !postalCode.take(2).all { it.isDigit() } ||
+                postalCode[2] != '-' ||
+                !postalCode.substring(3).all { it.isDigit() }
     }
 
-    private fun isCityInvalid(): Boolean {
-        return city.isBlank()
+    fun isCityInvalid(): Boolean {
+        return city.value.isBlank()
     }
 
-    private fun isValidUri(uri: String?): Boolean {
-        return uri != null
+    fun isDescriptionInvalid(): Boolean {
+        return description.value.isBlank()
+    }
+
+    fun isBusinessPermissionInvalid(context: Context): Boolean {
+        val value = businessPermission.value
+        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+            ".pdf",
+            ignoreCase = true
+        )
+    }
+
+    fun isIdCardInvalid(context: Context): Boolean {
+        val value = idCard.value
+        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+            ".pdf",
+            ignoreCase = true
+        )
+    }
+
+    fun isAlcoholLicenseInvalid(context: Context): Boolean {
+        val value = alcoholLicense.value
+        return if (value.isBlank())
+            false
+        else
+            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+    }
+
+    fun isRentalContractInvalid(context: Context): Boolean {
+        val value = rentalContract.value
+        return if (value.isBlank())
+            false
+        else
+            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+    }
+
+
+    fun isLogoInvalid(context: Context): Boolean {
+        val value = logo.value
+        return if (value.isBlank()) {
+            false
+        } else {
+            val fileName = getFileName(context, value.toUri())
+            !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(".jpg", ignoreCase = true))
+        }
+    }
+
+
+    fun areTagsInvalid(): Boolean {
+        return selectedTags.isEmpty()
+    }
+
+    private fun <T> getFieldError(result: Result<T>, name: String): Int {
+        if (!result.isError) {
+            return -1
+        }
+
+        return result.errors?.getOrDefault(name, -1) ?: -1
+    }
+
+
+    fun getNameError(): Int {
+        return getFieldError(result, name.name)
+    }
+
+    fun getRestaurantTypeError(): Int {
+        return getFieldError(result, restaurantType.name)
+    }
+
+    fun getNipError(): Int {
+        return getFieldError(result, nip.name)
+    }
+
+    fun getAdressError(): Int {
+        return getFieldError(result, address.name)
+    }
+
+    fun getPostalError(): Int {
+        return getFieldError(result, postalCode.name)
+    }
+
+    fun getCityError(): Int {
+        return getFieldError(result, city.name)
+    }
+
+    fun getRentalContractError(): Int {
+        return getFieldError(result2, rentalContract.name)
+    }
+
+    fun getAlcoholLicenseError(): Int {
+        return getFieldError(result2, alcoholLicense.name)
+    }
+
+    fun getBusinessPermissionError(): Int {
+        return getFieldError(result2, businessPermission.name)
+    }
+
+    fun getIdCardError(): Int {
+        return getFieldError(result2, idCard.name)
+    }
+
+    fun getLogoError(): Int {
+        return getFieldError(result3, logo.name)
+    }
+
+    fun getDescriptionError(): Int {
+        return getFieldError(result3, description.name)
+    }
+
+    fun <T> getToastError(result: Result<T>): Int {
+        return getFieldError(result, "TOAST")
     }
 }
