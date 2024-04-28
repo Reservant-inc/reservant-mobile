@@ -111,7 +111,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     label = stringResource(R.string.label_restaurant_type),
                     itemsList = options,
                     onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it },
-                    label = stringResource(id = R.string.label_restaurant_type),
                     isError = registerRestaurantViewModel.isRestaurantTypeInvalid(),
                     errorText = stringResource(
                         if (registerRestaurantViewModel.getRestaurantTypeError() != -1)
