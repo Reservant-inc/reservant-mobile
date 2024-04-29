@@ -81,9 +81,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -705,6 +707,63 @@ fun TagsDetailView(tags: List<String>) {
     }
 }
 
+@Composable
+fun OutLinedDropdownMenu(
+    selectedOption: String,
+    itemsList: List<String>,
+    onOptionSelected: (String) -> Unit,
+    label: String,
+    shape: RoundedCornerShape = roundedShape,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = selectedOption,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text(label) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            interactionSource = interactionSource,
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = if (expanded) "Hide" else "Show"
+                )
+            }
+        )
+
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                if (interaction is PressInteraction.Release) {
+                    expanded = true
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            itemsList.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuBox(
@@ -868,6 +927,31 @@ fun CountryCodePickerDialog(
     }
 }
 
+@Composable
+fun IconWithHeader(
+    icon: ImageVector,
+    text: String,
+    scale: Float = 1F
+){
+    Box(modifier = Modifier.fillMaxWidth()
+        .scale(scale)
+    ){
+        Row(){
+            Image(
+                icon,
+                contentDescription = icon.name,
+                modifier = Modifier.size(82.dp)
+                    .padding(top = 16.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
+            )
+        }
+    }
+}
 
 @Composable
 fun LogoWithReturn(navController: NavController = rememberNavController()) {
@@ -903,7 +987,7 @@ fun BottomNavigation(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Login,
+        BottomNavItem.Management,
         BottomNavItem.Profile
     )
 
