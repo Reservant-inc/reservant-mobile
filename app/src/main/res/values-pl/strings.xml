@@ -57,7 +57,7 @@
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
-    <string name="label_registerRestaurant_choseTags">Wybierz tagi, które opisują twój lokal</string>
+    <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
     <string name="label_no">nie</string>
     <string name="label_next">Przejdź dalej</string>
@@ -70,4 +70,5 @@
     <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
     <string name="label_group">Grupa</string>
+    <string name="label_restaurant_informations">Informacje o restauracji</string>
 </resources>
