@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Tag
+import androidx.compose.material.icons.rounded.UploadFile
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
@@ -74,6 +78,12 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
+
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+                IconWithHeader(
+                    icon = Icons.Rounded.Info,
+                    text = stringResource(R.string.label_restaurant_informations),
+                )
 
                 InputUserInfo(
                     inputText = registerRestaurantViewModel.name.value,
@@ -204,12 +214,12 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 horizontalAlignment = Alignment.Start
             ) {
 
-                Spacer(modifier = Modifier.height(40.dp))
-                Text(
-                    text = stringResource(id = R.string.label_uploadFiles),
-                    style = MaterialTheme.typography.bodyLarge
+                Spacer(modifier = Modifier.height(30.dp))
+                IconWithHeader(
+                    icon = Icons.Rounded.UploadFile,
+                    text = stringResource(R.string.label_uploadFiles),
                 )
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
@@ -316,23 +326,20 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
         }
         composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
             // TODO: tags
-            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
+            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-
                 ) {
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
+                IconWithHeader(
+                    icon = Icons.Rounded.Tag,
                     text = stringResource(id = R.string.label_registerRestaurant_choseTags),
-                    style = MaterialTheme.typography.bodyLarge
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
                 TagsSelection(
                     tags = tags,
@@ -346,12 +353,10 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -388,8 +393,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Column {
                     InputUserFile(
                         label = stringResource(id = R.string.label_restaurant_logo),
@@ -421,7 +424,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
 
                 ShowErrorToast(
                     context = LocalContext.current,
@@ -443,6 +445,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         }
                     }
                 )
+                Spacer(modifier = Modifier.height(64.dp))
             }
         }
     }
