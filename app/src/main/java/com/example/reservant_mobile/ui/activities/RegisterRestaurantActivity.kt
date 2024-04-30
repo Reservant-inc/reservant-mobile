@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.activities
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Tag
 import androidx.compose.material.icons.rounded.UploadFile
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -299,16 +302,24 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (groups != null) {
-                    OutLinedDropdownMenu(
-                        selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
-                        itemsList = groups.map { it.name },
-                        onOptionSelected = { name ->
-                            registerRestaurantViewModel.viewModelScope.launch {
-                                registerRestaurantViewModel.selectedGroup = groups.find { it.name == name }
-                            }
-                        },
-                        label = stringResource(R.string.label_add_to_group)
-                    )
+                    if(groups.size > 1){
+                        OutLinedDropdownMenu(
+                            selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
+                            itemsList = groups.map { it.name },
+                            onOptionSelected = { name ->
+                                registerRestaurantViewModel.viewModelScope.launch {
+                                    registerRestaurantViewModel.selectedGroup = groups.find { it.name == name }
+                                }
+                            },
+                            label = stringResource(R.string.label_add_to_group)
+                        )
+                    }else if(groups.size == 1){
+                        registerRestaurantViewModel.selectedGroup = groups[0]
+                        Text(
+                            text = stringResource(R.string.label_group)+": "+selectedGroup!!.name,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(8.dp))
