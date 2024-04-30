@@ -38,7 +38,7 @@ fun HomeActivity() {
                 RestaurantManagementActivity()
             }
             composable(Management.ACTIVITY_EMPLOYEE){
-                EmployeeManagementActivity()
+                EmployeeManagementActivity(1)
             }
         }
 
