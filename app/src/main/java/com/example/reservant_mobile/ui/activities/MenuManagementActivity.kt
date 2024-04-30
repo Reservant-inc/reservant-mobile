@@ -1,10 +1,12 @@
 package com.example.reservant_mobile.ui.activities
 
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 
 
@@ -16,6 +18,14 @@ fun MenuManagementActivity(restaurantId: Int){
         }
     )
 
-    Text(text = restaurantId.toString())
+    LazyColumn {
+        items(viewmodel.menus){menu ->
+            MenuCard(
+                menu = menu,
+                onEditClick = {},
+                onDeleteClick = {viewmodel.deleteMenu(menu)}
+            )
+        }
+    }
 
 }
