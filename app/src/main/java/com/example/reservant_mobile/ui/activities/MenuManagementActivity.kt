@@ -22,7 +22,7 @@ fun MenuManagementActivity(restaurantId: Int){
         items(viewmodel.menus){menu ->
             MenuCard(
                 menu = menu,
-                onEditClick = {},
+                onEditClick = {}, //TODO
                 onDeleteClick = {viewmodel.deleteMenu(menu)}
             )
         }
