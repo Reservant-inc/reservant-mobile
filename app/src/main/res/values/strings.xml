@@ -74,4 +74,8 @@
     <string name="error_not_found">Could not find resource</string>
     <string name="label_group">Group</string>
     <string name="label_restaurant_informations">Restaurant information</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_employee_hall">Hall employee</string>
+    <string name="label_employee_backdoor">Backdoor employee</string>
+    <string name="label_employee_add">Add new employee</string>
 </resources>

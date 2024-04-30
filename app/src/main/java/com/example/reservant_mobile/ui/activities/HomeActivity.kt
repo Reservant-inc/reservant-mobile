@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import EmployeeManagementActivity
 import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -37,7 +38,7 @@ fun HomeActivity() {
                 RestaurantManagementActivity()
             }
             composable(Management.ACTIVITY_EMPLOYEE){
-                EmployeeManagementActivity()
+                EmployeeManagementActivity(1)
             }
         }
 

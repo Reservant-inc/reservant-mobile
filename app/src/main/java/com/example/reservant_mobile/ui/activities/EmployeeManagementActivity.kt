@@ -9,17 +9,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.AddEmployeeDialog
 import com.example.reservant_mobile.ui.components.EmployeeCard
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 
 @Composable
-fun EmployeeManagementActivity() {
-    val employeeViewModel = viewModel<EmployeeViewModel>()
+fun EmployeeManagementActivity(restaurantId: Int) {
+    val employeeViewModel = EmployeeViewModel(restaurantId)
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AddEmployeeDialog(onDismiss = { showDialog = false }, vm = employeeViewModel)
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -35,10 +46,10 @@ fun EmployeeManagementActivity() {
         item {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { /* Dodaj pracownika */ },
+                onClick = { showDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Add Employee")
+                Text(stringResource(id = R.string.label_employee_add))
             }
         }
     }
@@ -47,5 +58,5 @@ fun EmployeeManagementActivity() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewEmployee() {
-    EmployeeManagementActivity()
+    EmployeeManagementActivity(1)
 }
