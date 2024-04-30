@@ -21,6 +21,22 @@ interface IUserService{
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+    object User {
+        lateinit var login: String
+        lateinit var firstName: String
+        lateinit var lastName: String
+        lateinit var roles:List<String>
+    }
+    
+    private suspend fun wrapUser(u:UserDTO){
+        User.login = u.login
+        User.firstName = u.login
+        User.lastName = u.login
+        User.roles = u.roles!!
+        LocalBearerService().saveBearerToken(u.token!!)
+    }
+
+
     override suspend fun isLoginUnique(login: String): Boolean {
         val res = api.post(login, Endpoints.LOGIN_UNIQUE).value
             ?: return true
@@ -46,7 +62,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
         //return errors in toast when connection error
-        val res = api.post(credentials, Endpoints.REGISTER_CUSTOMER)
+        val res = api.post(credentials, Endpoints.LOGIN)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
@@ -54,7 +70,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         if(res.value!!.status == HttpStatusCode.OK){
             return try {
                 val user: UserDTO = res.value.body()
-                LocalBearerService().saveBearerToken(user.token!!)
+                wrapUser(user)
                 Result(isError = false, value = true)
             }
             catch (e: Exception){
@@ -72,7 +88,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
          return if(res.value!!.status == HttpStatusCode.OK){
              try{
                  val user: UserDTO = res.value.body()
-                 LocalBearerService().saveBearerToken(user.token!!)
+                 wrapUser(user)
                  true
              }
              catch (e: Exception) {
@@ -81,7 +97,4 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
          }
          else false
     }
-
-
-
 }

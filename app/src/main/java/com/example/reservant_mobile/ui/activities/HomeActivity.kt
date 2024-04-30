@@ -10,6 +10,7 @@ import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -29,7 +30,10 @@ fun HomeActivity() {
                 RestaurantOwnerProfileActivity(navController = innerNavController)
             }
             composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
-                RegisterRestaurantActivity()
+                RegisterRestaurantActivity(navControllerHome = innerNavController)
+            }
+            composable(RestaurantManagementRoutes.ACTIVITY_MANAGE){
+                RestaurantManagementActivity()
             }
         }
 

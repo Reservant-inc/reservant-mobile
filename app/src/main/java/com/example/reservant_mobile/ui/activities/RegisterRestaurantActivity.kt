@@ -16,39 +16,48 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
-import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagsSelection
-import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterRestaurantActivity() {
+fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
     val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
     val navController = rememberNavController()
+    var isLoading by remember { mutableStateOf(false) }
+    var formSent by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    NavHost(navController = navController, startDestination = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
+    NavHost(
+        navController = navController,
+        startDestination = RegisterRestaurantRoutes.ACTIVITY_INPUTS
+    ) {
         composable(route = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
 
             val options = listOf(
@@ -62,60 +71,123 @@ fun RegisterRestaurantActivity() {
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.name,
-                    onValueChange = { registerRestaurantViewModel.name = it },
+                    inputText = registerRestaurantViewModel.name.value,
+                    onValueChange = { registerRestaurantViewModel.name.value = it },
                     label = stringResource(id = R.string.label_restaurant_name),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isNameInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getNameError() != -1)
+                            registerRestaurantViewModel.getNameError()
+                        else
+                            R.string.error_registerRestaurant_invalid_name
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.nip,
-                    onValueChange = { registerRestaurantViewModel.nip = it },
+                    inputText = registerRestaurantViewModel.nip.value,
+                    onValueChange = { registerRestaurantViewModel.nip.value = it },
                     label = stringResource(id = R.string.label_restaurant_nip),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isNipInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getNipError() != -1)
+                            registerRestaurantViewModel.getNipError()
+                        else
+                            R.string.error_registerRestaurant_invalid_nip
+                    ),
+                    formSent = formSent
                 )
 
                 OutLinedDropdownMenu(
-                    selectedOption = registerRestaurantViewModel.restaurantType,
+                    selectedOption = registerRestaurantViewModel.restaurantType.value,
+                    label = stringResource(R.string.label_restaurant_type),
                     itemsList = options,
-                    onOptionSelected = { registerRestaurantViewModel.restaurantType = it }
+                    onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it },
+                    isError = registerRestaurantViewModel.isRestaurantTypeInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getRestaurantTypeError() != -1)
+                            registerRestaurantViewModel.getRestaurantTypeError()
+                        else
+                            R.string.error_registerRestaurant_invalid_restaurantType
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.address,
-                    onValueChange = { registerRestaurantViewModel.address = it },
+                    inputText = registerRestaurantViewModel.address.value,
+                    onValueChange = { registerRestaurantViewModel.address.value = it },
                     label = stringResource(id = R.string.label_restaurant_address),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isAddressInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getAdressError() != -1)
+                            registerRestaurantViewModel.getAdressError()
+                        else
+                            R.string.error_registerRestaurant_invalid_adress
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.postalCode,
-                    onValueChange = { registerRestaurantViewModel.postalCode = it },
+                    inputText = registerRestaurantViewModel.postalCode.value,
+                    onValueChange = { registerRestaurantViewModel.postalCode.value = it },
                     label = stringResource(id = R.string.label_restaurant_postal),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isPostalCodeInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getPostalError() != -1)
+                            registerRestaurantViewModel.getPostalError()
+                        else
+                            R.string.error_registerRestaurant_invalid_postal
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.city,
-                    onValueChange = { registerRestaurantViewModel.city = it },
+                    inputText = registerRestaurantViewModel.city.value,
+                    onValueChange = { registerRestaurantViewModel.city.value = it },
                     label = stringResource(id = R.string.label_restaurant_city),
-                    optional = false
+                    optional = false,
+                    isError = registerRestaurantViewModel.isCityInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getCityError() != -1)
+                            registerRestaurantViewModel.getCityError()
+                        else
+                            R.string.error_registerRestaurant_invalid_city
+                    ),
+                    formSent = formSent
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result)
+                )
+
                 ButtonComponent(
-                    label = "Next",
+                    label = stringResource(id = R.string.label_next),
                     onClick = {
-                        //TODO: send validate inputs
-                        navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                        registerRestaurantViewModel.viewModelScope.launch {
+                            isLoading = true
+
+                            val result = registerRestaurantViewModel.validateFirstStep(context)
+
+                            if (result) {
+                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                            }
+
+                            isLoading = false
+                        }
                     }
                 )
 
@@ -133,35 +205,80 @@ fun RegisterRestaurantActivity() {
             ) {
 
                 Spacer(modifier = Modifier.height(40.dp))
-                Text(text = "Załaduj potrzebne pliki:", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(id = R.string.label_uploadFiles),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 Spacer(modifier = Modifier.height(40.dp))
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.consentUri = file.toString();
-                    }
+                        registerRestaurantViewModel.businessPermission.value = file.toString();
+                    },
+                    context = context,
+                    optional = false,
+                    isError = registerRestaurantViewModel.isBusinessPermissionInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getBusinessPermissionError() != -1)
+                            registerRestaurantViewModel.getBusinessPermissionError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_ownerId),
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.idCardUri = file.toString();
-                    }
+                        registerRestaurantViewModel.idCard.value = file.toString();
+                    },
+                    context = context,
+                    optional = false,
+                    isError = registerRestaurantViewModel.isIdCardInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getIdCardError() != -1)
+                            registerRestaurantViewModel.getIdCardError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_lease),
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.leaseUri = file.toString();
-                    }
+                        registerRestaurantViewModel.rentalContract.value = file.toString();
+                    },
+                    context = context,
+                    optional = true,
+                    isError = registerRestaurantViewModel.isRentalContractInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getRentalContractError() != -1)
+                            registerRestaurantViewModel.getRentalContractError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent,
+                    deletable = true
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_license),
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.licenseUri = file.toString();
-                    }
+                        registerRestaurantViewModel.alcoholLicense.value = file.toString();
+                    },
+                    context = context,
+                    optional = true,
+                    isError = registerRestaurantViewModel.isAlcoholLicenseInvalid(context),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getAlcoholLicenseError() != -1)
+                            registerRestaurantViewModel.getAlcoholLicenseError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file
+                    ),
+                    formSent = formSent,
+                    deletable = true
                 )
 
                 Spacer(modifier = Modifier.height(80.dp))
@@ -180,6 +297,12 @@ fun RegisterRestaurantActivity() {
 
                     Spacer(Modifier.width(16.dp))
 
+                    // TODO: 2nd step validation
+                    ShowErrorToast(
+                        context = LocalContext.current,
+                        id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                    )
+
                     ButtonComponent(
                         label = stringResource(R.string.label_add_to_group),
                         onClick = {
@@ -192,10 +315,8 @@ fun RegisterRestaurantActivity() {
             }
         }
         composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
-            // TODO: resources
+            // TODO: tags
             val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2")
-            val selectedTags = remember { mutableStateListOf<String>() }
-            var delivery by remember { mutableStateOf(true) }
 
             Column(
                 modifier = Modifier
@@ -207,17 +328,20 @@ fun RegisterRestaurantActivity() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "Wybierz tagi, które opisują twój lokal", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(id = R.string.label_registerRestaurant_choseTags),
+                    style = MaterialTheme.typography.bodyLarge
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TagsSelection(
                     tags = tags,
-                    selectedTags = selectedTags,
+                    selectedTags = registerRestaurantViewModel.selectedTags,
                     onTagSelected = { tag, isSelected ->
                         if (isSelected) {
-                            selectedTags.add(tag)
+                            registerRestaurantViewModel.selectedTags.add(tag)
                         } else {
-                            selectedTags.remove(tag)
+                            registerRestaurantViewModel.selectedTags.remove(tag)
                         }
                     }
                 )
@@ -231,19 +355,19 @@ fun RegisterRestaurantActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Dostawa na naszym pośrednictwem:",
+                        text = stringResource(id = R.string.label_registerRestaurant_delivery),
                         modifier = Modifier.weight(1f)
                     )
 
                     Row {
                         RadioButton(
-                            selected = delivery,
-                            onClick = { delivery = true }
+                            selected = registerRestaurantViewModel.delivery,
+                            onClick = { registerRestaurantViewModel.delivery = true }
                         )
                         Text(
-                            text = "tak",
+                            text = stringResource(id = R.string.label_yes),
                             modifier = Modifier
-                                .clickable { delivery = true }
+                                .clickable { registerRestaurantViewModel.delivery = true }
                                 .padding(end = 8.dp)
                                 .padding(top = 16.dp)
                         )
@@ -251,13 +375,13 @@ fun RegisterRestaurantActivity() {
                         Spacer(modifier = Modifier.width(16.dp))
 
                         RadioButton(
-                            selected = !delivery,
-                            onClick = { delivery = false }
+                            selected = !registerRestaurantViewModel.delivery,
+                            onClick = { registerRestaurantViewModel.delivery = false }
                         )
                         Text(
-                            text = "nie",
+                            text = stringResource(id = R.string.label_no),
                             modifier = Modifier
-                                .clickable { delivery = false }
+                                .clickable { registerRestaurantViewModel.delivery = false }
                                 .padding(start = 8.dp)
                                 .padding(top = 16.dp)
                         )
@@ -266,26 +390,58 @@ fun RegisterRestaurantActivity() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // File upload and description
                 Column {
                     InputUserFile(
-                        label = "Logo, zdjęcia lokalu",
-                        onFilePicked = {
-                            // ...
-                        }
+                        label = stringResource(id = R.string.label_restaurant_logo),
+                        onFilePicked = { file ->
+                            registerRestaurantViewModel.logo.value = file.toString();
+                        },
+                        context = context,
+                        isError = registerRestaurantViewModel.isLogoInvalid(context),
+                        errorText = stringResource(
+                            if (registerRestaurantViewModel.getIdCardError() != -1)
+                                registerRestaurantViewModel.getIdCardError()
+                            else
+                                R.string.error_registerRestaurant_invalid_file
+                        ),
+                        formSent = formSent
                     )
-                    TextField(
-                        value = "Opis lokalu",
-                        onValueChange = { /* Handle description input */ },
-                        modifier = Modifier.fillMaxWidth()
+                    InputUserInfo(
+                        inputText = registerRestaurantViewModel.description.value,
+                        onValueChange = { registerRestaurantViewModel.description.value = it },
+                        label = stringResource(id = R.string.label_restaurant_description),
+                        isError = registerRestaurantViewModel.isDescriptionInvalid(),
+                        errorText = stringResource(
+                            if (registerRestaurantViewModel.getDescriptionError() != -1)
+                                registerRestaurantViewModel.getDescriptionError()
+                            else
+                                R.string.error_registerRestaurant_invalid_description
+                        ),
+                        formSent = formSent
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result3)
+                )
+
                 ButtonComponent(
-                    label = "Zapisz",
-                    onClick = { /* Handle file add */ }
+                    label = stringResource(id = R.string.label_register_restaurant),
+                    onClick = {
+                        registerRestaurantViewModel.viewModelScope.launch {
+                            isLoading = true
+                            formSent = true
+
+                            if (registerRestaurantViewModel.registerRestaurant(context)) {
+                                navControllerHome.navigate(MainRoutes.ACTIVITY_HOME)
+                            }
+
+                            isLoading = false
+                        }
+                    }
                 )
             }
         }
