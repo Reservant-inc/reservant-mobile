@@ -15,9 +15,12 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -110,6 +115,7 @@ import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -1111,35 +1117,78 @@ fun MenuCard(menu: RestaurantMenuDTO){
 
             Row {
                 val buttonModifier = Modifier
-                    .size(32.dp)
                     .align(Alignment.Bottom)
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                val colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
 
                 Text(text = menu.menuType, modifier = Modifier.weight(1f))
-                Icon(Icons.Filled.Edit,
-                    contentDescription = "edit",
-                    modifier = buttonModifier.background(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.medium
-                    )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = {},
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditMenuItem"
                 )
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = buttonModifier
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = "delete")
-                }
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = {},
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "delete"
+                )
+                
             }
         }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    modifier: Modifier,
+    onClick: () -> Unit,
+    imageVector: ImageVector,
+    contentDescription: String,
+    contentPadding: PaddingValues = PaddingValues(6.dp),
+){
+
+    val secondaryButtonColors = ButtonColors(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+        disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
+    Button(
+        onClick = onClick,
+        shape = CircleShape,
+        contentPadding = contentPadding,
+        colors = secondaryButtonColors,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            contentDescription = contentDescription
+        )
     }
 }
 
 @Preview
 @Composable
 fun Preview(){
-    MenuCard(
-        RestaurantMenuDTO(
-            menuType = "Jedzenie",
-            dateFrom = "2024-01-01"
+    AppTheme {
+        MenuCard(
+            RestaurantMenuDTO(
+                menuType = "Jedzenie",
+                dateFrom = "2024-01-01"
+            )
         )
-    )
+    }
 }
