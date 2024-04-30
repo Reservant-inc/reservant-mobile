@@ -63,6 +63,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedTextField
@@ -162,7 +163,8 @@ fun InputUserInfo(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = stringResource(id = R.string.label_optional), color = Color.Gray, fontStyle = FontStyle.Italic)
+                        Text(text = stringResource(id = R.string.label_optional), color = MaterialTheme.colorScheme.outline, fontStyle = FontStyle.Italic)
+
                 }
             },
             placeholder = { Text(text = placeholder) },
@@ -181,7 +183,7 @@ fun InputUserInfo(
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -991,7 +993,9 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Profile
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    ) {
         for (i in items) {
             AddItem(
                 screen = i,
