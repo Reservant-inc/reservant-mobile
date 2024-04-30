@@ -324,7 +324,9 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         selectedGroup = groups[0]
                         Text(
                             text = stringResource(R.string.label_group)+": "+selectedGroup!!.name,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(start = 4.dp, bottom = 16.dp)
                         )
                     }
                 }
