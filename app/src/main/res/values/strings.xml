@@ -73,5 +73,5 @@
     <string name="label_restaurant_tags">Tags</string>
     <string name="error_not_found">Could not find resource</string>
     <string name="label_group">Group</string>
-    <string name="label_restaurant_informations">Restaurant informations</string>
+    <string name="label_restaurant_informations">Restaurant information</string>
 </resources>
