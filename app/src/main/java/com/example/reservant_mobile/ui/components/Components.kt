@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -96,6 +97,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
@@ -107,6 +109,7 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -935,21 +938,25 @@ fun IconWithHeader(
     text: String,
     scale: Float = 1F
 ){
-    Box(modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier
+        .fillMaxWidth()
         .scale(scale)
     ){
         Row(){
             Image(
                 icon,
                 contentDescription = icon.name,
-                modifier = Modifier.size(82.dp)
+                modifier = Modifier
+                    .size(82.dp)
                     .padding(top = 16.dp)
             )
             Text(
                 text = text,
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(4.dp, 16.dp, 8.dp, 4.dp)
+                    .fillMaxWidth()
             )
         }
     }
@@ -1091,4 +1098,48 @@ fun Content() {
     ) {
         Text(text = "Zgłodniałeś?")
     }
+}
+
+@Composable
+fun MenuCard(menu: RestaurantMenuDTO){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column {
+
+            Row {
+                val buttonModifier = Modifier
+                    .size(32.dp)
+                    .align(Alignment.Bottom)
+
+                Text(text = menu.menuType, modifier = Modifier.weight(1f))
+                Icon(Icons.Filled.Edit,
+                    contentDescription = "edit",
+                    modifier = buttonModifier.background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                )
+                Button(
+                    onClick = { /*TODO*/ },
+                    modifier = buttonModifier
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = "delete")
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    MenuCard(
+        RestaurantMenuDTO(
+            menuType = "Jedzenie",
+            dateFrom = "2024-01-01"
+        )
+    )
 }

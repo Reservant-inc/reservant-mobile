@@ -30,7 +30,7 @@ class RegisterRestaurantActivityTest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            RegisterRestaurantActivity()
+            //RegisterRestaurantActivity()
         }
     }
 

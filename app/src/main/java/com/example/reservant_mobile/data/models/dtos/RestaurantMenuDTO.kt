@@ -7,6 +7,6 @@ data class RestaurantMenuDTO (
     val id: Int = 0,
     val menuType: String,
     val dateFrom: String,
-    val dateUntil: String?,
+    val dateUntil: String? = null,
     val menuItems: List<RestaurantMenuItemDTO> = emptyList()
 )
