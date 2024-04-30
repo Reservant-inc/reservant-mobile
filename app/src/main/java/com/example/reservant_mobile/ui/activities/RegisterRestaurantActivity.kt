@@ -59,7 +59,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
     val navController = rememberNavController()
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
-    var selectedGroup by remember { mutableStateOf<RestaurantGroupDTO?>(null) }
+    var selectedGroup = registerRestaurantViewModel.selectedGroup
     var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
 
@@ -303,20 +303,23 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
                         itemsList = groups.map { it.name },
                         onOptionSelected = { name ->
-                            selectedGroup = groups.find { it.name == name }
+                            registerRestaurantViewModel.viewModelScope.launch {
+                                registerRestaurantViewModel.selectedGroup = groups.find { it.name == name }
+                            }
                         },
                         label = stringResource(R.string.label_add_to_group)
                     )
                 }
 
+                Spacer(Modifier.height(8.dp))
+
                 ButtonComponent(
                     label = stringResource(R.string.label_register_restaurant),
                     onClick = {
-                        navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                        if(!registerRestaurantViewModel.isGroupInvalid())
+                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
                     }
                 )
-
-                Spacer(Modifier.width(16.dp))
 
                 // TODO: 2nd step validation
                 ShowErrorToast(

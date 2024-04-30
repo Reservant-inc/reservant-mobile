@@ -45,6 +45,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
+    var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
 
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid(context)) {
@@ -175,6 +176,9 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isDescriptionInvalid(): Boolean {
         return description.value.isBlank()
+    }
+    fun isGroupInvalid(): Boolean {
+        return selectedGroup == null
     }
 
     fun isBusinessPermissionInvalid(context: Context): Boolean {
