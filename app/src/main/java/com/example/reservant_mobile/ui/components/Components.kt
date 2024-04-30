@@ -104,6 +104,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -1107,13 +1108,23 @@ fun Content() {
 }
 
 @Composable
-fun MenuCard(menu: RestaurantMenuDTO){
+fun MenuCard(
+    menu: RestaurantMenuDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
         Column {
+
+            Image(
+                painterResource(id = R.drawable.ic_logo),
+                contentDescription = "",
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Row {
                 val buttonModifier = Modifier
@@ -1128,22 +1139,29 @@ fun MenuCard(menu: RestaurantMenuDTO){
                     disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
 
-                Text(text = menu.menuType, modifier = Modifier.weight(1f))
+                Text(
+                    text = menu.menuType,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(1f)
+                        .align(Alignment.Bottom)
+                )
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = {},
+                    onClick = onEditClick,
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "EditMenuItem"
                 )
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = {},
+                    onClick = onDeleteClick,
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "delete"
                 )
-                
+
             }
         }
     }
@@ -1185,10 +1203,12 @@ fun SecondaryButton(
 fun Preview(){
     AppTheme {
         MenuCard(
-            RestaurantMenuDTO(
+            menu = RestaurantMenuDTO(
                 menuType = "Jedzenie",
                 dateFrom = "2024-01-01"
-            )
+            ),
+            onEditClick = {},
+            onDeleteClick = {}
         )
     }
 }
