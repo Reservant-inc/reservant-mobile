@@ -296,45 +296,33 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     deletable = true
                 )
 
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    ButtonComponent(
-                        label = stringResource(R.string.label_register_restaurant),
-                        onClick = {
-                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                if (groups != null) {
+                    OutLinedDropdownMenu(
+                        selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
+                        itemsList = groups.map { it.name },
+                        onOptionSelected = { name ->
+                            selectedGroup = groups.find { it.name == name }
                         },
-                        modifier = Modifier.weight(1f)
+                        label = stringResource(R.string.label_add_to_group)
                     )
-
-                    Spacer(Modifier.width(16.dp))
-
-                    // TODO: 2nd step validation
-                    ShowErrorToast(
-                        context = LocalContext.current,
-                        id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
-                    )
-
-                    if (groups != null) {
-                        OutLinedDropdownMenu(
-                            selectedOption = selectedGroup?.name ?: "Choose a group",
-                            itemsList = groups.map { it.name },
-                            onOptionSelected =,
-                            label = stringResource(R.string.label_add_to_group)
-                        )
-                    }
-
-//                    ButtonComponent(
-//                        label = stringResource(R.string.label_add_to_group),
-//                        onClick = {
-//                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
-//                        },
-//                        modifier = Modifier.weight(1f)
-//                    )
                 }
+
+                ButtonComponent(
+                    label = stringResource(R.string.label_register_restaurant),
+                    onClick = {
+                        navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                    }
+                )
+
+                Spacer(Modifier.width(16.dp))
+
+                // TODO: 2nd step validation
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                )
 
             }
         }

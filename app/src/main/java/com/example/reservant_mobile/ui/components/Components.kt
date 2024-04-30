@@ -766,31 +766,6 @@ fun OutLinedDropdownMenu(
     }
 }
 
-fun IconWithHeader(
-    icon: ImageVector,
-    text: String,
-    scale: Float = 1F
-){
-    Box(modifier = Modifier.fillMaxWidth()
-        .scale(scale)
-    ){
-        Row(){
-            Image(
-                icon,
-                contentDescription = icon.name,
-                modifier = Modifier.size(82.dp)
-                    .padding(top = 16.dp)
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenuBox(
