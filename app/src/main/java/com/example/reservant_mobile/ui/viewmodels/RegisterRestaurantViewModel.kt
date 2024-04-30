@@ -11,6 +11,7 @@ import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import androidx.core.net.toUri
+import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.utils.getFileName
 
@@ -42,6 +43,9 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     var selectedTags = mutableStateListOf<String>()
     var delivery by mutableStateOf(false)
 
+    // Grupa
+    var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
+
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid(context)) {
             return false
@@ -62,7 +66,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         val restaurant = getRestaurantData(context)
 
         result = restaurantService.validateFirstStep(restaurant)
-
+        getGroups()
         return result.value
     }
 
@@ -88,6 +92,10 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             photos = emptyList(),
             tables = emptyList()
         )
+    }
+
+    suspend fun getGroups(){
+        groups = restaurantService.getGroups().value
     }
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): String {

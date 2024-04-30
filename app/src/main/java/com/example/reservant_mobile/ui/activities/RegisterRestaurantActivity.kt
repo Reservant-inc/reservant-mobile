@@ -21,6 +21,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +38,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
@@ -56,6 +59,8 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
     val navController = rememberNavController()
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
+    var selectedGroup by remember { mutableStateOf<RestaurantGroupDTO?>(null) }
+    var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
 
     NavHost(
@@ -313,13 +318,22 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
                     )
 
-                    ButtonComponent(
-                        label = stringResource(R.string.label_add_to_group),
-                        onClick = {
-                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+                    if (groups != null) {
+                        OutLinedDropdownMenu(
+                            selectedOption = selectedGroup?.name ?: "Choose a group",
+                            itemsList = groups.map { it.name },
+                            onOptionSelected =,
+                            label = stringResource(R.string.label_add_to_group)
+                        )
+                    }
+
+//                    ButtonComponent(
+//                        label = stringResource(R.string.label_add_to_group),
+//                        onClick = {
+//                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+//                        },
+//                        modifier = Modifier.weight(1f)
+//                    )
                 }
 
             }
