@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
@@ -65,6 +67,10 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
     var selectedGroup = registerRestaurantViewModel.selectedGroup
     var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
+
+    registerRestaurantViewModel.viewModelScope.launch {
+        registerRestaurantViewModel.getGroups()
+    }
 
     NavHost(
         navController = navController,
@@ -315,6 +321,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         )
                     }else if(groups.size == 1){
                         registerRestaurantViewModel.selectedGroup = groups[0]
+                        selectedGroup = groups[0]
                         Text(
                             text = stringResource(R.string.label_group)+": "+selectedGroup!!.name,
                             textAlign = TextAlign.Center

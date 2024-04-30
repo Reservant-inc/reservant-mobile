@@ -67,7 +67,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         val restaurant = getRestaurantData(context)
 
         result = restaurantService.validateFirstStep(restaurant)
-        getGroups()
         return result.value
     }
 
