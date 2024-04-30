@@ -151,7 +151,7 @@ fun InputUserInfo(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+                        Text(text = " - optional", color = MaterialTheme.colorScheme.outline, fontStyle = FontStyle.Italic)
                 }
             },
             placeholder = { Text(text = placeholder) },
@@ -170,7 +170,7 @@ fun InputUserInfo(
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
