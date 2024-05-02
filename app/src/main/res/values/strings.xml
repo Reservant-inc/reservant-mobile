@@ -61,7 +61,7 @@
     <string name="error_registerRestaurant_invalid_description">Invalid description</string>
     <string name="label_restaurant_logo" translatable="false">Logo</string>
     <string name="label_registerRestaurant_delivery">Delivery by us:</string>
-    <string name="label_registerRestaurant_choseTags">Choose tags that describe your premises</string>
+    <string name="label_registerRestaurant_choseTags">Choose tags for your premises</string>
     <string name="label_yes">yes</string>
     <string name="label_no">no</string>
     <string name="label_next">Next</string>
@@ -73,4 +73,5 @@
     <string name="label_restaurant_tags">Tags</string>
     <string name="error_not_found">Could not find resource</string>
     <string name="label_group">Group</string>
+    <string name="label_restaurant_informations">Restaurant information</string>
 </resources>
