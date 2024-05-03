@@ -52,7 +52,7 @@
     <string name="label_management_manage">Restaurant management</string>
     <string name="error_registerRestaurant_invalid_name">Invalid restaurant name</string>
     <string name="error_registerRestaurant_invalid_nip">Invalid NIP</string>
-    <string name="error_registerRestaurant_invalid_adress">Invalid adress</string>
+    <string name="error_registerRestaurant_invalid_adress">Invalid address</string>
     <string name="error_registerRestaurant_invalid_postal">Invalid postal code</string>
     <string name="error_registerRestaurant_invalid_city">Invalid city</string>
     <string name="error_registerRestaurant_invalid_restaurantType">Invalid restaurant type</string>

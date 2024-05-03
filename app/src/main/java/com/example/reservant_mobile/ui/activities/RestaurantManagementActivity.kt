@@ -21,15 +21,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.RestaurantInfoView
+import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.ACTIVITY_MANAGE
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.MENU_MANAGE
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.getMenuManageRoute
 import com.example.reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 import kotlinx.coroutines.launch
 
@@ -47,63 +53,73 @@ fun RestaurantManagementActivity() {
         restaurantManageVM.initialize()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp, 8.dp, 16.dp, 8.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        IconWithHeader(
-            icon = Icons.Rounded.RestaurantMenu,
-            text = stringResource(R.string.label_management_manage),
-            scale = 0.9F
-        )
+    NavHost(navController = navController, startDestination = ACTIVITY_MANAGE){
+        composable(ACTIVITY_MANAGE){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                IconWithHeader(
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_management_manage),
+                    scale = 0.9F
+                )
 
-        if (groups != null) {
-            // Displaying multiple groups
-            if(groups.size > 1){
-                OutLinedDropdownMenu(
-                    label = stringResource(R.string.label_group),
-                    selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
-                    itemsList = groups.map { it.name },
-                    onOptionSelected = { name ->
-                        selectedGroup = groups.find { it.name == name }
+                if (groups != null) {
+                    // Displaying multiple groups
+                    if(groups.size > 1){
+                        OutLinedDropdownMenu(
+                            label = stringResource(R.string.label_group),
+                            selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
+                            itemsList = groups.map { it.name },
+                            onOptionSelected = { name ->
+                                selectedGroup = groups.find { it.name == name }
+                                restaurantManageVM.viewModelScope.launch {
+                                    selectedGroup = selectedGroup?.let { group ->
+                                        restaurantManageVM.getGroup(
+                                            group.id
+                                        )
+                                    }
+                                }
+                            },
+                            modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                        )
+                        // Displaying single group
+                    }else if(groups.size == 1){
                         restaurantManageVM.viewModelScope.launch {
-                            selectedGroup = selectedGroup?.let { group ->
-                                restaurantManageVM.getGroup(
-                                    group.id
-                                )
-                            }
+                            selectedGroup = restaurantManageVM.getGroup(groups[0].id)
                         }
-                    },
-                    modifier = Modifier.padding(start = 4.dp, end = 4.dp)
-                )
-                // Displaying single group
-            }else if(groups.size == 1){
-                restaurantManageVM.viewModelScope.launch {
-                    selectedGroup = restaurantManageVM.getGroup(groups[0].id)
+                    }else{
+                        Text(
+                            text = "You have no restaurants :("
+                        )
+                    }
                 }
-            }else{
-                Text(
-                    text = "You have no restaurants :("
+
+
+                selectedGroup?.restaurants?.forEach { restaurant ->
+                    RestaurantInfoView(
+                        restaurant = restaurant,
+                        onEditClick = { /*TODO*/ },
+                        onManageEmployeeClick = { /*TODO*/ },
+                        onManageMenuClick = { navController.navigate(getMenuManageRoute(restaurant.id)) },
+                        onManageSubscriptionClick = { /*TODO*/ }) {
+
+                    }
+                }
+                Spacer(
+                    modifier = Modifier.padding(bottom = 64.dp)
                 )
             }
         }
-
-        selectedGroup?.restaurants?.forEach { restaurant ->
-            RestaurantInfoView(
-                restaurant = restaurant,
-                onEditClick = { /*TODO*/ },
-                onManageEmployeeClick = { /*TODO*/ },
-                onManageMenuClick = { /*TODO*/ },
-                onManageSubscriptionClick = { /*TODO*/ }) {
-
-            }
+        composable(MENU_MANAGE, arguments = listOf(navArgument(RestaurantManagementArguments.RESTAURANT_ID) {type = NavType.IntType} )){
+            backStackEntry -> MenuManagementActivity(restaurantId = backStackEntry.arguments?.getInt("restaurantId")!!)
         }
-        Spacer(
-            modifier = Modifier.padding(bottom = 64.dp)
-        )
     }
+
+
 }

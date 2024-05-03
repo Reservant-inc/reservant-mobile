@@ -15,9 +15,12 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
@@ -38,13 +42,17 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -96,7 +104,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -107,6 +117,8 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -935,21 +947,25 @@ fun IconWithHeader(
     text: String,
     scale: Float = 1F
 ){
-    Box(modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier
+        .fillMaxWidth()
         .scale(scale)
     ){
         Row(){
             Image(
                 icon,
                 contentDescription = icon.name,
-                modifier = Modifier.size(82.dp)
+                modifier = Modifier
+                    .size(82.dp)
                     .padding(top = 16.dp)
             )
             Text(
                 text = text,
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(4.dp,16.dp,8.dp,4.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(4.dp, 16.dp, 8.dp, 4.dp)
+                    .fillMaxWidth()
             )
         }
     }
@@ -1090,5 +1106,105 @@ fun Content() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Zgłodniałeś?")
+    }
+}
+
+@Composable
+fun MenuCard(
+    menu: RestaurantMenuDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column {
+
+            Image(
+                painterResource(id = R.drawable.ic_logo),
+                contentDescription = "",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row {
+                val buttonModifier = Modifier
+                    .align(Alignment.Bottom)
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                Text(
+                    text = menu.menuType,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(1f)
+                        .align(Alignment.Bottom)
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onEditClick,
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditMenuItem"
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onDeleteClick,
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "delete"
+                )
+
+            }
+        }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    modifier: Modifier,
+    onClick: () -> Unit,
+    imageVector: ImageVector,
+    contentDescription: String,
+    contentPadding: PaddingValues = PaddingValues(6.dp),
+){
+
+    val secondaryButtonColors = ButtonColors(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+        disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
+    Button(
+        onClick = onClick,
+        shape = CircleShape,
+        contentPadding = contentPadding,
+        colors = secondaryButtonColors,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            contentDescription = contentDescription
+        )
+    }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    AppTheme {
+        MenuCard(
+            menu = RestaurantMenuDTO(
+                menuType = "Jedzenie",
+                dateFrom = "2024-01-01"
+            ),
+            onEditClick = {},
+            onDeleteClick = {}
+        )
     }
 }
