@@ -995,7 +995,9 @@ fun LogoWithReturn(navController: NavController = rememberNavController()) {
 @Composable
 fun ShowErrorToast(context: Context, id: Int) {
     if (id != -1) {
-        Toast.makeText(context, stringResource(id), Toast.LENGTH_SHORT).show()
+        val msg = stringResource(id)
+        println("[TOAST] '$msg'")
+        Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
     }
 }
 
