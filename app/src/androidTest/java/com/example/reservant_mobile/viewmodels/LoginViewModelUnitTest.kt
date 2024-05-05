@@ -13,8 +13,10 @@ class LoginViewModelUnitTest {
         val vm = LoginViewModel()
         vm.login.value = ""
         vm.password.value = "P@ssw0rd"
-        val result = vm.login()
-        assertThat(result).isEqualTo(false)
+        assertThat(vm.login()).isEqualTo(false)
+        vm.login.value = " "
+        assertThat(vm.login()).isEqualTo(false)
+
     }
 
     @Test
@@ -22,8 +24,10 @@ class LoginViewModelUnitTest {
         val vm = LoginViewModel()
         vm.login.value = "test"
         vm.password.value = ""
-        val result = vm.login()
-        assertThat(result).isEqualTo(false)
+        assertThat(vm.login()).isEqualTo(false)
+        vm.password.value = " "
+        assertThat(vm.login()).isEqualTo(false)
+
     }
 
     @Test
