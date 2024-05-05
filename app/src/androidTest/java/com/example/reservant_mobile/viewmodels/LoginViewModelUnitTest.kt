@@ -1,7 +1,5 @@
 package com.example.reservant_mobile.viewmodels
 
-import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
-import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -19,22 +17,21 @@ class LoginViewModelUnitTest {
         assertThat(result).isEqualTo(false)
     }
 
-
     @Test
     fun empty_password_returns_false() = runTest {
-        val result = LoginViewModel().apply {
-            login = FormField(LoginCredentialsDTO::login.name).apply { value = "test" }
-            password = FormField(LoginCredentialsDTO::password.name).apply { value = "" }
-        }.login()
+        val vm = LoginViewModel()
+        vm.login.value = "test"
+        vm.password.value = ""
+        val result = vm.login()
         assertThat(result).isEqualTo(false)
     }
 
     @Test
     fun valid_login_and_password_returns_true() = runTest{
-        val result = LoginViewModel().apply {
-            login = FormField(LoginCredentialsDTO::login.name).apply { value = "JD" }
-            password = FormField(LoginCredentialsDTO::password.name).apply { value = "Pa${"$"}${"$"}w0rd" }
-        }.login()
+        val vm = LoginViewModel()
+        vm.login.value = "JD"
+        vm.password.value = "Pa${"$"}${"$"}w0rd"
+        val result = vm.login()
         assertThat(result).isEqualTo(true)
     }
 
