@@ -1,4 +1,4 @@
-package com.example.reservant_mobile
+package com.example.reservant_mobile.viewmodels
 
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import com.google.common.truth.Truth.assertThat
