@@ -50,8 +50,9 @@ class RegisterViewModelUnitTest {
     fun error_when_login_is_empty()  {
         val vm = RegisterViewModel()
         vm.login.value = ""
-        val result = vm.isLoginInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isLoginInvalid()).isTrue()
+        vm.login.value = " "
+        assertThat(vm.isLoginInvalid()).isTrue()
     }
 
     @Test
@@ -73,8 +74,9 @@ class RegisterViewModelUnitTest {
     fun error_when_first_name_is_empty()  {
         val vm = RegisterViewModel()
         vm.firstName.value = ""
-        val result = vm.isFirstNameInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isFirstNameInvalid()).isTrue()
+        vm.firstName.value = " "
+        assertThat(vm.isFirstNameInvalid()).isTrue()
     }
 
     @Test
@@ -97,8 +99,10 @@ class RegisterViewModelUnitTest {
     fun error_when_last_name_is_empty()  {
         val vm = RegisterViewModel()
         vm.lastName.value = ""
-        val result = vm.isLastNameInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isLastNameInvalid()).isTrue()
+        vm.lastName.value = " "
+        assertThat(vm.isLastNameInvalid()).isTrue()
+
     }
 
     @Test
@@ -121,8 +125,9 @@ class RegisterViewModelUnitTest {
     fun error_when_birthdate_is_empty()  {
         val vm = RegisterViewModel()
         vm.birthday.value = ""
-        val result = vm.isBirthDateInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isBirthDateInvalid()).isTrue()
+        vm.birthday.value = " "
+        assertThat(vm.isBirthDateInvalid()).isTrue()
     }
 
     @Test
@@ -145,8 +150,9 @@ class RegisterViewModelUnitTest {
     fun form_returns_error_when_email_is_empty(){
         val vm = RegisterViewModel()
         vm.email.value = ""
-        val result = vm.isEmailInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isEmailInvalid()).isTrue()
+        vm.email.value = " "
+        assertThat(vm.isEmailInvalid()).isTrue()
     }
 
     @Test
@@ -169,8 +175,10 @@ class RegisterViewModelUnitTest {
     fun error_when_phone_number_is_empty(){
         val vm = RegisterViewModel()
         vm.phoneNum.value = ""
-        val result = vm.isPhoneInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isPhoneInvalid()).isTrue()
+        vm.phoneNum.value = " "
+        assertThat(vm.isPhoneInvalid()).isTrue()
+
     }
 
     @Test
@@ -193,8 +201,9 @@ class RegisterViewModelUnitTest {
     fun error_when_password_is_empty() {
         val vm = RegisterViewModel()
         vm.password.value = ""
-        val result = vm.isPasswordInvalid()
-        assertThat(result).isTrue()
+        assertThat(vm.isPasswordInvalid()).isTrue()
+        vm.password.value = " "
+        assertThat(vm.isPasswordInvalid()).isTrue()
     }
 
     @Test
@@ -210,8 +219,10 @@ class RegisterViewModelUnitTest {
         val vm = RegisterViewModel()
         vm.password.value = "Passw0rd!"
         vm.confirmPassword.value = ""
-        val result = vm.isConfirmPasswordDiff()
-        assertThat(result).isTrue()
+        assertThat(vm.isConfirmPasswordDiff()).isTrue()
+        vm.confirmPassword.value = " "
+        assertThat(vm.isConfirmPasswordDiff()).isTrue()
+
     }
 
     @Test
