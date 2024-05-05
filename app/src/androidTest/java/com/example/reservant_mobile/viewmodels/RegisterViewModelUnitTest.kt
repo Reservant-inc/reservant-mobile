@@ -1,7 +1,5 @@
-/*
 package com.example.reservant_mobile.viewmodels
 
-import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -11,259 +9,390 @@ import org.junit.Test
 class RegisterViewModelUnitTest {
 
     @Test
-    fun `Form returns error code when username already taken`() = runTest {
-        val result = RegisterViewModel().apply {
-            login = "john@doe.pl"
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@doe.pl"
-            phoneNum = "123456789"
-            password = "Password123@"
-            confirmPassword = "Password123@"
-        }.register()
-
-        assertThat(result).isEqualTo(R.string.error_register_username_taken)
-    }
-
-    @Test
-    fun `Form returns no error when all fields are valid`() {
-        val result = RegisterViewModel().apply {
-            login = "JohnDope"
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123@"
-            confirmPassword = "Password123@"
-        }.isRegisterInvalid()
+    fun form_returns_error_false_username_already_taken() = runTest {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.register()
         assertThat(result).isFalse()
     }
 
     @Test
-    fun `Error when login is empty`()  {
-        val result = RegisterViewModel().apply {
-            login = ""
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isLoginInvalid()
+    fun form_returns_no_error_when_all_fields_are_valid() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isRegisterInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun no_error_when_login_is_correct()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLoginInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun error_when_login_is_empty()  {
+        val vm = RegisterViewModel()
+        vm.login.value = ""
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLoginInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when login is invalid`()  {
-        val result = RegisterViewModel().apply {
-            login = "!@#%^&*()_-+="
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isLoginInvalid()
+    fun error_when_login_is_invalid()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "!@#%^&*()_-+="
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLoginInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when first name is empty`()  {
-        val result = RegisterViewModel().apply {
-            firstName = ""
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isFirstNameInvalid()
+    fun no_error_when_first_name_is_correct()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isFirstNameInvalid()
+        assertThat(result).isFalse()
+    }
+    @Test
+    fun error_when_first_name_is_empty()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = ""
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isFirstNameInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when first name is invalid`()  {
-        val result = RegisterViewModel().apply {
-            firstName = "!@#%^&*()_-+="
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isFirstNameInvalid()
+    fun error_when_first_name_is_invalid()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "!@#%^&*()_-+="
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isFirstNameInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when last name is empty`()  {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = ""
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isLastNameInvalid()
+    fun no_error_when_last_name_is_correct()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLastNameInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun error_when_last_name_is_empty()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = ""
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLastNameInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when last name is invalid`()  {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "!@#%^&*()_-+="
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isLastNameInvalid()
+    fun error_when_last_name_is_invalid()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "!@#%^&*()_-+="
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isLastNameInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when birthdate is empty`()  {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = ""
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isBirthDateInvalid()
+    fun no_error_when_birthdate_is_correct()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isBirthDateInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun error_when_birthdate_is_empty()  {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = ""
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isBirthDateInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when birthdate has wrong format`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "20-02-2020"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isBirthDateInvalid()
+    fun error_when_birthdate_has_wrong_format() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "20-02-2020"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isBirthDateInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Form returns error when email is empty`(){
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = ""
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isEmailInvalid()
+    fun form_returns_no_error_when_email_is_correct(){
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isEmailInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun form_returns_error_when_email_is_empty(){
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = ""
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isEmailInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when email has wrong format`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "invalid"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isEmailInvalid()
+    fun error_when_email_has_wrong_format() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "invalid"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isEmailInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when phone number is empty`(){
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = ""
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isPhoneInvalid()
+    fun no_error_when_phone_number_is_correct(){
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPhoneInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun error_when_phone_number_is_empty(){
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = ""
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPhoneInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when phone number has wrong format`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "1234"
-            password = "Password123"
-            confirmPassword = "Password123"
-        }.isPhoneInvalid()
+    fun error_when_phone_number_has_wrong_format() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "1234"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPhoneInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when password is empty`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = ""
-            confirmPassword = "Password123"
-        }.isPasswordInvalid()
+    fun no_error_when_password_is_correct() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPasswordInvalid()
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun error_when_password_is_empty() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = ""
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPasswordInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when password is invalid`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "invalid"
-            confirmPassword = "Password123"
-        }.isPasswordInvalid()
+    fun error_when_password_is_invalid() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "invalid"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isPasswordInvalid()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when confirm password is empty`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "Password123"
-            confirmPassword = ""
-        }.isConfirmPasswordDiff()
+    fun error_when_confirm_password_is_empty() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "P@ssw0rd"
+        vm.confirmPassword.value = ""
+        val result = vm.isConfirmPasswordDiff()
         assertThat(result).isTrue()
     }
 
     @Test
-    fun `Error when passwords do not match`() {
-        val result = RegisterViewModel().apply {
-            firstName = "John"
-            lastName = "Dope"
-            birthday = "2020-02-20"
-            email = "john@test.com"
-            phoneNum = "123456789"
-            password = "invalid"
-            confirmPassword = "Password123"
-        }.isConfirmPasswordDiff()
+    fun no_error_when_passwords_match() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "Passw0rd!"
+        vm.confirmPassword.value = "Passw0rd!"
+        val result = vm.isConfirmPasswordDiff()
+        assertThat(result).isFalse()
+    }
+    @Test
+    fun error_when_passwords_do_not_match() {
+        val vm = RegisterViewModel()
+        vm.login.value = "JD"
+        vm.firstName.value = "John"
+        vm.lastName.value = "Doe"
+        vm.birthday.value = "2020-02-20"
+        vm.email.value = "john@doe.pl"
+        vm.phoneNum.value = "123456789"
+        vm.password.value = "Passw0rd!"
+        vm.confirmPassword.value = "P@ssw0rd"
+        val result = vm.isConfirmPasswordDiff()
         assertThat(result).isTrue()
     }
-}*/
+}
