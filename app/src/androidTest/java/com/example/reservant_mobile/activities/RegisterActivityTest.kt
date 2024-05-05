@@ -1,7 +1,6 @@
-package com.example.reservant_mobile
+package com.example.reservant_mobile.activities
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasSetTextAction
@@ -12,14 +11,12 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.testing.TestNavHostController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.activities.RegisterActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.net.PasswordAuthentication
 
 class RegisterActivityTest {
 
