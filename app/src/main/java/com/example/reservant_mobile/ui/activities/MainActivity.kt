@@ -1,17 +1,17 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.content.res.Resources.Theme
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.ui.constants.AuthRoutes
 import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.theme.AppTheme
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -28,35 +28,29 @@ class MainActivity : ComponentActivity() {
             startPoint = if(LoginViewModel().refreshToken())
                 MainRoutes.ACTIVITY_HOME
             else
-                MainRoutes.ACTIVITY_LANDING
-
+                AuthRoutes.ACTIVITY_LANDING
 
             setContent {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = startPoint) {
-                    composable(route = MainRoutes.ACTIVITY_LANDING) {
-                        LandingActivity(navController = navController)
-                    }
-                    composable(route = MainRoutes.ACTIVITY_LOGIN) {
-                        LoginActivity(navController = navController)
-                    }
-                    composable(route = MainRoutes.ACTIVITY_REGISTER) {
-                        RegisterActivity(navController = navController)
-                    }
-                    composable(route = MainRoutes.ACTIVITY_HOME) {
-                        HomeActivity(navController = navController)
-                    }
+                AppTheme {
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = startPoint) {
+                        composable(route = AuthRoutes.ACTIVITY_LANDING) {
+                            LandingActivity(navController = navController)
+                        }
+                        composable(route = AuthRoutes.ACTIVITY_LOGIN) {
+                            LoginActivity(navController = navController)
+                        }
+                        composable(route = AuthRoutes.ACTIVITY_REGISTER) {
+                            RegisterActivity(navController = navController)
+                        }
+                        composable(route = MainRoutes.ACTIVITY_HOME) {
+                            HomeActivity()
+                        }
 
+                    }
                 }
-
             }
+
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    //preview if needed
 }

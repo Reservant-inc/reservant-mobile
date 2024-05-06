@@ -3,35 +3,39 @@ package com.example.reservant_mobile.data.utils
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.AccountTree
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 
 sealed class BottomNavItem(
-    var title: String,
+    var route: String,
     var icon: ImageVector
 ) {
     data object Home :
         BottomNavItem(
-            "Home",
+            MainRoutes.ACTIVITY_HOME,
             Icons.Filled.Home
         )
 
     data object Landing :
         BottomNavItem(
-            "Landing",
+            "",
             Icons.Filled.Accessibility
         )
 
-    data object Login :
+    data object Management :
         BottomNavItem(
-            "Login",
-            Icons.Filled.AccountBox
+            RestaurantManagementRoutes.ACTIVITY_MANAGE,
+            Icons.Filled.Restaurant
         )
 
-    data object Register :
+    data object Profile :
         BottomNavItem(
-            "Register",
-            Icons.Filled.AccountTree
+            MainRoutes.ACTIVITY_PROFILE,
+            Icons.Filled.Settings
         )
+
 }

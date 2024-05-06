@@ -1,4 +1,4 @@
-package com.example.reservant_mobile
+package com.example.reservant_mobile.activities
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable

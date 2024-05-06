@@ -1,4 +1,4 @@
-package com.example.reservant_mobile
+package com.example.reservant_mobile.activities
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -14,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.activities.LoginActivity
 import org.junit.Before
 import org.junit.Rule
