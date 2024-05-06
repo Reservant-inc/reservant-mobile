@@ -47,7 +47,7 @@
     <string name="label_management_reviews">Reviews</string>
     <string name="label_management_manage_employees">Manage employees</string>
     <string name="label_management_manage_subscription">Manage subscription</string>
-    <string name="label_management_delete_restaurant">Delete local</string>
+    <string name="label_management_delete_restaurant">Delete restaurant</string>
     <string name="label_management_choose_group">Choose a Group</string>
     <string name="label_management_manage">Restaurant management</string>
     <string name="error_registerRestaurant_invalid_name">Invalid restaurant name</string>
