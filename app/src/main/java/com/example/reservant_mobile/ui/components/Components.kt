@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,14 +26,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
@@ -49,9 +46,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -62,6 +57,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,7 +66,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedTextField
@@ -88,8 +83,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
@@ -115,6 +108,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -123,7 +117,6 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.theme.AppTheme
-import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -1436,6 +1429,24 @@ fun SecondaryButton(
             contentDescription = contentDescription
         )
     }
+}
+
+@Composable
+fun MyFloatingActionButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(16.dp)
+            .padding(bottom = 56.dp)
+            .padding(end = 16.dp)
+            .padding(bottom = 16.dp),
+        content = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Dodaj"
+            )
+        }
+    )
 }
 
 @Preview

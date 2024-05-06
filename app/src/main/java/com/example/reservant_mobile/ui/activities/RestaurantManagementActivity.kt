@@ -1,4 +1,5 @@
 package com.example.reservant_mobile.ui.activities
+import EmployeeManagementActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,9 @@ import com.example.reservant_mobile.ui.components.RestaurantInfoView
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.ACTIVITY_MANAGE
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.EMPLOYEE_MANAGE
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.MENU_MANAGE
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.getEmployeeManageRoute
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.getMenuManageRoute
 import com.example.reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 import kotlinx.coroutines.launch
@@ -105,7 +108,7 @@ fun RestaurantManagementActivity() {
                     RestaurantInfoView(
                         restaurant = restaurant,
                         onEditClick = { /*TODO*/ },
-                        onManageEmployeeClick = { /*TODO*/ },
+                        onManageEmployeeClick = { navController.navigate(getEmployeeManageRoute(restaurant.id)) },
                         onManageMenuClick = { navController.navigate(getMenuManageRoute(restaurant.id)) },
                         onManageSubscriptionClick = { /*TODO*/ },
                         onDeleteClick = {
@@ -124,6 +127,10 @@ fun RestaurantManagementActivity() {
                 backStackEntry -> MenuManagementActivity(
             restaurantId = backStackEntry.arguments!!.getInt(RestaurantManagementArguments.RESTAURANT_ID)
         )
+        }
+
+        composable(EMPLOYEE_MANAGE, arguments = listOf(navArgument(RestaurantManagementArguments.RESTAURANT_ID) {type = NavType.IntType} )){
+                backStackEntry -> EmployeeManagementActivity(restaurantId = backStackEntry.arguments?.getInt("restaurantId")!!)
         }
     }
 

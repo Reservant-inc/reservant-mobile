@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
 import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.Management
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 
@@ -36,9 +35,6 @@ fun HomeActivity() {
             }
             composable(RestaurantManagementRoutes.ACTIVITY_MANAGE){
                 RestaurantManagementActivity()
-            }
-            composable(Management.ACTIVITY_EMPLOYEE){
-                EmployeeManagementActivity(1)
             }
         }
 

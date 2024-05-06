@@ -3,7 +3,7 @@ package com.example.reservant_mobile.data.models.dtos.fields
 import org.json.JSONObject
 
 class Result<T>(
-    val isError: Boolean,
+    var isError: Boolean,
     val value: T
 ){
     constructor(

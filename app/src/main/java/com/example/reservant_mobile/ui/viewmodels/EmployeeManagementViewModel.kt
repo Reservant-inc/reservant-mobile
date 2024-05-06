@@ -17,7 +17,6 @@ import java.util.regex.Pattern
 class EmployeeViewModel(private val restaurantId: Int, private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
     var employees by mutableStateOf<List<RestaurantEmployeeDTO>>(emptyList())
     var isLoading by mutableStateOf(false)
-    var hasError by mutableStateOf(false)
     var result by mutableStateOf(Result(isError=false, value=false))
 
 
@@ -37,19 +36,16 @@ class EmployeeViewModel(private val restaurantId: Int, private val restaurantSer
         }
     }
 
-    suspend fun fetchEmployees() {
+    private suspend fun fetchEmployees() {
         viewModelScope.launch {
             isLoading = true
             try {
                 val result: Result<List<RestaurantEmployeeDTO>?> = restaurantService.getEmployees(restaurantId)
                 if (!result.isError && result.value != null) {
                     employees = result.value
-                    hasError = false
-                } else {
-                    hasError = true
                 }
             } catch (e: Exception) {
-                hasError = true
+                result.isError = true
             } finally {
                 isLoading = false
             }
@@ -83,6 +79,11 @@ class EmployeeViewModel(private val restaurantId: Int, private val restaurantSer
         }
 
         result = restaurantService.addEmployeeToRestaurant(restaurantId, position)
+        if (result.value) {
+            viewModelScope.launch {
+                fetchEmployees()
+            }
+        }
         return result.value
     }
 

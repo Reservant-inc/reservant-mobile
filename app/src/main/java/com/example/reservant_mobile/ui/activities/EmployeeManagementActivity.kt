@@ -1,4 +1,5 @@
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,39 +19,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.AddEmployeeDialog
 import com.example.reservant_mobile.ui.components.EmployeeCard
+import com.example.reservant_mobile.ui.components.MyFloatingActionButton
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 
 @Composable
 fun EmployeeManagementActivity(restaurantId: Int) {
-    val employeeViewModel = EmployeeViewModel(restaurantId)
+    val employeeViewModel = viewModel<EmployeeViewModel>(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                EmployeeViewModel(restaurantId) as T
+        }
+    )
     var showDialog by remember { mutableStateOf(false) }
 
     if (showDialog) {
         AddEmployeeDialog(onDismiss = { showDialog = false }, vm = employeeViewModel)
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        items(employeeViewModel.employees) { employee ->
-            EmployeeCard(employee = employee)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            items(employeeViewModel.employees) { employee ->
+                EmployeeCard(employee = employee)
+            }
+            item {
+                Spacer(modifier = Modifier.height(72.dp))
+            }
         }
 
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(id = R.string.label_employee_add))
-            }
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            MyFloatingActionButton(onClick = { showDialog = true })
         }
     }
 }
