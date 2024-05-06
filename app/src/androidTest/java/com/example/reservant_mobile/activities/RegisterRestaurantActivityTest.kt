@@ -1,4 +1,4 @@
-package com.example.reservant_mobile
+package com.example.reservant_mobile.activities
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
@@ -11,7 +11,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.testing.TestNavHostController
+import com.example.reservant_mobile.ui.activities.RegisterActivity
 import com.example.reservant_mobile.ui.activities.RegisterRestaurantActivity
 import org.junit.Before
 import org.junit.Rule
@@ -28,9 +30,7 @@ class RegisterRestaurantActivityTest {
     @Before
     fun setupRegisterActivityNavHost() {
         rule.setContent {
-            navController = TestNavHostController(LocalContext.current)
-            navController.navigatorProvider.addNavigator(ComposeNavigator())
-            //RegisterRestaurantActivity()
+            RegisterActivity(navController = rememberNavController())
         }
     }
 
