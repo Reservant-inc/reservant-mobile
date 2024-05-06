@@ -952,8 +952,8 @@ fun IconWithHeader(
         .scale(scale)
     ){
         Row(){
-            Image(
-                icon,
+            Icon(
+                imageVector = icon,
                 contentDescription = icon.name,
                 modifier = Modifier
                     .size(82.dp)
