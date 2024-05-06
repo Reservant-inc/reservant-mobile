@@ -17,14 +17,15 @@ interface IRestaurantMenuService{
     suspend fun getMenus(restaurantId:Any): Result<List<RestaurantMenuDTO>?>
     suspend fun getMenu(id: Any): Result<RestaurantMenuDTO?>
     suspend fun editMenu(id: Any, menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>
+    suspend fun deleteMenu(id: Any): Result<Boolean>
     suspend fun addItemsToMenu(menuId: Any, itemsIds:List<Int>): Result<RestaurantMenuDTO?>
     suspend fun createMenuItems(menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItem(id:Any): Result<RestaurantMenuItemDTO?>
     suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuDTO): Result<RestaurantMenuItemDTO?>
-
-
+    suspend fun deleteMenuItem(id: Any): Result<Boolean>
 }
+
 class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRestaurantMenuService {
     private suspend inline fun <reified T> resultWrapper(res:Result<HttpResponse?>): Result<T?> {
         if(res.isError)
@@ -62,6 +63,18 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
         return resultWrapper(res)
     }
 
+    override suspend fun deleteMenu(id: Any): Result<Boolean> {
+        val res = api.delete(Endpoints.RESTAURANT_MENU(id.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = false)
+
+        if (res.value!!.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+    }
+
     override suspend fun addItemsToMenu(menuId: Any, itemsIds:List<Int>): Result<RestaurantMenuDTO?>{
         val newGroup: HashMap<String, List<Int>> = hashMapOf("itemIds" to itemsIds)
         val res = api.post(newGroup, Endpoints.RESTAURANT_ITEMS_IN_MENU(menuId.toString()))
@@ -90,4 +103,15 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
         return resultWrapper(res)
 
     }
+
+    override suspend fun deleteMenuItem(id: Any): Result<Boolean> {
+        val res = api.delete(Endpoints.RESTAURANT_MENU_ITEM(id.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = false)
+
+        if (res.value!!.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)    }
 }
