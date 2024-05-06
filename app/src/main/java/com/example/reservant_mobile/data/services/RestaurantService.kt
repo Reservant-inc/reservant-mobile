@@ -26,8 +26,9 @@ interface IRestaurantService{
     suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>
     suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
-    suspend fun getRestaurantTags(): Result<List<String>?>
     suspend fun getEmployees():  Result<List<UserDTO>?>
+    suspend fun deleteEmployment(id: Any): Result<Boolean>
+    suspend fun getRestaurantTags(): Result<List<String>?>
     }
 
 class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
@@ -233,24 +234,6 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
-
-    override suspend fun getRestaurantTags(): Result<List<String>?> {
-        val res = api.get(Endpoints.RESTAURANT_TAGS)
-
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
-    }
     override suspend fun getEmployees(): Result<List<UserDTO>?> {
         val res = api.get(Endpoints.USER_EMPLOYEES)
 
@@ -269,4 +252,33 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
+    override suspend fun deleteEmployment(id: Any): Result<Boolean> {
+        val res = api.delete(Endpoints.EMPLOYMENT(id.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = false)
+
+        if (res.value!!.status == HttpStatusCode.OK)
+            return Result(isError = false, value = true)
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+    }
+
+    override suspend fun getRestaurantTags(): Result<List<String>?> {
+        val res = api.get(Endpoints.RESTAURANT_TAGS)
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
 }
