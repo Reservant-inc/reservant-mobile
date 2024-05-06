@@ -24,4 +24,5 @@ data object Endpoints {
     fun MY_RESTAURANT_GROUP(id: String) = "/my-restaurant-groups/$id"
     const val RESTAURANT_TAGS="/restaurant-tags"
     const val USER_EMPLOYEES="/user/employees"
+    fun EMPLOYMENT(id:String)="/employments/$id"
 }
