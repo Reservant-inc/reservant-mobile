@@ -7,41 +7,58 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -54,6 +71,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedTextField
@@ -71,8 +89,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -83,6 +106,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -90,8 +114,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
+import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.activities.HomeActivity
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -122,6 +149,11 @@ fun InputUserInfo(
         mutableStateOf(false)
     }
 
+    if (inputText.isNotEmpty())
+        beginValidation = true
+
+    if (inputText.isEmpty() && optional)
+        beginValidation = false
 
     Column {
         OutlinedTextField(
@@ -144,7 +176,8 @@ fun InputUserInfo(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = " - optional", color = Color.Gray, fontStyle = FontStyle.Italic)
+                        Text(text = stringResource(id = R.string.label_optional), color = MaterialTheme.colorScheme.outline, fontStyle = FontStyle.Italic)
+
                 }
             },
             placeholder = { Text(text = placeholder) },
@@ -159,11 +192,11 @@ fun InputUserInfo(
             maxLines = maxLines,
             leadingIcon = leadingIcon,
 
-        )
+            )
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -171,10 +204,242 @@ fun InputUserInfo(
 }
 
 @Composable
+fun InputUserFile(
+    label: String = "",
+    onFilePicked: (Uri?) -> Unit,
+    modifier: Modifier = Modifier,
+    context: Context,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    isError: Boolean = false,
+    errorText: String = "",
+    formSent: Boolean = false,
+    optional: Boolean = false,
+    deletable: Boolean = false
+) {
+    var fileName by remember { mutableStateOf<String?>(null) }
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        fileName = uri?.let { getFileName(context, it) }
+        onFilePicked(uri)
+    }
+    var beginValidation: Boolean by remember { mutableStateOf(false) }
+
+    if (fileName != null) {
+        beginValidation = true
+    }
+    if (fileName == null && optional) {
+        beginValidation = false
+    }
+
+    OutlinedTextField(
+        modifier =
+        if (optional) {
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        } else {
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .onFocusChanged {
+                    if (it.hasFocus) {
+                        beginValidation = true
+                    }
+                }
+        },
+        value = fileName ?: "",
+        onValueChange = { },
+        label = {
+            Row {
+                Text(text = label)
+                if (optional) {
+                    Text(
+                        text = stringResource(R.string.label_optional),
+                        color = Color.Gray,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            }
+        },
+        readOnly = true,
+        visualTransformation = VisualTransformation.None,
+        keyboardOptions = KeyboardOptions.Default,
+        interactionSource = remember { MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is PressInteraction.Release) {
+                            pickFileLauncher.launch("*/*")
+                        }
+                    }
+                }
+            },
+        trailingIcon = {
+            if (deletable && fileName != null) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete file",
+                    modifier = Modifier.clickable {
+                        fileName = null
+                        onFilePicked(null)
+                    }
+                )
+            } else if (fileName == null) {
+                Icon(
+                    imageVector = Icons.Default.AttachFile,
+                    contentDescription = "Attach file"
+                )
+            }
+        },
+        shape = shape,
+        isError = isError && (beginValidation || formSent),
+    )
+
+    if (isError && (beginValidation || formSent)) {
+        Text(
+            text = errorText,
+            color = Color.Red
+        )
+    }
+}
+
+
+@Composable
+fun OutLinedDropdownMenu(
+    selectedOption: String,
+    itemsList: List<String>,
+    onOptionSelected: (String) -> Unit,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    errorText: String = "",
+    formSent: Boolean = false,
+    label: String = "",
+    optional: Boolean = false
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    var beginValidation: Boolean by remember {
+        mutableStateOf(false)
+    }
+
+    if (selectedOption.isNotEmpty())
+        beginValidation = true
+    if (selectedOption.isEmpty() && optional)
+        beginValidation = false
+
+    Column {
+        OutlinedTextField(
+            modifier =
+            if (optional) {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            } else {
+                modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .onFocusChanged {
+                        if (it.hasFocus) beginValidation = true
+                    }
+            },
+            value = selectedOption,
+            onValueChange = { },
+            readOnly = true,
+            label = {
+                Row {
+                    Text(text = label)
+                    if (optional)
+                        Text(text = stringResource(id = R.string.label_optional), color = Color.Gray, fontStyle = FontStyle.Italic)
+                }
+            },
+            interactionSource = interactionSource,
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    contentDescription = if (expanded) "Hide" else "Show"
+                )
+            },
+            shape = shape,
+            isError = isError && (beginValidation || formSent),
+        )
+        if (isError && (beginValidation || formSent)) {
+            Text(
+                text = errorText,
+                color = Color.Red
+            )
+        }
+
+        LaunchedEffect(interactionSource) {
+            interactionSource.interactions.collect { interaction ->
+                if (interaction is PressInteraction.Release) {
+                    expanded = true
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            itemsList.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ButtonComponent(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    label: String = "",
+    isLoading: Boolean = false
+) {
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.secondary
+        )
+    )
+
+    Button(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(gradientBrush, RoundedCornerShape(16.dp)),  // Gradient tła
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,  // Transparentny, by pokazać gradient
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        } else {
+            Text(text = label)
+        }
+    }
+}
+
+
+@Composable
 fun TagsSelection(
     tags: List<String>,
     selectedTags: List<String>,
-    onTagSelected: (String, Boolean) -> Unit
+    onTagSelected: (String, Boolean) -> Unit,
 ) {
     Column {
         tags.forEach { tag ->
@@ -200,53 +465,6 @@ fun TagsSelection(
             }
         }
     }
-}
-
-@Composable
-fun InputUserFile(
-    label: String = "",
-    modifier: Modifier = Modifier,
-    onFilePicked: (Uri?) -> Unit
-) {
-    val pickFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        onFilePicked(uri)
-    }
-
-    ButtonComponent(
-        label = label,
-        onClick = {
-            pickFileLauncher.launch("*/*")
-        },
-        modifier = modifier
-    )
-}
-
-@Composable
-fun ButtonComponent(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    label: String = "",
-    isLoading: Boolean = false
-) {
-    Button(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .testTag("Button"),
-        onClick = onClick,
-        content = {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp),
-                    trackColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            } else {
-                Text(text = label)
-            }
-        }
-    )
 }
 
 @Composable
@@ -348,12 +566,168 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
         )
     }
 }
+@Composable
+fun RestaurantInfoView(
+    restaurant: RestaurantDTO,
+    onEditClick: () -> Unit,
+    onManageEmployeeClick: () -> Unit,
+    onManageMenuClick: () -> Unit,
+    onManageSubscriptionClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "${restaurant.name} - ${restaurant.restaurantType}",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_nip),
+                    value = restaurant.nip
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_address),
+                    value = "${restaurant.address}, ${restaurant.postalIndex}"
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_city),
+                    value = restaurant.city
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_delivery),
+                    value =
+                        if (restaurant.provideDelivery)
+                            stringResource(R.string.label_restaurant_delivery_available)
+                        else
+                            stringResource(R.string.label_restaurant_delivery_not_available)
+                )
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_description),
+                    value = restaurant.description
+                )
+                if(restaurant.tags.isNotEmpty()){
+                    TagsDetailView(tags = restaurant.tags)
+                }
+                DetailItem(
+                    label = stringResource(R.string.label_restaurant_tables),
+                    value = "${restaurant.tables.size}"
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopEnd)
+                    .offset(x = 16.dp)
+                    .offset(y = (-12).dp)
+            ) {
+                IconButton(
+                    onClick = { showMenu = !showMenu },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onEditClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_edit_local_data))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageEmployeeClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_employees))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageMenuClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_menu))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onManageSubscriptionClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_manage_subscription))}
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onDeleteClick()
+                            showMenu = false
+                        },
+                        text = {Text(stringResource(R.string.label_management_delete_restaurant))}
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailItem(label: String, value: String) {
+    Column(
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Text(
+            "$label:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun TagsDetailView(tags: List<String>) {
+    if (tags.isNotEmpty()) {
+        val tagsString = tags.joinToString(separator = ", ")
+        DetailItem(
+            label = stringResource(R.string.label_restaurant_tags),
+            value = tagsString
+        )
+    }
+}
 
 @Composable
 fun OutLinedDropdownMenu(
     selectedOption: String,
     itemsList: List<String>,
     onOptionSelected: (String) -> Unit,
+    label: String,
     shape: RoundedCornerShape = roundedShape,
     modifier: Modifier = Modifier
 ) {
@@ -365,7 +739,7 @@ fun OutLinedDropdownMenu(
             value = selectedOption,
             onValueChange = { },
             readOnly = true,
-            label = { Text(stringResource(R.string.label_restaurant_type)) },
+            label = { Text(label) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
@@ -403,7 +777,6 @@ fun OutLinedDropdownMenu(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -568,6 +941,35 @@ fun CountryCodePickerDialog(
     }
 }
 
+@Composable
+fun IconWithHeader(
+    icon: ImageVector,
+    text: String,
+    scale: Float = 1F
+){
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .scale(scale)
+    ){
+        Row(){
+            Image(
+                icon,
+                contentDescription = icon.name,
+                modifier = Modifier
+                    .size(82.dp)
+                    .padding(top = 16.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(4.dp, 16.dp, 8.dp, 4.dp)
+                    .fillMaxWidth()
+            )
+        }
+    }
+}
 
 @Composable
 fun LogoWithReturn(navController: NavController = rememberNavController()) {
@@ -593,7 +995,9 @@ fun LogoWithReturn(navController: NavController = rememberNavController()) {
 @Composable
 fun ShowErrorToast(context: Context, id: Int) {
     if (id != -1) {
-        Toast.makeText(context, stringResource(id), Toast.LENGTH_SHORT).show()
+        val msg = stringResource(id)
+        println("[TOAST] '$msg'")
+        Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -603,11 +1007,13 @@ fun BottomNavigation(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Login,
+        BottomNavItem.Management,
         BottomNavItem.Profile
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    ) {
         for (i in items) {
             AddItem(
                 screen = i,
@@ -702,5 +1108,105 @@ fun Content() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Zgłodniałeś?")
+    }
+}
+
+@Composable
+fun MenuCard(
+    menu: RestaurantMenuDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column {
+
+            Image(
+                painterResource(id = R.drawable.ic_logo),
+                contentDescription = "",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row {
+                val buttonModifier = Modifier
+                    .align(Alignment.Bottom)
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                Text(
+                    text = menu.menuType,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(1f)
+                        .align(Alignment.Bottom)
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onEditClick,
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditMenuItem"
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onDeleteClick,
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "delete"
+                )
+
+            }
+        }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    modifier: Modifier,
+    onClick: () -> Unit,
+    imageVector: ImageVector,
+    contentDescription: String,
+    contentPadding: PaddingValues = PaddingValues(6.dp),
+){
+
+    val secondaryButtonColors = ButtonColors(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+        disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+
+    Button(
+        onClick = onClick,
+        shape = CircleShape,
+        contentPadding = contentPadding,
+        colors = secondaryButtonColors,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            contentDescription = contentDescription
+        )
+    }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    AppTheme {
+        MenuCard(
+            menu = RestaurantMenuDTO(
+                menuType = "Jedzenie",
+                dateFrom = "2024-01-01"
+            ),
+            onEditClick = {},
+            onDeleteClick = {}
+        )
     }
 }

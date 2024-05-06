@@ -1,5 +1,7 @@
 package com.example.reservant_mobile.ui.constants
 
+import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments.RESTAURANT_ID
+
 data object AuthRoutes{
     val ACTIVITY_LANDING = "${AuthRoutes::class.simpleName}/landing"
     val ACTIVITY_LOGIN = "${AuthRoutes::class.simpleName}/login"
@@ -16,4 +18,11 @@ data object RegisterRestaurantRoutes {
     val ACTIVITY_INPUTS = "${RegisterRestaurantRoutes::class.simpleName}/input"
     val ACTIVITY_FILES = "${RegisterRestaurantRoutes::class.simpleName}/files"
     val ACTIVITY_DESC = "${RegisterRestaurantRoutes::class.simpleName}/desc"
+}
+
+data object RestaurantManagementRoutes {
+    val ACTIVITY_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manage"
+    val MENU_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/{${RESTAURANT_ID}}"
+
+    fun getMenuManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/${restaurantId}"
 }
