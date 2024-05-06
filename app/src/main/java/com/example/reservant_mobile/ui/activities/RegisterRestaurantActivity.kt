@@ -336,12 +336,20 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 ButtonComponent(
                     label = stringResource(R.string.label_register_restaurant),
                     onClick = {
-                        if(!registerRestaurantViewModel.isGroupInvalid())
-                            navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                        registerRestaurantViewModel.viewModelScope.launch {
+                            isLoading = true
+
+                            val result = registerRestaurantViewModel.validateSecondStep(context)
+
+                            if (result) {
+                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                            }
+
+                            isLoading = false
+                        }
                     }
                 )
 
-                // TODO: 2nd step validation
                 ShowErrorToast(
                     context = LocalContext.current,
                     id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)

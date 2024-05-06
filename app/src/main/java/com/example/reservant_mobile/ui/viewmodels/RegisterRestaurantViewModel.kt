@@ -70,6 +70,21 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return result.value
     }
 
+    fun validateSecondStep(context: Context): Boolean {
+
+        val isBusinessPermissionValid = !isBusinessPermissionInvalid(context)
+        val isIdCardValid = !isIdCardInvalid(context)
+
+        val isRentalContractValid = rentalContract.value.isBlank() || !isRentalContractInvalid(context)
+        val isAlcoholLicenseValid = alcoholLicense.value.isBlank() || !isAlcoholLicenseInvalid(context)
+
+        val isValid = isBusinessPermissionValid && isIdCardValid && isRentalContractValid && isAlcoholLicenseValid
+
+        result2 = Result(isError = !isValid, value = isValid)
+
+        return isValid
+    }
+
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
         val rental = if (rentalContract.value.isBlank()) null else sendFile(rentalContract.value, context, DataType.PDF)
         val alcohol = if (alcoholLicense.value.isBlank()) null else sendFile(alcoholLicense.value, context, DataType.PDF)
