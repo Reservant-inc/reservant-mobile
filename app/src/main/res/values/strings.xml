@@ -78,4 +78,6 @@
     <string name="label_employee_hall">Hall employee</string>
     <string name="label_employee_backdoor">Backdoor employee</string>
     <string name="label_employee_add">Add new employee</string>
+    <string name="label_phone_display">"Phone number: "</string>
+    <string name="label_login_display">"Login: "</string>
 </resources>

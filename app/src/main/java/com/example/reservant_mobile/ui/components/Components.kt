@@ -1026,24 +1026,28 @@ fun EmployeeCard(employee: RestaurantEmployeeDTO) {
                 style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
             )
             Text(
-                text = "${stringResource(id = R.string.label_login)} ${employee.login}",
+                text = "${stringResource(id = R.string.label_login_display)} ${employee.login}",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
             )
             Text(
-                text = "${stringResource(id = R.string.label_phone)} ${employee.phoneNumber}",
+                text = "${stringResource(id = R.string.label_phone_display)} ${employee.phoneNumber}",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
             )
 
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-            Text(
-                text = "${stringResource(id = R.string.label_employee_hall)} ${employee.isHallEmployee}",
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = "${stringResource(id = R.string.label_employee_backdoor)} ${employee.isBackdoorEmployee}",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if(employee.isHallEmployee) {
+                Text(
+                    text = stringResource(id = R.string.label_employee_hall),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if(employee.isBackdoorEmployee) {
+                Text(
+                    text = stringResource(id = R.string.label_employee_backdoor),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
