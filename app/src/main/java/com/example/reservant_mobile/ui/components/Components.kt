@@ -985,7 +985,8 @@ fun LogoWithReturn(navController: NavController = rememberNavController()) {
             Icon(
                 Icons.AutoMirrored.Rounded.ArrowBack,
                 contentDescription = "back",
-                modifier = Modifier.size(35.dp)
+                modifier = Modifier.size(35.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
         Logo(modifier = Modifier.align(Alignment.Center))
@@ -1198,13 +1199,6 @@ fun SecondaryButton(
 @Composable
 fun Preview(){
     AppTheme {
-        MenuCard(
-            menu = RestaurantMenuDTO(
-                menuType = "Jedzenie",
-                dateFrom = "2024-01-01"
-            ),
-            onEditClick = {},
-            onDeleteClick = {}
-        )
+        LogoWithReturn()
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,81 +49,84 @@ fun LoginActivity(navController: NavHostController) {
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LogoWithReturn(navController)
+    Surface {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LogoWithReturn(navController)
 
-        InputUserInfo(
-            inputText = loginViewModel.login.value,
-            onValueChange = {
-                loginViewModel.login.value = it
-                formSent = false
-            },
-            label = stringResource(R.string.label_login),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            isError = loginViewModel.result.isError && formSent,
-            formSent = formSent
-        )
+            InputUserInfo(
+                inputText = loginViewModel.login.value,
+                onValueChange = {
+                    loginViewModel.login.value = it
+                    formSent = false
+                },
+                label = stringResource(R.string.label_login),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                isError = loginViewModel.result.isError && formSent,
+                formSent = formSent
+            )
 
-        InputUserInfo(
-            inputText = loginViewModel.password.value,
-            onValueChange = {
-                loginViewModel.password.value = it
-                formSent = false
-            },
-            label = stringResource(R.string.label_password),
-            leadingIcon = {
-                IconButton(onClick = {
-                    isPasswordVisible = !isPasswordVisible
-                }) {
-                    Icon(
-                        imageVector = if (isPasswordVisible)
-                            Icons.Filled.Visibility
-                        else
-                            Icons.Filled.VisibilityOff,
-                        contentDescription = stringResource(R.string.label_password_visibility)
-                    )
+            InputUserInfo(
+                inputText = loginViewModel.password.value,
+                onValueChange = {
+                    loginViewModel.password.value = it
+                    formSent = false
+                },
+                label = stringResource(R.string.label_password),
+                leadingIcon = {
+                    IconButton(onClick = {
+                        isPasswordVisible = !isPasswordVisible
+                    }) {
+                        Icon(
+                            imageVector = if (isPasswordVisible)
+                                Icons.Filled.Visibility
+                            else
+                                Icons.Filled.VisibilityOff,
+                            contentDescription = stringResource(R.string.label_password_visibility)
+                        )
+                    }
+                },
+                visualTransformation = if (isPasswordVisible)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                isError = loginViewModel.result.isError && formSent,
+                formSent = formSent
+            )
+
+
+            ButtonComponent(onClick = {
+                loginViewModel.viewModelScope.launch {
+                    isLoading = true
+                    formSent = true
+
+                    if (loginViewModel.login()){
+                        navController.navigate(MainRoutes.ACTIVITY_HOME)
+                    }
+
+                    isLoading = false
+
                 }
-            },
-            visualTransformation = if (isPasswordVisible)
-                VisualTransformation.None
-            else
-                PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            isError = loginViewModel.result.isError && formSent,
-            formSent = formSent
-        )
+            }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
 
+            ShowErrorToast(context = LocalContext.current, id = loginViewModel.getToastError())
 
-        ButtonComponent(onClick = {
-            loginViewModel.viewModelScope.launch {
-                isLoading = true
-                formSent = true
+            Spacer(modifier = Modifier.weight(1f))
 
-                if (loginViewModel.login()){
-                    navController.navigate(MainRoutes.ACTIVITY_HOME)
-                }
+            ButtonComponent(onClick = { if (!isLoading) navController.navigate(AuthRoutes.ACTIVITY_REGISTER) },
+                label = stringResource(R.string.label_signup))
 
-                isLoading = false
-
-            }
-        }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
-
-        ShowErrorToast(context = LocalContext.current, id = loginViewModel.getToastError())
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        ButtonComponent(onClick = { if (!isLoading) navController.navigate(AuthRoutes.ACTIVITY_REGISTER) },
-            label = stringResource(R.string.label_signup))
-
-        ButtonComponent(onClick = { if (!isLoading) return@ButtonComponent /* Handle Password Recovery */ },
-            label = stringResource(R.string.label_password_forgot))
+            ButtonComponent(onClick = { if (!isLoading) return@ButtonComponent /* Handle Password Recovery */ },
+                label = stringResource(R.string.label_password_forgot))
+        }
     }
+
 }
 
 @Preview(showBackground = true)
