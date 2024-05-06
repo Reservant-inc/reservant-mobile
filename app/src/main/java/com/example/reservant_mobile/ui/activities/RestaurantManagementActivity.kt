@@ -117,7 +117,9 @@ fun RestaurantManagementActivity() {
             }
         }
         composable(MENU_MANAGE, arguments = listOf(navArgument(RestaurantManagementArguments.RESTAURANT_ID) {type = NavType.IntType} )){
-            backStackEntry -> MenuManagementActivity(restaurantId = backStackEntry.arguments?.getInt("restaurantId")!!)
+                backStackEntry -> MenuManagementActivity(
+            restaurantId = backStackEntry.arguments!!.getInt(RestaurantManagementArguments.RESTAURANT_ID)
+        )
         }
     }
 
