@@ -107,9 +107,13 @@ fun RestaurantManagementActivity() {
                         onEditClick = { /*TODO*/ },
                         onManageEmployeeClick = { /*TODO*/ },
                         onManageMenuClick = { navController.navigate(getMenuManageRoute(restaurant.id)) },
-                        onManageSubscriptionClick = { /*TODO*/ }) {
-
-                    }
+                        onManageSubscriptionClick = { /*TODO*/ },
+                        onDeleteClick = {
+                            restaurantManageVM.viewModelScope.launch {
+                                // TODO: restaurantManageVM.deleteRestaurant(restaurant.id)
+                            }
+                        }
+                    )
                 }
                 Spacer(
                     modifier = Modifier.padding(bottom = 64.dp)

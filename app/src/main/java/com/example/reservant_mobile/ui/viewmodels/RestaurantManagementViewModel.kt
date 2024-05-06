@@ -37,14 +37,9 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
         return restaurantService.getRestaurant(id).value
     }
 
-
-    fun deleteSelectedRestaurant() {
-        selectedRestaurant?.let { restaurant ->
-            viewModelScope.launch {
-                restaurantService.deleteRestaurant(restaurant.id)
-//                loadRestaurants()
-            }
-        }
+    suspend fun deleteRestaurant(id: Int) {
+        restaurantService.deleteRestaurant(id)
+        this.initialize() // Reloading groups
     }
 
 }
