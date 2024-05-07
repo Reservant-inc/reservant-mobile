@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -83,6 +84,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,6 +122,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.theme.AppTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -1259,22 +1262,87 @@ fun SecondaryButton(
         )
     }
 }
+@Composable
+fun CountDownPopup(
+    countDownTimer: Int = 5,
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirmText: String = "Confirm",
+    dismissText: String = "Cancel",
+    onDismissRequest: () -> Unit = {},
+    onConfirm: () -> Unit,
+){
+
+    var allowConfirm by remember {
+        mutableStateOf(false)
+    }
+
+    var timer by remember {
+        mutableIntStateOf(countDownTimer)
+    }
+
+    if (timer > 0){
+        LaunchedEffect(key1 = timer) {
+            delay(1000)
+            timer -= 1
+            allowConfirm = timer == 0
+        }
+    }
+
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Text(text = text)
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (allowConfirm) onConfirm()
+                },
+                enabled = allowConfirm
+            ) {
+                Text(if (!allowConfirm) timer.toString() else confirmText)
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(dismissText)
+            }
+        }
+    )
+}
 
 @Preview
 @Composable
 fun Preview() {
-    val menuItem = RestaurantMenuItemDTO(
-        id = 1,
-        name = "Pizza Margherita",
-        price = 25.0,
-        alcoholPercentage = null
-    )
-
     AppTheme {
-        MenuItemCard(
-            menuItem = menuItem,
-            onEditClick = {},
-            onDeleteClick = {}
-        )
+        val openDialog = remember {
+            mutableStateOf(true)
+        }
+
+        when {
+            openDialog.value -> {
+                CountDownPopup(
+                    icon = Icons.Filled.DeleteForever,
+                    title = "Czy napewno chcesz usunąć menu?",
+                    text = "Ta czynność jest nieodwracalna",
+                    onConfirm = {openDialog.value = false},
+                    onDismissRequest = {openDialog.value = false},
+                    confirmText = "Tak",
+                    dismissText = "Nie"
+                )
+            }
+        }
     }
 }
