@@ -7,9 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,14 +26,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
@@ -46,13 +41,12 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -63,6 +57,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,7 +66,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedTextField
@@ -90,13 +84,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -108,18 +103,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.theme.AppTheme
+import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -567,6 +565,7 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
         )
     }
 }
+
 @Composable
 fun RestaurantInfoView(
     restaurant: RestaurantDTO,
@@ -591,7 +590,11 @@ fun RestaurantInfoView(
         ) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painter = painterResource(R.drawable.ic_logo), contentDescription = "Restaurant Icon", modifier = Modifier.size(24.dp))
+                    Icon(
+                        painter = painterResource(R.drawable.ic_logo),
+                        contentDescription = "Restaurant Icon",
+                        modifier = Modifier.size(24.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = "${restaurant.name} - ${restaurant.restaurantType}",
@@ -613,16 +616,16 @@ fun RestaurantInfoView(
                 DetailItem(
                     label = stringResource(R.string.label_restaurant_delivery),
                     value =
-                        if (restaurant.provideDelivery)
-                            stringResource(R.string.label_restaurant_delivery_available)
-                        else
-                            stringResource(R.string.label_restaurant_delivery_not_available)
+                    if (restaurant.provideDelivery)
+                        stringResource(R.string.label_restaurant_delivery_available)
+                    else
+                        stringResource(R.string.label_restaurant_delivery_not_available)
                 )
                 DetailItem(
                     label = stringResource(R.string.label_restaurant_description),
                     value = restaurant.description
                 )
-                if(restaurant.tags.isNotEmpty()){
+                if (restaurant.tags.isNotEmpty()) {
                     TagsDetailView(tags = restaurant.tags)
                 }
                 DetailItem(
@@ -658,35 +661,35 @@ fun RestaurantInfoView(
                             onEditClick()
                             showMenu = false
                         },
-                        text = {Text(stringResource(R.string.label_management_edit_local_data))}
+                        text = { Text(stringResource(R.string.label_management_edit_local_data)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onManageEmployeeClick()
                             showMenu = false
                         },
-                        text = {Text(stringResource(R.string.label_management_manage_employees))}
+                        text = { Text(stringResource(R.string.label_management_manage_employees)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onManageMenuClick()
                             showMenu = false
                         },
-                        text = {Text(stringResource(R.string.label_management_manage_menu))}
+                        text = { Text(stringResource(R.string.label_management_manage_menu)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onManageSubscriptionClick()
                             showMenu = false
                         },
-                        text = {Text(stringResource(R.string.label_management_manage_subscription))}
+                        text = { Text(stringResource(R.string.label_management_manage_subscription)) }
                     )
                     DropdownMenuItem(
                         onClick = {
                             onDeleteClick()
                             showMenu = false
                         },
-                        text = {Text(stringResource(R.string.label_management_delete_restaurant))}
+                        text = { Text(stringResource(R.string.label_management_delete_restaurant)) }
                     )
                 }
             }
@@ -1004,6 +1007,103 @@ fun ShowErrorToast(context: Context, id: Int) {
 }
 
 @Composable
+fun EmployeeCard(
+    employee: RestaurantEmployeeDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        val localDensity = LocalDensity.current
+        var tabWidth by remember { mutableStateOf(0.dp) }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopStart
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "${employee.firstName} ${employee.lastName}",
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
+                    )
+
+                    Text(
+                        text = "${stringResource(id = R.string.label_login_display)} ${employee.login}",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
+                    Text(
+                        text = "${stringResource(id = R.string.label_phone_display)} ${employee.phoneNumber}",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                        modifier = Modifier
+                            .onGloballyPositioned { coordinates ->
+                                tabWidth = with(localDensity) { coordinates.size.width.toDp() }
+                            }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .width(tabWidth),
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+
+
+                    if (employee.isHallEmployee) {
+                        Text(
+                            text = stringResource(id = R.string.label_employee_hall),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    if (employee.isBackdoorEmployee) {
+                        Text(
+                            text = stringResource(id = R.string.label_employee_backdoor),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+            Row {
+                val buttonModifier = Modifier
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onEditClick,
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditEmployee"
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onDeleteClick,
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "DeleteEmployee"
+                )
+            }
+        }
+
+    }
+}
+
+
+
+
+@Composable
 fun BottomNavigation(navController: NavHostController) {
 
     val items = listOf(
@@ -1098,6 +1198,244 @@ fun Heading() {
             }
         }
     }
+}
+
+@Composable
+fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
+    var formSent by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.label_employee_add)) },
+        text = {
+            Column {
+                InputUserInfo(
+                    inputText = vm.login.value,
+                    onValueChange = { vm.login.value = it },
+                    label = stringResource(id = R.string.label_login),
+                    optional = false,
+                    isError = vm.isLoginInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLoginError() != -1)
+                            vm.getLoginError()
+                        else
+                            R.string.error_login_invalid
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.firstName.value,
+                    onValueChange = { vm.firstName.value = it },
+                    label = stringResource(id = R.string.label_name),
+                    optional = false,
+                    isError = vm.isFirstNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getFirstNameError() != -1)
+                            vm.getFirstNameError()
+                        else
+                            R.string.error_register_invalid_name
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.lastName.value,
+                    onValueChange = { vm.lastName.value = it },
+                    label = stringResource(id = R.string.label_lastname),
+                    optional = false,
+                    isError = vm.isLastNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLastNameError() != -1)
+                            vm.getLastNameError()
+                        else
+                            R.string.error_register_invalid_lastname
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.phoneNum.value,
+                    onValueChange = { vm.phoneNum.value = it },
+                    label = stringResource(id = R.string.label_phone),
+                    optional = false,
+                    isError = vm.isPhoneInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPhoneError() != -1)
+                            vm.getPhoneError()
+                        else
+                            R.string.error_register_invalid_phone
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.password.value,
+                    onValueChange = { vm.password.value = it },
+                    label = stringResource(id = R.string.label_password),
+                    optional = false,
+                    isError = vm.isPasswordInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPasswordError() != -1)
+                            vm.getPasswordError()
+                        else
+                            R.string.error_register_invalid_password
+                    ),
+                    formSent = formSent
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isHallEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isHallEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isBackdoorEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isBackdoorEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_backdoor))
+                }
+            }
+        },
+        confirmButton = {
+            ShowErrorToast(context = LocalContext.current, id = vm.getToastError())
+            ButtonComponent(
+                onClick = {
+                    vm.viewModelScope.launch {
+                        isLoading = true
+                        formSent = true
+
+                        if (vm.register()){
+                            onDismiss()
+                        }
+
+                        isLoading = false
+                    }
+                },
+                label = stringResource(R.string.label_signup)
+            )
+        },
+        dismissButton = {
+            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
+        }
+    )
+}
+
+@Composable
+fun EditEmployeeDialog(
+    employee: RestaurantEmployeeDTO,
+    onDismiss: () -> Unit,
+    vm: EmployeeViewModel
+) {
+    vm.login.value = employee.login.substringAfter('+')
+    vm.firstName.value = employee.firstName
+    vm.lastName.value = employee.lastName
+    vm.phoneNum.value = employee.phoneNumber
+    vm.isHallEmpployee = employee.isHallEmployee
+    vm.isBackdoorEmpployee = employee.isBackdoorEmployee
+
+    var formSent by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.label_employee_edit)) },
+        text = {
+            Column {
+                InputUserInfo(
+                    inputText = vm.login.value,
+                    onValueChange = { vm.login.value = it },
+                    label = stringResource(id = R.string.label_login),
+                    optional = false,
+                    isError = vm.isLoginInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLoginError() != -1)
+                            vm.getLoginError()
+                        else
+                            R.string.error_login_invalid
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.firstName.value,
+                    onValueChange = { vm.firstName.value = it },
+                    label = stringResource(id = R.string.label_name),
+                    optional = false,
+                    isError = vm.isFirstNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getFirstNameError() != -1)
+                            vm.getFirstNameError()
+                        else
+                            R.string.error_register_invalid_name
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.lastName.value,
+                    onValueChange = { vm.lastName.value = it },
+                    label = stringResource(id = R.string.label_lastname),
+                    optional = false,
+                    isError = vm.isLastNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLastNameError() != -1)
+                            vm.getLastNameError()
+                        else
+                            R.string.error_register_invalid_lastname
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.phoneNum.value,
+                    onValueChange = { vm.phoneNum.value = it },
+                    label = stringResource(id = R.string.label_phone),
+                    optional = false,
+                    isError = vm.isPhoneInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPhoneError() != -1)
+                            vm.getPhoneError()
+                        else
+                            R.string.error_register_invalid_phone
+                    ),
+                    formSent = formSent
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isHallEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isHallEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isBackdoorEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isBackdoorEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_backdoor))
+                }
+            }
+        },
+        confirmButton = {
+            ButtonComponent(
+                onClick = {
+                    vm.editEmployee(employee)
+                    onDismiss()
+                },
+                label = stringResource(R.string.label_save)
+            )
+        },
+        dismissButton = {
+            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
+        }
+    )
 }
 
 @Composable
@@ -1260,6 +1598,24 @@ fun SecondaryButton(
     }
 }
 
+@Composable
+fun MyFloatingActionButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(16.dp)
+            .padding(bottom = 56.dp)
+            .padding(end = 16.dp)
+            .padding(bottom = 16.dp),
+        content = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Dodaj"
+            )
+        }
+    )
+}
+
 @Preview
 @Composable
 fun Preview() {
@@ -1271,10 +1627,13 @@ fun Preview() {
     )
 
     AppTheme {
-        MenuItemCard(
-            menuItem = menuItem,
-            onEditClick = {},
-            onDeleteClick = {}
-        )
+        EditEmployeeDialog(employee = RestaurantEmployeeDTO(
+            firstName = "John",
+            lastName = "Doe",
+            login = "johndoe",
+            phoneNumber = "+1234567890",
+            isHallEmployee = true,
+            isBackdoorEmployee = false
+        ), onDismiss = {}, vm = EmployeeViewModel(1))
     }
 }

@@ -13,6 +13,9 @@ data object MainRoutes {
 
     val ACTIVITY_PROFILE = "${MainRoutes::class.simpleName}/profile"
 }
+data object Management {
+    val ACTIVITY_EMPLOYEE = "${MainRoutes::class.simpleName}/employee"
+}
 
 data object RegisterRestaurantRoutes {
     val ACTIVITY_REGISTER_RESTAURANT = "${RegisterRestaurantRoutes::class.simpleName}/register-restaurant"
@@ -25,7 +28,9 @@ data object RestaurantManagementRoutes {
     val ACTIVITY_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manage"
     val MENU_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/{${RESTAURANT_ID}}"
     val MENU_ITEM_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manageMenuItem/{${MENU_ID}}"
-
-    fun getMenuManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/${restaurantId}"
+    val EMPLOYEE_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/employee/{${RESTAURANT_ID}}"
+    
     fun getMenuItemManageRoute(menuId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenuItem/${menuId}"
+    fun getMenuManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/${restaurantId}"
+    fun getEmployeeManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/employee/${restaurantId}"
 }

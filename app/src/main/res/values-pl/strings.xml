@@ -71,4 +71,12 @@
     <string name="error_not_found">Nie znaleziono zasobu</string>
     <string name="label_group">Grupa</string>
     <string name="label_restaurant_informations">Informacje o restauracji</string>
+    <string name="label_cancel">Anuluj</string>
+    <string name="label_employee_hall">Pracownik sali</string>
+    <string name="label_employee_backdoor">Pracownik zaplecza</string>
+    <string name="label_employee_add">Dodaj nowego pracownika</string>
+    <string name="label_phone_display">"Numer telefonu: "</string>
+    <string name="label_login_display">"Nazwa użytkownika: "</string>
+    <string name="label_save">Zapisz</string>
+    <string name="label_employee_edit">Edytuj pracownika</string>
 </resources>
