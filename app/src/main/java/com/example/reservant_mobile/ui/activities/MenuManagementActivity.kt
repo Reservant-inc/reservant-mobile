@@ -39,11 +39,11 @@ fun MenuManagementActivity(restaurantId: Int) {
                         onEditClick = {}, //TODO
                         onDeleteClick = { viewmodel.deleteMenu(menu) },
                         onClick = {
-                            navController.navigate(
-                                RestaurantManagementRoutes.getMenuItemManageRoute(
-                                    menu.id
+                            if (menu.id != null) {
+                                navController.navigate(
+                                    RestaurantManagementRoutes.getMenuItemManageRoute(menu.id)
                                 )
-                            )
+                            }
                         }
                     )
                 }
