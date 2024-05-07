@@ -61,9 +61,11 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,9 +77,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -1132,15 +1136,15 @@ fun MenuCard(
         showConfirmDeletePopup -> {
             CountDownPopup(
                 icon = Icons.Filled.DeleteForever,
-                title = "Czy napewno chcesz usunąć menu?",
-                text = "Ta czynność jest nieodwracalna",
+                title = stringResource(id = R.string.confirm_delete_title),
+                text = stringResource(id = R.string.confirm_delete_text),
                 onConfirm = {
                     onDeleteClick()
                     showConfirmDeletePopup = false
                 },
                 onDismissRequest = {showConfirmDeletePopup = false},
-                confirmText = "Tak",
-                dismissText = "Nie"
+                confirmText = stringResource(id = R.string.label_yes_capital),
+                dismissText = stringResource(id = R.string.cancel)
             )
         }
     }
@@ -1312,6 +1316,8 @@ fun CountDownPopup(
         }
     }
 
+
+
     AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1324,17 +1330,21 @@ fun CountDownPopup(
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            Button(
+            OutlinedButton(
                 onClick = {
                     if (allowConfirm) onConfirm()
                 },
                 enabled = allowConfirm
             ) {
-                Text(if (!allowConfirm) timer.toString() else confirmText)
+                if (allowConfirm){
+                    Text(confirmText, color = MaterialTheme.colorScheme.error)
+                } else {
+                    Text(timer.toString())
+                }
             }
         },
         dismissButton = {
-            Button(
+            FilledTonalButton(
                 onClick = {
                     onDismissRequest()
                 }
