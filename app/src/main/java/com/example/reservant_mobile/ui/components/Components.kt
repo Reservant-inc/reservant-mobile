@@ -89,7 +89,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -1007,7 +1009,11 @@ fun ShowErrorToast(context: Context, id: Int) {
 }
 
 @Composable
-fun EmployeeCard(employee: RestaurantEmployeeDTO) {
+fun EmployeeCard(
+    employee: RestaurantEmployeeDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1016,41 +1022,87 @@ fun EmployeeCard(employee: RestaurantEmployeeDTO) {
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.Start
+        val localDensity = LocalDensity.current
+        var tabWidth by remember { mutableStateOf(0.dp) }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd
         ) {
-            Text(
-                text = "${employee.firstName} ${employee.lastName}",
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
-            )
-            Text(
-                text = "${stringResource(id = R.string.label_login_display)} ${employee.login}",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
-            )
-            Text(
-                text = "${stringResource(id = R.string.label_phone_display)} ${employee.phoneNumber}",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp)
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopStart
+            ) {
 
-            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "${employee.firstName} ${employee.lastName}",
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
+                    )
 
-            if(employee.isHallEmployee) {
-                Text(
-                    text = stringResource(id = R.string.label_employee_hall),
-                    style = MaterialTheme.typography.bodySmall
-                )
+                    Text(
+                        text = "${stringResource(id = R.string.label_login_display)} ${employee.login}",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+
+                    Text(
+                        text = "${stringResource(id = R.string.label_phone_display)} ${employee.phoneNumber}",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                        modifier = Modifier
+                            .onGloballyPositioned { coordinates ->
+                                tabWidth = with(localDensity) { coordinates.size.width.toDp() }
+                            }
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .width(tabWidth),
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+
+
+                    if (employee.isHallEmployee) {
+                        Text(
+                            text = stringResource(id = R.string.label_employee_hall),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    if (employee.isBackdoorEmployee) {
+                        Text(
+                            text = stringResource(id = R.string.label_employee_backdoor),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
-            if(employee.isBackdoorEmployee) {
-                Text(
-                    text = stringResource(id = R.string.label_employee_backdoor),
-                    style = MaterialTheme.typography.bodySmall
+            Row {
+                val buttonModifier = Modifier
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onEditClick,
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditEmployee"
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = onDeleteClick,
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "DeleteEmployee"
                 )
             }
         }
+
     }
 }
+
+
 
 
 @Composable
@@ -1276,6 +1328,119 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
 }
 
 @Composable
+fun EditEmployeeDialog(
+    employee: RestaurantEmployeeDTO,
+    onDismiss: () -> Unit,
+    vm: EmployeeViewModel
+) {
+    vm.login.value = employee.login.substringAfter('+')
+    vm.firstName.value = employee.firstName
+    vm.lastName.value = employee.lastName
+    vm.phoneNum.value = employee.phoneNumber
+    vm.isHallEmpployee = employee.isHallEmployee
+    vm.isBackdoorEmpployee = employee.isBackdoorEmployee
+
+    var formSent by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.label_employee_edit)) },
+        text = {
+            Column {
+                InputUserInfo(
+                    inputText = vm.login.value,
+                    onValueChange = { vm.login.value = it },
+                    label = stringResource(id = R.string.label_login),
+                    optional = false,
+                    isError = vm.isLoginInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLoginError() != -1)
+                            vm.getLoginError()
+                        else
+                            R.string.error_login_invalid
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.firstName.value,
+                    onValueChange = { vm.firstName.value = it },
+                    label = stringResource(id = R.string.label_name),
+                    optional = false,
+                    isError = vm.isFirstNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getFirstNameError() != -1)
+                            vm.getFirstNameError()
+                        else
+                            R.string.error_register_invalid_name
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.lastName.value,
+                    onValueChange = { vm.lastName.value = it },
+                    label = stringResource(id = R.string.label_lastname),
+                    optional = false,
+                    isError = vm.isLastNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLastNameError() != -1)
+                            vm.getLastNameError()
+                        else
+                            R.string.error_register_invalid_lastname
+                    ),
+                    formSent = formSent
+                )
+                InputUserInfo(
+                    inputText = vm.phoneNum.value,
+                    onValueChange = { vm.phoneNum.value = it },
+                    label = stringResource(id = R.string.label_phone),
+                    optional = false,
+                    isError = vm.isPhoneInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPhoneError() != -1)
+                            vm.getPhoneError()
+                        else
+                            R.string.error_register_invalid_phone
+                    ),
+                    formSent = formSent
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isHallEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isHallEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isBackdoorEmpployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isBackdoorEmpployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_backdoor))
+                }
+            }
+        },
+        confirmButton = {
+            ButtonComponent(
+                onClick = {
+                    vm.editEmployee(employee)
+                    onDismiss()
+                },
+                label = stringResource(R.string.label_save)
+            )
+        },
+        dismissButton = {
+            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
+        }
+    )
+}
+
+@Composable
 fun Content() {
     Column(
         Modifier
@@ -1464,10 +1629,13 @@ fun Preview() {
     )
 
     AppTheme {
-        MenuItemCard(
-            menuItem = menuItem,
-            onEditClick = {},
-            onDeleteClick = {}
-        )
+        EditEmployeeDialog(employee = RestaurantEmployeeDTO(
+            firstName = "John",
+            lastName = "Doe",
+            login = "johndoe",
+            phoneNumber = "+1234567890",
+            isHallEmployee = true,
+            isBackdoorEmployee = false
+        ), onDismiss = {}, vm = EmployeeViewModel(1))
     }
 }

@@ -80,4 +80,6 @@
     <string name="label_employee_add">Add new employee</string>
     <string name="label_phone_display">"Phone number: "</string>
     <string name="label_login_display">"Login: "</string>
+    <string name="label_save">Save</string>
+    <string name="label_employee_edit">Edit employee</string>
 </resources>

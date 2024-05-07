@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantService
@@ -14,10 +15,13 @@ import com.example.reservant_mobile.ui.constants.Regex
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-class EmployeeViewModel(private val restaurantId: Int, private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
+class EmployeeViewModel(
+    private val restaurantId: Int,
+    private val restaurantService: IRestaurantService = RestaurantService()
+) : ViewModel() {
     var employees by mutableStateOf<List<RestaurantEmployeeDTO>>(emptyList())
     var isLoading by mutableStateOf(false)
-    var result by mutableStateOf(Result(isError=false, value=false))
+    var result by mutableStateOf(Result(isError = false, value = false))
 
 
     val login: FormField = FormField(RestaurantEmployeeDTO::login.name)
@@ -40,7 +44,8 @@ class EmployeeViewModel(private val restaurantId: Int, private val restaurantSer
         viewModelScope.launch {
             isLoading = true
             try {
-                val result: Result<List<RestaurantEmployeeDTO>?> = restaurantService.getEmployees(restaurantId)
+                val result: Result<List<RestaurantEmployeeDTO>?> =
+                    restaurantService.getEmployees(restaurantId)
                 if (!result.isError && result.value != null) {
                     employees = result.value
                 }
@@ -52,9 +57,34 @@ class EmployeeViewModel(private val restaurantId: Int, private val restaurantSer
         }
     }
 
-    suspend fun register() : Boolean{
+    fun deleteEmployee(employee: RestaurantEmployeeDTO) {
+        employees = employees.filter {
+            it != employee
+        }
+    }
 
-        if (isRegisterInvalid()){
+    fun editEmployee(employee: RestaurantEmployeeDTO) {
+        employees = employees.map { existingEmployee ->
+            if (existingEmployee.id == employee.id) {
+                RestaurantEmployeeDTO(
+                    login = login.value,
+                    firstName = firstName.value,
+                    lastName = lastName.value,
+                    phoneNumber = phoneNum.value,
+                    password = password.value,
+                    isHallEmployee = isHallEmpployee,
+                    isBackdoorEmployee = isBackdoorEmpployee
+                )
+            } else {
+                existingEmployee
+            }
+        }
+    }
+
+
+    suspend fun register(): Boolean {
+
+        if (isRegisterInvalid()) {
             return false
         }
 
@@ -90,69 +120,69 @@ class EmployeeViewModel(private val restaurantId: Int, private val restaurantSer
     fun isRegisterInvalid(): Boolean {
         return isLoginInvalid() ||
                 isFirstNameInvalid() ||
-                isLastNameInvalid()  ||
+                isLastNameInvalid() ||
                 isPasswordInvalid()
     }
 
-    fun isLoginInvalid(): Boolean{
+    fun isLoginInvalid(): Boolean {
         return isInvalidWithRegex(Regex.LOGIN, login.value) ||
                 getFieldError(login.name) != -1
     }
 
 
-    fun isFirstNameInvalid() : Boolean{
+    fun isFirstNameInvalid(): Boolean {
         return isInvalidWithRegex(Regex.NAME_REG, firstName.value) ||
                 getFieldError(firstName.name) != -1
     }
 
-    fun isLastNameInvalid() : Boolean{
+    fun isLastNameInvalid(): Boolean {
         return isInvalidWithRegex(Regex.NAME_REG, lastName.value) ||
                 getFieldError(lastName.name) != -1
     }
 
-    fun isPhoneInvalid() : Boolean{
+    fun isPhoneInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value) ||
                 getFieldError(phoneNum.name) != -1
     }
 
-    fun isPasswordInvalid() : Boolean{
+    fun isPasswordInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
                 getFieldError(password.name) != -1
     }
 
-    private fun isInvalidWithRegex(regex: String, str: String): Boolean{
+    private fun isInvalidWithRegex(regex: String, str: String): Boolean {
         return !Pattern.matches(regex, str)
     }
 
-    private fun getFieldError(name: String): Int{
-        if(!result.isError){
+    private fun getFieldError(name: String): Int {
+        if (!result.isError) {
             return -1
         }
 
         return result.errors!!.getOrDefault(name, -1)
     }
 
-    fun getLoginError(): Int{
+    fun getLoginError(): Int {
         return getFieldError(login.name)
     }
 
-    fun getFirstNameError(): Int{
+    fun getFirstNameError(): Int {
         return getFieldError(firstName.name)
     }
 
-    fun getLastNameError(): Int{
+    fun getLastNameError(): Int {
         return getFieldError(lastName.name)
     }
 
-    fun getPhoneError(): Int{
+    fun getPhoneError(): Int {
         return getFieldError(phoneNum.name)
     }
 
-    fun getPasswordError(): Int{
+    fun getPasswordError(): Int {
         return getFieldError(password.name)
     }
 
-    fun getToastError(): Int{
+    fun getToastError(): Int {
         return getFieldError("TOAST")
     }
 }
