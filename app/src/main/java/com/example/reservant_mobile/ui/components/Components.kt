@@ -1123,6 +1123,28 @@ fun MenuCard(
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
+
+    var showConfirmDeletePopup by remember {
+        mutableStateOf(false)
+    }
+
+    when {
+        showConfirmDeletePopup -> {
+            CountDownPopup(
+                icon = Icons.Filled.DeleteForever,
+                title = "Czy napewno chcesz usunąć menu?",
+                text = "Ta czynność jest nieodwracalna",
+                onConfirm = {
+                    onDeleteClick()
+                    showConfirmDeletePopup = false
+                },
+                onDismissRequest = {showConfirmDeletePopup = false},
+                confirmText = "Tak",
+                dismissText = "Nie"
+            )
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1161,7 +1183,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = onDeleteClick,
+                    onClick = {showConfirmDeletePopup = true},
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "delete"
                 )
