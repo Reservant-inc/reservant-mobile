@@ -118,6 +118,7 @@ import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -1116,16 +1117,17 @@ fun Content() {
 fun MenuCard(
     menu: RestaurantMenuDTO,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-){
+    onDeleteClick: () -> Unit,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column {
-
             Image(
                 painterResource(id = R.drawable.ic_logo),
                 contentDescription = "",
@@ -1160,11 +1162,72 @@ fun MenuCard(
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "delete"
                 )
-
             }
         }
     }
 }
+
+
+@Composable
+fun MenuItemCard(
+    menuItem: RestaurantMenuItemDTO,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column {
+            Text(
+                text = menuItem.name,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Text(
+                text = "Price: ${menuItem.price} zł",
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+            )
+
+            if(menuItem.alcoholPercentage != null) {
+                Text(
+                    text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                SecondaryButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(50.dp),
+                    onClick = onEditClick,
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditMenuItem"
+                )
+
+                SecondaryButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(50.dp),
+                    onClick = onDeleteClick,
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "DeleteMenuItem"
+                )
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun SecondaryButton(
@@ -1199,8 +1262,19 @@ fun SecondaryButton(
 
 @Preview
 @Composable
-fun Preview(){
+fun Preview() {
+    val menuItem = RestaurantMenuItemDTO(
+        id = 1,
+        name = "Pizza Margherita",
+        price = 25.0,
+        alcoholPercentage = null
+    )
+
     AppTheme {
-        LogoWithReturn()
+        MenuItemCard(
+            menuItem = menuItem,
+            onEditClick = {},
+            onDeleteClick = {}
+        )
     }
 }

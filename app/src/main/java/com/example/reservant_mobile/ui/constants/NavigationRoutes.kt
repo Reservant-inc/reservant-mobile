@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.constants
 
+import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments.MENU_ID
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments.RESTAURANT_ID
 
 data object AuthRoutes{
@@ -23,6 +24,8 @@ data object RegisterRestaurantRoutes {
 data object RestaurantManagementRoutes {
     val ACTIVITY_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manage"
     val MENU_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/{${RESTAURANT_ID}}"
+    val MENU_ITEM_MANAGE = "${RestaurantManagementRoutes::class.simpleName}/manageMenuItem/{${MENU_ID}}"
 
     fun getMenuManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/${restaurantId}"
+    fun getMenuItemManageRoute(menuId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenuItem/${menuId}"
 }

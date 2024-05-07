@@ -65,7 +65,7 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
 
     override suspend fun deleteMenu(id: Any): Result<Boolean> {
         val res = api.delete(Endpoints.RESTAURANT_MENU(id.toString()))
-
+        
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 

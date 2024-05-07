@@ -6,26 +6,59 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
+import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 
 
 @Composable
-fun MenuManagementActivity(restaurantId: Int){
+fun MenuManagementActivity(restaurantId: Int) {
     val viewmodel = viewModel<MenuManagementViewModel>(
         factory = object : ViewModelProvider.Factory {
-            override fun <T: ViewModel> create(modelClass: Class<T>): T = MenuManagementViewModel(restaurantId) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                MenuManagementViewModel(restaurantId) as T
         }
     )
+    val navController = rememberNavController()
 
-    LazyColumn {
-        items(viewmodel.menus){menu ->
-            MenuCard(
-                menu = menu,
-                onEditClick = {}, //TODO
-                onDeleteClick = {viewmodel.deleteMenu(menu)}
+    NavHost(
+        navController = navController,
+        startDestination = RestaurantManagementRoutes.MENU_MANAGE
+    ) {
+        composable(RestaurantManagementRoutes.MENU_MANAGE) {
+            LazyColumn {
+                items(viewmodel.menus) { menu ->
+                    MenuCard(
+                        menu = menu,
+                        onEditClick = {}, //TODO
+                        onDeleteClick = { viewmodel.deleteMenu(menu) },
+                        onClick = {
+                            if (menu.id != null) {
+                                navController.navigate(
+                                    RestaurantManagementRoutes.getMenuItemManageRoute(menu.id)
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
+        composable(
+            RestaurantManagementRoutes.MENU_ITEM_MANAGE, arguments = listOf(
+                navArgument(
+                    RestaurantManagementArguments.MENU_ID
+                ) { type = NavType.IntType })
+        ) { backStackEntry ->
+            MenuItemManagementActivity(
+                menuId = backStackEntry.arguments!!.getInt(RestaurantManagementArguments.MENU_ID)
             )
         }
-    }
 
+    }
 }
