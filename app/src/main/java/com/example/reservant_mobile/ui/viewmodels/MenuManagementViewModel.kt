@@ -29,7 +29,7 @@ class MenuManagementViewModel(
     }
 
     suspend fun addMenu(menu: RestaurantMenuDTO){
-        val result = service.addMenu(restaurantId, menu)
+        val result = service.addMenu(menu)
 
         TODO()
     }
