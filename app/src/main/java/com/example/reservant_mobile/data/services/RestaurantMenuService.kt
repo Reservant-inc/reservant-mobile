@@ -14,7 +14,7 @@ import io.ktor.http.HttpStatusCode
 interface IRestaurantMenuService{
     suspend fun addMenu(restaurantId: Any, menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>
     suspend fun getMenus(restaurantId:Any): Result<List<RestaurantMenuDTO>?>
-    suspend fun getMenu(restaurantId:Any, menuId: Any): Result<RestaurantMenuDTO?>
+    suspend fun getMenu(menuId: Any): Result<RestaurantMenuDTO?>
     suspend fun createMenuItems(restaurantId:Any, menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItem(restaurantId:Any, itemId:Any): Result<RestaurantMenuItemDTO?>
@@ -57,8 +57,8 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
-    override suspend fun getMenu(restaurantId: Any, menuId: Any): Result<RestaurantMenuDTO?> {
-        val res = api.get(Endpoints.RESTAURANT_MENU(restaurantId.toString(), menuId.toString()))
+    override suspend fun getMenu(menuId: Any): Result<RestaurantMenuDTO?> {
+        val res = api.get(Endpoints.RESTAURANT_MENU(menuId.toString()))
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)

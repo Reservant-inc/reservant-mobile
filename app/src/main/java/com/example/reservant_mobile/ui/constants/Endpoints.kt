@@ -15,7 +15,7 @@ data object Endpoints {
     const val RESTAURANT_VALIDATE_STEP="/my-restaurants/validate-first-step"
     fun MY_RESTAURANT(id: String) = "/my-restaurants/$id"
     fun RESTAURANT_MENUS(id: String) = "/my-restaurants/$id/menus"
-    fun RESTAURANT_MENU(restaurantId: String, menuId:String) = "/my-restaurants/$restaurantId/menus/$menuId"
+    fun RESTAURANT_MENU(menuId:String) = "/menus/$menuId"
     fun RESTAURANT_MENU_ITEMS(id: String) = "/my-restaurants/$id/menu-items"
     fun RESTAURANT_MENU_ITEM(restaurantId: String, itemId:String) = "/my-restaurants/$restaurantId/menu-items/$itemId"
     fun MY_RESTAURANT_EMPLOYEES(id: String) = "/my-restaurants/$id/employees"
