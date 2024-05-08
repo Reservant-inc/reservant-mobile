@@ -71,6 +71,10 @@
     <string name="error_not_found">Nie znaleziono zasobu</string>
     <string name="label_group">Grupa</string>
     <string name="label_restaurant_informations">Informacje o restauracji</string>
+    <string name="confirm_delete_title">Czy napewno chcesz usunąć to menu?</string>
+    <string name="confirm_delete_text">Ta czynność jest nieodwracalna</string>
+    <string name="cancel">Anuluj</string>
+    <string name="label_yes_capital">Tak</string>
     <string name="label_cancel">Anuluj</string>
     <string name="label_employee_hall">Pracownik sali</string>
     <string name="label_employee_backdoor">Pracownik zaplecza</string>

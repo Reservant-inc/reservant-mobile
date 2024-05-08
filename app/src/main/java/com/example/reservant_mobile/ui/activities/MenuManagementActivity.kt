@@ -2,7 +2,13 @@ package com.example.reservant_mobile.ui.activities
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -11,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
@@ -37,7 +44,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                     MenuCard(
                         menu = menu,
                         onEditClick = {}, //TODO
-                        onDeleteClick = { viewmodel.deleteMenu(menu) },
+                        onDeleteClick = {
+                            viewmodel.deleteMenu(menu)
+                        },
                         onClick = {
                             if (menu.id != null) {
                                 navController.navigate(

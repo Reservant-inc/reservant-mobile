@@ -54,9 +54,11 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -68,15 +70,18 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -117,6 +122,7 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.theme.AppTheme
+import kotlinx.coroutines.delay
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -1458,6 +1464,28 @@ fun MenuCard(
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
+
+    var showConfirmDeletePopup by remember {
+        mutableStateOf(false)
+    }
+
+    when {
+        showConfirmDeletePopup -> {
+            CountDownPopup(
+                icon = Icons.Filled.DeleteForever,
+                title = stringResource(id = R.string.confirm_delete_title),
+                text = stringResource(id = R.string.confirm_delete_text),
+                onConfirm = {
+                    onDeleteClick()
+                    showConfirmDeletePopup = false
+                },
+                onDismissRequest = {showConfirmDeletePopup = false},
+                confirmText = stringResource(id = R.string.label_yes_capital),
+                dismissText = stringResource(id = R.string.cancel)
+            )
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1496,7 +1524,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = onDeleteClick,
+                    onClick = {showConfirmDeletePopup = true},
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "delete"
                 )
@@ -1597,6 +1625,72 @@ fun SecondaryButton(
         )
     }
 }
+@Composable
+fun CountDownPopup(
+    countDownTimer: Int = 5,
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirmText: String = "Confirm",
+    dismissText: String = "Cancel",
+    onDismissRequest: () -> Unit = {},
+    onConfirm: () -> Unit,
+){
+
+    var allowConfirm by remember {
+        mutableStateOf(false)
+    }
+
+    var timer by remember {
+        mutableIntStateOf(countDownTimer)
+    }
+
+    if (timer > 0){
+        LaunchedEffect(key1 = timer) {
+            delay(1000)
+            timer -= 1
+            allowConfirm = timer == 0
+        }
+    }
+
+
+
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Text(text = text)
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            OutlinedButton(
+                onClick = {
+                    if (allowConfirm) onConfirm()
+                },
+                enabled = allowConfirm
+            ) {
+                if (allowConfirm){
+                    Text(confirmText, color = MaterialTheme.colorScheme.error)
+                } else {
+                    Text(timer.toString())
+                }
+            }
+        },
+        dismissButton = {
+            FilledTonalButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(dismissText)
+            }
+        }
+    )
+}
 
 @Composable
 fun MyFloatingActionButton(onClick: () -> Unit) {
@@ -1614,26 +1708,4 @@ fun MyFloatingActionButton(onClick: () -> Unit) {
             )
         }
     )
-}
-
-@Preview
-@Composable
-fun Preview() {
-    val menuItem = RestaurantMenuItemDTO(
-        id = 1,
-        name = "Pizza Margherita",
-        price = 25.0,
-        alcoholPercentage = null
-    )
-
-    AppTheme {
-        EditEmployeeDialog(employee = RestaurantEmployeeDTO(
-            firstName = "John",
-            lastName = "Doe",
-            login = "johndoe",
-            phoneNumber = "+1234567890",
-            isHallEmployee = true,
-            isBackdoorEmployee = false
-        ), onDismiss = {}, vm = EmployeeViewModel(1))
-    }
 }
