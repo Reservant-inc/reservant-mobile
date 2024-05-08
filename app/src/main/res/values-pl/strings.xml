@@ -75,4 +75,12 @@
     <string name="confirm_delete_text">Ta czynność jest nieodwracalna</string>
     <string name="cancel">Anuluj</string>
     <string name="label_yes_capital">Tak</string>
+    <string name="label_cancel">Anuluj</string>
+    <string name="label_employee_hall">Pracownik sali</string>
+    <string name="label_employee_backdoor">Pracownik zaplecza</string>
+    <string name="label_employee_add">Dodaj nowego pracownika</string>
+    <string name="label_phone_display">"Numer telefonu: "</string>
+    <string name="label_login_display">"Nazwa użytkownika: "</string>
+    <string name="label_save">Zapisz</string>
+    <string name="label_employee_edit">Edytuj pracownika</string>
 </resources>
