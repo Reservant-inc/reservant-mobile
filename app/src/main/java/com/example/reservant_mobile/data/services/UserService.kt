@@ -16,11 +16,13 @@ interface IUserService{
     suspend fun isLoginUnique(login: String): Boolean
     suspend fun registerUser(user: RegisterUserDTO): Result<Boolean>
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
+    suspend fun logoutUser()
     suspend fun refreshToken(): Boolean
 
 }
 
 class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+    private val localBearer = LocalBearerService()
     object User {
         lateinit var login: String
         lateinit var firstName: String
@@ -33,7 +35,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         User.firstName = u.login
         User.lastName = u.login
         User.roles = u.roles!!
-        LocalBearerService().saveBearerToken(u.token!!)
+        localBearer.saveBearerToken(u.token!!)
     }
 
 
@@ -79,7 +81,12 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
         }
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_login_wrong_credentials)), false)
     }
-     override suspend fun refreshToken(): Boolean {
+
+    override suspend fun logoutUser() {
+        api.clearToken()
+    }
+
+    override suspend fun refreshToken(): Boolean {
          val res = api.post("",Endpoints.REFRESH_ACCESS_TOKEN)
 
          if(res.isError)
