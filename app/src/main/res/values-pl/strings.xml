@@ -60,6 +60,7 @@
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
     <string name="label_no">nie</string>
+    <string name="label_next">Dalej</string>
     <string name="label_uploadFiles">Wyślij potrzebne pliki:</string>
     <string name="label_restaurant_delivery">Dostawa</string>
     <string name="label_restaurant_description">Opis</string>
