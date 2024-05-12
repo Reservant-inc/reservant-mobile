@@ -107,8 +107,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             description = description.value,
             provideDelivery = delivery,
             tags = selectedTags.toList(),
-            groupId = null,
-            //groupId = selectedGroup?.id,
+            groupId = selectedGroup?.id,
             photos = emptyList(),
             tables = emptyList()
         )
