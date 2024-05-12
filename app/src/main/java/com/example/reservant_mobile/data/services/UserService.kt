@@ -38,13 +38,13 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
 
     override suspend fun isLoginUnique(login: String): Boolean {
-        val res = api.post(login, Endpoints.LOGIN_UNIQUE).value
-            ?: return true
+        val res = api.get(Endpoints.LOGIN_UNIQUE, mapOf("login" to login)).value
+            ?: return false
 
         return if (res.status == HttpStatusCode.OK){
             res.body<Boolean>()
         } else {
-            true
+            false
         }
     }
 

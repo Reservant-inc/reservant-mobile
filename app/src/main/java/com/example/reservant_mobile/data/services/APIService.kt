@@ -30,6 +30,7 @@ import kotlin.Exception
 
 interface APIService{
     suspend fun get(endpoint: String = ""): Result<HttpResponse?>
+    suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?>
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): Result<HttpResponse?>
     suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?>
     suspend fun delete(endpoint: String): Result<HttpResponse?>
@@ -73,6 +74,19 @@ class APIServiceImpl: APIService {
         return responseWrapper(
             try {
                 client.get(endpoint)
+            } catch (e: Exception){
+                println("[GET ERROR]: "+e.message)
+                null
+            }
+        )
+    }
+
+    override suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?> {
+        return responseWrapper(
+            try {
+                client.get(endpoint){
+                    params.forEach { (key, value) -> parameter(key, value) }
+                }
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null
