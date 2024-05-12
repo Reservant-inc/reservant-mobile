@@ -15,7 +15,6 @@ class LocalBearerService{
         private val context  = ApplicationService.instance
         private val Context.dataStore by preferencesDataStore(context.packageName)
         private val bearerTokenKey = stringPreferencesKey("bearer_token")
-        private val refreshTokenKey = stringPreferencesKey("refresh_token")
     }
 
         suspend fun saveBearerToken(bearerToken: String) {
@@ -24,19 +23,10 @@ class LocalBearerService{
         }
     }
 
-    suspend fun saveRefreshToken(refreshToken: String) {
-        context.dataStore.edit {
-            it[refreshTokenKey] = refreshToken
-        }
-    }
-
     suspend fun getBearerToken(): String {
-            return context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
-    }
-
-    suspend fun getRefreshToken(): String {
-        return context.dataStore.data.firstOrNull()?.get(refreshTokenKey).orEmpty()
-
+        val test = context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
+        println("CURRENT TOKEN; "+test)
+            return test
     }
 
 }
