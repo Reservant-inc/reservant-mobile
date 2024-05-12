@@ -73,7 +73,7 @@
     <string name="label_restaurant_tags">Tags</string>
     <string name="error_not_found">Could not find resource</string>
     <string name="label_group">Group</string>
-    <string name="label_restaurant_informations">Restaurant information</string>
+    <string name="label_new_restaurant">New Restaurant</string>
     <string name="confirm_delete_title">Are you sure you want do delete the menu?</string>
     <string name="confirm_delete_text">This action is irreversible</string>
     <string name="cancel">Cancel</string>
