@@ -83,4 +83,7 @@
     <string name="label_login_display">"Nazwa użytkownika: "</string>
     <string name="label_save">Zapisz</string>
     <string name="label_employee_edit">Edytuj pracownika</string>
+    <string name="label_step_information">Informacje</string>
+    <string name="label_step_files">Pliki</string>
+    <string name="label_step_description">Opis</string>
 </resources>
