@@ -8,5 +8,6 @@ data class RestaurantMenuItemDTO (
     val restaurantId: Int? = null,
     val price: Double,
     val name: String,
+    val alternateName: String? = null,
     val alcoholPercentage: Double?
 )

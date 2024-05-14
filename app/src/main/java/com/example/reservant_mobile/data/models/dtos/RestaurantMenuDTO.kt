@@ -8,6 +8,8 @@ data class RestaurantMenuDTO (
     val name: String,
     val alternateName: String?,
     val restaurantId: Int? = null,
+    val name: String,
+    val alternateName: String? = null,
     val menuType: String,
     val dateFrom: String,
     val dateUntil: String? = null,
