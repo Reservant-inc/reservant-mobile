@@ -1,13 +1,14 @@
 package com.example.reservant_mobile.ui.activities
 
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -17,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.reservant_mobile.ui.components.AddMenuCard
+import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
@@ -40,35 +41,41 @@ fun MenuManagementActivity(restaurantId: Int) {
         startDestination = RestaurantManagementRoutes.MENU_MANAGE
     ) {
         composable(RestaurantManagementRoutes.MENU_MANAGE) {
-            LazyColumn {
-                items(viewmodel.menus) { menu ->
-                    MenuCard(
-                        name = viewmodel.name,
-                        altName = viewmodel.alternateName,
-                        menuType = viewmodel.menuType,
-                        dateFrom = viewmodel.dateFrom,
-                        dateUntil = viewmodel.dateUntil,
-                        menu = menu,
-                        onEditClick = {
-                            viewmodel.viewModelScope.launch {
-                                viewmodel.editMenu(menu)
+            Box(modifier = Modifier.fillMaxSize()){
+                LazyColumn {
+                    items(viewmodel.menus) { menu ->
+                        MenuCard(
+                            name = viewmodel.name,
+                            altName = viewmodel.alternateName,
+                            menuType = viewmodel.menuType,
+                            dateFrom = viewmodel.dateFrom,
+                            dateUntil = viewmodel.dateUntil,
+                            menu = menu,
+                            onEditClick = {
+                                viewmodel.viewModelScope.launch {
+                                    viewmodel.editMenu(menu)
+                                }
+                            },
+                            onDeleteClick = {
+                                viewmodel.deleteMenu(menu)
+                            },
+                            clearFields = viewmodel::clearFields,
+                            onClick = {
+                                if (menu.id != null) {
+                                    navController.navigate(
+                                        RestaurantManagementRoutes.getMenuItemManageRoute(menu.id)
+                                    )
+                                }
                             }
-                        },
-                        onDeleteClick = {
-                            viewmodel.deleteMenu(menu)
-                        },
-                        clearFields = viewmodel::clearFields,
-                        onClick = {
-                            if (menu.id != null) {
-                                navController.navigate(
-                                    RestaurantManagementRoutes.getMenuItemManageRoute(menu.id)
-                                )
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
-                item{
-                    AddMenuCard(
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                ){
+                    AddMenuButton(
                         name = viewmodel.name,
                         altName = viewmodel.alternateName,
                         menuType = viewmodel.menuType,
@@ -84,6 +91,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                     )
                 }
             }
+
+
         }
         composable(
             RestaurantManagementRoutes.MENU_ITEM_MANAGE, arguments = listOf(

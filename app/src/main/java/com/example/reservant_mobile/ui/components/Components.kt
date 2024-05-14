@@ -1618,7 +1618,7 @@ fun MenuCard(
 }
 
 @Composable
-fun AddMenuCard(
+fun AddMenuButton(
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1692,7 +1692,10 @@ fun AddMenuCard(
         }
     }
 
-    Card(
+    MyFloatingActionButton(
+        onClick = { showAddDialog = true }
+    )
+    /*Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -1714,7 +1717,7 @@ fun AddMenuCard(
                 contentDescription = "add menu"
             )
         }
-    }
+    }*/
 }
 
 
