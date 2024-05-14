@@ -86,4 +86,5 @@
     <string name="label_login_display">"Login: "</string>
     <string name="label_save">Save</string>
     <string name="label_employee_edit">Edit employee</string>
+    <string name="label_menu_management">Menu management</string>
 </resources>
