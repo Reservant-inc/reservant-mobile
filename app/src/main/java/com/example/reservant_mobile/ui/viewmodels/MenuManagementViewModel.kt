@@ -33,9 +33,28 @@ class MenuManagementViewModel(
         TODO()
     }
 
+    fun editMenu(
+        menu: RestaurantMenuDTO,
+        name: String,
+        altName: String,
+        menuType: String,
+        dateFrom: String,
+        dateUntil: String
+    ) {
+        val editedMenu = RestaurantMenuDTO(
+            menu.id,
+            menu.restaurantId,
+            name,
+            altName.ifEmpty { null },
+            menuType,
+            dateFrom,
+            dateUntil.ifEmpty { null }
+        )
+
+        menus = menus.filter { it != menu } + editedMenu
+    }
+
     fun deleteMenu(menu: RestaurantMenuDTO){
-        menus = menus.filter {
-            it != menu
-        }
+        menus = menus.filter { it != menu }
     }
 }

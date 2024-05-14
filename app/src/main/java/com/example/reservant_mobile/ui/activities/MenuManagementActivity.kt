@@ -45,7 +45,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                 items(viewmodel.menus) { menu ->
                     MenuCard(
                         menu = menu,
-                        onEditClick = {}, //TODO
+                        onEditClick = viewmodel::editMenu, //TODO
                         onDeleteClick = {
                             viewmodel.deleteMenu(menu)
                         },

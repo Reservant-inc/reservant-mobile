@@ -126,6 +126,10 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+<<<<<<< HEAD
+=======
+import kotlinx.coroutines.delay
+>>>>>>> d9369b5 (added fun editMenu)
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1457,20 +1461,13 @@ fun Content() {
 @Composable
 fun MenuCard(
     menu: RestaurantMenuDTO,
-    onEditClick: (RestaurantMenuDTO, String, String?, String, String, String?) -> Unit,
+    onEditClick: (RestaurantMenuDTO, String, String, String, String, String) -> Unit,
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
 
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
-
-    //menu info
-    var menuName by remember { mutableStateOf(menu.name) }
-    var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
-    var menuType by remember { mutableStateOf(menu.menuType) }
-    var dateFrom by remember { mutableStateOf(menu.dateFrom) }
-    var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
 
 
     when {
@@ -1492,6 +1489,13 @@ fun MenuCard(
 
     when {
         showEditPopup -> {
+            //menu info
+            var menuName by remember { mutableStateOf(menu.name) }
+            var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
+            var menuType by remember { mutableStateOf(menu.menuType) }
+            var dateFrom by remember { mutableStateOf(menu.dateFrom) }
+            var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
+
             AlertDialog(
                 onDismissRequest = { /*TODO*/ },
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
