@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -1499,7 +1500,7 @@ fun MenuCard(
             var dateUntil by remember { mutableStateOf(menu.dateUntil) }
 
             AlertDialog(
-                onDismissRequest = { /*TODO*/ },
+                onDismissRequest = { showEditPopup = false },
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
                 text = {
                     Column {
@@ -1595,6 +1596,61 @@ fun MenuCard(
                     contentDescription = "delete"
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AddMenuCard(
+    addMenu: () -> Unit
+){
+    var showAddDialog by remember { mutableStateOf(false)}
+
+    when{
+        showAddDialog -> {
+            AlertDialog(
+                onDismissRequest = { showAddDialog = false },
+                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
+                dismissButton = {
+                    ButtonComponent(
+                        onClick = {showAddDialog = false},
+                        label = stringResource(id = R.string.label_cancel)
+                    )
+                },
+                confirmButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showAddDialog = false
+                            addMenu()
+                        },
+                        label = stringResource(id = R.string.label_save)
+                    )
+                },
+            )
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(8.dp)
+            .clickable(onClick = { showAddDialog = true }),
+        elevation = CardDefaults.cardElevation(4.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceDim),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Icon(
+                modifier = Modifier.size(60.dp),
+                imageVector = Icons.Rounded.Add,
+                contentDescription = "add menu"
+            )
         }
     }
 }

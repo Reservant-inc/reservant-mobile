@@ -92,4 +92,5 @@
     <string name="label_menu_type">Typ menu</string>
     <string name="label_date_from">Data od</string>
     <string name="label_date_to">Data do</string>
+    <string name="label_add_menu">Dodaj menu</string>
 </resources>
