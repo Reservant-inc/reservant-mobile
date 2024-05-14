@@ -54,7 +54,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -74,7 +73,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -104,7 +102,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -121,7 +118,6 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import kotlinx.coroutines.launch
@@ -1460,20 +1456,13 @@ fun Content() {
 @Composable
 fun MenuCard(
     menu: RestaurantMenuDTO,
-    onEditClick: (RestaurantMenuDTO, String, String?, String, String, String?) -> Unit,
+    onEditClick: (RestaurantMenuDTO, String, String, String, String, String) -> Unit,
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
 
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
-
-    //menu info
-    var menuName by remember { mutableStateOf(menu.name) }
-    var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
-    var menuType by remember { mutableStateOf(menu.menuType) }
-    var dateFrom by remember { mutableStateOf(menu.dateFrom) }
-    var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
 
 
     when {
@@ -1495,6 +1484,13 @@ fun MenuCard(
 
     when {
         showEditPopup -> {
+            //menu info
+            var menuName by remember { mutableStateOf(menu.name) }
+            var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
+            var menuType by remember { mutableStateOf(menu.menuType) }
+            var dateFrom by remember { mutableStateOf(menu.dateFrom) }
+            var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
+
             AlertDialog(
                 onDismissRequest = { /*TODO*/ },
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },

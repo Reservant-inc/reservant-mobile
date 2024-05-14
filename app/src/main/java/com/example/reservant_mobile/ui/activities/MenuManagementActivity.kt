@@ -1,14 +1,13 @@
 package com.example.reservant_mobile.ui.activities
 
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
@@ -43,7 +41,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                 items(viewmodel.menus) { menu ->
                     MenuCard(
                         menu = menu,
-                        onEditClick = {}, //TODO
+                        onEditClick = viewmodel::editMenu, //TODO
                         onDeleteClick = {
                             viewmodel.deleteMenu(menu)
                         },
