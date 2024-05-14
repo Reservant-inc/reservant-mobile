@@ -76,7 +76,6 @@
     <string name="label_new_restaurant">New Restaurant</string>
     <string name="confirm_delete_title">Are you sure you want do delete the menu?</string>
     <string name="confirm_delete_text">This action is irreversible</string>
-    <string name="cancel">Cancel</string>
     <string name="label_yes_capital">Yes</string>
     <string name="label_cancel">Cancel</string>
     <string name="label_employee_hall">Hall employee</string>
@@ -86,4 +85,5 @@
     <string name="label_login_display">"Login: "</string>
     <string name="label_save">Save</string>
     <string name="label_employee_edit">Edit employee</string>
+    <string name="label_edit_menu">Edit menu</string>
 </resources>

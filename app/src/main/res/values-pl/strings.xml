@@ -73,7 +73,6 @@
     <string name="label_new_restaurant">Nowa Restauracja</string>
     <string name="confirm_delete_title">Czy napewno chcesz usunąć to menu?</string>
     <string name="confirm_delete_text">Ta czynność jest nieodwracalna</string>
-    <string name="cancel">Anuluj</string>
     <string name="label_yes_capital">Tak</string>
     <string name="label_cancel">Anuluj</string>
     <string name="label_employee_hall">Pracownik sali</string>
@@ -83,4 +82,5 @@
     <string name="label_login_display">"Nazwa użytkownika: "</string>
     <string name="label_save">Zapisz</string>
     <string name="label_employee_edit">Edytuj pracownika</string>
+    <string name="label_edit_menu">Edytuj menu</string>
 </resources>
