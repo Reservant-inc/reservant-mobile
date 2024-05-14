@@ -79,6 +79,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -115,6 +116,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -1465,9 +1467,15 @@ fun Content() {
 
 @Composable
 fun MenuCard(
+    name: FormField,
+    altName: FormField,
+    menuType: FormField,
+    dateFrom: FormField,
+    dateUntil: FormField,
     menu: RestaurantMenuDTO,
-    onEditClick: (RestaurantMenuDTO, String, String, String, String, String?) -> Unit,
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    clearFields: () -> Unit,
     onClick: () -> Unit
 ) {
 
@@ -1491,51 +1499,58 @@ fun MenuCard(
             )
         }
         showEditPopup -> {
-            //menu info
-            var menuName by remember { mutableStateOf(menu.name) }
-            var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
-            var menuType by remember { mutableStateOf(menu.menuType) }
-            var dateFrom by remember { mutableStateOf(menu.dateFrom) }
-            var dateUntil by remember { mutableStateOf(menu.dateUntil) }
+
+            name.value = menu.name
+            altName.value = menu.alternateName ?: ""
+            menuType.value = menu.menuType
+            dateFrom.value = menu.dateFrom
+            dateUntil.value = menu.dateUntil ?: LocalDate.now().toString()
+
 
             AlertDialog(
-                onDismissRequest = { showEditPopup = false },
+                onDismissRequest = {
+                    showEditPopup = false
+                    clearFields()
+                },
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
                 text = {
                     Column {
                         InputUserInfo(
                             label = stringResource(id = R.string.label_restaurant_name),
-                            inputText = menuName,
-                            onValueChange = {menuName = it}
+                            inputText = name.value,
+                            onValueChange = {name.value = it}
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_alternate_name),
-                            inputText = altName,
-                            onValueChange = {altName = it}
+                            inputText = altName.value,
+                            onValueChange = {altName.value = it}
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_menu_type),
-                            inputText = menuType,
-                            onValueChange = {menuType = it}
+                            inputText = menuType.value,
+                            onValueChange = {menuType.value = it}
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_from))},
-                            defaultValue = dateFrom,
-                            startDate = dateFrom,
-                            onBirthdayChange = {dateFrom = it}
+                            defaultValue = dateFrom.value,
+                            startDate = dateFrom.value,
+                            onBirthdayChange = {dateFrom.value = it}
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_to))},
-                            defaultValue = dateUntil,
-                            startDate = dateUntil ?: LocalDate.now().toString(),
-                            onBirthdayChange = {dateUntil = it}
+                            defaultValue = dateUntil.value,
+                            startDate = dateUntil.value ?: LocalDate.now().toString(),
+                            onBirthdayChange = {dateUntil.value = it}
                         )
 
                     }
                 },
                 dismissButton = {
                     ButtonComponent(
-                        onClick = {showEditPopup = false},
+                        onClick = {
+                            showEditPopup = false
+                            clearFields()
+                        },
                         label = stringResource(id = R.string.label_cancel)
                     )
                 },
@@ -1543,13 +1558,14 @@ fun MenuCard(
                     ButtonComponent(
                         onClick = {
                             showEditPopup = false
-                            onEditClick(menu, menuName, altName, menuType, dateFrom, dateUntil)
+                            onEditClick()
+                            clearFields()
                         },
                         label = stringResource(id = R.string.label_save)
                     )
                 },
 
-                )
+            )
         }
     }
 
@@ -1603,6 +1619,12 @@ fun MenuCard(
 
 @Composable
 fun AddMenuCard(
+    name: FormField,
+    altName: FormField,
+    menuType: FormField,
+    dateFrom: FormField,
+    dateUntil: FormField,
+    clearFields: () -> Unit,
     addMenu: () -> Unit
 ){
     var showAddDialog by remember { mutableStateOf(false)}
@@ -1610,11 +1632,49 @@ fun AddMenuCard(
     when{
         showAddDialog -> {
             AlertDialog(
-                onDismissRequest = { showAddDialog = false },
+                onDismissRequest = {
+                    showAddDialog = false
+                    clearFields()
+                },
                 title = { Text(text = stringResource(id = R.string.label_add_menu)) },
+                text = {
+                    Column {
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_restaurant_name),
+                            inputText = name.value,
+                            onValueChange = {name.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_alternate_name),
+                            inputText = altName.value,
+                            onValueChange = {altName.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_menu_type),
+                            inputText = menuType.value,
+                            onValueChange = {menuType.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                            defaultValue = dateFrom.value,
+                            startDate = LocalDate.now().toString(),
+                            onBirthdayChange = {dateFrom.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            defaultValue = dateUntil.value,
+                            startDate = LocalDate.now().toString(),
+                            onBirthdayChange = {dateUntil.value = it}
+                        )
+
+                    }
+                },
                 dismissButton = {
                     ButtonComponent(
-                        onClick = {showAddDialog = false},
+                        onClick = {
+                            showAddDialog = false
+                            clearFields()
+                        },
                         label = stringResource(id = R.string.label_cancel)
                     )
                 },
@@ -1623,6 +1683,7 @@ fun AddMenuCard(
                         onClick = {
                             showAddDialog = false
                             addMenu()
+                            clearFields()
                         },
                         label = stringResource(id = R.string.label_save)
                     )
