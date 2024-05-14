@@ -1457,14 +1457,21 @@ fun Content() {
 @Composable
 fun MenuCard(
     menu: RestaurantMenuDTO,
-    onEditClick: () -> Unit,
+    onEditClick: (RestaurantMenuDTO, String, String?, String, String, String?) -> Unit,
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
 
-    var showConfirmDeletePopup by remember {
-        mutableStateOf(false)
-    }
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
+    var showEditPopup by remember { mutableStateOf(false) }
+
+    //menu info
+    var menuName by remember { mutableStateOf(menu.name) }
+    var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
+    var menuType by remember { mutableStateOf(menu.menuType) }
+    var dateFrom by remember { mutableStateOf(menu.dateFrom) }
+    var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
+
 
     when {
         showConfirmDeletePopup -> {
@@ -1478,7 +1485,56 @@ fun MenuCard(
                 },
                 onDismissRequest = { showConfirmDeletePopup = false },
                 confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.cancel)
+                dismissText = stringResource(id = R.string.label_cancel)
+            )
+        }
+    }
+
+    when {
+        showEditPopup -> {
+            AlertDialog(
+                onDismissRequest = { /*TODO*/ },
+                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
+                text = {
+                    Column {
+                        InputUserInfo(
+                            inputText = menuName,
+                            onValueChange = {menuName = it}
+                        )
+                        InputUserInfo(
+                            inputText = altName,
+                            onValueChange = {altName = it}
+                        )
+                        InputUserInfo(
+                            inputText = menuType,
+                            onValueChange = {menuType = it}
+                        )
+                        InputUserInfo(
+                            inputText = dateFrom,
+                            onValueChange = {dateFrom = it}
+                        )
+                        InputUserInfo(
+                            inputText = dateUntil,
+                            onValueChange = {dateUntil = it}
+                        )
+                    }
+                },
+                dismissButton = {
+                    ButtonComponent(
+                        onClick = {showEditPopup = false},
+                        label = stringResource(id = R.string.label_cancel)
+                    )
+                },
+                confirmButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showEditPopup = false
+                            onEditClick(menu, menuName, altName, menuType, dateFrom, dateUntil)
+                        },
+                        label = stringResource(id = R.string.label_save)
+                    )
+                },
+                
             )
         }
     }
@@ -1514,7 +1570,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = onEditClick,
+                    onClick = {showEditPopup = true},
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "EditMenuItem"
                 )
