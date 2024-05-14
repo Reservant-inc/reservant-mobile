@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material.icons.rounded.Tag
 import androidx.compose.material.icons.rounded.UploadFile
 import androidx.compose.material3.RadioButton
@@ -44,6 +45,7 @@ import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
+import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagsSelection
 import com.example.reservant_mobile.ui.constants.MainRoutes
@@ -91,9 +93,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.padding(top = 8.dp))
 
                 IconWithHeader(
-                    icon = Icons.Rounded.Info,
+                    icon = Icons.Rounded.RestaurantMenu,
                     text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                 )
+
+                ProgressBar(currentStep = 1)
 
                 InputUserInfo(
                     inputText = registerRestaurantViewModel.name.value,
@@ -226,9 +230,12 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.height(30.dp))
                 IconWithHeader(
-                    icon = Icons.Rounded.UploadFile,
-                    text = stringResource(R.string.label_uploadFiles),
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                 )
+
+                ProgressBar(currentStep = 2)
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                 InputUserFile(
@@ -363,12 +370,14 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+            ) {
 
                 IconWithHeader(
-                    icon = Icons.Rounded.Tag,
-                    text = stringResource(id = R.string.label_registerRestaurant_choseTags),
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                 )
+
+                ProgressBar(currentStep = 3)
 
                 TagsSelection(
                     tags = tags,

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +53,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -104,6 +107,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -181,7 +185,11 @@ fun InputUserInfo(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = stringResource(id = R.string.label_optional), color = MaterialTheme.colorScheme.outline, fontStyle = FontStyle.Italic)
+                        Text(
+                            text = stringResource(id = R.string.label_optional),
+                            color = MaterialTheme.colorScheme.outline,
+                            fontStyle = FontStyle.Italic
+                        )
 
                 }
             },
@@ -356,7 +364,11 @@ fun OutLinedDropdownMenu(
                 Row {
                     Text(text = label)
                     if (optional)
-                        Text(text = stringResource(id = R.string.label_optional), color = Color.Gray, fontStyle = FontStyle.Italic)
+                        Text(
+                            text = stringResource(id = R.string.label_optional),
+                            color = Color.Gray,
+                            fontStyle = FontStyle.Italic
+                        )
                 }
             },
             interactionSource = interactionSource,
@@ -956,12 +968,13 @@ fun IconWithHeader(
     icon: ImageVector,
     text: String,
     scale: Float = 1F
-){
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .scale(scale)
-    ){
-        Row(){
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+    ) {
+        Row() {
             Icon(
                 imageVector = icon,
                 contentDescription = icon.name,
@@ -1008,7 +1021,7 @@ fun ShowErrorToast(context: Context, id: Int) {
     if (id != -1) {
         val msg = stringResource(id)
         println("[TOAST] '$msg'")
-        Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -1105,8 +1118,6 @@ fun EmployeeCard(
 
     }
 }
-
-
 
 
 @Composable
@@ -1315,7 +1326,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                         isLoading = true
                         formSent = true
 
-                        if (vm.register()){
+                        if (vm.register()) {
                             onDismiss()
                         }
 
@@ -1479,7 +1490,7 @@ fun MenuCard(
                     onDeleteClick()
                     showConfirmDeletePopup = false
                 },
-                onDismissRequest = {showConfirmDeletePopup = false},
+                onDismissRequest = { showConfirmDeletePopup = false },
                 confirmText = stringResource(id = R.string.label_yes_capital),
                 dismissText = stringResource(id = R.string.cancel)
             )
@@ -1524,7 +1535,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = {showConfirmDeletePopup = true},
+                    onClick = { showConfirmDeletePopup = true },
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "delete"
                 )
@@ -1559,7 +1570,7 @@ fun MenuItemCard(
                 modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
             )
 
-            if(menuItem.alcoholPercentage != null) {
+            if (menuItem.alcoholPercentage != null) {
                 Text(
                     text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
                     style = MaterialTheme.typography.labelSmall,
@@ -1594,7 +1605,6 @@ fun MenuItemCard(
 }
 
 
-
 @Composable
 fun SecondaryButton(
     modifier: Modifier,
@@ -1602,7 +1612,7 @@ fun SecondaryButton(
     imageVector: ImageVector,
     contentDescription: String,
     contentPadding: PaddingValues = PaddingValues(6.dp),
-){
+) {
 
     val secondaryButtonColors = ButtonColors(
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -1625,6 +1635,7 @@ fun SecondaryButton(
         )
     }
 }
+
 @Composable
 fun CountDownPopup(
     countDownTimer: Int = 5,
@@ -1635,7 +1646,7 @@ fun CountDownPopup(
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
-){
+) {
 
     var allowConfirm by remember {
         mutableStateOf(false)
@@ -1645,7 +1656,7 @@ fun CountDownPopup(
         mutableIntStateOf(countDownTimer)
     }
 
-    if (timer > 0){
+    if (timer > 0) {
         LaunchedEffect(key1 = timer) {
             delay(1000)
             timer -= 1
@@ -1673,7 +1684,7 @@ fun CountDownPopup(
                 },
                 enabled = allowConfirm
             ) {
-                if (allowConfirm){
+                if (allowConfirm) {
                     Text(confirmText, color = MaterialTheme.colorScheme.error)
                 } else {
                     Text(timer.toString())
@@ -1708,4 +1719,37 @@ fun MyFloatingActionButton(onClick: () -> Unit) {
             )
         }
     )
+}
+
+@Composable
+fun ProgressBar(currentStep: Int) {
+    val progress = when (currentStep) {
+        1 -> 0.33f
+        2 -> 0.66f
+        3 -> 1f
+        else -> 0f
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(8.dp)
+
+    ) {
+        Row()
+        {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.outlineVariant)
+            )
+        }
+    }
 }
