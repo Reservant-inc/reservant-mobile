@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,6 +20,7 @@ import com.example.reservant_mobile.ui.components.AddMenuCard
 import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -45,11 +47,21 @@ fun MenuManagementActivity(restaurantId: Int) {
                 }
                 items(viewmodel.menus) { menu ->
                     MenuCard(
+                        name = viewmodel.name,
+                        altName = viewmodel.alternateName,
+                        menuType = viewmodel.menuType,
+                        dateFrom = viewmodel.dateFrom,
+                        dateUntil = viewmodel.dateUntil,
                         menu = menu,
-                        onEditClick = viewmodel::editMenu,
+                        onEditClick = {
+                            viewmodel.viewModelScope.launch {
+                                viewmodel.editMenu(menu)
+                            }
+                        },
                         onDeleteClick = {
                             viewmodel.deleteMenu(menu)
                         },
+                        clearFields = viewmodel::clearFields,
                         onClick = {
                             if (menu.id != null) {
                                 navController.navigate(
@@ -61,7 +73,18 @@ fun MenuManagementActivity(restaurantId: Int) {
                 }
                 item{
                     AddMenuCard(
-                        addMenu = {}
+                        name = viewmodel.name,
+                        altName = viewmodel.alternateName,
+                        menuType = viewmodel.menuType,
+                        dateFrom =  viewmodel.dateFrom,
+                        dateUntil = viewmodel.dateUntil,
+                        clearFields = viewmodel::clearFields,
+                        addMenu = {
+                            viewmodel.viewModelScope.launch {
+                                viewmodel.addMenu()
+                                viewmodel.clearFields()
+                            }
+                        }
                     )
                 }
             }
