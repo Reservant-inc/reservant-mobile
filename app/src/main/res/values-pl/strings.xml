@@ -88,4 +88,8 @@
     <string name="label_menu_management">Zarządzanie menu</string>
     <string name="label_become_restaurant_owner">Zostań właścicielem restauracji</string>
     <string name="label_edit_menu">Edytuj menu</string>
+    <string name="label_alternate_name">Alternatywna nazwa</string>
+    <string name="label_menu_type">Typ menu</string>
+    <string name="label_date_from">Data od</string>
+    <string name="label_date_to">Data do</string>
 </resources>
