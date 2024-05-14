@@ -83,4 +83,8 @@
     <string name="label_save">Zapisz</string>
     <string name="label_employee_edit">Edytuj pracownika</string>
     <string name="label_edit_menu">Edytuj menu</string>
+    <string name="label_alternate_name">Alternatywna nazwa</string>
+    <string name="label_menu_type">Typ menu</string>
+    <string name="label_date_from">Data od</string>
+    <string name="label_date_to">Data do</string>
 </resources>

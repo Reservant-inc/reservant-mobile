@@ -1497,22 +1497,27 @@ fun MenuCard(
                 text = {
                     Column {
                         InputUserInfo(
+                            label = stringResource(id = R.string.label_restaurant_name),
                             inputText = menuName,
                             onValueChange = {menuName = it}
                         )
                         InputUserInfo(
+                            label = stringResource(id = R.string.label_alternate_name),
                             inputText = altName,
                             onValueChange = {altName = it}
                         )
                         InputUserInfo(
+                            label = stringResource(id = R.string.label_menu_type),
                             inputText = menuType,
                             onValueChange = {menuType = it}
                         )
                         InputUserInfo(
+                            label = stringResource(id = R.string.label_date_from),
                             inputText = dateFrom,
                             onValueChange = {dateFrom = it}
                         )
                         InputUserInfo(
+                            label = stringResource(id = R.string.label_date_to),
                             inputText = dateUntil,
                             onValueChange = {dateUntil = it}
                         )
