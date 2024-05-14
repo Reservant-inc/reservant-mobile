@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class RestaurantMenuDTO (
     val id: Int? = null,
     val name: String,
+    val alternateName: String?,
     val restaurantId: Int? = null,
     val menuType: String,
     val dateFrom: String,
