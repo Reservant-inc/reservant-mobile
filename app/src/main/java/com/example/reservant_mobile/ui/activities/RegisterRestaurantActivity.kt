@@ -230,8 +230,8 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.height(30.dp))
                 IconWithHeader(
-                    icon = Icons.Rounded.UploadFile,
-                    text = stringResource(R.string.label_uploadFiles),
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                 )
 
                 ProgressBar(currentStep = 2)
@@ -373,8 +373,8 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             ) {
 
                 IconWithHeader(
-                    icon = Icons.Rounded.Tag,
-                    text = stringResource(id = R.string.label_registerRestaurant_choseTags),
+                    icon = Icons.Rounded.RestaurantMenu,
+                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                 )
 
                 ProgressBar(currentStep = 3)
