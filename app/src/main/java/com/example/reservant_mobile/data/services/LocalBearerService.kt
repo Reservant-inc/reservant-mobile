@@ -24,9 +24,7 @@ class LocalBearerService{
     }
 
     suspend fun getBearerToken(): String {
-        val test = context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
-        println("CURRENT TOKEN; "+test)
-            return test
+            return context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
     }
 
 }
