@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.reservant_mobile.ui.components.AddMenuCard
 import com.example.reservant_mobile.ui.components.MenuCard
 import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
@@ -52,6 +53,11 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 )
                             }
                         }
+                    )
+                }
+                item{
+                    AddMenuCard(
+                        addMenu = {}
                     )
                 }
             }
