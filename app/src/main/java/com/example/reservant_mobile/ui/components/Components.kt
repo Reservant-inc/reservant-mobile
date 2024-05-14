@@ -1490,9 +1490,6 @@ fun MenuCard(
                 dismissText = stringResource(id = R.string.label_cancel)
             )
         }
-    }
-
-    when {
         showEditPopup -> {
             //menu info
             var menuName by remember { mutableStateOf(menu.name) }
@@ -1549,10 +1546,11 @@ fun MenuCard(
                         label = stringResource(id = R.string.label_save)
                     )
                 },
-                
-            )
+
+                )
         }
     }
+
 
     Card(
         modifier = Modifier
