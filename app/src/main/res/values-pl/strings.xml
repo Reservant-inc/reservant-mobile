@@ -60,7 +60,7 @@
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
     <string name="label_no">nie</string>
-    <string name="label_next">Przejdź dalej</string>
+    <string name="label_next">Dalej</string>
     <string name="label_uploadFiles">Wyślij potrzebne pliki:</string>
     <string name="label_restaurant_delivery">Dostawa</string>
     <string name="label_restaurant_description">Opis</string>
@@ -70,7 +70,7 @@
     <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
     <string name="label_group">Grupa</string>
-    <string name="label_restaurant_informations">Informacje o restauracji</string>
+    <string name="label_new_restaurant">Nowa Restauracja</string>
     <string name="confirm_delete_title">Czy napewno chcesz usunąć to menu?</string>
     <string name="confirm_delete_text">Ta czynność jest nieodwracalna</string>
     <string name="cancel">Anuluj</string>

@@ -2,6 +2,7 @@ package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
@@ -11,6 +12,7 @@ import com.example.reservant_mobile.data.services.FileUploadService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import androidx.core.net.toUri
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.utils.getFileName
@@ -78,7 +80,9 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         val isRentalContractValid = rentalContract.value.isBlank() || !isRentalContractInvalid(context)
         val isAlcoholLicenseValid = alcoholLicense.value.isBlank() || !isAlcoholLicenseInvalid(context)
 
-        val isValid = isBusinessPermissionValid && isIdCardValid && isRentalContractValid && isAlcoholLicenseValid
+        val isGroupValid = !isGroupInvalid()
+
+        val isValid = isBusinessPermissionValid && isIdCardValid && isRentalContractValid && isAlcoholLicenseValid && isGroupValid
 
         result2 = Result(isError = !isValid, value = isValid)
 
@@ -103,7 +107,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             description = description.value,
             provideDelivery = delivery,
             tags = selectedTags.toList(),
-            groupId = null,
+            groupId = selectedGroup?.id,
             photos = emptyList(),
             tables = emptyList()
         )
