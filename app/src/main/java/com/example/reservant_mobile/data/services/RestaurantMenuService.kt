@@ -22,7 +22,7 @@ interface IRestaurantMenuService{
     suspend fun createMenuItems(menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItem(id:Any): Result<RestaurantMenuItemDTO?>
-    suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuDTO): Result<RestaurantMenuItemDTO?>
+    suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?>
     suspend fun deleteMenuItem(id: Any): Result<Boolean>
 }
 
@@ -69,7 +69,7 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
-        if (res.value!!.status == HttpStatusCode.OK)
+        if (res.value!!.status == HttpStatusCode.NoContent)
             return Result(isError = false, value = true)
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
@@ -98,7 +98,7 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
         return resultWrapper(res)
     }
 
-    override suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuDTO): Result<RestaurantMenuItemDTO?> {
+    override suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?> {
         val res = api.put( item ,Endpoints.RESTAURANT_MENU_ITEM(menuItemId.toString()))
         return resultWrapper(res)
 
@@ -109,8 +109,8 @@ class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRe
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
-
-        if (res.value!!.status == HttpStatusCode.OK)
+        println("TEST"+res.value!!.status)
+        if (res.value!!.status == HttpStatusCode.NoContent)
             return Result(isError = false, value = true)
 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)    }
