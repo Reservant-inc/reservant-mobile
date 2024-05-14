@@ -1035,9 +1035,7 @@ fun EmployeeCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         val localDensity = LocalDensity.current
         var tabWidth by remember { mutableStateOf(0.dp) }
