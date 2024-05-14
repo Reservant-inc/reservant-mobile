@@ -40,7 +40,7 @@ class MenuManagementViewModel(
         altName: String,
         menuType: String,
         dateFrom: String,
-        dateUntil: String
+        dateUntil: String?
     ) {
         val editedMenu = RestaurantMenuDTO(
             menu.id,
@@ -49,7 +49,7 @@ class MenuManagementViewModel(
             altName.ifEmpty { null },
             menuType,
             dateFrom,
-            dateUntil.ifEmpty { null }
+            dateUntil
         )
 
         menus = menus.filter { it != menu } + editedMenu

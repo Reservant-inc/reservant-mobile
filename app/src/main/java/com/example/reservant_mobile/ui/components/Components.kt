@@ -482,7 +482,8 @@ fun Logo(modifier: Modifier = Modifier) {
 @Composable
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    startDate: String
 ) {
     fun convertMillisToDate(millis: Long): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -495,7 +496,7 @@ fun DatePickerDialog(
     }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
+        initialSelectedDateMillis = convertDateToMillis(startDate),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis <= System.currentTimeMillis()
@@ -531,15 +532,22 @@ fun DatePickerDialog(
 
 
 @Composable
-fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
-    // TODO: insert resource stringResource(R.string.label_register_birthday_dialog)
-    var date by remember { mutableStateOf("Open date picker dialog") }
+fun MyDatePickerDialog(
+    onBirthdayChange: (String) -> Unit,
+    label: @Composable () -> Unit = {Text(stringResource(R.string.label_register_birthday_select))},
+    defaultValue: String? = null,
+    startDate: String? = null
+) {
+    val defaultValue = defaultValue ?: stringResource(R.string.label_register_birthday_dialog)
+    val startDate = startDate ?: ((LocalDate.now().year - 28).toString() + "-06-15")
+
+    var date by remember { mutableStateOf(defaultValue) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = date,
         onValueChange = { },
-        label = { Text(stringResource(R.string.label_register_birthday_select)) },
+        label = label,
         readOnly = true,
         shape = roundedShape,
         modifier = Modifier
@@ -563,7 +571,8 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
                 date = it
                 onBirthdayChange(it)
             },
-            onDismiss = { showDatePicker = false }
+            onDismiss = { showDatePicker = false },
+            startDate = startDate
         )
     }
 }
@@ -1456,7 +1465,7 @@ fun Content() {
 @Composable
 fun MenuCard(
     menu: RestaurantMenuDTO,
-    onEditClick: (RestaurantMenuDTO, String, String, String, String, String) -> Unit,
+    onEditClick: (RestaurantMenuDTO, String, String, String, String, String?) -> Unit,
     onDeleteClick: () -> Unit,
     onClick: () -> Unit
 ) {
@@ -1489,7 +1498,7 @@ fun MenuCard(
             var altName by remember { mutableStateOf(menu.alternateName.orEmpty()) }
             var menuType by remember { mutableStateOf(menu.menuType) }
             var dateFrom by remember { mutableStateOf(menu.dateFrom) }
-            var dateUntil by remember { mutableStateOf(menu.dateUntil.orEmpty()) }
+            var dateUntil by remember { mutableStateOf(menu.dateUntil) }
 
             AlertDialog(
                 onDismissRequest = { /*TODO*/ },
@@ -1511,16 +1520,19 @@ fun MenuCard(
                             inputText = menuType,
                             onValueChange = {menuType = it}
                         )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_date_from),
-                            inputText = dateFrom,
-                            onValueChange = {dateFrom = it}
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                            defaultValue = dateFrom,
+                            startDate = dateFrom,
+                            onBirthdayChange = {dateFrom = it}
                         )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_date_to),
-                            inputText = dateUntil,
-                            onValueChange = {dateUntil = it}
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            defaultValue = dateUntil,
+                            startDate = dateUntil ?: LocalDate.now().toString(),
+                            onBirthdayChange = {dateUntil = it}
                         )
+
                     }
                 },
                 dismissButton = {
