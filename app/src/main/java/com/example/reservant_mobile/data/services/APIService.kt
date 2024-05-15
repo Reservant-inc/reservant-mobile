@@ -6,6 +6,8 @@ import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerAuthConfig
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,9 +16,11 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.accept
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -30,18 +34,19 @@ import kotlin.Exception
 
 interface APIService{
     suspend fun get(endpoint: String = ""): Result<HttpResponse?>
+    suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?>
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): Result<HttpResponse?>
     suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?>
     suspend fun delete(endpoint: String): Result<HttpResponse?>
     suspend fun getHttpClient(): HttpClient
     suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
+    suspend fun clearToken()
 }
 
 
 class APIServiceImpl: APIService {
 
     private val localService = LocalBearerService()
-
     private val client = HttpClient(CIO){
         defaultRequest {
             url(Endpoints.BACKEND_URL)
@@ -56,11 +61,19 @@ class APIServiceImpl: APIService {
             level = LogLevel.ALL
         }
         install(Auth) {
+
             bearer {
                 loadTokens {
                     BearerTokens(
                         localService.getBearerToken(),
-                        localService.getRefreshToken()
+                        ""
+                    )
+                }
+
+                refreshTokens {
+                    BearerTokens(
+                        localService.getBearerToken(),
+                        ""
                     )
                 }
             }
@@ -69,10 +82,39 @@ class APIServiceImpl: APIService {
     }
 
 
+
+    override suspend fun clearToken(){
+        try{
+            localService.saveBearerToken("")
+
+            client.plugin(Auth).providers
+                .filterIsInstance<BearerAuthProvider>()
+                .first().clearToken()
+        }
+        catch (e: Exception){
+            println("[TOKEN ERROR]: "+e.message)
+        }
+
+
+    }
+
     override suspend fun get(endpoint: String): Result<HttpResponse?> {
         return responseWrapper(
             try {
                 client.get(endpoint)
+            } catch (e: Exception){
+                println("[GET ERROR]: "+e.message)
+                null
+            }
+        )
+    }
+
+    override suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?> {
+        return responseWrapper(
+            try {
+                client.get(endpoint){
+                    params.forEach { (key, value) -> parameter(key, value) }
+                }
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null
