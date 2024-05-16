@@ -27,15 +27,14 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.resources.Resource
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 
 interface APIService{
-    suspend fun get(resource: Resource): Result<HttpResponse?>
-    suspend fun post(resource: Resource, obj: @Serializable Any): Result<HttpResponse?>
-    suspend fun put(resource: Resource, obj: @Serializable Any): Result<HttpResponse?>
-    suspend fun delete(resource: Resource): Result<HttpResponse?>
+    suspend fun get(resource: Any): Result<HttpResponse?>
+    suspend fun post(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun delete(resource: Any): Result<HttpResponse?>
     suspend fun getHttpClient(): HttpClient
     suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
     suspend fun clearToken()
@@ -97,7 +96,7 @@ class APIServiceImpl: APIService {
 
     }
 
-    override suspend fun get(resource: Resource): Result<HttpResponse?> {
+    override suspend fun get(resource: Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
                 client.get(resource)
@@ -108,7 +107,7 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun post(resource: Resource, obj: @Serializable Any): Result<HttpResponse?> {
+    override suspend fun post(resource: Any, obj: Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
                 client.post(resource) {
@@ -120,8 +119,7 @@ class APIServiceImpl: APIService {
             }
         )
     }
-
-    override suspend fun put(resource: Resource, obj: @Serializable Any): Result<HttpResponse?> {
+    override suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
                 client.put(resource) {
@@ -134,7 +132,7 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun delete(resource: Resource,): Result<HttpResponse?> {
+    override suspend fun delete(resource: Any,): Result<HttpResponse?> {
         return responseWrapper(
             try {
                 client.delete(resource)
