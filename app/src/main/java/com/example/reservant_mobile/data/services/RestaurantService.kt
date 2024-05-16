@@ -295,7 +295,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
     }
 
     override suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?> {
-        val res = api.get(Endpoints.USER(id.toString()))
+        val res = api.get(Users.Id(id=id.toString()))
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
