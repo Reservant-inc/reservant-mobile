@@ -1,9 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
-import com.example.reservant_mobile.data.utils.insertParams
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -18,27 +16,26 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.plugins.plugin
+import io.ktor.client.plugins.resources.Resources
+import io.ktor.client.plugins.resources.delete
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.post
+import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.accept
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.resources.Resource
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
-import kotlin.Exception
 
 interface APIService{
-    suspend fun get(endpoint: String = "", vararg params: Any): Result<HttpResponse?>
-    suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?>
-    suspend fun post(obj: @Serializable Any, endpoint: String = ""): Result<HttpResponse?>
-    suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?>
-    suspend fun delete(endpoint: String): Result<HttpResponse?>
+    suspend fun get(resource: Resource): Result<HttpResponse?>
+    suspend fun post(resource: Resource, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun put(resource: Resource, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun delete(resource: Resource): Result<HttpResponse?>
     suspend fun getHttpClient(): HttpClient
     suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
     suspend fun clearToken()
@@ -79,6 +76,7 @@ class APIServiceImpl: APIService {
                 }
             }
         }
+        install(Resources)
 
     }
 
@@ -99,10 +97,10 @@ class APIServiceImpl: APIService {
 
     }
 
-    override suspend fun get(endpoint: String, vararg params: Any): Result<HttpResponse?> {
+    override suspend fun get(resource: Resource): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(endpoint.insertParams(params))
+                client.get(resource)
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null
@@ -110,23 +108,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?> {
+    override suspend fun post(resource: Resource, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(endpoint){
-                    params.forEach { (key, value) -> parameter(key, value) }
-                }
-            } catch (e: Exception){
-                println("[GET ERROR]: "+e.message)
-                null
-            }
-        )
-    }
-
-    override suspend fun post(obj: @Serializable Any, endpoint: String): Result<HttpResponse?> {
-        return responseWrapper(
-            try {
-                client.post(endpoint) {
+                client.post(resource) {
                     setBody(obj)
                 }
             } catch (e: Exception){
@@ -136,10 +121,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?> {
+    override suspend fun put(resource: Resource, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.put(endpoint) {
+                client.put(resource) {
                 setBody(obj)
             }
             } catch (e: Exception){
@@ -149,10 +134,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun delete(endpoint: String): Result<HttpResponse?> {
+    override suspend fun delete(resource: Resource,): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.delete(endpoint)
+                client.delete(resource)
             } catch (e: Exception){
                 println("[DELETE ERROR]: "+e.message)
                 null

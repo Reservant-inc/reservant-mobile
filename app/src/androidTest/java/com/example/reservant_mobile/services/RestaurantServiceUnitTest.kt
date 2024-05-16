@@ -4,6 +4,8 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.UserDTO
+import com.example.reservant_mobile.data.services.APIService
+import com.example.reservant_mobile.data.services.APIServiceImpl
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.google.common.truth.Truth.assertThat
@@ -50,11 +52,6 @@ class RestaurantServiceUnitTest: ServiceTest() {
             phoneNumber = "+48123456789",
             password = "P@ssw0rd"
         )
-    }
-
-    @Test
-    fun varargs_test() = runTest {
-        assertThat(ser.getRestaurant(1)).isNotNull()
     }
 
     @Test
