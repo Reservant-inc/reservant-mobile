@@ -11,6 +11,12 @@ class MyRestaurants {
 
         @Resource("employees")
         class Employees(val parent: Id)
+
+        @Resource("menus")
+        class Menus(val parent: Id)
+
+        @Resource("menu-items")
+        class MenuItems(val parent: Id)
     }
 
     @Resource("validate-first-step")
