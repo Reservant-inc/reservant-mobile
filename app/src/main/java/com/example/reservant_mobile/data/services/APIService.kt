@@ -1,12 +1,13 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.utils.insertParams
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerAuthConfig
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -33,7 +34,7 @@ import kotlinx.serialization.Serializable
 import kotlin.Exception
 
 interface APIService{
-    suspend fun get(endpoint: String = ""): Result<HttpResponse?>
+    suspend fun get(endpoint: String = "", vararg params: Any): Result<HttpResponse?>
     suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?>
     suspend fun post(obj: @Serializable Any, endpoint: String = ""): Result<HttpResponse?>
     suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?>
@@ -98,10 +99,10 @@ class APIServiceImpl: APIService {
 
     }
 
-    override suspend fun get(endpoint: String): Result<HttpResponse?> {
+    override suspend fun get(endpoint: String, vararg params: Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(endpoint)
+                client.get(endpoint.insertParams(params))
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null

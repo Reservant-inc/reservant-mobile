@@ -1,7 +1,9 @@
 package com.example.reservant_mobile.data.models.dtos
 
+import io.ktor.resources.Resource
 import kotlinx.serialization.Serializable
 
+@Resource("/my-restaurant")
 @Serializable
 data class RestaurantDTO (
     val id: Int = Int.MIN_VALUE,
@@ -24,4 +26,7 @@ data class RestaurantDTO (
     val isVerified:Boolean = false,
     val description:String = "",
     val tags:List<String> = emptyList()
-)
+){
+    @Resource("{id}")
+    class Id(val parent: RestaurantDTO, val id: Long)
+}

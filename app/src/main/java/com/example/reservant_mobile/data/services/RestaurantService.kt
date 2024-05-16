@@ -77,7 +77,7 @@ class RestaurantService(private var api: APIService = APIServiceImpl()): IRestau
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
     override suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>  {
-        val res = api.get(Endpoints.MY_RESTAURANT(id.toString()))
+        val res = api.get(Endpoints.MY_RESTAURANT_TEST, id)
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)

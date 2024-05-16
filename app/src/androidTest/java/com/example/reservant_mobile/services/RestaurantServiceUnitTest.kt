@@ -53,6 +53,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
+    fun varargs_test() = runTest {
+        assertThat(ser.getRestaurant(1)).isNotNull()
+    }
+
+    @Test
     fun get_restaurants_return_not_null()= runTest{
         assertThat(ser.getRestaurants().value).isNotNull()
     }
