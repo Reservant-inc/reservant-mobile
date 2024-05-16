@@ -87,4 +87,6 @@
     <string name="label_step_files">Pliki</string>
     <string name="label_step_description">Opis</string>
     <string name="label_menu_management">Zarządzanie menu</string>
+    <string name="label_new_group_name">Dodaj nową grupę</string>
+    <string name="error_registerRestaurant_invalid_group_name">Nieprawidłowa nazwa grupy</string>
 </resources>

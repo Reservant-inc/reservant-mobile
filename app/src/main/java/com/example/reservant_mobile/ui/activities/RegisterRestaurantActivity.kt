@@ -342,6 +342,21 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     }
                 }
 
+                InputUserInfo(
+                    inputText = registerRestaurantViewModel.newGroup.value,
+                    onValueChange = { registerRestaurantViewModel.newGroup.value = it },
+                    label = stringResource(id = R.string.label_new_group_name),
+                    optional = true,
+                    isError = registerRestaurantViewModel.isGroupNameInvalid(),
+                    errorText = stringResource(
+                        if (registerRestaurantViewModel.getGroupNameError() != -1)
+                            registerRestaurantViewModel.getGroupNameError()
+                        else
+                            R.string.error_registerRestaurant_invalid_group_name
+                    ),
+                    formSent = formSent
+                )
+
                 Spacer(Modifier.height(8.dp))
 
                 ButtonComponent(
