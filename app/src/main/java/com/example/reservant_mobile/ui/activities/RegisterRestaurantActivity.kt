@@ -1,9 +1,12 @@
 package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,13 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material.icons.rounded.Tag
-import androidx.compose.material.icons.rounded.UploadFile
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,12 +49,13 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.components.TagsSelection
+import com.example.reservant_mobile.ui.components.TagSelectionScreen
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
@@ -65,8 +68,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
     var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
 
+    var showTagDialog by remember { mutableStateOf(false) }
+
     registerRestaurantViewModel.viewModelScope.launch {
         registerRestaurantViewModel.getGroups()
+        registerRestaurantViewModel.getTags()
     }
 
     NavHost(
@@ -311,22 +317,24 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (groups != null) {
-                    if(groups.size > 1){
+                    if (groups.size > 1) {
                         OutLinedDropdownMenu(
-                            selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
+                            selectedOption = selectedGroup?.name
+                                ?: stringResource(R.string.label_management_choose_group),
                             itemsList = groups.map { it.name },
                             onOptionSelected = { name ->
                                 registerRestaurantViewModel.viewModelScope.launch {
-                                    registerRestaurantViewModel.selectedGroup = groups.find { it.name == name }
+                                    registerRestaurantViewModel.selectedGroup =
+                                        groups.find { it.name == name }
                                 }
                             },
                             label = stringResource(R.string.label_add_to_group)
                         )
-                    }else if(groups.size == 1){
+                    } else if (groups.size == 1) {
                         registerRestaurantViewModel.selectedGroup = groups[0]
                         selectedGroup = groups[0]
                         Text(
-                            text = stringResource(R.string.label_group)+": "+selectedGroup!!.name,
+                            text = stringResource(R.string.label_group) + ": " + selectedGroup!!.name,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(start = 4.dp, bottom = 16.dp)
@@ -361,8 +369,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             }
         }
         composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
-            // TODO: tags
-            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
 
             Column(
                 modifier = Modifier
@@ -379,17 +385,41 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 ProgressBar(currentStep = 3)
 
-                TagsSelection(
-                    tags = tags,
-                    selectedTags = registerRestaurantViewModel.selectedTags,
-                    onTagSelected = { tag, isSelected ->
-                        if (isSelected) {
-                            registerRestaurantViewModel.selectedTags.add(tag)
-                        } else {
-                            registerRestaurantViewModel.selectedTags.remove(tag)
-                        }
+                FlowRow(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                ) {
+                    registerRestaurantViewModel.selectedTags.forEach() { tag ->
+                        Text(
+                            text = tag,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(50)
+                                ) // Purpurowe tło z zaokrąglonymi rogami
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
                     }
-                )
+                }
+
+
+                ButtonComponent(onClick = { showTagDialog = true }, label = "Choose tags")
+
+                if (showTagDialog) {
+                    TagSelectionScreen(
+                        vm = registerRestaurantViewModel,
+                        onDismiss = { showTagDialog = false },
+                        onTagSelected = { tag, isSelected ->
+                            if (isSelected) {
+                                registerRestaurantViewModel.selectedTags.add(tag)
+                            } else {
+                                registerRestaurantViewModel.selectedTags.remove(tag)
+                            }
+                        }
+                    )
+                }
 
                 Row(
                     modifier = Modifier

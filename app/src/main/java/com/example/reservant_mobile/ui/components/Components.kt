@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -128,6 +129,7 @@ import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
+import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -1751,3 +1753,48 @@ fun ProgressBar(currentStep: Int) {
         }
     }
 }
+
+@Composable
+fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+    val selectedTags = vm.selectedTags
+    val tags = vm.tags
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Wybierz tagi") },
+        text = {
+            LazyColumn {
+                items(tags) { tag ->
+                    val isChecked = selectedTags.contains(tag)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isSelected ->
+                                onTagSelected(tag, isSelected)
+                            }
+                        )
+                        Text(
+                            text = tag,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .clickable { onTagSelected(tag, !isChecked) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+

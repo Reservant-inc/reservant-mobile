@@ -2,6 +2,7 @@ package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
@@ -42,6 +43,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     val logo: FormField = FormField(RestaurantDTO::logo.name)
 
     // Tagowanie i inne
+    var tags = listOf(String())
     var selectedTags = mutableStateListOf<String>()
     var delivery by mutableStateOf(false)
 
@@ -115,6 +117,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     suspend fun getGroups(){
         groups = restaurantService.getGroups().value
+    }
+
+    suspend fun getTags(){
+        //Przypisujemy pustą listę listOf(), jeśli getRestaurantTags() jest null
+        tags = restaurantService.getRestaurantTags().value ?: listOf()
     }
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
