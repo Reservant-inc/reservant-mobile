@@ -61,17 +61,11 @@ class APIServiceImpl: APIService {
 
             bearer {
                 loadTokens {
-                    BearerTokens(
-                        localService.getBearerToken(),
-                        ""
-                    )
+                    getBearerTokens()
                 }
 
                 refreshTokens {
-                    BearerTokens(
-                        localService.getBearerToken(),
-                        ""
-                    )
+                    getBearerTokens()
                 }
             }
         }
@@ -79,7 +73,12 @@ class APIServiceImpl: APIService {
 
     }
 
-
+    private suspend inline fun getBearerTokens():BearerTokens {
+        return BearerTokens(
+            localService.getBearerToken(),
+            ""
+        )
+    }
 
     override suspend fun clearToken(){
         try{
