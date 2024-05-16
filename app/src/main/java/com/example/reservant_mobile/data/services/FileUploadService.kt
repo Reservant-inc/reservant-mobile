@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.endpoints.Uploads
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.ui.constants.Endpoints
@@ -30,7 +31,7 @@ class FileUploadService(private var api: APIService = APIServiceImpl()) {
          }
         )
 
-        val res = api.post(content, Endpoints.FILE_UPLOADS)
+        val res = api.post(content, Uploads())
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
 
