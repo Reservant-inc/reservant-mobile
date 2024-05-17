@@ -1,12 +1,12 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerAuthConfig
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
@@ -17,12 +17,12 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.plugins.plugin
+import io.ktor.client.plugins.resources.Resources
+import io.ktor.client.plugins.resources.delete
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.post
+import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.accept
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -30,21 +30,20 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
-import kotlin.Exception
 
-interface APIService{
-    suspend fun get(endpoint: String = ""): Result<HttpResponse?>
-    suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?>
-    suspend fun post(obj: @Serializable Any, endpoint: String = ""): Result<HttpResponse?>
-    suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?>
-    suspend fun delete(endpoint: String): Result<HttpResponse?>
-    suspend fun getHttpClient(): HttpClient
+/*interface APIService{
+    suspend fun get(resource: Any): Result<HttpResponse?>
+    suspend fun get(resource: Any, unused: String): HttpResponse?
+    suspend inline fun <reified T : Any> post(resource: T, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun delete(resource: Any): Result<HttpResponse?>
+    fun getHttpClient(): HttpClient
     suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
     suspend fun clearToken()
-}
+}*/
 
 
-class APIServiceImpl: APIService {
+class APIService{
 
     private val localService = LocalBearerService()
     private val client = HttpClient(CIO){
@@ -64,26 +63,26 @@ class APIServiceImpl: APIService {
 
             bearer {
                 loadTokens {
-                    BearerTokens(
-                        localService.getBearerToken(),
-                        ""
-                    )
+                    getBearerTokens()
                 }
 
                 refreshTokens {
-                    BearerTokens(
-                        localService.getBearerToken(),
-                        ""
-                    )
+                    getBearerTokens()
                 }
             }
         }
+        install(Resources)
 
     }
 
+    private suspend inline fun getBearerTokens():BearerTokens {
+        return BearerTokens(
+            localService.getBearerToken(),
+            ""
+        )
+    }
 
-
-    override suspend fun clearToken(){
+    suspend fun clearToken(){
         try{
             localService.saveBearerToken("")
 
@@ -98,10 +97,10 @@ class APIServiceImpl: APIService {
 
     }
 
-    override suspend fun get(endpoint: String): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> get(resource: T): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(endpoint)
+                getHttpClient().get(resource)
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null
@@ -109,23 +108,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun get(endpoint: String, params: Map<String, String>): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> post(resource: T, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(endpoint){
-                    params.forEach { (key, value) -> parameter(key, value) }
-                }
-            } catch (e: Exception){
-                println("[GET ERROR]: "+e.message)
-                null
-            }
-        )
-    }
-
-    override suspend fun post(obj: @Serializable Any, endpoint: String): Result<HttpResponse?> {
-        return responseWrapper(
-            try {
-                client.post(endpoint) {
+                getHttpClient().post(resource) {
                     setBody(obj)
                 }
             } catch (e: Exception){
@@ -135,10 +121,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun put(obj: @Serializable Any, endpoint: String): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> put(resource: T, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.put(endpoint) {
+                getHttpClient().put(resource) {
                 setBody(obj)
             }
             } catch (e: Exception){
@@ -148,10 +134,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun delete(endpoint: String): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> delete(resource: T): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.delete(endpoint)
+                getHttpClient().delete(resource)
             } catch (e: Exception){
                 println("[DELETE ERROR]: "+e.message)
                 null
@@ -159,11 +145,11 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun getHttpClient(): HttpClient {
+    fun getHttpClient(): HttpClient {
         return client
     }
 
-    override suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
+    suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
         res?:
             return Result(isError = true, errors =  mapOf(pair= Pair("TOAST", R.string.error_connection_server)), value = null)
 

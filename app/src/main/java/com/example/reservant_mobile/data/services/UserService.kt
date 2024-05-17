@@ -1,13 +1,11 @@
 package com.example.reservant_mobile.data.services
 
-import androidx.collection.emptyIntSet
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.endpoints.Auth
 import com.example.reservant_mobile.data.models.dtos.LoginCredentialsDTO
-import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.models.dtos.RegisterUserDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
-import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
@@ -21,7 +19,7 @@ interface IUserService{
 
 }
 
-class UserService(private var api: APIService = APIServiceImpl()) : IUserService {
+class UserService(private var api: APIService = APIService()) : IUserService {
     private val localBearer = LocalBearerService()
     object User {
         lateinit var login: String
@@ -40,7 +38,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
 
     override suspend fun isLoginUnique(login: String): Boolean {
-        val res = api.get(Endpoints.LOGIN_UNIQUE, mapOf("login" to login)).value
+        val res = api.get(Auth.IsUniqueLogin(login=login)).value
             ?: return false
 
         return if (res.status == HttpStatusCode.OK){
@@ -52,7 +50,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
         //return errors in toast when connection error
-        val res = api.post(user, Endpoints.REGISTER_CUSTOMER)
+        val res = api.post(Auth.RegisterCustomer(), user)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
@@ -64,7 +62,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
         //return errors in toast when connection error
-        val res = api.post(credentials, Endpoints.LOGIN)
+        val res = api.post(Auth.Login(), credentials)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
@@ -87,7 +85,7 @@ class UserService(private var api: APIService = APIServiceImpl()) : IUserService
     }
 
     override suspend fun refreshToken(): Boolean {
-         val res = api.post("",Endpoints.REFRESH_ACCESS_TOKEN)
+         val res = api.post(Auth.RefreshToken(), "")
 
          if(res.isError)
              return false

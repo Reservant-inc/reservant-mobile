@@ -13,6 +13,9 @@ data object Endpoints {
     const val REGISTER_RESTAURANT_OWNER="/auth/register-restaurant-owner"
     const val MY_RESTAURANTS="/my-restaurants"
     const val RESTAURANT_VALIDATE_STEP="/my-restaurants/validate-first-step"
+
+    const val MY_RESTAURANT_TEST = "/my-restaurants/{id}"
+
     fun MY_RESTAURANT(id: String) = "/my-restaurants/$id"
     fun RESTAURANT_MENU(menuId:String) = "/menus/$menuId"
     fun RESTAURANT_MENUS(restaurantId: String) = "/my-restaurants/$restaurantId/menus"
