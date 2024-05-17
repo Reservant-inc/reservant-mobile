@@ -9,16 +9,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
-import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 
 
@@ -34,9 +32,9 @@ fun MenuManagementActivity(restaurantId: Int) {
 
     NavHost(
         navController = navController,
-        startDestination = RestaurantManagementRoutes.MENU_MANAGE
+        startDestination = RestaurantManagementRoutes.Menu(restaurantId = restaurantId)
     ) {
-        composable(RestaurantManagementRoutes.MENU_MANAGE) {
+        composable<RestaurantManagementRoutes.Menu> {
             LazyColumn {
                 item {
                     IconWithHeader(
@@ -54,7 +52,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                         onClick = {
                             if (menu.id != null) {
                                 navController.navigate(
-                                    RestaurantManagementRoutes.getMenuItemManageRoute(menu.id)
+                                    RestaurantManagementRoutes.MenuItem(menuId = menu.id)
                                 )
                             }
                         }
@@ -62,14 +60,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                 }
             }
         }
-        composable(
-            RestaurantManagementRoutes.MENU_ITEM_MANAGE, arguments = listOf(
-                navArgument(
-                    RestaurantManagementArguments.MENU_ID
-                ) { type = NavType.IntType })
-        ) { backStackEntry ->
+        composable<RestaurantManagementRoutes.MenuItem> {
             MenuItemManagementActivity(
-                menuId = backStackEntry.arguments!!.getInt(RestaurantManagementArguments.MENU_ID)
+                menuId = it.toRoute<RestaurantManagementRoutes.MenuItem>().menuId
             )
         }
 
