@@ -339,23 +339,9 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             modifier = Modifier
                                 .padding(start = 4.dp, bottom = 16.dp)
                         )
+                        // TODO zrobic OutLinedDropdownMenu z aktualnej grupy oraz nazwy restauracji która dodajemy
                     }
                 }
-
-                InputUserInfo(
-                    inputText = registerRestaurantViewModel.newGroup.value,
-                    onValueChange = { registerRestaurantViewModel.newGroup.value = it },
-                    label = stringResource(id = R.string.label_new_group_name),
-                    optional = true,
-                    isError = registerRestaurantViewModel.isGroupNameInvalid(),
-                    errorText = stringResource(
-                        if (registerRestaurantViewModel.getGroupNameError() != -1)
-                            registerRestaurantViewModel.getGroupNameError()
-                        else
-                            R.string.error_registerRestaurant_invalid_group_name
-                    ),
-                    formSent = formSent
-                )
 
                 Spacer(Modifier.height(8.dp))
 

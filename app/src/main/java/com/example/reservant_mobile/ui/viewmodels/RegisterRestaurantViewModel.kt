@@ -50,7 +50,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
-    val newGroup: FormField = FormField(RestaurantGroupDTO::name.name)
 
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid(context)) {
@@ -60,10 +59,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         val restaurant = getRestaurantData(context)
 
         result = restaurantService.registerRestaurant(restaurant)
-        if(newGroup.value.isNotEmpty()){
-            val restaurantGroup = getRestaurantGroupData(0) // TODO skąd wziąć id??
-            restaurantService.addGroup(restaurantGroup)
-        }
 
         return result.value
     }
@@ -120,13 +115,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         )
     }
 
-    suspend fun getRestaurantGroupData(idRestaurant: Int): RestaurantGroupDTO {
-        return RestaurantGroupDTO(
-            name = newGroup.value,
-            restaurantIds = listOf(idRestaurant)
-        )
-    }
-
     suspend fun getGroups(){
         groups = restaurantService.getGroups().value
     }
@@ -162,8 +150,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isIdCardInvalid(context) ||
                 isLogoInvalid(context) ||
                 isRestaurantTypeInvalid() ||
-                areTagsInvalid() ||
-                isGroupNameInvalid()
+                areTagsInvalid()
     }
 
     fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
@@ -267,10 +254,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return selectedTags.isEmpty()
     }
 
-    fun isGroupNameInvalid(): Boolean {
-        return newGroup.value.isBlank()
-    }
-
 
     private fun <T> getFieldError(result: Result<T>, name: String): Int {
         if (!result.isError) {
@@ -327,10 +310,6 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun getDescriptionError(): Int {
         return getFieldError(result3, description.name)
-    }
-
-    fun getGroupNameError(): Int {
-        return getFieldError(result2, newGroup.name)
     }
 
     fun <T> getToastError(result: Result<T>): Int {
