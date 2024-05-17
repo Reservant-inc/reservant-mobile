@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
@@ -30,18 +31,19 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 
-interface APIService{
+/*interface APIService{
     suspend fun get(resource: Any): Result<HttpResponse?>
-    suspend fun post(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
+    suspend fun get(resource: Any, unused: String): HttpResponse?
+    suspend inline fun <reified T : Any> post(resource: T, obj: @Serializable Any): Result<HttpResponse?>
     suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
     suspend fun delete(resource: Any): Result<HttpResponse?>
-    suspend fun getHttpClient(): HttpClient
+    fun getHttpClient(): HttpClient
     suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
     suspend fun clearToken()
-}
+}*/
 
 
-class APIServiceImpl: APIService {
+class APIService{
 
     private val localService = LocalBearerService()
     private val client = HttpClient(CIO){
@@ -80,7 +82,7 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun clearToken(){
+    suspend fun clearToken(){
         try{
             localService.saveBearerToken("")
 
@@ -95,10 +97,10 @@ class APIServiceImpl: APIService {
 
     }
 
-    override suspend fun get(resource: Any): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> get(resource: T): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.get(resource)
+                getHttpClient().get(resource)
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null
@@ -106,10 +108,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun post(resource: Any, obj: Any): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> post(resource: T, obj: Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.post(resource) {
+                getHttpClient().post(resource) {
                     setBody(obj)
                 }
             } catch (e: Exception){
@@ -118,10 +120,11 @@ class APIServiceImpl: APIService {
             }
         )
     }
-    override suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?> {
+
+    suspend inline fun <reified T : Any> put(resource: T, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.put(resource) {
+                getHttpClient().put(resource) {
                 setBody(obj)
             }
             } catch (e: Exception){
@@ -131,10 +134,10 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun delete(resource: Any,): Result<HttpResponse?> {
+    suspend inline fun <reified T : Any> delete(resource: T): Result<HttpResponse?> {
         return responseWrapper(
             try {
-                client.delete(resource)
+                getHttpClient().delete(resource)
             } catch (e: Exception){
                 println("[DELETE ERROR]: "+e.message)
                 null
@@ -142,11 +145,11 @@ class APIServiceImpl: APIService {
         )
     }
 
-    override suspend fun getHttpClient(): HttpClient {
+    fun getHttpClient(): HttpClient {
         return client
     }
 
-    override suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
+    suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
         res?:
             return Result(isError = true, errors =  mapOf(pair= Pair("TOAST", R.string.error_connection_server)), value = null)
 

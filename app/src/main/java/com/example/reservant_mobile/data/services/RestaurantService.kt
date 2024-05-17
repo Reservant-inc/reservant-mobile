@@ -8,13 +8,10 @@ import com.example.reservant_mobile.data.endpoints.MyRestaurants
 import com.example.reservant_mobile.data.endpoints.RestaurantTags
 import com.example.reservant_mobile.data.endpoints.User
 import com.example.reservant_mobile.data.endpoints.Users
-import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
-import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
@@ -42,7 +39,7 @@ interface IRestaurantService{
     suspend fun getRestaurantsByTag(tag:String): Result<List<RestaurantDTO>?>
     }
 
-class RestaurantService(private var api: APIService = APIServiceImpl()): IRestaurantService {
+class RestaurantService(private var api: APIService = APIService()): IRestaurantService {
 
     override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<Boolean> {
         val res = api.post(MyRestaurants(), restaurant)

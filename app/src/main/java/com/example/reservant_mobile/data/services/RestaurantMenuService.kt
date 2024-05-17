@@ -29,7 +29,7 @@ interface IRestaurantMenuService{
     suspend fun deleteMenuItem(id: Any): Result<Boolean>
 }
 
-class RestaurantMenuService(private var api: APIService = APIServiceImpl()): IRestaurantMenuService {
+class RestaurantMenuService(private var api: APIService = APIService()): IRestaurantMenuService {
     private suspend inline fun <reified T> resultWrapper(res:Result<HttpResponse?>): Result<T?> {
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)

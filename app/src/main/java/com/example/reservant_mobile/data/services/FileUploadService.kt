@@ -19,7 +19,7 @@ enum class DataType(val dType: String) {
     JPG("image/jpeg"),
     PNG("image/png")
 }
-class FileUploadService(private var api: APIService = APIServiceImpl()) {
+class FileUploadService(private var api: APIService = APIService()) {
 
      suspend fun sendFile(contentType: DataType, f: ByteArray): Result<FileUploadDTO?> {
         val content = MultiPartFormDataContent(
