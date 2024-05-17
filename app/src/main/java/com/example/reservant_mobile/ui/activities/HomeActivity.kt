@@ -33,11 +33,6 @@ fun HomeActivity() {
                 BottomNavigation(innerNavController)
             }
         ){
-            NavHost(navController = innerNavController,
-                startDestination = MainRoutes.Home
-            ) {
-
-            }
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home){
                 composable<MainRoutes.Home>{
                     Content()
