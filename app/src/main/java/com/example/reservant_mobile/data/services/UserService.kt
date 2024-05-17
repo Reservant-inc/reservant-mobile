@@ -50,7 +50,7 @@ class UserService(private var api: APIService = APIService()) : IUserService {
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
         //return errors in toast when connection error
-        val res = api.post(user, Auth.RegisterCustomer())
+        val res = api.post(Auth.RegisterCustomer(), user)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
@@ -85,7 +85,7 @@ class UserService(private var api: APIService = APIService()) : IUserService {
     }
 
     override suspend fun refreshToken(): Boolean {
-         val res = api.post("",Auth.RefreshToken())
+         val res = api.post(Auth.RefreshToken(), "")
 
          if(res.isError)
              return false

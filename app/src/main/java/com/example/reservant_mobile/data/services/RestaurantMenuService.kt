@@ -47,7 +47,7 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
     }
 
     override suspend fun addMenu(menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>{
-        val res = api.post(menu, Menus())
+        val res = api.post(Menus(), menu)
         return resultWrapper(res)
     }
 
@@ -62,7 +62,7 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
     }
 
     override suspend fun editMenu(id: Any, menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?> {
-        val res = api.put( menu ,Menus.Id(id=id.toString()))
+        val res = api.put(Menus.Id(id=id.toString()), menu)
         return resultWrapper(res)
     }
 
@@ -80,13 +80,13 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
 
     override suspend fun addItemsToMenu(menuId: Any, itemsIds:List<Int>): Result<RestaurantMenuDTO?>{
         val newGroup: HashMap<String, List<Int>> = hashMapOf("itemIds" to itemsIds)
-        val res = api.post(newGroup, Menus.Id.Items(Menus.Id(id=menuId.toString())))
+        val res = api.post(Menus.Id.Items(Menus.Id(id=menuId.toString())), newGroup)
         return resultWrapper(res)
 
     }
 
     override suspend fun createMenuItems(menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?> {
-        val res = api.post(menuItems, MenuItems())
+        val res = api.post( MenuItems(), menuItems)
         return resultWrapper(res)
     }
 
@@ -102,7 +102,7 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
     }
 
     override suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?> {
-        val res = api.put( item ,MenuItems.Id(id=menuItemId.toString()))
+        val res = api.put(MenuItems.Id(id=menuItemId.toString()), item)
         return resultWrapper(res)
 
     }
