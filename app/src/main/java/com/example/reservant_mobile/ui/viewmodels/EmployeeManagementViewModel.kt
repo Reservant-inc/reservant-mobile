@@ -11,7 +11,7 @@ import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
-import com.example.reservant_mobile.ui.constants.Regex
+import com.example.reservant_mobile.data.constants.Regex
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
