@@ -32,12 +32,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.components.ButtonComponent
-import com.example.reservant_mobile.ui.constants.AuthRoutes
-import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.navigation.Home
+import com.example.reservant_mobile.ui.navigation.Register
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -107,7 +107,7 @@ fun LoginActivity(navController: NavHostController) {
                     formSent = true
 
                     if (loginViewModel.login()){
-                        navController.navigate(MainRoutes.ACTIVITY_HOME)
+                        navController.navigate(Home)
                     }
 
                     isLoading = false
@@ -119,7 +119,7 @@ fun LoginActivity(navController: NavHostController) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ButtonComponent(onClick = { if (!isLoading) navController.navigate(AuthRoutes.ACTIVITY_REGISTER) },
+            ButtonComponent(onClick = { if (!isLoading) navController.navigate(Register) },
                 label = stringResource(R.string.label_signup))
 
             ButtonComponent(onClick = { if (!isLoading) return@ButtonComponent /* Handle Password Recovery */ },
