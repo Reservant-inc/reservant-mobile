@@ -1132,43 +1132,26 @@ fun BottomNavigation(navController: NavHostController) {
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         for (i in items) {
-            AddItem(
-                screen = i,
-                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
+            NavigationBarItem(
+                /*label = {
+                    Text(text = screen.title)
+                },*/
+
+                icon = {
+                    Icon(
+                        i.icon,
+                        contentDescription = i.route.toString(),
+                    )
+                },
+
+                selected = true,
+                alwaysShowLabel = true,
+                onClick = { i.route?.let {
+                    navController.navigate(it)
+                } },
             )
         }
     }
-}
-
-@Composable
-fun RowScope.AddItem(
-    screen: BottomNavItem,
-    onClick: () -> Unit,
-) {
-    NavigationBarItem(
-        /*label = {
-            Text(text = screen.title)
-        },*/
-
-        icon = {
-            Icon(
-                screen.icon,
-                contentDescription = screen.route,
-            )
-        },
-
-        // Display if the icon it is select or not
-        selected = true,
-
-        // Always show the label bellow the icon or not
-        alwaysShowLabel = true,
-
-        // Click listener for the icon
-        onClick = onClick,
-
-        // Control all the colors of the icon
-        colors = NavigationBarItemDefaults.colors()
-    )
 }
 
 
