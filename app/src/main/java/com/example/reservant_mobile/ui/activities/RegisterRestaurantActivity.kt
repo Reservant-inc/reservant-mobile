@@ -15,10 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material.icons.rounded.Tag
-import androidx.compose.material.icons.rounded.UploadFile
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,8 +45,8 @@ import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagsSelection
-import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 
@@ -71,9 +68,9 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = RegisterRestaurantRoutes.ACTIVITY_INPUTS
+        startDestination = RegisterRestaurantRoutes.Inputs
     ) {
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
+        composable<RegisterRestaurantRoutes.Inputs> {
 
             val options = listOf(
                 stringResource(R.string.label_restaurant_type_restaurant),
@@ -207,7 +204,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             val result = registerRestaurantViewModel.validateFirstStep(context)
 
                             if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                                navController.navigate(RegisterRestaurantRoutes.Files)
                             }
 
                             isLoading = false
@@ -217,7 +214,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
             }
         }
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_FILES) {
+        composable<RegisterRestaurantRoutes.Files> {
 
             Column(
                 modifier = Modifier
@@ -345,7 +342,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             val result = registerRestaurantViewModel.validateSecondStep(context)
 
                             if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                                navController.navigate(RegisterRestaurantRoutes.Description);
                             }
 
                             isLoading = false
@@ -360,7 +357,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
             }
         }
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
+        composable<RegisterRestaurantRoutes.Description> {
             // TODO: tags
             val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
 
@@ -476,7 +473,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             formSent = true
 
                             if (registerRestaurantViewModel.registerRestaurant(context)) {
-                                navControllerHome.navigate(MainRoutes.ACTIVITY_HOME)
+                                navControllerHome.navigate(MainRoutes.Home)
                             }
 
                             isLoading = false

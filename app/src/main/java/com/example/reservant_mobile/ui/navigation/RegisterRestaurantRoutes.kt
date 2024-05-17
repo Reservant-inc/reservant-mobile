@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 data object RegisterRestaurantRoutes{
     @Serializable
-    object RegisterRestaurant
+    object Register
 
     @Serializable
     object Inputs
@@ -13,5 +13,5 @@ data object RegisterRestaurantRoutes{
     object Files
 
     @Serializable
-    object Home
+    object Description
 }
