@@ -1271,9 +1271,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1281,9 +1281,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))
@@ -1324,8 +1324,8 @@ fun EditEmployeeDialog(
     vm.firstName.value = employee.firstName
     vm.lastName.value = employee.lastName
     vm.phoneNum.value = employee.phoneNumber
-    vm.isHallEmpployee = employee.isHallEmployee
-    vm.isBackdoorEmpployee = employee.isBackdoorEmployee
+    vm.isHallEmployee = employee.isHallEmployee
+    vm.isBackdoorEmployee = employee.isBackdoorEmployee
 
     var formSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -1393,9 +1393,9 @@ fun EditEmployeeDialog(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1403,9 +1403,9 @@ fun EditEmployeeDialog(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))

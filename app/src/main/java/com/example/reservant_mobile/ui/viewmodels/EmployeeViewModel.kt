@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantService
@@ -31,8 +30,8 @@ class EmployeeViewModel(
     val phoneNum: FormField = FormField(RestaurantEmployeeDTO::phoneNumber.name)
 
     val id: FormField = FormField(RestaurantEmployeeDTO::id.name)
-    var isHallEmpployee by mutableStateOf(false)
-    var isBackdoorEmpployee by mutableStateOf(false)
+    var isHallEmployee by mutableStateOf(false)
+    var isBackdoorEmployee by mutableStateOf(false)
 
     init {
         viewModelScope.launch {
@@ -72,8 +71,8 @@ class EmployeeViewModel(
                     lastName = lastName.value,
                     phoneNumber = phoneNum.value,
                     password = password.value,
-                    isHallEmployee = isHallEmpployee,
-                    isBackdoorEmployee = isBackdoorEmpployee
+                    isHallEmployee = isHallEmployee,
+                    isBackdoorEmployee = isBackdoorEmployee
                 )
             } else {
                 existingEmployee
@@ -101,8 +100,8 @@ class EmployeeViewModel(
         val position = if (response.value != null) {
             RestaurantEmployeeDTO(
                 id = response.value.id,
-                isHallEmployee = isHallEmpployee,
-                isBackdoorEmployee = isBackdoorEmpployee
+                isHallEmployee = isHallEmployee,
+                isBackdoorEmployee = isBackdoorEmployee
             )
         } else {
             return false
