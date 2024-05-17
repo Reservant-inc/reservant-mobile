@@ -2,11 +2,7 @@ package com.example.reservant_mobile.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-data object MainRoutes{
+data object ManagementRoutes{
     @Serializable
-    object Home
-
-    @Serializable
-    object Profile
+    object Employee
 }
-

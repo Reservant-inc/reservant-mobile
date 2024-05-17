@@ -2,13 +2,16 @@ package com.example.reservant_mobile.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-data object AuthRoutes{
+data object RegisterRestaurantRoutes{
     @Serializable
-    object Landing
+    object RegisterRestaurant
 
     @Serializable
-    object Login
+    object Inputs
 
     @Serializable
-    object Register
+    object Files
+
+    @Serializable
+    object Home
 }
