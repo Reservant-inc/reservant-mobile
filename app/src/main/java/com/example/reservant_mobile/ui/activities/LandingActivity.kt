@@ -14,8 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.Logo
-import com.example.reservant_mobile.ui.navigation.Login
-import com.example.reservant_mobile.ui.navigation.Register
+import com.example.reservant_mobile.ui.navigation.AuthRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
 @Composable
@@ -30,9 +29,9 @@ fun LandingActivity(navController: NavController) {
         ) {
             Logo()
 
-            ButtonComponent(onClick = { navController.navigate(Login) }, label = "Login")
+            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Login) }, label = "Login")
 
-            ButtonComponent(onClick = { navController.navigate(Register) }, label = "Sign up")
+            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Register) }, label = "Sign up")
         }
     }
 

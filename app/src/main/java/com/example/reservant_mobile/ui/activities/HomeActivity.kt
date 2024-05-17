@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.ui.activities
 
-import EmployeeManagementActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Scaffold
@@ -13,7 +12,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
 import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.Management
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
