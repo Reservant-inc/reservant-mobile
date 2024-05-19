@@ -12,13 +12,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.viewmodels.ProfileViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
+
+    val viewModel = viewModel<ProfileViewModel>()
 
     Surface {
         Column(
@@ -41,6 +47,13 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
             ButtonComponent(
                 label = "Temporary theme changer",
                 onClick = { darkTheme.value = !darkTheme.value }
+            )
+
+            ButtonComponent(
+                label = "Logout",
+                onClick = { viewModel.viewModelScope.launch {
+                    viewModel.logout()
+                } }
             )
         }
     }
