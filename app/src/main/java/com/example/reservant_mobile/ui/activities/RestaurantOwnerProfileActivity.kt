@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.constants.RestaurantDetailRoutes
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
@@ -41,6 +42,16 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
             ButtonComponent(
                 label = "Temporary theme changer",
                 onClick = { darkTheme.value = !darkTheme.value }
+            )
+
+            ButtonComponent(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(16.dp),
+                label = "Restaurant Detail Preview",
+                onClick = {
+                    navController.navigate(RestaurantDetailRoutes.RESTAURANT_DETAILS)
+                },
             )
         }
     }

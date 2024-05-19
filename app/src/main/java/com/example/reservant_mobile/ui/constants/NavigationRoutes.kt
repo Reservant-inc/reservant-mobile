@@ -34,3 +34,7 @@ data object RestaurantManagementRoutes {
     fun getMenuManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/manageMenu/${restaurantId}"
     fun getEmployeeManageRoute(restaurantId: Int) = "${RestaurantManagementRoutes::class.simpleName}/employee/${restaurantId}"
 }
+
+data object RestaurantDetailRoutes {
+    val RESTAURANT_DETAILS = "${RestaurantDetailRoutes::class.simpleName}/details"
+}
