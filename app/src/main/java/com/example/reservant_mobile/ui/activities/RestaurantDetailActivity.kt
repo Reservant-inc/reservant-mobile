@@ -5,18 +5,22 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import kotlin.math.floor
 
 
 @Composable
@@ -25,11 +29,12 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
         Image(
-            painter = painterResource(R.drawable.ic_logo),
+            painter = painterResource(R.drawable.restaurant_photo),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(200.dp),
+            contentScale = ContentScale.Crop
         )
 
         Text(
@@ -123,11 +128,27 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
 // TODO: Composables to Components.kt ?
 @Composable
 fun RatingBar(rating: Float) {
+    val fullStars = floor(rating).toInt()
+    val halfStars = if (rating - fullStars >= 0.5) 1 else 0
+    val emptyStars = 5 - fullStars - halfStars
+
     Row {
-        repeat(5) { index ->
+        repeat(fullStars) {
             Icon(
-                imageVector = if (index < rating) Icons.Filled.Star else Icons.Filled.StarBorder,
-                contentDescription = null
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Filled Star"
+            )
+        }
+        repeat(halfStars) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.StarHalf,
+                contentDescription = "Half Star"
+            )
+        }
+        repeat(emptyStars) {
+            Icon(
+                imageVector = Icons.Filled.StarBorder,
+                contentDescription = "Empty Star"
             )
         }
     }
