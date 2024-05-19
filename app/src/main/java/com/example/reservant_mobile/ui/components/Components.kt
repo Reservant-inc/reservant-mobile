@@ -112,6 +112,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -498,7 +499,8 @@ fun Logo(modifier: Modifier = Modifier) {
 @Composable
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    allowFutureDates: Boolean
 ) {
     fun convertMillisToDate(millis: Long): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -514,7 +516,11 @@ fun DatePickerDialog(
         initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis <= System.currentTimeMillis()
+                return if (allowFutureDates) {
+                    true
+                } else {
+                    utcTimeMillis <= System.currentTimeMillis()
+                }
             }
         }
     )
@@ -547,9 +553,8 @@ fun DatePickerDialog(
 
 
 @Composable
-fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
-    // TODO: insert resource stringResource(R.string.label_register_birthday_dialog)
-    var date by remember { mutableStateOf("Open date picker dialog") }
+fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, allowFutureDates: Boolean = false) {
+    var date by remember { mutableStateOf(getString(context, R.string.label_register_birthday_dialog)) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -579,7 +584,8 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
                 date = it
                 onBirthdayChange(it)
             },
-            onDismiss = { showDatePicker = false }
+            onDismiss = { showDatePicker = false },
+            allowFutureDates = allowFutureDates
         )
     }
 }
