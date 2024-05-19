@@ -3,13 +3,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,7 +13,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
-import kotlin.math.floor
+import com.example.reservant_mobile.ui.components.MenuCategoryButton
+import com.example.reservant_mobile.ui.components.MenuItemCard
+import com.example.reservant_mobile.ui.components.MenuTypeButton
+import com.example.reservant_mobile.ui.components.RatingBar
 
 
 @Composable
@@ -121,103 +117,5 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             )
         }
         Spacer(modifier = Modifier.height(80.dp))
-    }
-}
-
-
-// TODO: Composables to Components.kt ?
-@Composable
-fun RatingBar(rating: Float) {
-    val fullStars = floor(rating).toInt()
-    val halfStars = if (rating - fullStars >= 0.5) 1 else 0
-    val emptyStars = 5 - fullStars - halfStars
-
-    Row {
-        repeat(fullStars) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = "Filled Star"
-            )
-        }
-        repeat(halfStars) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.StarHalf,
-                contentDescription = "Half Star"
-            )
-        }
-        repeat(emptyStars) {
-            Icon(
-                imageVector = Icons.Filled.StarBorder,
-                contentDescription = "Empty Star"
-            )
-        }
-    }
-}
-
-@Composable
-fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(4.dp)
-    ) {
-        Text(menuType)
-    }
-}
-
-@Composable
-fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(2.dp)
-    ) {
-        Text(category)
-    }
-}
-
-@Composable
-fun MenuItemCard(name: String, price: String, description: String, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-            Text(
-                text = price,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (description.isNotEmpty()) {
-                Text(description, style = MaterialTheme.typography.bodySmall)
-            }
-            Image(
-                painter = painterResource(R.drawable.ic_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(top = 8.dp)
-            )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                IconButton(onClick = onDeleteClick) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                }
-            }
-        }
     }
 }

@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -43,6 +44,8 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -133,6 +136,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
+import kotlin.math.floor
 
 val roundedShape = RoundedCornerShape(12.dp)
 
@@ -1748,6 +1752,102 @@ fun ProgressBar(currentStep: Int) {
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.outlineVariant)
             )
+        }
+    }
+}
+
+@Composable
+fun RatingBar(rating: Float) {
+    val fullStars = floor(rating).toInt()
+    val halfStars = if (rating - fullStars >= 0.5) 1 else 0
+    val emptyStars = 5 - fullStars - halfStars
+
+    Row {
+        repeat(fullStars) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Filled Star"
+            )
+        }
+        repeat(halfStars) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.StarHalf,
+                contentDescription = "Half Star"
+            )
+        }
+        repeat(emptyStars) {
+            Icon(
+                imageVector = Icons.Filled.StarBorder,
+                contentDescription = "Empty Star"
+            )
+        }
+    }
+}
+
+@Composable
+fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        modifier = modifier.padding(4.dp)
+    ) {
+        Text(menuType)
+    }
+}
+
+@Composable
+fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        modifier = modifier.padding(2.dp)
+    ) {
+        Text(category)
+    }
+}
+
+@Composable
+fun MenuItemCard(name: String, price: String, description: String, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Text(
+                text = price,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (description.isNotEmpty()) {
+                Text(description, style = MaterialTheme.typography.bodySmall)
+            }
+            Image(
+                painter = painterResource(R.drawable.ic_logo),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(top = 8.dp)
+            )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = onDeleteClick) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                }
+            }
         }
     }
 }
