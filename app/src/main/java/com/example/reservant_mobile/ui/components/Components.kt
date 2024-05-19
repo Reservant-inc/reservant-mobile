@@ -115,6 +115,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
@@ -1120,7 +1121,6 @@ fun EmployeeCard(
 
 @Composable
 fun BottomNavigation(navController: NavHostController) {
-
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Landing,
@@ -1128,13 +1128,32 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Profile
     )
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
-        for (i in items) {
-            AddItem(
-                screen = i,
-                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
+        items.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(item.icon, contentDescription = null) },
+                //label = { Text(item.route) },
+                selected = item.route == currentRoute,
+                onClick = {
+                    if (item.route.isNotBlank() && item.route != currentRoute) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
         }
     }

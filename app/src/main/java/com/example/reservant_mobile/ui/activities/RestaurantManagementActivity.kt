@@ -61,7 +61,7 @@ fun RestaurantManagementActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
+                    .padding(16.dp, 8.dp, 16.dp, 24.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
