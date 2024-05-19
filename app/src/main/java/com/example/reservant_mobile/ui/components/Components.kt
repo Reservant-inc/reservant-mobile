@@ -1147,13 +1147,7 @@ fun BottomNavigation(navController: NavHostController) {
                         }
                     }
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+
             )
         }
     }
