@@ -1137,7 +1137,7 @@ fun BottomNavigation(navController: NavHostController) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = null) },
-                //label = { Text(item.route) },
+                label = { Text(stringResource(id = item.label)) },
                 selected = item.route == currentRoute,
                 onClick = {
                     if (item.route.isNotBlank() && item.route != currentRoute) {
@@ -1146,8 +1146,7 @@ fun BottomNavigation(navController: NavHostController) {
                             launchSingleTop = true
                         }
                     }
-                },
-
+                }
             )
         }
     }
