@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -188,7 +189,8 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         else
                             R.string.error_registerRestaurant_invalid_city
                     ),
-                    formSent = formSent
+                    formSent = formSent,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
