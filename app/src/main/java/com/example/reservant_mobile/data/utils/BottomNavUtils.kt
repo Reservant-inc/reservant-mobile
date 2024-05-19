@@ -14,30 +14,36 @@ import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 
 sealed class BottomNavItem(
     var route: Any?,
-    var icon: ImageVector
+    var icon: ImageVector,
+    var label: Int
+
 ) {
     data object Home :
         BottomNavItem(
             MainRoutes.Home,
-            Icons.Filled.Home
+            Icons.Filled.Home,
+            R.string.label_home
         )
 
     data object Landing :
         BottomNavItem(
             null,
-            Icons.Filled.Accessibility
+            Icons.Filled.Accessibility,
+            R.string.label_TODO
         )
 
     data object Management :
         BottomNavItem(
             RestaurantManagementRoutes.Restaurant,
-            Icons.Filled.Restaurant
+            Icons.Filled.Restaurant,
+            R.string.label_management
         )
 
     data object Profile :
         BottomNavItem(
             MainRoutes.Profile,
-            Icons.Filled.Settings
+            Icons.Filled.Settings,
+            R.string.label_settings
         )
 
 }
