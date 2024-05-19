@@ -83,9 +83,11 @@ fun RestaurantManagementActivity() {
                                 selectedGroup = groups.find { it.name == name }
                                 restaurantManageVM.viewModelScope.launch {
                                     selectedGroup = selectedGroup?.let { group ->
-                                        restaurantManageVM.getGroup(
-                                            group.id
-                                        )
+                                        group.id?.let { it1 ->
+                                            restaurantManageVM.getGroup(
+                                                it1
+                                            )
+                                        }
                                     }
                                 }
                             },
@@ -94,7 +96,11 @@ fun RestaurantManagementActivity() {
                         // Displaying single group
                     }else if(groups.size == 1){
                         restaurantManageVM.viewModelScope.launch {
-                            selectedGroup = restaurantManageVM.getGroup(groups[0].id)
+                            selectedGroup = groups[0].id?.let { it1 ->
+                                restaurantManageVM.getGroup(
+                                    it1
+                                )
+                            }
                         }
                     }else{
                         Text(

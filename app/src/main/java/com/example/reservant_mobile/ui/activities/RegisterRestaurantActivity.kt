@@ -42,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
@@ -317,30 +318,19 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (groups != null) {
-                    if (groups.size > 1) {
-                        OutLinedDropdownMenu(
-                            selectedOption = selectedGroup?.name
-                                ?: stringResource(R.string.label_management_choose_group),
-                            itemsList = groups.map { it.name },
-                            onOptionSelected = { name ->
-                                registerRestaurantViewModel.viewModelScope.launch {
-                                    registerRestaurantViewModel.selectedGroup =
-                                        groups.find { it.name == name }
-                                }
-                            },
-                            label = stringResource(R.string.label_add_to_group)
-                        )
-                    } else if (groups.size == 1) {
-                        registerRestaurantViewModel.selectedGroup = groups[0]
-                        selectedGroup = groups[0]
-                        Text(
-                            text = stringResource(R.string.label_group) + ": " + selectedGroup!!.name,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(start = 4.dp, bottom = 16.dp)
-                        )
-                        // TODO zrobic OutLinedDropdownMenu z aktualnej grupy oraz nazwy restauracji która dodajemy
-                    }
+                    val newGroups = groups + RestaurantGroupDTO(name = registerRestaurantViewModel.name.value)
+                    OutLinedDropdownMenu(
+                        selectedOption = selectedGroup?.name
+                            ?: stringResource(R.string.label_management_choose_group),
+                        itemsList = newGroups.map { it.name },
+                        onOptionSelected = { name ->
+                            registerRestaurantViewModel.viewModelScope.launch {
+                                registerRestaurantViewModel.selectedGroup =
+                                    newGroups.find { it.name == name }
+                            }
+                        },
+                        label = stringResource(R.string.label_add_to_group)
+                    )
                 }
 
                 Spacer(Modifier.height(8.dp))
