@@ -1776,7 +1776,6 @@ fun TabRowSwitch(
                     selected = selected,
                     onClick = {
                         coroutineScope.launch {
-                            println("OnCLick "+index+ "test: "+ selected)
                             pagerState.animateScrollToPage(index)
                         }
                     },
