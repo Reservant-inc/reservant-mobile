@@ -1,5 +1,5 @@
 package com.example.reservant_mobile.ui.activities
-import EmployeeManagementActivity
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,23 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.RestaurantInfoView
-import com.example.reservant_mobile.ui.constants.RestaurantManagementArguments
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.ACTIVITY_MANAGE
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.EMPLOYEE_MANAGE
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.MENU_MANAGE
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.getEmployeeManageRoute
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes.getMenuManageRoute
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 import kotlinx.coroutines.launch
 
@@ -56,8 +49,8 @@ fun RestaurantManagementActivity() {
         restaurantManageVM.initialize()
     }
 
-    NavHost(navController = navController, startDestination = ACTIVITY_MANAGE){
-        composable(ACTIVITY_MANAGE){
+    NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant){
+        composable<RestaurantManagementRoutes.Restaurant>{
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -103,13 +96,16 @@ fun RestaurantManagementActivity() {
                     }
                 }
 
-
                 selectedGroup?.restaurants?.forEach { restaurant ->
                     RestaurantInfoView(
                         restaurant = restaurant,
                         onEditClick = { /*TODO*/ },
-                        onManageEmployeeClick = { navController.navigate(getEmployeeManageRoute(restaurant.id)) },
-                        onManageMenuClick = { navController.navigate(getMenuManageRoute(restaurant.id)) },
+                        onManageEmployeeClick = { navController.navigate(
+                            RestaurantManagementRoutes.Employee(restaurantId = restaurant.id)
+                        ) },
+                        onManageMenuClick = { navController.navigate(
+                            RestaurantManagementRoutes.Menu(restaurantId = restaurant.id)
+                        ) },
                         onManageSubscriptionClick = { /*TODO*/ },
                         onDeleteClick = {
                             restaurantManageVM.viewModelScope.launch {
@@ -123,15 +119,15 @@ fun RestaurantManagementActivity() {
                 )
             }
         }
-        composable(MENU_MANAGE, arguments = listOf(navArgument(RestaurantManagementArguments.RESTAURANT_ID) {type = NavType.IntType} )){
-                backStackEntry -> MenuManagementActivity(
-            restaurantId = backStackEntry.arguments!!.getInt(RestaurantManagementArguments.RESTAURANT_ID)
-        )
+        composable<RestaurantManagementRoutes.Menu>{
+            MenuManagementActivity(
+                restaurantId = it.toRoute<RestaurantManagementRoutes.Menu>().restaurantId
+            )
         }
 
-        composable(EMPLOYEE_MANAGE, arguments = listOf(navArgument(RestaurantManagementArguments.RESTAURANT_ID) {type = NavType.IntType} )){
-            backStackEntry -> EmployeeManagementActivity(
-                restaurantId = backStackEntry.arguments!!.getInt("restaurantId")
+        composable<RestaurantManagementRoutes.Employee>{
+            EmployeeManagementActivity(
+                restaurantId = it.toRoute<RestaurantManagementRoutes.Employee>().restaurantId
             )
         }
     }
