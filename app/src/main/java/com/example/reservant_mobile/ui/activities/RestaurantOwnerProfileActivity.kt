@@ -53,6 +53,15 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                 label = "Temporary theme changer",
                 onClick = { darkTheme.value = !darkTheme.value }
             )
+
+//            FIXME: proper navigation
+            ButtonComponent(
+                label = "Logout",
+                onClick = { GlobalScope.launch {
+                    UserService().logoutUser()
+                    navController.navigate(AuthRoutes.Landing)
+                }  }
+            )
         }
     }
 }
