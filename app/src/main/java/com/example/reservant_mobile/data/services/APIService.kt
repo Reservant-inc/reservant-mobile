@@ -1,9 +1,7 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
-import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
@@ -31,24 +29,15 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 
-/*interface APIService{
-    suspend fun get(resource: Any): Result<HttpResponse?>
-    suspend fun get(resource: Any, unused: String): HttpResponse?
-    suspend inline fun <reified T : Any> post(resource: T, obj: @Serializable Any): Result<HttpResponse?>
-    suspend fun put(resource: Any, obj: @Serializable Any): Result<HttpResponse?>
-    suspend fun delete(resource: Any): Result<HttpResponse?>
-    fun getHttpClient(): HttpClient
-    suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?>
-    suspend fun clearToken()
-}*/
-
 
 class APIService{
+
+    private val backendUrl= "http://172.21.40.127:12038"
 
     private val localService = LocalBearerService()
     private val client = HttpClient(CIO){
         defaultRequest {
-            url(Endpoints.BACKEND_URL)
+            url(backendUrl)
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
         }

@@ -1,20 +1,21 @@
 package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.*
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.DataType
 import com.example.reservant_mobile.data.services.FileUploadService
+import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
-import androidx.core.net.toUri
-import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.utils.getFileName
 
 class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :

@@ -34,13 +34,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.CountryPickerView
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.LogoWithReturn
 import com.example.reservant_mobile.ui.components.MyDatePickerDialog
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.components.ButtonComponent
-import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterViewModel
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
@@ -230,7 +230,7 @@ fun RegisterActivity(navController: NavHostController) {
                         formSent = true
 
                         if (registerViewModel.register()){
-                            navController.navigate(MainRoutes.ACTIVITY_HOME)
+                            navController.navigate(MainRoutes.Home)
                         }
 
                         isLoading = false

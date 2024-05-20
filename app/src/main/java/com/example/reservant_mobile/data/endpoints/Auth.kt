@@ -1,10 +1,9 @@
 package com.example.reservant_mobile.data.endpoints
 
 import io.ktor.resources.Resource
-import kotlinx.serialization.Serializable
 
 @Resource("/auth")
-class Auth() {
+class Auth {
     @Resource("register-restaurant-employee")
     class RegisterRestaurantEmployee(val parent: Auth = Auth())
     @Resource("register-customer-support-agent")
