@@ -13,9 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
-import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -35,18 +35,18 @@ fun HomeActivity() {
                 BottomNavigation(innerNavController)
             }
         ){
-            NavHost(navController = innerNavController, startDestination = MainRoutes.ACTIVITY_HOME, modifier = Modifier.padding(it)){
-                composable(MainRoutes.ACTIVITY_HOME){
+            NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
+                composable<MainRoutes.Home>{
                     Content()
                 }
-                composable(MainRoutes.ACTIVITY_PROFILE){
-                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
+                composable<RestaurantManagementRoutes.Restaurant>{
+                    RestaurantManagementActivity()
                 }
-                composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
+                composable<RegisterRestaurantRoutes.Register>{
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
-                composable(RestaurantManagementRoutes.ACTIVITY_MANAGE){
-                    RestaurantManagementActivity()
+                composable<MainRoutes.Profile>{
+                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
                 }
             }
 

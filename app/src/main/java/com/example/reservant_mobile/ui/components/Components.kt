@@ -7,7 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,11 +51,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -71,13 +67,11 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -107,8 +101,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -125,9 +117,8 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.theme.AppTheme
-import kotlinx.coroutines.delay
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -1132,43 +1123,26 @@ fun BottomNavigation(navController: NavHostController) {
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         for (i in items) {
-            AddItem(
-                screen = i,
-                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
+            NavigationBarItem(
+                /*label = {
+                    Text(text = screen.title)
+                },*/
+
+                icon = {
+                    Icon(
+                        i.icon,
+                        contentDescription = i.route.toString(),
+                    )
+                },
+
+                selected = true,
+                alwaysShowLabel = true,
+                onClick = { i.route?.let {
+                    navController.navigate(it)
+                } },
             )
         }
     }
-}
-
-@Composable
-fun RowScope.AddItem(
-    screen: BottomNavItem,
-    onClick: () -> Unit,
-) {
-    NavigationBarItem(
-        /*label = {
-            Text(text = screen.title)
-        },*/
-
-        icon = {
-            Icon(
-                screen.icon,
-                contentDescription = screen.route,
-            )
-        },
-
-        // Display if the icon it is select or not
-        selected = true,
-
-        // Always show the label bellow the icon or not
-        alwaysShowLabel = true,
-
-        // Click listener for the icon
-        onClick = onClick,
-
-        // Control all the colors of the icon
-        colors = NavigationBarItemDefaults.colors()
-    )
 }
 
 
@@ -1297,9 +1271,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1307,9 +1281,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))
@@ -1350,8 +1324,8 @@ fun EditEmployeeDialog(
     vm.firstName.value = employee.firstName
     vm.lastName.value = employee.lastName
     vm.phoneNum.value = employee.phoneNumber
-    vm.isHallEmpployee = employee.isHallEmployee
-    vm.isBackdoorEmpployee = employee.isBackdoorEmployee
+    vm.isHallEmployee = employee.isHallEmployee
+    vm.isBackdoorEmployee = employee.isBackdoorEmployee
 
     var formSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -1419,9 +1393,9 @@ fun EditEmployeeDialog(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1429,9 +1403,9 @@ fun EditEmployeeDialog(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))

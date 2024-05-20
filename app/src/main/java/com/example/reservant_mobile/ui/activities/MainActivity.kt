@@ -8,8 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.reservant_mobile.ui.constants.AuthRoutes
-import com.example.reservant_mobile.ui.constants.MainRoutes
+import com.example.reservant_mobile.ui.navigation.AuthRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
@@ -20,32 +20,34 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val splashScreen = installSplashScreen()
-        var startPoint = String()
-        splashScreen.setKeepOnScreenCondition { startPoint.isEmpty() }
+        var startPoint: Any? = null
+        splashScreen.setKeepOnScreenCondition { startPoint == null }
 
         lifecycleScope.launch {
             startPoint = if(LoginViewModel().refreshToken())
-                MainRoutes.ACTIVITY_HOME
+                MainRoutes.Home
             else
-                AuthRoutes.ACTIVITY_LANDING
+                AuthRoutes.Landing
 
             setContent {
                 AppTheme {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = startPoint) {
-                        composable(route = AuthRoutes.ACTIVITY_LANDING) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = startPoint!!
+                    ) {
+                        composable<AuthRoutes.Landing> {
                             LandingActivity(navController = navController)
                         }
-                        composable(route = AuthRoutes.ACTIVITY_LOGIN) {
+                        composable<AuthRoutes.Login> {
                             LoginActivity(navController = navController)
                         }
-                        composable(route = AuthRoutes.ACTIVITY_REGISTER) {
+                        composable<AuthRoutes.Register> {
                             RegisterActivity(navController = navController)
                         }
-                        composable(route = MainRoutes.ACTIVITY_HOME) {
+                        composable<MainRoutes.Home> {
                             HomeActivity()
                         }
-
                     }
                 }
             }

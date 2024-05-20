@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
@@ -34,7 +34,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                     .padding(16.dp),
                 label = stringResource(id = R.string.label_register_restaurant),
                 onClick = {
-                    navController.navigate(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT)
+                    navController.navigate(RegisterRestaurantRoutes.Register)
                 },
             )
 

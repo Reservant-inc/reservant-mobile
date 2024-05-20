@@ -1,7 +1,6 @@
 package com.example.reservant_mobile.data.models.dtos
 
 import kotlinx.serialization.Serializable
-import java.io.File
 
 @Serializable
 data class RegisterRestaurantDTO(
