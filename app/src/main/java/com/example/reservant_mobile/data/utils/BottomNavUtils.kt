@@ -16,7 +16,6 @@ sealed class BottomNavItem(
     var route: Any?,
     var icon: ImageVector,
     var label: Int
-
 ) {
     data object Home :
         BottomNavItem(
