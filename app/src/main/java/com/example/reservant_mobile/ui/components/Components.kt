@@ -1131,7 +1131,7 @@ fun BottomNavigation(navController: NavHostController) {
                 label = { Text(stringResource(id = item.label)) },
                 selected = item.route == currentRoute,
                 onClick = {
-                    if (item.route.isNotBlank() && item.route != currentRoute) {
+                    if (item.route != null && item.route != currentRoute) {
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
