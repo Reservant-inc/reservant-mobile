@@ -13,7 +13,7 @@ import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 
 
 sealed class BottomNavItem(
-    var route: Any?,
+    var route: Any,
     var icon: ImageVector,
     var label: Int
 ) {
@@ -26,7 +26,7 @@ sealed class BottomNavItem(
 
     data object Landing :
         BottomNavItem(
-            null,
+            MainRoutes.Home,
             Icons.Filled.Accessibility,
             R.string.label_TODO
         )
