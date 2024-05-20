@@ -109,10 +109,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -1112,10 +1114,10 @@ fun EmployeeCard(
 @Composable
 fun BottomNavigation(navController: NavHostController) {
 
-    val items = listOf(
+    val items = listOfNotNull(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Management,
+        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.User.roles },
         BottomNavItem.Profile
     )
 
