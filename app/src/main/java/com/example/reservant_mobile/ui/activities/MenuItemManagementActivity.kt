@@ -1,8 +1,11 @@
 package com.example.reservant_mobile.ui.activities
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,7 +22,9 @@ fun MenuItemManagementActivity(menuId: Int) {
         }
     )
 
-    LazyColumn {
+    LazyColumn (
+        modifier = Modifier.padding(16.dp, 8.dp, 16.dp, 8.dp)
+    ){
         items(viewmodel.items) { item ->
             MenuItemCard(
                 menuItem = item,

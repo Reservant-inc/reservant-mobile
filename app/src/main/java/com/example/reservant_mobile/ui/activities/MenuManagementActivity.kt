@@ -46,7 +46,9 @@ fun MenuManagementActivity(restaurantId: Int) {
 
         composable<RestaurantManagementRoutes.Menu> {
             Box(modifier = Modifier.fillMaxSize()){
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.padding(16.dp, 8.dp, 16.dp, 8.dp)
+                ) {
                     item {
                         IconWithHeader(
                             icon = Icons.AutoMirrored.Rounded.MenuBook,
@@ -101,8 +103,6 @@ fun MenuManagementActivity(restaurantId: Int) {
                     )
                 }
             }
-
-
         }
 
         composable<RestaurantManagementRoutes.MenuItem> {
