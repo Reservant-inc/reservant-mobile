@@ -500,7 +500,8 @@ fun Logo(modifier: Modifier = Modifier) {
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit,
-    allowFutureDates: Boolean
+    allowFutureDates: Boolean,
+    startDate: String
 ) {
     fun convertMillisToDate(millis: Long): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -513,7 +514,7 @@ fun DatePickerDialog(
     }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
+        initialSelectedDateMillis = convertDateToMillis(startDate),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return if (allowFutureDates) {
@@ -553,14 +554,20 @@ fun DatePickerDialog(
 
 
 @Composable
-fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, allowFutureDates: Boolean = false) {
-    var date by remember { mutableStateOf(getString(context, R.string.label_register_birthday_dialog)) }
+fun MyDatePickerDialog(
+    onBirthdayChange: (String) -> Unit,
+    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
+    startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
+    allowFutureDates: Boolean = false,
+    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
+) {
+    var date by remember { mutableStateOf(startStringValue) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = date,
         onValueChange = { },
-        label = { Text(stringResource(R.string.label_register_birthday_select)) },
+        label = label,
         readOnly = true,
         shape = roundedShape,
         modifier = Modifier
@@ -585,8 +592,10 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, all
                 onBirthdayChange(it)
             },
             onDismiss = { showDatePicker = false },
-            allowFutureDates = allowFutureDates
+            allowFutureDates = allowFutureDates,
+            startDate = startDate
         )
+
     }
 }
 
