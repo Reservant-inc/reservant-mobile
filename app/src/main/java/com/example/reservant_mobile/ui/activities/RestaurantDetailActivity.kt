@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.ui.components.FloatingActionMenu
 import com.example.reservant_mobile.ui.components.MenuCategoryButton
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.MenuTypeButton
@@ -159,5 +160,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             )
         }
         Spacer(modifier = Modifier.height(80.dp))
+
+        //FloatingActionMenu()
     }
 }
