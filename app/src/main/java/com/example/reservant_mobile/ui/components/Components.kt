@@ -107,6 +107,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -1690,14 +1691,19 @@ fun CountDownPopup(
 }
 
 @Composable
-fun MyFloatingActionButton(onClick: () -> Unit) {
+fun MyFloatingActionButton(
+    onClick: () -> Unit,
+    allPadding: Dp = 16.dp,
+    topPadding: Dp = 16.dp,
+    bottomPadding: Dp = 16.dp,
+    startPadding: Dp = 16.dp,
+    endPadding: Dp = 16.dp,
+) {
     FloatingActionButton(
         onClick = onClick,
         modifier = Modifier
-            .padding(16.dp)
-            .padding(bottom = 56.dp)
-            .padding(end = 16.dp)
-            .padding(bottom = 16.dp),
+            .padding(allPadding)
+            .padding(top = topPadding, bottom = bottomPadding, start = startPadding, end = endPadding),
         content = {
             Icon(
                 imageVector = Icons.Default.Add,
