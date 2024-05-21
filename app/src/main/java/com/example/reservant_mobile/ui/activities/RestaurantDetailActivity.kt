@@ -169,4 +169,17 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
     }
+//
+//    FloatingActionMenu(
+//        onDineInClick = { // Na miejscu
+//            delivery = "Dine in"
+//        },
+//        onDeliveryClick = {
+//            delivery = "Delivery"
+//        },
+//        onTakeawayClick = {
+//            delivery = "Delivery"
+//        }
+//    )
+
 }

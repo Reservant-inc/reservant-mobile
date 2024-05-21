@@ -1978,7 +1978,11 @@ fun FullscreenGallery(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun FloatingActionMenu() {
+fun FloatingActionMenu(
+    onDineInClick: () -> Unit,
+    onDeliveryClick: () -> Unit,
+    onTakeawayClick: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -1995,27 +1999,42 @@ fun FloatingActionMenu() {
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                onClick = { /* Handle "na miejscu" */ },
+                onClick = {
+                    onDineInClick()
+                    expanded = false
+                },
                 text = {
-                    Icon(imageVector = Icons.Filled.LocalDining, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Na miejscu")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.LocalDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Na miejscu")
+                    }
                 }
             )
             DropdownMenuItem(
-                onClick = { /* Handle "dostawa" */ },
+                onClick = {
+                    onDeliveryClick()
+                    expanded = false
+                },
                 text = {
-                    Icon(imageVector = Icons.Filled.DeliveryDining, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Dostawa")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.DeliveryDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Dostawa")
+                    }
                 }
             )
             DropdownMenuItem(
-                onClick = { /* Handle "odbiór" */ },
+                onClick = {
+                    onTakeawayClick()
+                    expanded = false
+                },
                 text = {
-                    Icon(imageVector = Icons.Filled.TakeoutDining, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Odbiór")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.TakeoutDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Odbiór")
+                    }
                 }
             )
         }
