@@ -44,7 +44,6 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -83,7 +82,6 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -112,7 +110,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -123,8 +120,8 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
@@ -1533,6 +1530,7 @@ fun MenuCard(
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_from))},
+
                             startStringValue = dateFrom.value,
                             startDate = dateFrom.value,
                             onBirthdayChange = {dateFrom.value = it}

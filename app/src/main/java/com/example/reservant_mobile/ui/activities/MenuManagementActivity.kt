@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.ui.activities
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -91,6 +90,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                     )
                 }
             }
+
+
         }
 
         composable<RestaurantManagementRoutes.MenuItem> {
