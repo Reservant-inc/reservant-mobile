@@ -14,6 +14,8 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -29,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -129,6 +132,7 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
+import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -1810,6 +1814,78 @@ fun ProgressBar(currentStep: Int) {
             )
         }
     }
+}
+
+@Composable
+fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+    val selectedTags = vm.selectedTags
+    val tags = vm.tags
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Wybierz tagi") },
+        text = {
+            LazyColumn {
+                items(tags) { tag ->
+                    val isChecked = selectedTags.contains(tag)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isSelected ->
+                                onTagSelected(tag, isSelected)
+                            }
+                        )
+                        Text(
+                            text = tag,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .clickable { onTagSelected(tag, !isChecked) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TagList(tags: List<String>) {
+    FlowRow(
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        tags.forEach { tag ->
+            TagItem(tag = tag)
+        }
+    }
+}
+
+@Composable
+fun TagItem(tag: String) {
+    Text(
+        text = tag,
+        color = MaterialTheme.colorScheme.onPrimary,
+        fontSize = 12.sp,
+        modifier = Modifier
+            .padding(4.dp)
+            .background(
+                MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(50)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    )
 }
 
 @Composable
