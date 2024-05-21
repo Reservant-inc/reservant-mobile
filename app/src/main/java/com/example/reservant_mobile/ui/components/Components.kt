@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +33,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -38,16 +42,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.TakeoutDining
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -97,6 +112,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -111,6 +127,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -139,6 +156,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
+import kotlin.math.floor
 
 val roundedShape = RoundedCornerShape(12.dp)
 
@@ -1978,6 +1996,64 @@ fun ProgressBar(currentStep: Int) {
 }
 
 @Composable
+fun RatingBar(rating: Float) {
+    val fullStars = floor(rating).toInt()
+    val halfStars = if (rating - fullStars >= 0.5) 1 else 0
+    val emptyStars = 5 - fullStars - halfStars
+
+    Row {
+        repeat(fullStars) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Filled Star"
+            )
+        }
+        repeat(halfStars) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.StarHalf,
+                contentDescription = "Half Star"
+            )
+        }
+        repeat(emptyStars) {
+            Icon(
+                imageVector = Icons.Filled.StarBorder,
+                contentDescription = "Empty Star"
+            )
+        }
+    }
+}
+
+@Composable
+fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        modifier = modifier.padding(4.dp)
+    ) {
+        Text(menuType)
+    }
+}
+
+@Composable
+fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        modifier = modifier.padding(2.dp)
+    ) {
+        Text(category)
+    }
+}
+
+@Composable
 fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
@@ -2029,6 +2105,237 @@ fun TagList(tags: List<String>) {
     ) {
         tags.forEach { tag ->
             TagItem(tag = tag)
+        }
+    }
+}
+
+@Composable
+fun MenuItemCard(
+    name: String,
+    price: String,
+    description: String,
+    imageResource: Int,
+    onInfoClick: () -> Unit,
+    onAddClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = onInfoClick,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .offset(y = (-4).dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = "Info",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                Text(
+                    text = price,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.offset(y = (-4).dp)
+                )
+                if (description.isNotEmpty()) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Image(
+                painter = painterResource(imageResource),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(end = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .fillMaxSize()
+            )
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier
+                    .size(36.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FullscreenGallery(onDismiss: () -> Unit) {
+    val imageList = listOf(
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo
+    )
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 64.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f),
+                shape = RoundedCornerShape(16.dp))
+                    .padding(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(imageList.size) { index ->
+                        Card(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .aspectRatio(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(8.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = imageList[index]),
+                                contentDescription = "Image $index",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Gray),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FloatingActionMenu(
+    onDineInClick: () -> Unit,
+    onDeliveryClick: () -> Unit,
+    onTakeawayClick: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        FloatingActionButton(onClick = { expanded = !expanded }) {
+            Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    onDineInClick()
+                    expanded = false
+                },
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.LocalDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Na miejscu")
+                    }
+                }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    onDeliveryClick()
+                    expanded = false
+                },
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.DeliveryDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Dostawa")
+                    }
+                }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    onTakeawayClick()
+                    expanded = false
+                },
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.TakeoutDining, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Odbiór")
+                    }
+                }
+            )
         }
     }
 }

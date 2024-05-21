@@ -18,8 +18,8 @@ import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.navigation.AuthRoutes
-import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -54,13 +54,24 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                 onClick = { darkTheme.value = !darkTheme.value }
             )
 
+            ButtonComponent(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(16.dp),
+                label = "Restaurant Detail Preview",
+                onClick = {
+                    navController.navigate(RestaurantDetailRoutes.Details)
+                },
+            )
 //            FIXME: proper navigation
             ButtonComponent(
                 label = "Logout",
-                onClick = { GlobalScope.launch {
-                    UserService().logoutUser()
-                    navController.navigate(AuthRoutes.Landing)
-                }  }
+                onClick = {
+                    GlobalScope.launch {
+                        UserService().logoutUser()
+                        navController.navigate(AuthRoutes.Landing)
+                    }
+                }
             )
         }
     }

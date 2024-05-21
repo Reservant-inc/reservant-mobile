@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import RestaurantDetailActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.TabRowSwitch
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
@@ -74,6 +76,9 @@ fun HomeActivity() {
                 }
                 composable<MainRoutes.Profile>{
                     RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
+                }
+                composable<RestaurantDetailRoutes.Details>{
+                    RestaurantDetailActivity(navControllerHome = innerNavController)
                 }
             }
         }
