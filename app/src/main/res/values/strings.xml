@@ -90,4 +90,5 @@
     <string name="label_step_files">Files</string>
     <string name="label_step_description">Description</string>
     <string name="label_menu_management">Menu management</string>
+    <string name="label_choose_tags">Choose tags</string>
 </resources>

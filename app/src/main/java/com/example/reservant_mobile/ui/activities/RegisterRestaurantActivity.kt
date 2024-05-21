@@ -50,6 +50,7 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
+import com.example.reservant_mobile.ui.components.TagList
 import com.example.reservant_mobile.ui.components.TagSelectionScreen
 import com.example.reservant_mobile.ui.constants.MainRoutes
 import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
@@ -376,27 +377,9 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 ProgressBar(currentStep = 3)
 
-                FlowRow(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                ) {
-                    registerRestaurantViewModel.selectedTags.forEach() { tag ->
-                        Text(
-                            text = tag,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(50)
-                                ) // Purpurowe tło z zaokrąglonymi rogami
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
-                    }
-                }
-
-
-                ButtonComponent(onClick = { showTagDialog = true }, label = "Choose tags")
+                TagList(tags = registerRestaurantViewModel.selectedTags)
+                
+                ButtonComponent(onClick = { showTagDialog = true }, label = stringResource(id = R.string.label_choose_tags))
 
                 if (showTagDialog) {
                     TagSelectionScreen(

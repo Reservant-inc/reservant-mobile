@@ -14,6 +14,8 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -1795,6 +1797,34 @@ fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, o
                 Text("OK")
             }
         }
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TagList(tags: List<String>) {
+    FlowRow(
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        tags.forEach { tag ->
+            TagItem(tag = tag)
+        }
+    }
+}
+
+@Composable
+fun TagItem(tag: String) {
+    Text(
+        text = tag,
+        color = MaterialTheme.colorScheme.onPrimary,
+        fontSize = 12.sp,
+        modifier = Modifier
+            .padding(4.dp)
+            .background(
+                MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(50)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
     )
 }
 
