@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.ui.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -63,8 +62,12 @@ class MenuManagementViewModel(
         menus = menus.filter { it != menu } + editedMenu
     }
 
-    fun deleteMenu(menu: RestaurantMenuDTO){
-        menus = menus.filter { it != menu }
+    suspend fun deleteMenu(id: Int){
+        val result = service.deleteMenu(id)
+
+        if (!result.isError){
+            fetchMenus()
+        }
     }
 
     fun clearFields(){

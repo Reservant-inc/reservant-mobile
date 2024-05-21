@@ -69,7 +69,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 }
                             },
                             onDeleteClick = {
-                                viewmodel.deleteMenu(menu)
+                                viewmodel.viewModelScope.launch {
+                                    menu.id?.let { id -> viewmodel.deleteMenu(id) }
+                                }
                             },
                             clearFields = viewmodel::clearFields,
                             onClick = {
