@@ -10,6 +10,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -20,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.FloatingActionMenu
+import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.MenuCategoryButton
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.MenuTypeButton
@@ -28,6 +33,7 @@ import com.example.reservant_mobile.ui.components.RatingBar
 
 @Composable
 fun RestaurantDetailActivity(navControllerHome: NavHostController) {
+    var showGallery by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
@@ -92,7 +98,8 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             }
             Card(
                 modifier = Modifier
-                    .size(100.dp),
+                    .size(100.dp)
+                    .clickable { showGallery = true }, // Kliknięcie otwiera galerię
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
@@ -100,9 +107,6 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black.copy(alpha = 0.8f))
-                        .clickable {
-                            println("Card clicked")
-                        }
                 ) {
                     Image(
                         painter = painterResource(R.drawable.restaurant_photo),
@@ -160,7 +164,9 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             )
         }
         Spacer(modifier = Modifier.height(80.dp))
+    }
 
-        //FloatingActionMenu()
+    if (showGallery) {
+        FullscreenGallery(onDismiss = { showGallery = false })
     }
 }

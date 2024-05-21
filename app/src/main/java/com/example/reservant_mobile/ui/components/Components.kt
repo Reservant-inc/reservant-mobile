@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,6 +41,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.DeliveryDining
@@ -50,6 +54,8 @@ import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -1844,7 +1850,7 @@ fun MenuItemCard(
                             .offset(y = (-4).dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Info,
+                            imageVector = Icons.Outlined.Info,
                             contentDescription = "Info",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -1890,6 +1896,87 @@ fun MenuItemCard(
         }
     }
 }
+@Composable
+fun FullscreenGallery(onDismiss: () -> Unit) {
+    val imageList = listOf(
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo,
+        R.drawable.restaurant_photo
+    )
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 64.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f),
+                shape = RoundedCornerShape(16.dp))
+                    .padding(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    items(imageList.size) { index ->
+                        Card(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .aspectRatio(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(8.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = imageList[index]),
+                                contentDescription = "Image $index",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Gray),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun FloatingActionMenu() {
     var expanded by remember { mutableStateOf(false) }
