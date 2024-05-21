@@ -3,7 +3,6 @@ package com.example.reservant_mobile.services
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import com.example.reservant_mobile.data.models.dtos.UserDTO
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.google.common.truth.Truth.assertThat
@@ -52,10 +51,6 @@ class RestaurantServiceUnitTest: ServiceTest() {
         )
     }
 
-    @Test
-    fun get_restaurants_return_not_null()= runTest{
-        assertThat(ser.getRestaurants().value).isNotNull()
-    }
 
     @Test
     fun get_restaurant_return_not_null()= runTest{

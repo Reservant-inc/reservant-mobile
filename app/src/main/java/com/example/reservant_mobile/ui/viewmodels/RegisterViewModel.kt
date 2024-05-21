@@ -10,7 +10,7 @@ import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IUserService
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.utils.getCountriesList
-import com.example.reservant_mobile.ui.constants.Regex
+import com.example.reservant_mobile.data.constants.Regex
 import java.util.regex.Pattern
 
 

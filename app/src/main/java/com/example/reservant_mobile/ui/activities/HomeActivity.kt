@@ -1,21 +1,26 @@
 package com.example.reservant_mobile.ui.activities
 
-import EmployeeManagementActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
-import com.example.reservant_mobile.ui.components.Content
-import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.Management
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
+import com.example.reservant_mobile.ui.components.TabRowSwitch
+import com.example.reservant_mobile.ui.navigation.MainRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -35,22 +40,42 @@ fun HomeActivity() {
                 BottomNavigation(innerNavController)
             }
         ){
-            NavHost(navController = innerNavController, startDestination = MainRoutes.ACTIVITY_HOME){
-                composable(MainRoutes.ACTIVITY_HOME){
-                    Content()
+            NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
+                composable<MainRoutes.Home>{
+                    val map: Map<Int, Pair<String, @Composable () -> Unit>> = mapOf(
+                        0 to ( "Test 1" to {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(text="Page 1")
+                            }
+                        }),
+                        1 to ( "Test 2" to {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(text="Page 2")
+                            }
+                        })
+                    )
+
+                    //tab layout
+                    TabRowSwitch(map)
                 }
-                composable(MainRoutes.ACTIVITY_PROFILE){
-                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
-                }
-                composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
-                    RegisterRestaurantActivity(navControllerHome = innerNavController)
-                }
-                composable(RestaurantManagementRoutes.ACTIVITY_MANAGE){
+                composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
                 }
+                composable<RegisterRestaurantRoutes.Register>{
+                    RegisterRestaurantActivity(navControllerHome = innerNavController)
+                }
+                composable<MainRoutes.Profile>{
+                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
+                }
             }
-
         }
     }
-
 }

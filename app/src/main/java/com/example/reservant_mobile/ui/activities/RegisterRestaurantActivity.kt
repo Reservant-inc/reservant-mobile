@@ -1,12 +1,9 @@
 package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,8 +47,8 @@ import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagList
 import com.example.reservant_mobile.ui.components.TagSelectionScreen
-import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 
@@ -78,9 +73,9 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = RegisterRestaurantRoutes.ACTIVITY_INPUTS
+        startDestination = RegisterRestaurantRoutes.Inputs
     ) {
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_INPUTS) {
+        composable<RegisterRestaurantRoutes.Inputs> {
 
             val options = listOf(
                 stringResource(R.string.label_restaurant_type_restaurant),
@@ -195,7 +190,8 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         else
                             R.string.error_registerRestaurant_invalid_city
                     ),
-                    formSent = formSent
+                    formSent = formSent,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -214,7 +210,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             val result = registerRestaurantViewModel.validateFirstStep(context)
 
                             if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_FILES)
+                                navController.navigate(RegisterRestaurantRoutes.Files)
                             }
 
                             isLoading = false
@@ -224,7 +220,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
             }
         }
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_FILES) {
+        composable<RegisterRestaurantRoutes.Files> {
 
             Column(
                 modifier = Modifier
@@ -344,7 +340,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             val result = registerRestaurantViewModel.validateSecondStep(context)
 
                             if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.ACTIVITY_DESC);
+                                navController.navigate(RegisterRestaurantRoutes.Description);
                             }
 
                             isLoading = false
@@ -359,7 +355,10 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
             }
         }
-        composable(route = RegisterRestaurantRoutes.ACTIVITY_DESC) {
+        composable<RegisterRestaurantRoutes.Description> {
+            // TODO: tags
+            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
+
 
             Column(
                 modifier = Modifier
@@ -479,7 +478,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                             formSent = true
 
                             if (registerRestaurantViewModel.registerRestaurant(context)) {
-                                navControllerHome.navigate(MainRoutes.ACTIVITY_HOME)
+                                navControllerHome.navigate(MainRoutes.Home)
                             }
 
                             isLoading = false

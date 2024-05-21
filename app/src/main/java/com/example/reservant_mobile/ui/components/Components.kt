@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +31,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -56,11 +57,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -74,13 +73,13 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -94,6 +93,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
@@ -110,28 +110,28 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.theme.AppTheme
-import kotlinx.coroutines.delay
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -502,7 +502,8 @@ fun Logo(modifier: Modifier = Modifier) {
 @Composable
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    allowFutureDates: Boolean
 ) {
     fun convertMillisToDate(millis: Long): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -518,7 +519,11 @@ fun DatePickerDialog(
         initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return utcTimeMillis <= System.currentTimeMillis()
+                return if (allowFutureDates) {
+                    true
+                } else {
+                    utcTimeMillis <= System.currentTimeMillis()
+                }
             }
         }
     )
@@ -551,9 +556,8 @@ fun DatePickerDialog(
 
 
 @Composable
-fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
-    // TODO: insert resource stringResource(R.string.label_register_birthday_dialog)
-    var date by remember { mutableStateOf("Open date picker dialog") }
+fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, allowFutureDates: Boolean = false) {
+    var date by remember { mutableStateOf(getString(context, R.string.label_register_birthday_dialog)) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -583,7 +587,8 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit) {
                 date = it
                 onBirthdayChange(it)
             },
-            onDismiss = { showDatePicker = false }
+            onDismiss = { showDatePicker = false },
+            allowFutureDates = allowFutureDates
         )
     }
 }
@@ -1125,10 +1130,10 @@ fun EmployeeCard(
 @Composable
 fun BottomNavigation(navController: NavHostController) {
 
-    val items = listOf(
+    val items = listOfNotNull(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Management,
+        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.User.roles },
         BottomNavItem.Profile
     )
 
@@ -1136,43 +1141,26 @@ fun BottomNavigation(navController: NavHostController) {
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         for (i in items) {
-            AddItem(
-                screen = i,
-                onClick = { if (i.route.isNotBlank()) navController.navigate(i.route) }
+            NavigationBarItem(
+                /*label = {
+                    Text(text = screen.title)
+                },*/
+
+                icon = {
+                    Icon(
+                        i.icon,
+                        contentDescription = i.route.toString(),
+                    )
+                },
+
+                selected = true,
+                alwaysShowLabel = true,
+                onClick = { i.route?.let {
+                    navController.navigate(it)
+                } },
             )
         }
     }
-}
-
-@Composable
-fun RowScope.AddItem(
-    screen: BottomNavItem,
-    onClick: () -> Unit,
-) {
-    NavigationBarItem(
-        /*label = {
-            Text(text = screen.title)
-        },*/
-
-        icon = {
-            Icon(
-                screen.icon,
-                contentDescription = screen.route,
-            )
-        },
-
-        // Display if the icon it is select or not
-        selected = true,
-
-        // Always show the label bellow the icon or not
-        alwaysShowLabel = true,
-
-        // Click listener for the icon
-        onClick = onClick,
-
-        // Control all the colors of the icon
-        colors = NavigationBarItemDefaults.colors()
-    )
 }
 
 
@@ -1301,9 +1289,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1311,9 +1299,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))
@@ -1354,8 +1342,8 @@ fun EditEmployeeDialog(
     vm.firstName.value = employee.firstName
     vm.lastName.value = employee.lastName
     vm.phoneNum.value = employee.phoneNumber
-    vm.isHallEmpployee = employee.isHallEmployee
-    vm.isBackdoorEmpployee = employee.isBackdoorEmployee
+    vm.isHallEmployee = employee.isHallEmployee
+    vm.isBackdoorEmployee = employee.isBackdoorEmployee
 
     var formSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -1423,9 +1411,9 @@ fun EditEmployeeDialog(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isHallEmpployee,
+                        checked = vm.isHallEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isHallEmpployee = isChecked
+                            vm.isHallEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_hall))
@@ -1433,9 +1421,9 @@ fun EditEmployeeDialog(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = vm.isBackdoorEmpployee,
+                        checked = vm.isBackdoorEmployee,
                         onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmpployee = isChecked
+                            vm.isBackdoorEmployee = isChecked
                         }
                     )
                     Text(stringResource(id = R.string.label_employee_backdoor))
@@ -1828,3 +1816,54 @@ fun TagItem(tag: String) {
     )
 }
 
+@Composable
+fun TabRowSwitch(
+    pages: Map<Int, Pair<String, @Composable () -> Unit>>
+) {
+    val pagerState = rememberPagerState(
+        pageCount = {pages.size}
+    )
+    val coroutineScope = rememberCoroutineScope()
+    val cornerShape = RoundedCornerShape(50)
+
+    Column {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier
+                .padding(30.dp)
+                .clip(cornerShape),
+            indicator = {},
+            divider = {}
+        ) {
+            pages.forEach{ (index, tabItem) ->
+                val selected = pagerState.currentPage == index
+                Tab(
+                    modifier =
+                    if (selected) Modifier
+                        .clip(cornerShape)
+                        .border(width = 2.dp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .background(Color.White)
+
+                    else Modifier
+                        .clip(cornerShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+
+                    selected = selected,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    text = { Text(text = tabItem.first) }
+                )
+            }
+        }
+        HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = true
+        ) {page ->
+            pages[page]?.second?.invoke()
+        }
+    }
+}

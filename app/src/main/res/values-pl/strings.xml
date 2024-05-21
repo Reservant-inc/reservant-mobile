@@ -39,11 +39,11 @@
     <string name="label_add_to_group">Dodaj do grupy</string>
     <string name="error_unknown">Nieznany błąd</string>
     <string name="error_unauthorized_access">Funkcja niedostępna</string>
-    <string name="label_management_edit_local_data">Edytuj dane lokali</string>
+    <string name="label_management_edit_local_data">Edytuj dane lokalu</string>
     <string name="label_management_manage_menu">Zarządzaj menu</string>
     <string name="label_management_reviews">Opinie</string>
     <string name="label_management_manage_employees">Zarządzaj pracownikami</string>
-    <string name="label_management_manage_subscription">Zarządzaj subskrypcjami</string>
+    <string name="label_management_manage_subscription">Zarządzaj subskrypcją</string>
     <string name="label_management_delete_restaurant">Usuń lokal</string>
     <string name="label_management_choose_group">Wybierz Grupę</string>
     <string name="label_management_manage">Zarządzanie restauracją</string>
@@ -88,4 +88,5 @@
     <string name="label_step_description">Opis</string>
     <string name="label_menu_management">Zarządzanie menu</string>
     <string name="label_choose_tags">Wybierz tagi</string>
+    <string name="label_become_restaurant_owner">Zostań właścicielem restauracji</string>
 </resources>
