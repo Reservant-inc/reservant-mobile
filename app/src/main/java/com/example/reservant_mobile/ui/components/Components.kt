@@ -115,7 +115,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -126,6 +125,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
@@ -1471,15 +1471,21 @@ fun Content() {
 
 @Composable
 fun MenuCard(
+    name: FormField,
+    altName: FormField,
+    menuType: FormField,
+    dateFrom: FormField,
+    dateUntil: FormField,
     menu: RestaurantMenuDTO,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    clearFields: () -> Unit,
     onClick: () -> Unit
 ) {
 
-    var showConfirmDeletePopup by remember {
-        mutableStateOf(false)
-    }
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
+    var showEditPopup by remember { mutableStateOf(false) }
+
 
     when {
         showConfirmDeletePopup -> {
@@ -1493,10 +1499,82 @@ fun MenuCard(
                 },
                 onDismissRequest = { showConfirmDeletePopup = false },
                 confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.cancel)
+                dismissText = stringResource(id = R.string.label_cancel)
+            )
+        }
+        showEditPopup -> {
+
+            name.value = menu.name
+            altName.value = menu.alternateName ?: ""
+            menuType.value = menu.menuType
+            dateFrom.value = menu.dateFrom
+            dateUntil.value = menu.dateUntil ?: LocalDate.now().toString()
+
+
+            AlertDialog(
+                onDismissRequest = {
+                    showEditPopup = false
+                    clearFields()
+                },
+                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
+                text = {
+                    Column {
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_restaurant_name),
+                            inputText = name.value,
+                            onValueChange = {name.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_alternate_name),
+                            inputText = altName.value,
+                            onValueChange = {altName.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_menu_type),
+                            inputText = menuType.value,
+                            onValueChange = {menuType.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                            allowFutureDates = true,
+                            startStringValue = dateFrom.value,
+                            startDate = dateFrom.value,
+                            onBirthdayChange = {dateFrom.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            allowFutureDates = true,
+                            startStringValue = dateUntil.value,
+                            startDate = dateUntil.value,
+                            onBirthdayChange = {dateUntil.value = it}
+                        )
+
+                    }
+                },
+                dismissButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showEditPopup = false
+                            clearFields()
+                        },
+                        label = stringResource(id = R.string.label_cancel)
+                    )
+                },
+                confirmButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showEditPopup = false
+                            onEditClick()
+                            clearFields()
+                        },
+                        label = stringResource(id = R.string.label_save)
+                    )
+                },
+
             )
         }
     }
+
 
     Card(
         modifier = Modifier
@@ -1529,7 +1607,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = onEditClick,
+                    onClick = {showEditPopup = true},
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "EditMenuItem"
                 )
@@ -1543,6 +1621,89 @@ fun MenuCard(
             }
         }
     }
+}
+
+@Composable
+fun AddMenuButton(
+    name: FormField,
+    altName: FormField,
+    menuType: FormField,
+    dateFrom: FormField,
+    dateUntil: FormField,
+    clearFields: () -> Unit,
+    addMenu: () -> Unit
+){
+    var showAddDialog by remember { mutableStateOf(false)}
+
+    when{
+        showAddDialog -> {
+            AlertDialog(
+                onDismissRequest = {
+                    showAddDialog = false
+                    clearFields()
+                },
+                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
+                text = {
+                    Column {
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_restaurant_name),
+                            inputText = name.value,
+                            onValueChange = {name.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_alternate_name),
+                            inputText = altName.value,
+                            optional = true,
+                            onValueChange = {altName.value = it}
+                        )
+                        InputUserInfo(
+                            label = stringResource(id = R.string.label_menu_type),
+                            inputText = menuType.value,
+                            onValueChange = {menuType.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                            allowFutureDates = true,
+                            startStringValue = dateFrom.value,
+                            startDate = LocalDate.now().toString(),
+                            onBirthdayChange = {dateFrom.value = it}
+                        )
+                        MyDatePickerDialog (
+                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            allowFutureDates = true,
+                            startStringValue = dateUntil.value,
+                            startDate = LocalDate.now().toString(),
+                            onBirthdayChange = {dateUntil.value = it}
+                        )
+
+                    }
+                },
+                dismissButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showAddDialog = false
+                            clearFields()
+                        },
+                        label = stringResource(id = R.string.label_cancel)
+                    )
+                },
+                confirmButton = {
+                    ButtonComponent(
+                        onClick = {
+                            showAddDialog = false
+                            addMenu()
+                            clearFields()
+                        },
+                        label = stringResource(id = R.string.label_save)
+                    )
+                },
+            )
+        }
+    }
+
+    MyFloatingActionButton(
+        onClick = { showAddDialog = true }
+    )
 }
 
 
