@@ -1,20 +1,27 @@
 package com.example.reservant_mobile.ui.activities
 
+import RestaurantDetailActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
-import com.example.reservant_mobile.ui.components.Content
+import com.example.reservant_mobile.ui.components.TabRowSwitch
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
@@ -37,7 +44,29 @@ fun HomeActivity() {
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
                 composable<MainRoutes.Home>{
-                    Content()
+                    val map: Map<Int, Pair<String, @Composable () -> Unit>> = mapOf(
+                        0 to ( "Test 1" to {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(text="Page 1")
+                            }
+                        }),
+                        1 to ( "Test 2" to {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ){
+                                Text(text="Page 2")
+                            }
+                        })
+                    )
+
+                    //tab layout
+                    TabRowSwitch(map)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
@@ -48,9 +77,10 @@ fun HomeActivity() {
                 composable<MainRoutes.Profile>{
                     RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
                 }
+                composable<RestaurantDetailRoutes.Details>{
+                    RestaurantDetailActivity(navControllerHome = innerNavController)
+                }
             }
-
         }
     }
-
 }
