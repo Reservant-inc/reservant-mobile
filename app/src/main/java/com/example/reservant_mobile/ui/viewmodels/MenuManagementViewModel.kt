@@ -52,8 +52,8 @@ class MenuManagementViewModel(
     suspend fun editMenu(menu: RestaurantMenuDTO) {
         val editedMenu = RestaurantMenuDTO(
             menu.id,
-            menu.restaurantId,
             name.value,
+            menu.restaurantId,
             alternateName.value.ifEmpty { null },
             menuType.value,
             dateFrom.value,
