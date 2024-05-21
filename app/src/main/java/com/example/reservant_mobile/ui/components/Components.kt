@@ -1646,6 +1646,7 @@ fun AddMenuButton(
                         InputUserInfo(
                             label = stringResource(id = R.string.label_alternate_name),
                             inputText = altName.value,
+                            optional = true,
                             onValueChange = {altName.value = it}
                         )
                         InputUserInfo(

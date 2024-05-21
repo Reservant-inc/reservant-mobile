@@ -36,35 +36,37 @@ class MenuManagementViewModel(
 
     suspend fun addMenu(){
         val menu = RestaurantMenuDTO(
-            restaurantId,
             name = name.value,
+            restaurantId = restaurantId,
             alternateName = alternateName.value,
             menuType = menuType.value,
             dateFrom = dateFrom.value,
             dateUntil = dateUntil.value
         )
 
-        menus = menus + menu
+        val result = service.addMenu(menu)
+
+        if(!result.isError){
+            fetchMenus()
+        }
 
     }
 
     suspend fun editMenu(menu: RestaurantMenuDTO) {
         val editedMenu = RestaurantMenuDTO(
-            menu.id,
-            name.value,
-            menu.restaurantId,
-            alternateName.value.ifEmpty { null },
-            menuType.value,
-            dateFrom.value,
-            dateUntil.value
+            id = menu.id,
+            name = name.value,
+            restaurantId = menu.restaurantId,
+            alternateName = alternateName.value.ifEmpty { null },
+            menuType = menuType.value,
+            dateFrom = dateFrom.value,
+            dateUntil = dateUntil.value
         )
 
         val result = service.editMenu(editedMenu.id!!, editedMenu)
 
         if (!result.isError){
-            result.value?.let {
-                fetchMenus()
-            }
+            fetchMenus()
         }
 
     }
