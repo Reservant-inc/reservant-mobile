@@ -2340,6 +2340,7 @@ fun FloatingActionMenu(
     }
 }
 
+@Composable
 fun TagItem(tag: String) {
     Text(
         text = tag,
