@@ -116,7 +116,7 @@ fun RegisterActivity(navController: NavHostController) {
                 formSent = formSent
             )
 
-            MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday.value = birthday }, LocalContext.current)
+            MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday.value = birthday })
 
             InputUserInfo(
                 inputText = registerViewModel.email.value,

@@ -108,6 +108,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -500,7 +501,8 @@ fun Logo(modifier: Modifier = Modifier) {
 fun DatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit,
-    allowFutureDates: Boolean
+    allowFutureDates: Boolean,
+    startDate: String
 ) {
     fun convertMillisToDate(millis: Long): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -513,7 +515,7 @@ fun DatePickerDialog(
     }
 
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateToMillis((LocalDate.now().year - 28).toString() + "-06-15"),
+        initialSelectedDateMillis = convertDateToMillis(startDate),
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return if (allowFutureDates) {
@@ -553,14 +555,20 @@ fun DatePickerDialog(
 
 
 @Composable
-fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, allowFutureDates: Boolean = false) {
-    var date by remember { mutableStateOf(getString(context, R.string.label_register_birthday_dialog)) }
+fun MyDatePickerDialog(
+    onBirthdayChange: (String) -> Unit,
+    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
+    startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
+    allowFutureDates: Boolean = false,
+    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
+) {
+    var date by remember { mutableStateOf(startStringValue) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = date,
         onValueChange = { },
-        label = { Text(stringResource(R.string.label_register_birthday_select)) },
+        label = label,
         readOnly = true,
         shape = roundedShape,
         modifier = Modifier
@@ -585,8 +593,10 @@ fun MyDatePickerDialog(onBirthdayChange: (String) -> Unit, context: Context, all
                 onBirthdayChange(it)
             },
             onDismiss = { showDatePicker = false },
-            allowFutureDates = allowFutureDates
+            allowFutureDates = allowFutureDates,
+            startDate = startDate
         )
+
     }
 }
 
@@ -1747,14 +1757,19 @@ fun CountDownPopup(
 }
 
 @Composable
-fun MyFloatingActionButton(onClick: () -> Unit) {
+fun MyFloatingActionButton(
+    onClick: () -> Unit,
+    allPadding: Dp = 16.dp,
+    topPadding: Dp = 16.dp,
+    bottomPadding: Dp = 16.dp,
+    startPadding: Dp = 16.dp,
+    endPadding: Dp = 16.dp,
+) {
     FloatingActionButton(
         onClick = onClick,
         modifier = Modifier
-            .padding(16.dp)
-            .padding(bottom = 56.dp)
-            .padding(end = 16.dp)
-            .padding(bottom = 16.dp),
+            .padding(allPadding)
+            .padding(top = topPadding, bottom = bottomPadding, start = startPadding, end = endPadding),
         content = {
             Icon(
                 imageVector = Icons.Default.Add,
