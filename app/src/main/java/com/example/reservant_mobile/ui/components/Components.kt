@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -1623,6 +1624,46 @@ fun SecondaryButton(
 }
 
 @Composable
+fun DeletePopup(
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirmText:String = "Confirm",
+    dismissText: String = "Cancel",
+    onDismissRequest: () -> Unit = {},
+    onConfirm: () -> Unit,
+    enabled: Boolean = true,
+    deleteButtonContent: @Composable (RowScope.() -> Unit) = {Text(confirmText, color = MaterialTheme.colorScheme.error)}
+){
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Text(text = text)
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            OutlinedButton(
+                onClick = onConfirm,
+                enabled = enabled,
+                content = deleteButtonContent
+            )
+        },
+        dismissButton = {
+            FilledTonalButton(
+                onClick = onDismissRequest
+            ) {
+                Text(dismissText)
+            }
+        }
+    )
+}
+
+@Composable
 fun CountDownPopup(
     countDownTimer: Int = 5,
     icon: ImageVector,
@@ -1649,10 +1690,8 @@ fun CountDownPopup(
             allowConfirm = timer == 0
         }
     }
-
-
-
-    AlertDialog(
+    
+    /*AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
         },
@@ -1686,7 +1725,25 @@ fun CountDownPopup(
                 Text(dismissText)
             }
         }
-    )
+    )*/
+    
+    DeletePopup(
+        icon = icon,
+        title = title,
+        text = text,
+        dismissText = dismissText,
+        onDismissRequest = onDismissRequest,
+        onConfirm = {
+            if (allowConfirm) onConfirm()
+        },
+        enabled = allowConfirm
+    ){
+        if (allowConfirm) {
+            Text(confirmText, color = MaterialTheme.colorScheme.error)
+        } else {
+            Text(timer.toString())
+        }
+    }
 }
 
 @Composable
@@ -1766,7 +1823,11 @@ fun TabRowSwitch(
                     modifier =
                     if (selected) Modifier
                         .clip(cornerShape)
-                        .border(width = 2.dp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
                         .background(Color.White)
 
                     else Modifier
