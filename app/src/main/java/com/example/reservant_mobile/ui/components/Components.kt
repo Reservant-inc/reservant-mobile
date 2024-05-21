@@ -1530,13 +1530,14 @@ fun MenuCard(
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_from))},
-
+                            allowFutureDates = true,
                             startStringValue = dateFrom.value,
                             startDate = dateFrom.value,
                             onBirthdayChange = {dateFrom.value = it}
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            allowFutureDates = true,
                             startStringValue = dateUntil.value,
                             startDate = dateUntil.value,
                             onBirthdayChange = {dateUntil.value = it}
@@ -1656,12 +1657,14 @@ fun AddMenuButton(
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_from))},
+                            allowFutureDates = true,
                             startStringValue = dateFrom.value,
                             startDate = LocalDate.now().toString(),
                             onBirthdayChange = {dateFrom.value = it}
                         )
                         MyDatePickerDialog (
                             label = { Text(text = stringResource(id = R.string.label_date_to))},
+                            allowFutureDates = true,
                             startStringValue = dateUntil.value,
                             startDate = LocalDate.now().toString(),
                             onBirthdayChange = {dateUntil.value = it}
@@ -1695,29 +1698,6 @@ fun AddMenuButton(
     MyFloatingActionButton(
         onClick = { showAddDialog = true }
     )
-    /*Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(8.dp)
-            .clickable(onClick = { showAddDialog = true }),
-        elevation = CardDefaults.cardElevation(4.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceDim),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            Icon(
-                modifier = Modifier.size(60.dp),
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "add menu"
-            )
-        }
-    }*/
 }
 
 
