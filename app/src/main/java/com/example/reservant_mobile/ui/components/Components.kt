@@ -1127,13 +1127,13 @@ fun BottomNavigation(navController: NavHostController) {
     ) {
         items.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = i.route.toString()) },
+                icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                 label = { Text(stringResource(id = item.label)) },
-                selected = item.route == currentRoute,
+                selected = item.route.toString().replace("$", ".").split("@")[0] == currentRoute,
                 alwaysShowLabel = true,
                 onClick = {
-                    if (item.route != null && item.route != currentRoute) {
-                        navController.navigate(item.route) {
+                    if (item.route !== null && item.route.toString().replace("$", ".").split("@")[0] != currentRoute) {
+                        navController.navigate(item.route!!) {
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
                         }
