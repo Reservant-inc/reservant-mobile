@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,12 +40,16 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -92,6 +97,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -106,6 +112,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -1880,6 +1887,50 @@ fun MenuItemCard(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+    }
+}
+@Composable
+fun FloatingActionMenu() {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        FloatingActionButton(onClick = { expanded = !expanded }) {
+            Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                onClick = { /* Handle "na miejscu" */ },
+                text = {
+                    Icon(imageVector = Icons.Filled.LocalDining, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Na miejscu")
+                }
+            )
+            DropdownMenuItem(
+                onClick = { /* Handle "dostawa" */ },
+                text = {
+                    Icon(imageVector = Icons.Filled.DeliveryDining, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Dostawa")
+                }
+            )
+            DropdownMenuItem(
+                onClick = { /* Handle "odbiór" */ },
+                text = {
+                    Icon(imageVector = Icons.Filled.TakeoutDining, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Odbiór")
+                }
+            )
         }
     }
 }
