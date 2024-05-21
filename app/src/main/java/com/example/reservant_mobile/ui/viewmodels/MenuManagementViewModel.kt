@@ -59,7 +59,14 @@ class MenuManagementViewModel(
             dateUntil.value
         )
 
-        menus = menus.filter { it != menu } + editedMenu
+        val result = service.editMenu(editedMenu.id!!, editedMenu)
+
+        if (!result.isError){
+            result.value?.let {
+                fetchMenus()
+            }
+        }
+
     }
 
     suspend fun deleteMenu(id: Int){
