@@ -73,7 +73,6 @@
     <string name="label_new_restaurant">Nowa Restauracja</string>
     <string name="confirm_delete_title">Czy napewno chcesz usunąć to menu?</string>
     <string name="confirm_delete_text">Ta czynność jest nieodwracalna</string>
-    <string name="cancel">Anuluj</string>
     <string name="label_yes_capital">Tak</string>
     <string name="label_cancel">Anuluj</string>
     <string name="label_employee_hall">Pracownik sali</string>
@@ -87,5 +86,12 @@
     <string name="label_step_files">Pliki</string>
     <string name="label_step_description">Opis</string>
     <string name="label_menu_management">Zarządzanie menu</string>
+    <string name="label_choose_tags">Wybierz tagi</string>
     <string name="label_become_restaurant_owner">Zostań właścicielem restauracji</string>
+    <string name="label_edit_menu">Edytuj menu</string>
+    <string name="label_alternate_name">Przetłumaczona nazwa</string>
+    <string name="label_menu_type">Typ menu</string>
+    <string name="label_date_from">Data od</string>
+    <string name="label_date_to">Data do</string>
+    <string name="label_add_menu">Dodaj menu</string>
 </resources>

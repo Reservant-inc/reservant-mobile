@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RestaurantGroupDTO (
-    val id: Int = 0,
+    val id: Int? = null,
     val name: String,
     val restaurants: List<RestaurantDTO> = emptyList(),
     val restaurantCount: Int = restaurants.size,

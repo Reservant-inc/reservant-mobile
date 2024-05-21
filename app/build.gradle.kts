@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation ("com.googlecode.libphonenumber:libphonenumber:8.12.39")
     implementation("androidx.navigation:navigation-testing:2.7.7")
+    implementation("com.google.android.material:material:1.12.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.google.truth:truth:1.0.1")
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
