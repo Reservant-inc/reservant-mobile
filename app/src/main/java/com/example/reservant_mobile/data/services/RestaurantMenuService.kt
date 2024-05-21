@@ -4,12 +4,9 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.endpoints.MenuItems
 import com.example.reservant_mobile.data.endpoints.Menus
 import com.example.reservant_mobile.data.endpoints.MyRestaurants
-import com.example.reservant_mobile.data.models.dtos.RegisterRestaurantDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
-import com.example.reservant_mobile.ui.constants.Endpoints
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode

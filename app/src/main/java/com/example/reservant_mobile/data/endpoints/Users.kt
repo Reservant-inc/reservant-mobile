@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.data.endpoints
 
-import com.example.reservant_mobile.data.services.UserService
 import io.ktor.resources.Resource
 
 @Resource("/users")

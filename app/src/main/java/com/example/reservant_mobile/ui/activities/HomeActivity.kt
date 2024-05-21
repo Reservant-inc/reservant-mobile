@@ -1,23 +1,23 @@
 package com.example.reservant_mobile.ui.activities
 
-import EmployeeManagementActivity
 import RestaurantDetailActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.Content
-import com.example.reservant_mobile.ui.constants.MainRoutes
-import com.example.reservant_mobile.ui.constants.Management
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantDetailRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantManagementRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -37,20 +37,20 @@ fun HomeActivity() {
                 BottomNavigation(innerNavController)
             }
         ){
-            NavHost(navController = innerNavController, startDestination = MainRoutes.ACTIVITY_HOME){
-                composable(MainRoutes.ACTIVITY_HOME){
+            NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
+                composable<MainRoutes.Home>{
                     Content()
                 }
-                composable(MainRoutes.ACTIVITY_PROFILE){
-                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
-                }
-                composable(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT){
-                    RegisterRestaurantActivity(navControllerHome = innerNavController)
-                }
-                composable(RestaurantManagementRoutes.ACTIVITY_MANAGE){
+                composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
                 }
-                composable(RestaurantDetailRoutes.RESTAURANT_DETAILS){
+                composable<RegisterRestaurantRoutes.Register>{
+                    RegisterRestaurantActivity(navControllerHome = innerNavController)
+                }
+                composable<MainRoutes.Profile>{
+                    RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
+                }
+                composable<RestaurantDetailRoutes.Details>{
                     RestaurantDetailActivity(navControllerHome = innerNavController)
                 }
             }

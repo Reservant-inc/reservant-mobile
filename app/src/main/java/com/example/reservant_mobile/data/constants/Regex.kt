@@ -1,4 +1,4 @@
-package com.example.reservant_mobile.ui.constants
+package com.example.reservant_mobile.data.constants
 
 data object Regex{
     const val LOGIN = "[\\w.\\-$!]{2,}"

@@ -14,9 +14,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Roles
+import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.ButtonComponent
-import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.constants.RestaurantDetailRoutes
+import com.example.reservant_mobile.ui.navigation.AuthRoutes
+import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
@@ -29,13 +34,18 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            var newRestaurantLabel:Int = R.string.label_become_restaurant_owner
+            if(Roles.RESTAURANT_OWNER in UserService.User.roles)
+                newRestaurantLabel = R.string.label_register_restaurant
+
             ButtonComponent(
                 modifier = Modifier
                     .wrapContentSize()
                     .padding(16.dp),
-                label = stringResource(id = R.string.label_register_restaurant),
+                label = stringResource(id = newRestaurantLabel),
                 onClick = {
-                    navController.navigate(RegisterRestaurantRoutes.ACTIVITY_REGISTER_RESTAURANT)
+                    navController.navigate(RegisterRestaurantRoutes.Register)
                 },
             )
 
@@ -50,8 +60,18 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                     .padding(16.dp),
                 label = "Restaurant Detail Preview",
                 onClick = {
-                    navController.navigate(RestaurantDetailRoutes.RESTAURANT_DETAILS)
+                    navController.navigate(RestaurantDetailRoutes.Details)
                 },
+            )
+//            FIXME: proper navigation
+            ButtonComponent(
+                label = "Logout",
+                onClick = {
+                    GlobalScope.launch {
+                        UserService().logoutUser()
+                        navController.navigate(AuthRoutes.Landing)
+                    }
+                }
             )
         }
     }
