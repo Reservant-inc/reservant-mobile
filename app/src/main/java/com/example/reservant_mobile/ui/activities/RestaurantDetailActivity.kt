@@ -152,9 +152,10 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             MenuItemCard(
                 name = "Nazwa pozycji ${index + 1}",
                 price = "Cena: ${10 + index} zł",
+                imageResource = R.drawable.pizza,
                 description = "Opis pozycji ${index + 1} (jeśli jest)",
-                onEditClick = { /* TODO: Handle edit */ },
-                onDeleteClick = { /* TODO: Handle delete */ }
+                onInfoClick = { /* TODO: Handle info */ },
+                onAddClick = { /* TODO: Handle add */ }
             )
         }
         Spacer(modifier = Modifier.height(80.dp))

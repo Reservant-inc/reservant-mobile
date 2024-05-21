@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
@@ -88,6 +89,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
@@ -1797,38 +1799,86 @@ fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick:
 }
 
 @Composable
-fun MenuItemCard(name: String, price: String, description: String, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+fun MenuItemCard(
+    name: String,
+    price: String,
+    description: String,
+    imageResource: Int,
+    onInfoClick: () -> Unit,
+    onAddClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-            Text(
-                text = price,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            if (description.isNotEmpty()) {
-                Text(description, style = MaterialTheme.typography.bodySmall)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = onInfoClick,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .offset(y = (-4).dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = "Info",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                Text(
+                    text = price,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.offset(y = (-4).dp)
+                )
+                if (description.isNotEmpty()) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
+            Spacer(modifier = Modifier.width(16.dp))
             Image(
-                painter = painterResource(R.drawable.ic_logo),
+                painter = painterResource(imageResource),
+                contentScale = ContentScale.Crop,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(top = 8.dp)
+                    .size(80.dp)
+                    .padding(end = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .fillMaxSize()
             )
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                IconButton(onClick = onDeleteClick) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                }
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier
+                    .size(36.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
