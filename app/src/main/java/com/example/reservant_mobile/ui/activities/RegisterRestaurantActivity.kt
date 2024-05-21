@@ -57,7 +57,6 @@ import com.example.reservant_mobile.ui.constants.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalLayoutApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
