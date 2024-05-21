@@ -86,6 +86,7 @@
     <string name="label_step_files">Pliki</string>
     <string name="label_step_description">Opis</string>
     <string name="label_menu_management">Zarządzanie menu</string>
+    <string name="label_choose_tags">Wybierz tagi</string>
     <string name="label_become_restaurant_owner">Zostań właścicielem restauracji</string>
     <string name="label_edit_menu">Edytuj menu</string>
     <string name="label_alternate_name">Przetłumaczona nazwa</string>

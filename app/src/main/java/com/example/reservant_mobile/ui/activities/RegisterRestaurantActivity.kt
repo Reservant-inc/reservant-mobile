@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,6 +37,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
@@ -45,7 +45,8 @@ import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ProgressBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.components.TagsSelection
+import com.example.reservant_mobile.ui.components.TagList
+import com.example.reservant_mobile.ui.components.TagSelectionScreen
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
@@ -63,8 +64,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
     var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
 
+    var showTagDialog by remember { mutableStateOf(false) }
+
     registerRestaurantViewModel.viewModelScope.launch {
         registerRestaurantViewModel.getGroups()
+        registerRestaurantViewModel.getTags()
     }
 
     NavHost(
@@ -310,27 +314,19 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (groups != null) {
-                    if(groups.size > 1){
-                        OutLinedDropdownMenu(
-                            selectedOption = selectedGroup?.name ?:  stringResource(R.string.label_management_choose_group),
-                            itemsList = groups.map { it.name },
-                            onOptionSelected = { name ->
-                                registerRestaurantViewModel.viewModelScope.launch {
-                                    registerRestaurantViewModel.selectedGroup = groups.find { it.name == name }
-                                }
-                            },
-                            label = stringResource(R.string.label_add_to_group)
-                        )
-                    }else if(groups.size == 1){
-                        registerRestaurantViewModel.selectedGroup = groups[0]
-                        selectedGroup = groups[0]
-                        Text(
-                            text = stringResource(R.string.label_group)+": "+selectedGroup!!.name,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(start = 4.dp, bottom = 16.dp)
-                        )
-                    }
+                    val newGroups = groups + RestaurantGroupDTO(name = registerRestaurantViewModel.name.value)
+                    OutLinedDropdownMenu(
+                        selectedOption = selectedGroup?.name
+                            ?: stringResource(R.string.label_management_choose_group),
+                        itemsList = newGroups.map { it.name },
+                        onOptionSelected = { name ->
+                            registerRestaurantViewModel.viewModelScope.launch {
+                                registerRestaurantViewModel.selectedGroup =
+                                    newGroups.find { it.name == name }
+                            }
+                        },
+                        label = stringResource(R.string.label_add_to_group)
+                    )
                 }
 
                 Spacer(Modifier.height(8.dp))
@@ -363,6 +359,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             // TODO: tags
             val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
 
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -378,17 +375,23 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 ProgressBar(currentStep = 3)
 
-                TagsSelection(
-                    tags = tags,
-                    selectedTags = registerRestaurantViewModel.selectedTags,
-                    onTagSelected = { tag, isSelected ->
-                        if (isSelected) {
-                            registerRestaurantViewModel.selectedTags.add(tag)
-                        } else {
-                            registerRestaurantViewModel.selectedTags.remove(tag)
+                TagList(tags = registerRestaurantViewModel.selectedTags)
+                
+                ButtonComponent(onClick = { showTagDialog = true }, label = stringResource(id = R.string.label_choose_tags))
+
+                if (showTagDialog) {
+                    TagSelectionScreen(
+                        vm = registerRestaurantViewModel,
+                        onDismiss = { showTagDialog = false },
+                        onTagSelected = { tag, isSelected ->
+                            if (isSelected) {
+                                registerRestaurantViewModel.selectedTags.add(tag)
+                            } else {
+                                registerRestaurantViewModel.selectedTags.remove(tag)
+                            }
                         }
-                    }
-                )
+                    )
+                }
 
                 Row(
                     modifier = Modifier

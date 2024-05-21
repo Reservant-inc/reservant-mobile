@@ -43,6 +43,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     val logo: FormField = FormField(RestaurantDTO::logo.name)
 
     // Tagowanie i inne
+    var tags = listOf(String())
     var selectedTags = mutableStateListOf<String>()
     var delivery by mutableStateOf(false)
 
@@ -118,6 +119,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         groups = restaurantService.getGroups().value
     }
 
+    suspend fun getTags(){
+        //Przypisujemy pustą listę listOf(), jeśli getRestaurantTags() jest null
+        tags = restaurantService.getRestaurantTags().value ?: listOf()
+    }
+
     suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
         val fDto = file?.let { FileUploadService().sendFile(type, it).value }
@@ -143,8 +149,8 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isBusinessPermissionInvalid(context) ||
                 isIdCardInvalid(context) ||
                 isLogoInvalid(context) ||
-                isRestaurantTypeInvalid()// ||
-//                areTagsInvalid()
+                isRestaurantTypeInvalid() ||
+                areTagsInvalid()
     }
 
     fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
@@ -247,6 +253,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
+
 
     private fun <T> getFieldError(result: Result<T>, name: String): Int {
         if (!result.isError) {

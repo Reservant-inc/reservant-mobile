@@ -14,8 +14,11 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -107,6 +111,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -127,6 +132,7 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
+import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -1793,6 +1799,46 @@ fun SecondaryButton(
 }
 
 @Composable
+fun DeletePopup(
+    icon: ImageVector,
+    title: String,
+    text: String,
+    confirmText:String = "Confirm",
+    dismissText: String = "Cancel",
+    onDismissRequest: () -> Unit = {},
+    onConfirm: () -> Unit,
+    enabled: Boolean = true,
+    deleteButtonContent: @Composable (RowScope.() -> Unit) = {Text(confirmText, color = MaterialTheme.colorScheme.error)}
+){
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Text(text = text)
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            OutlinedButton(
+                onClick = onConfirm,
+                enabled = enabled,
+                content = deleteButtonContent
+            )
+        },
+        dismissButton = {
+            FilledTonalButton(
+                onClick = onDismissRequest
+            ) {
+                Text(dismissText)
+            }
+        }
+    )
+}
+
+@Composable
 fun CountDownPopup(
     countDownTimer: Int = 5,
     icon: ImageVector,
@@ -1819,10 +1865,8 @@ fun CountDownPopup(
             allowConfirm = timer == 0
         }
     }
-
-
-
-    AlertDialog(
+    
+    /*AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
         },
@@ -1856,18 +1900,41 @@ fun CountDownPopup(
                 Text(dismissText)
             }
         }
-    )
+    )*/
+    
+    DeletePopup(
+        icon = icon,
+        title = title,
+        text = text,
+        dismissText = dismissText,
+        onDismissRequest = onDismissRequest,
+        onConfirm = {
+            if (allowConfirm) onConfirm()
+        },
+        enabled = allowConfirm
+    ){
+        if (allowConfirm) {
+            Text(confirmText, color = MaterialTheme.colorScheme.error)
+        } else {
+            Text(timer.toString())
+        }
+    }
 }
 
 @Composable
-fun MyFloatingActionButton(onClick: () -> Unit) {
+fun MyFloatingActionButton(
+    onClick: () -> Unit,
+    allPadding: Dp = 16.dp,
+    topPadding: Dp = 16.dp,
+    bottomPadding: Dp = 16.dp,
+    startPadding: Dp = 16.dp,
+    endPadding: Dp = 16.dp,
+) {
     FloatingActionButton(
         onClick = onClick,
         modifier = Modifier
-            .padding(16.dp)
-            .padding(bottom = 56.dp)
-            .padding(end = 16.dp)
-            .padding(bottom = 16.dp),
+            .padding(allPadding)
+            .padding(top = topPadding, bottom = bottomPadding, start = startPadding, end = endPadding),
         content = {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -1908,6 +1975,78 @@ fun ProgressBar(currentStep: Int) {
             )
         }
     }
+}
+
+@Composable
+fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+    val selectedTags = vm.selectedTags
+    val tags = vm.tags
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Wybierz tagi") },
+        text = {
+            LazyColumn {
+                items(tags) { tag ->
+                    val isChecked = selectedTags.contains(tag)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isSelected ->
+                                onTagSelected(tag, isSelected)
+                            }
+                        )
+                        Text(
+                            text = tag,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .clickable { onTagSelected(tag, !isChecked) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TagList(tags: List<String>) {
+    FlowRow(
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        tags.forEach { tag ->
+            TagItem(tag = tag)
+        }
+    }
+}
+
+@Composable
+fun TagItem(tag: String) {
+    Text(
+        text = tag,
+        color = MaterialTheme.colorScheme.onPrimary,
+        fontSize = 12.sp,
+        modifier = Modifier
+            .padding(4.dp)
+            .background(
+                MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(50)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    )
 }
 
 @Composable

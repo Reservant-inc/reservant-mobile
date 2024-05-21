@@ -24,6 +24,7 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.components.MyFloatingActionButton
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 import kotlinx.coroutines.launch
@@ -80,6 +81,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                         RestaurantManagementRoutes.MenuItem(menuId = menu.id)
                                     )
                                 }
+
                             }
                         )
                     }
@@ -100,11 +102,16 @@ fun MenuManagementActivity(restaurantId: Int) {
                             viewmodel.viewModelScope.launch {
                                 viewmodel.addMenu()
                                 viewmodel.clearFields()
+
                             }
                         }
                     )
                 }
+                Box(modifier = Modifier.align(Alignment.BottomEnd)){
+                    MyFloatingActionButton(onClick = { }, allPadding = 0.dp)
+                }
             }
+
         }
 
         composable<RestaurantManagementRoutes.MenuItem> {
