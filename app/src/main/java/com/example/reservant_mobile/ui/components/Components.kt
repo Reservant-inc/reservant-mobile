@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -27,6 +28,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -71,6 +74,8 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
@@ -85,6 +90,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
@@ -1730,6 +1736,58 @@ fun ProgressBar(currentStep: Int) {
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.outlineVariant)
             )
+        }
+    }
+}
+
+@Composable
+fun TabRowSwitch(
+    pages: Map<Int, Pair<String, @Composable () -> Unit>>
+) {
+    val pagerState = rememberPagerState(
+        pageCount = {pages.size}
+    )
+    val coroutineScope = rememberCoroutineScope()
+    val cornerShape = RoundedCornerShape(50)
+
+    Column {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier
+                .padding(30.dp)
+                .clip(cornerShape),
+            indicator = {},
+            divider = {}
+        ) {
+            pages.forEach{ (index, tabItem) ->
+                val selected = pagerState.currentPage == index
+                Tab(
+                    modifier =
+                    if (selected) Modifier
+                        .clip(cornerShape)
+                        .border(width = 2.dp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .background(Color.White)
+
+                    else Modifier
+                        .clip(cornerShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+
+                    selected = selected,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    text = { Text(text = tabItem.first) }
+                )
+            }
+        }
+        HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = true
+        ) {page ->
+            pages[page]?.second?.invoke()
         }
     }
 }
