@@ -137,6 +137,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
@@ -1168,31 +1169,28 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Profile
     )
 
+    var selectedItem by remember { mutableStateOf(items.first()) }
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
-        for (i in items) {
+        items.forEach { item ->
             NavigationBarItem(
-                /*label = {
-                    Text(text = screen.title)
-                },*/
-
-                icon = {
-                    Icon(
-                        i.icon,
-                        contentDescription = i.route.toString(),
-                    )
-                },
-
-                selected = true,
+                icon = { Icon(item.icon, contentDescription = item.route.toString()) },
+                label = { Text(stringResource(id = item.label)) },
+                selected = selectedItem == item,
                 alwaysShowLabel = true,
-                onClick = { i.route?.let {
-                    navController.navigate(it)
-                } },
+                onClick = {
+                    if (selectedItem != item) {
+                        navController.navigate(item.route)
+                        selectedItem = item
+                    }
+                }
             )
         }
     }
 }
+
 
 
 @Composable
