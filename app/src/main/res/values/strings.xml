@@ -89,6 +89,10 @@
     <string name="label_step_files">Files</string>
     <string name="label_step_description">Description</string>
     <string name="label_menu_management">Menu management</string>
+    <string name="label_home">Home</string>
+    <string name="label_TODO" translatable="false">TODO</string>
+    <string name="label_management">Management</string>
+    <string name="label_settings">Settings</string>
     <string name="label_choose_tags">Choose tags</string>
     <string name="label_become_restaurant_owner">Become a restaurant owner</string>
     <string name="label_edit_menu">Edit menu</string>
