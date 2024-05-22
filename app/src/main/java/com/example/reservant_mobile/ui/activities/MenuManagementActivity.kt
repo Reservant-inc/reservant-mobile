@@ -89,7 +89,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(8.dp)
+                        //.padding(8.dp)
                 ){
                     AddMenuButton(
                         name = viewmodel.name,
@@ -101,14 +101,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                         addMenu = {
                             viewmodel.viewModelScope.launch {
                                 viewmodel.addMenu()
-                                viewmodel.clearFields()
-
                             }
                         }
                     )
-                }
-                Box(modifier = Modifier.align(Alignment.BottomEnd)){
-                    MyFloatingActionButton(onClick = { }, allPadding = 0.dp)
                 }
             }
 
