@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
-import com.example.reservant_mobile.ui.components.TabRowSwitch
+import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
@@ -44,8 +44,8 @@ fun HomeActivity() {
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
                 composable<MainRoutes.Home>{
-                    val map: Map<Int, Pair<String, @Composable () -> Unit>> = mapOf(
-                        0 to ( "Test 1" to {
+                    val map: List< Pair<String, @Composable () -> Unit>> = listOf(
+                         "Test 1" to {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,8 +53,8 @@ fun HomeActivity() {
                             ){
                                 Text(text="Page 1")
                             }
-                        }),
-                        1 to ( "Test 2" to {
+                        },
+                         "Test 2" to {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,11 +62,11 @@ fun HomeActivity() {
                             ){
                                 Text(text="Page 2")
                             }
-                        })
+                        }
                     )
 
                     //tab layout
-                    TabRowSwitch(map)
+                    FloatingTabSwitch(map)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()

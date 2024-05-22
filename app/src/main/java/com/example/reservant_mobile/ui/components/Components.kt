@@ -5,6 +5,10 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +41,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -96,6 +101,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -134,6 +140,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -2359,8 +2366,8 @@ fun TagItem(tag: String) {
 }
 
 @Composable
-fun TabRowSwitch(
-    pages: Map<Int, Pair<String, @Composable () -> Unit>>
+fun FloatingTabSwitch(
+    pages: List<Pair<String, @Composable () -> Unit>>
 ) {
     val pagerState = rememberPagerState(
         pageCount = {pages.size}
@@ -2368,40 +2375,38 @@ fun TabRowSwitch(
     val coroutineScope = rememberCoroutineScope()
     val cornerShape = RoundedCornerShape(50)
 
+
+    val indicator = @Composable { tabPositions: List<TabPosition> ->
+        CustomIndicator(tabPositions, pagerState)
+    }
+
     Column {
         TabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier
-                .padding(30.dp)
+                .padding(20.dp)
                 .clip(cornerShape),
-            indicator = {},
+            indicator = indicator,
             divider = {}
         ) {
-            pages.forEach{ (index, tabItem) ->
+            pages.forEachIndexed{ index, tabItem ->
                 val selected = pagerState.currentPage == index
                 Tab(
-                    modifier =
-                    if (selected) Modifier
-                        .clip(cornerShape)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
-                        )
-                        .background(MaterialTheme.colorScheme.background)
-
-                    else Modifier
-                        .clip(cornerShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-
+                    modifier = Modifier.zIndex(6f),
+                text = {
+                    if (pagerState.currentPage == index) {
+                        Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
+                    } else {
+                        Text(text = tabItem.first)
+                    }
+                },
                     selected = selected,
                     onClick = {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    text = { Text(text = tabItem.first) }
                 )
             }
         }
@@ -2409,7 +2414,45 @@ fun TabRowSwitch(
             state = pagerState,
             userScrollEnabled = true
         ) {page ->
-            pages[page]?.second?.invoke()
+            pages[page].second.invoke()
         }
     }
+}
+
+@Composable
+private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
+    val transition = updateTransition(pagerState.currentPage, label = "")
+    val indicatorStart by transition.animateDp(
+        transitionSpec = {
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 400f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 1000f)
+            }
+        }, label = ""
+    ) {
+        tabPositions[it].left
+    }
+
+    val indicatorEnd by transition.animateDp(
+        transitionSpec = {
+            if (initialState < targetState) {
+                spring(dampingRatio = 1f, stiffness = 1000f)
+            } else {
+                spring(dampingRatio = 1f, stiffness = 400f)
+            }
+        }, label = ""
+    ) {
+        tabPositions[it].right
+    }
+
+    Box(
+        Modifier
+            .offset(x = indicatorStart)
+            .wrapContentSize(align = Alignment.BottomStart)
+            .width(indicatorEnd - indicatorStart)
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+            .zIndex(1f)
+    )
 }
