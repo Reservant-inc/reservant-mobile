@@ -2391,7 +2391,7 @@ fun TabRowSwitch(
                             color = MaterialTheme.colorScheme.primary,
                             shape = CircleShape
                         )
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.background)
 
                     else Modifier
                         .clip(cornerShape)
