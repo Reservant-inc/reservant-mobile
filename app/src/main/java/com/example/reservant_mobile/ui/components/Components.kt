@@ -1159,6 +1159,7 @@ fun EmployeeCard(
 
 @Composable
 fun BottomNavigation(navController: NavHostController) {
+
     val items = listOfNotNull(
         BottomNavItem.Home,
         BottomNavItem.Landing,
@@ -1166,8 +1167,7 @@ fun BottomNavigation(navController: NavHostController) {
         BottomNavItem.Profile
     )
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    var selectedItem by remember { mutableStateOf(items.first()) }
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -1176,14 +1176,12 @@ fun BottomNavigation(navController: NavHostController) {
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                 label = { Text(stringResource(id = item.label)) },
-                selected = item.route::class.qualifiedName == currentRoute,
+                selected = selectedItem == item,
                 alwaysShowLabel = true,
                 onClick = {
-                    if (item.route::class.qualifiedName != currentRoute) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId)
-                            launchSingleTop = true
-                        }
+                    if (selectedItem != item) {
+                        navController.navigate(item.route)
+                        selectedItem = item
                     }
                 }
             )
@@ -2228,8 +2226,10 @@ fun FullscreenGallery(onDismiss: () -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.8f),
-                shape = RoundedCornerShape(16.dp))
+                    .background(
+                        Color.Black.copy(alpha = 0.8f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
                     .padding(4.dp)
             ) {
                 Row(
