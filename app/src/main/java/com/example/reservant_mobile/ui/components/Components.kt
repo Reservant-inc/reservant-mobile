@@ -2380,7 +2380,15 @@ fun FloatingTabSwitch(
         CustomIndicator(tabPositions, pagerState)
     }
 
-    Column {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = true
+        ) {page ->
+            pages[page].second.invoke()
+        }
         TabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -2409,12 +2417,6 @@ fun FloatingTabSwitch(
                     },
                 )
             }
-        }
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = true
-        ) {page ->
-            pages[page].second.invoke()
         }
     }
 }
@@ -2453,6 +2455,6 @@ private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerSt
             .width(indicatorEnd - indicatorStart)
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
-            .zIndex(1f)
+            .zIndex(5f)
     )
 }
