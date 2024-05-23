@@ -2395,7 +2395,7 @@ fun FloatingTabSwitch(
                 Tab(
                     modifier = Modifier.zIndex(6f),
                 text = {
-                    if (pagerState.currentPage == index) {
+                    if (selected) {
                         Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
                     } else {
                         Text(text = tabItem.first)
