@@ -1,6 +1,10 @@
 package com.example.reservant_mobile.ui.components
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.LOCATION_SERVICE
+import android.graphics.drawable.BitmapDrawable
+import android.location.Location
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -108,6 +112,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -139,8 +144,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -162,6 +173,8 @@ import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -2457,4 +2470,51 @@ private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerSt
             .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
             .zIndex(5f)
     )
+}
+
+@Composable
+fun rememberMapViewWithLifecycle(mapView: MapView): MapView {
+    // Makes MapView follow the lifecycle of this composable
+    val lifecycleObserver = rememberMapLifecycleObserver(mapView)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        lifecycle.addObserver(lifecycleObserver)
+        onDispose {
+            lifecycle.removeObserver(lifecycleObserver)
+        }
+    }
+
+    return mapView
+}
+
+@Composable
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
+    remember(mapView) {
+        LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                else -> {}
+            }
+        }
+    }
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+fun MainMapView(
+    mapView: MapView,
+    startPoint: GeoPoint
+) {
+
+    val geoPoint by mutableStateOf(startPoint)
+    val mapViewState = rememberMapViewWithLifecycle(mapView)
+
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { mapViewState },
+        update = {
+            view -> view.controller.setCenter(geoPoint)
+        }
+    )
+
 }
