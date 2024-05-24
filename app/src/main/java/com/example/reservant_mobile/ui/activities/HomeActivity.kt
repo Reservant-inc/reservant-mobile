@@ -60,6 +60,49 @@ fun HomeActivity() {
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
                 composable<MainRoutes.Home>{
+                    
+
+                    val startPoint = GeoPoint(52.237049, 21.017532)
+                    // Init map
+                    val mv = MapView(LocalContext.current).apply {
+
+                        val customTiles = object : XYTileSource(
+                            "Thunderforest",
+                            1,
+                            20,
+                            256,
+                            ".png",
+                            arrayOf("https://tile.thunderforest.com/spinal-map/")
+                        ) {
+                            override fun getTileURLString(pMapTileIndex: Long): String {
+                                return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
+                                        MapTileIndex.getX(pMapTileIndex) + "/" +
+                                        MapTileIndex.getY(pMapTileIndex) + ".png?apikey=[API_KEY]"
+                            }
+                        }
+                        setTileSource(customTiles)
+                        setMultiTouchControls(true)
+                        // Enable rotation
+                        val rotationGestureOverlay = RotationGestureOverlay(this)
+                        rotationGestureOverlay.isEnabled
+                        overlays.add(rotationGestureOverlay)
+
+                        minZoomLevel = 3.0
+                        maxZoomLevel = 20.0
+                        controller.setZoom(15.0)
+                        controller.setCenter(startPoint)
+
+                        val startMarker = Marker(this)
+                        startMarker.position = startPoint
+                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        val bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
+                        startMarker.icon = BitmapDrawable(context.resources, bitmap)
+                        startMarker.title = "You are here"
+                        overlays.add(startMarker)
+
+                    }
+
+                            
                     val map: List< Pair<String, @Composable () -> Unit>> = listOf(
                          "Test 1" to {
                             Column(
