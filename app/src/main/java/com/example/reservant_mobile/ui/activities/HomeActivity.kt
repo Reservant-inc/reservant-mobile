@@ -27,7 +27,6 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.MainMapView
-import com.example.reservant_mobile.ui.components.TabRowSwitch
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
@@ -104,14 +103,8 @@ fun HomeActivity() {
 
                     val map: List< Pair<String, @Composable () -> Unit>> = listOf(
                          "Test 1" to {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ){
-                                Text(text="Page 1")
-                            }
-                        },
+                             MainMapView(mv, startPoint)
+                         },
                         "Test 2" to {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
@@ -122,49 +115,6 @@ fun HomeActivity() {
                             }
                         })
 
-                    val startPoint = GeoPoint(52.237049, 21.017532)
-                    // Init map
-                    val mv = MapView(LocalContext.current).apply {
-
-                        val customTiles = object : XYTileSource(
-                            "Thunderforest",
-                            1,
-                            20,
-                            256,
-                            ".png",
-                            arrayOf("https://tile.thunderforest.com/spinal-map/")
-                        ) {
-                            override fun getTileURLString(pMapTileIndex: Long): String {
-                                return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
-                                        MapTileIndex.getX(pMapTileIndex) + "/" +
-                                        MapTileIndex.getY(pMapTileIndex) + ".png?apikey=[API_KEY]"
-                            }
-                        }
-                        setTileSource(customTiles)
-                        setMultiTouchControls(true)
-                        // Enable rotation
-                        val rotationGestureOverlay = RotationGestureOverlay(this)
-                        rotationGestureOverlay.isEnabled
-                        overlays.add(rotationGestureOverlay)
-
-                        minZoomLevel = 3.0
-                        maxZoomLevel = 20.0
-                        controller.setZoom(15.0)
-                        controller.setCenter(startPoint)
-
-                        val startMarker = Marker(this)
-                        startMarker.position = startPoint
-                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        val bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
-                        startMarker.icon = BitmapDrawable(context.resources, bitmap)
-                        startMarker.title = "You are here"
-                        overlays.add(startMarker)
-
-                    }
-
-
-
-                    MainMapView(mv, startPoint)
 
                     //tab layout
                     FloatingTabSwitch(map)
