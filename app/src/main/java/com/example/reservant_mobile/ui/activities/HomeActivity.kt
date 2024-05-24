@@ -65,21 +65,7 @@ fun HomeActivity() {
                     // Init map
                     val mv = MapView(LocalContext.current).apply {
 
-                        val customTiles = object : XYTileSource(
-                            "Thunderforest",
-                            1,
-                            20,
-                            256,
-                            ".png",
-                            arrayOf("https://tile.thunderforest.com/spinal-map/")
-                        ) {
-                            override fun getTileURLString(pMapTileIndex: Long): String {
-                                return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
-                                        MapTileIndex.getX(pMapTileIndex) + "/" +
-                                        MapTileIndex.getY(pMapTileIndex) + ".png?apikey=[API_KEY]"
-                            }
-                        }
-                        setTileSource(customTiles)
+                        setTileSource(TileSourceFactory.OpenTopo)
                         setMultiTouchControls(true)
                         // Enable rotation
                         val rotationGestureOverlay = RotationGestureOverlay(this)
@@ -94,6 +80,7 @@ fun HomeActivity() {
                         val startMarker = Marker(this)
                         startMarker.position = startPoint
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        //Fixme: proper mark icons
                         val bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
                         startMarker.icon = BitmapDrawable(context.resources, bitmap)
                         startMarker.title = "You are here"
