@@ -63,7 +63,8 @@ fun HomeActivity() {
 
                     val startPoint = GeoPoint(52.237049, 21.017532)
                     // Init map
-                    val mv = MapView(LocalContext.current).apply {
+                    val context = LocalContext.current
+                    val mv = MapView(context).apply {
 
                         setTileSource(TileSourceFactory.OpenTopo)
                         setMultiTouchControls(true)
@@ -74,37 +75,32 @@ fun HomeActivity() {
 
                         minZoomLevel = 3.0
                         maxZoomLevel = 20.0
-                        controller.setZoom(15.0)
+                        controller.setZoom(17.0)
                         controller.setCenter(startPoint)
 
+                        // START POINT MARKER
                         val startMarker = Marker(this)
                         startMarker.position = startPoint
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         //Fixme: proper mark icons
-                        val bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
+                        var bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
                         startMarker.icon = BitmapDrawable(context.resources, bitmap)
                         startMarker.title = "You are here"
                         overlays.add(startMarker)
-
                     }
 
-                    val map: List< Pair<String, @Composable () -> Unit>> = listOf(
-                         "Test 1" to {
-                             MainMapView(mv, startPoint)
-                         },
-                        "Test 2" to {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ){
-                                Text(text="Page 1")
-                            }
-                        })
+                    // EXAMPLE RESTAURANT MARKER
+                    //Fixme: wrap me in function
+                    val restaurantMarker = Marker(mv)
+                    restaurantMarker.position = GeoPoint(52.240055, 21.017532)
+                    restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    //Fixme: proper mark icons
+                    val bitmap =  context.getDrawable( R.drawable.pizza)?.toBitmap(65, 65)
+                    restaurantMarker.icon = BitmapDrawable(context.resources, bitmap)
+                    restaurantMarker.title = "Restaurant is here"
+                    mv.overlays.add(restaurantMarker)
 
-
-                    //tab layout
-                    FloatingTabSwitch(map)
+                 MainMapView(mv, startPoint)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
