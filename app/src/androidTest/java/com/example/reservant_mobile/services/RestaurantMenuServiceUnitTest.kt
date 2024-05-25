@@ -32,7 +32,8 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
             restaurantId = 1,
             price = 100.0,
             name = "Burger",
-            alcoholPercentage = 99.9
+            alcoholPercentage = 99.9,
+            photo = ""
         )
     }
 
@@ -40,7 +41,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
     fun add_and_delete_restaurant_menu()= runTest{
         val m = ser.addMenu(menu).value
         assertThat(m).isNotNull()
-        assertThat(ser.deleteMenu(m!!.id!!).value).isTrue()
+        assertThat(ser.deleteMenu(m!!.menuId!!).value).isTrue()
     }
 
     @Test
@@ -50,13 +51,13 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_menu_return_not_null()= runTest{
-        val id = ser.getMenus(1).value!!.first().id!!
+        val id = ser.getMenus(1).value!!.first().menuId!!
         assertThat(ser.getMenu(id).value).isNotNull()
     }
 
     @Test
     fun edit_menu_return_not_null()= runTest{
-        val id = ser.getMenus(1).value!!.last().id!!
+        val id = ser.getMenus(1).value!!.last().menuId!!
         assertThat(ser.editMenu(id, menu).value).isNotNull()
     }
 
@@ -67,7 +68,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_menu_item_return_not_null()= runTest{
-        val id = ser.getMenuItems(1).value!!.first().id!!
+        val id = ser.getMenuItems(1).value!!.first().menuItemId!!
         assertThat(ser.getMenuItem(id).value).isNotNull()
     }
 
@@ -75,19 +76,19 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
     fun create_and_delete_menu_item()= runTest{
         val i = ser.createMenuItems(listOf(menuItem)).value
         assertThat(i).isNotNull()
-        assertThat(ser.deleteMenuItem(i!!.first().id!!).value).isTrue()
+        assertThat(ser.deleteMenuItem(i!!.first().menuItemId!!).value).isTrue()
     }
 
     @Test
     fun edit_menu_item_return_not_null()= runTest{
-        val id = ser.getMenuItems(1).value!!.last().id!!
+        val id = ser.getMenuItems(1).value!!.last().menuItemId!!
         assertThat(ser.editMenuItem(id, menuItem).value).isNotNull()
     }
 
     @Test
     fun add_items_to_menu_return_not_null()= runTest{
-        val menuId = ser.getMenus(1).value!!.last().id!!
-        val itemId = ser.getMenuItems(1).value!!.last().id!!
+        val menuId = ser.getMenus(1).value!!.last().menuId!!
+        val itemId = ser.getMenuItems(1).value!!.last().menuItemId!!
         assertThat(ser.addItemsToMenu(menuId, listOf(itemId)).value).isNotNull()
     }
 

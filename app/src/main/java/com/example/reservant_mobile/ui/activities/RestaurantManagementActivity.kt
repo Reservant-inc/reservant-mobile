@@ -45,9 +45,6 @@ fun RestaurantManagementActivity() {
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
 
-    restaurantManageVM.viewModelScope.launch {
-        restaurantManageVM.initialize()
-    }
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant){
         composable<RestaurantManagementRoutes.Restaurant>{
@@ -76,7 +73,7 @@ fun RestaurantManagementActivity() {
                                 selectedGroup = groups.find { it.name == name }
                                 restaurantManageVM.viewModelScope.launch {
                                     selectedGroup = selectedGroup?.let { group ->
-                                        group.id?.let { it1 ->
+                                        group.restaurantGroupId?.let { it1 ->
                                             restaurantManageVM.getGroup(
                                                 it1
                                             )
@@ -89,7 +86,7 @@ fun RestaurantManagementActivity() {
                         // Displaying single group
                     }else if(groups.size == 1){
                         restaurantManageVM.viewModelScope.launch {
-                            selectedGroup = groups[0].id?.let { it1 ->
+                            selectedGroup = groups[0].restaurantGroupId?.let { it1 ->
                                 restaurantManageVM.getGroup(
                                     it1
                                 )
@@ -107,10 +104,10 @@ fun RestaurantManagementActivity() {
                         restaurant = restaurant,
                         onEditClick = { /*TODO*/ },
                         onManageEmployeeClick = { navController.navigate(
-                            RestaurantManagementRoutes.Employee(restaurantId = restaurant.id)
+                            RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
                         ) },
                         onManageMenuClick = { navController.navigate(
-                            RestaurantManagementRoutes.Menu(restaurantId = restaurant.id)
+                            RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
                         ) },
                         onManageSubscriptionClick = { /*TODO*/ },
                         onDeleteClick = {

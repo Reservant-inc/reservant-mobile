@@ -22,6 +22,7 @@ interface IUserService{
 class UserService(private var api: APIService = APIService()) : IUserService {
     private val localBearer = LocalBearerService()
     object User {
+        lateinit var userId: String
         lateinit var login: String
         lateinit var firstName: String
         lateinit var lastName: String
@@ -29,6 +30,7 @@ class UserService(private var api: APIService = APIService()) : IUserService {
     }
     
     private suspend fun wrapUser(u:UserDTO){
+        u.userId?.let { User.userId = it }
         User.login = u.login
         User.firstName = u.login
         User.lastName = u.login

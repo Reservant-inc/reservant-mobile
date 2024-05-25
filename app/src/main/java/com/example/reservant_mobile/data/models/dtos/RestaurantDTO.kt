@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RestaurantDTO (
-    val id: Int = Int.MIN_VALUE,
+    val restaurantId: Int = Int.MIN_VALUE,
     val name: String,
     val restaurantType: String = "Restaurant",
     val nip: String = "",

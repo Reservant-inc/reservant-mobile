@@ -24,7 +24,6 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
-import com.example.reservant_mobile.ui.components.MyFloatingActionButton
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 import kotlinx.coroutines.launch
@@ -71,14 +70,14 @@ fun MenuManagementActivity(restaurantId: Int) {
                             },
                             onDeleteClick = {
                                 viewmodel.viewModelScope.launch {
-                                    menu.id?.let { id -> viewmodel.deleteMenu(id) }
+                                    menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
                                 }
                             },
                             clearFields = viewmodel::clearFields,
                             onClick = {
-                                if (menu.id != null) {
+                                if (menu.menuId != null) {
                                     navController.navigate(
-                                        RestaurantManagementRoutes.MenuItem(menuId = menu.id)
+                                        RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
                                     )
                                 }
 
