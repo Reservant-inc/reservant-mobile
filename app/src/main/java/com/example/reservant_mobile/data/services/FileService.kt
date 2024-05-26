@@ -1,7 +1,9 @@
 package com.example.reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.endpoints.File
 import com.example.reservant_mobile.data.endpoints.Uploads
+import com.example.reservant_mobile.data.endpoints.getFileName
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import io.ktor.client.call.body
@@ -10,6 +12,8 @@ import io.ktor.client.request.forms.formData
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.encodeURLPath
+import io.ktor.http.encodeURLPathPart
 
 
 enum class DataType(val dType: String) {
@@ -17,7 +21,7 @@ enum class DataType(val dType: String) {
     JPG("image/jpeg"),
     PNG("image/png")
 }
-class FileUploadService(private var api: APIService = APIService()) {
+class FileService(private var api: APIService = APIService()) {
 
      suspend fun sendFile(contentType: DataType, f: ByteArray): Result<FileUploadDTO?> {
         val content = MultiPartFormDataContent(
@@ -43,6 +47,24 @@ class FileUploadService(private var api: APIService = APIService()) {
         }
 
          return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    suspend fun getFile(filePath: String): Result<ByteArray?>{
+        val res = api.get(File("/uploads/test-jd.png".getFileName()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(isError = true, errors = mapOf(Pair("TOAST", R.string.error_unknown)), value = null)
     }
 
 }
