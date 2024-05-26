@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,11 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.components.FloatingActionMenu
+
+import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
-import com.example.reservant_mobile.ui.components.MenuCategoryButton
 import com.example.reservant_mobile.ui.components.MenuItemCard
-import com.example.reservant_mobile.ui.components.MenuTypeButton
 import com.example.reservant_mobile.ui.components.RatingBar
 
 
@@ -77,17 +75,17 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             RatingBar(rating = 3.9f)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("3.9 (200+ opinii)") // TODO: reformat w/ resources
+            Text("3.9 (200+ opinii)")
         }
 
         Text(
-            text = "Restauracja / Bar", // TODO: Restaurant type headline
+            text = "Restauracja / Bar",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         Text(
-            text =  stringResource(R.string.label_restaurant_address) + ": ul. Marszałkowska 2, 00-000",
+            text = stringResource(R.string.label_restaurant_address) + ": ul. Marszałkowska 2, 00-000",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -127,7 +125,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             Card(
                 modifier = Modifier
                     .size(100.dp)
-                    .clickable { showGallery = true }, // Kliknięcie otwiera galerię
+                    .clickable { showGallery = true },
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
@@ -153,24 +151,27 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             }
         }
 
-        Text(
-            text = stringResource(R.string.label_menu),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
+        FloatingTabSwitch(
+            pages = listOf(
+                "Menu" to { MenuContent() },
+                "Wydarzenia" to { EventsContent() }
+            )
         )
+    }
 
-        LazyRow(modifier = Modifier.padding(horizontal = 16.dp)) {
-            items(3) { index ->
-                MenuTypeButton(
-                    modifier = Modifier.scale(1.1f),
-                    menuType = "typ menu",
-                    onClick = { /* TODO: Handle click */ }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-        }
+    if (showGallery) {
+        FullscreenGallery(onDismiss = { showGallery = false })
+    }
+}
 
-
+@Composable
+fun MenuContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(64.dp))
         repeat(2) { index ->
             MenuItemCard(
                 name = "Nazwa pozycji ${index + 1}",
@@ -181,23 +182,23 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
                 onAddClick = { /* TODO: Handle add */ }
             )
         }
-        Spacer(modifier = Modifier.height(80.dp))
     }
+}
 
-    if (showGallery) {
-        FullscreenGallery(onDismiss = { showGallery = false })
+@Composable
+fun EventsContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(64.dp))
+        Text("Wydarzenie 1", style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Szczegóły wydarzenia 1")
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Wydarzenie 2", style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Szczegóły wydarzenia 2")
     }
-
-    //
-    //    FloatingActionMenu(
-    //        onDineInClick = { // Na miejscu
-    //            delivery = "Dine in"
-    //        },
-    //        onDeliveryClick = {
-    //            delivery = "Delivery"
-    //        },
-    //        onTakeawayClick = {
-    //            delivery = "Delivery"
-    //        }
-    //    )
 }
