@@ -60,13 +60,13 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
         }
 
         Text(
-            text = "Koszt dostawy 5,99 zł",
+            text = "Restauracja / Bar",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         Text(
-            text = "Restauracja / Bar\nAdres: ul. Marszałkowska 2, 00-000",
+            text = "Adres: ul. Marszałkowska 2, 00-000\nKoszt dostawy 5,99 zł",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
