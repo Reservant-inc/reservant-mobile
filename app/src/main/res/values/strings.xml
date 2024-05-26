@@ -101,4 +101,6 @@
     <string name="label_date_from">Date from</string>
     <string name="label_date_to">Date to</string>
     <string name="label_add_menu">Add menu</string>
+    <string name="delete_restaurant_title">Delete a restaurant</string>
+    <string name="delete_restaurant_message">Are you sure you want to delete</string>
 </resources>
