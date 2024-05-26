@@ -99,4 +99,5 @@
     <string name="label_add_menu">Dodaj menu</string>
     <string name="label_gallery">Galeria</string>
     <string name="label_more">Więcej</string>
+    <string name="label_delivery_cost">Koszt dostawy</string>
 </resources>
