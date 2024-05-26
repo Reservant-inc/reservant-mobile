@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
@@ -71,7 +72,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
         )
 
         Text(
-            text = "Galeria",
+            text = stringResource(R.string.label_gallery),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
@@ -116,7 +117,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
                         alpha = 0.35f
                     )
                     Text(
-                        text = "Więcej",
+                        text = stringResource(R.string.label_more),
                         color = Color.White,
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.align(Alignment.Center)
@@ -126,7 +127,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
         }
 
         Text(
-            text = "Menu",
+            text = stringResource(R.string.label_menu),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
