@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +28,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.RestaurantInfoView
@@ -44,10 +47,11 @@ fun RestaurantManagementActivity() {
 
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
+    var showDeletePopup by remember { mutableStateOf(false) }
+    var restaurantToDelete by remember { mutableStateOf<RestaurantDTO?>(null) }
 
-
-    NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant){
-        composable<RestaurantManagementRoutes.Restaurant>{
+    NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
+        composable<RestaurantManagementRoutes.Restaurant> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -63,8 +67,7 @@ fun RestaurantManagementActivity() {
                 )
 
                 if (groups != null) {
-                    // Displaying multiple groups
-                    if(groups.size > 1){
+                    if (groups.size > 1) {
                         OutLinedDropdownMenu(
                             label = stringResource(R.string.label_group),
                             selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
@@ -74,25 +77,20 @@ fun RestaurantManagementActivity() {
                                 restaurantManageVM.viewModelScope.launch {
                                     selectedGroup = selectedGroup?.let { group ->
                                         group.restaurantGroupId?.let { it1 ->
-                                            restaurantManageVM.getGroup(
-                                                it1
-                                            )
+                                            restaurantManageVM.getGroup(it1)
                                         }
                                     }
                                 }
                             },
                             modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                         )
-                        // Displaying single group
-                    }else if(groups.size == 1){
+                    } else if (groups.size == 1) {
                         restaurantManageVM.viewModelScope.launch {
                             selectedGroup = groups[0].restaurantGroupId?.let { it1 ->
-                                restaurantManageVM.getGroup(
-                                    it1
-                                )
+                                restaurantManageVM.getGroup(it1)
                             }
                         }
-                    }else{
+                    } else {
                         Text(
                             text = "You have no restaurants :("
                         )
@@ -103,37 +101,59 @@ fun RestaurantManagementActivity() {
                     RestaurantInfoView(
                         restaurant = restaurant,
                         onEditClick = { /*TODO*/ },
-                        onManageEmployeeClick = { navController.navigate(
-                            RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
-                        ) },
-                        onManageMenuClick = { navController.navigate(
-                            RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
-                        ) },
+                        onManageEmployeeClick = {
+                            navController.navigate(
+                                RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
+                            )
+                        },
+                        onManageMenuClick = {
+                            navController.navigate(
+                                RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
+                            )
+                        },
                         onManageSubscriptionClick = { /*TODO*/ },
                         onDeleteClick = {
-                            restaurantManageVM.viewModelScope.launch {
-                                // TODO: restaurantManageVM.deleteRestaurant(restaurant.id)
-                            }
+                            showDeletePopup = true
+                            restaurantToDelete = restaurant
                         }
                     )
                 }
+
                 Spacer(
                     modifier = Modifier.padding(bottom = 64.dp)
                 )
             }
+
+            if (showDeletePopup && restaurantToDelete != null) {
+                val confirmText = stringResource(R.string.delete_restaurant_message) +
+                        "\n"+ restaurantToDelete!!.name +
+                        " - " +restaurantToDelete!!.restaurantType + " ?";
+                CountDownPopup(
+                    icon = Icons.Default.Delete,
+                    title = stringResource(R.string.delete_restaurant_title),
+                    text = confirmText,
+                    confirmText = stringResource(R.string.label_yes_capital),
+                    dismissText = stringResource(R.string.label_cancel),
+                    onDismissRequest = { showDeletePopup = false },
+                    onConfirm = {
+                        restaurantManageVM.viewModelScope.launch {
+                            restaurantManageVM.deleteRestaurant(restaurantToDelete!!.restaurantId)
+                            showDeletePopup = false
+                        }
+                    }
+                )
+            }
         }
-        composable<RestaurantManagementRoutes.Menu>{
+        composable<RestaurantManagementRoutes.Menu> {
             MenuManagementActivity(
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Menu>().restaurantId
             )
         }
 
-        composable<RestaurantManagementRoutes.Employee>{
+        composable<RestaurantManagementRoutes.Employee> {
             EmployeeManagementActivity(
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Employee>().restaurantId
             )
         }
     }
-
-
 }
