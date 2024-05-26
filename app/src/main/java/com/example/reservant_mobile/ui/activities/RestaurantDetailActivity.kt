@@ -142,17 +142,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
-
-        LazyRow(modifier = Modifier.padding(horizontal = 16.dp)) {
-            items(3) { index ->
-                MenuCategoryButton(
-                    modifier = Modifier.scale(0.9f),
-                    category = "Kategoria ${index + 1}",
-                    onClick = { /* TODO: Handle click */ },
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-        }
+        
 
         repeat(2) { index ->
             MenuItemCard(
