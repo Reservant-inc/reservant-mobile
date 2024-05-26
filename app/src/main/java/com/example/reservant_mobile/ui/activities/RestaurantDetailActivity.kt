@@ -8,6 +8,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +38,7 @@ import com.example.reservant_mobile.ui.components.RatingBar
 @Composable
 fun RestaurantDetailActivity(navControllerHome: NavHostController) {
     var showGallery by remember { mutableStateOf(false) }
+    var isFavorite by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
@@ -47,26 +51,49 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
             contentScale = ContentScale.Crop
         )
 
-        Text(
-            text = "John Doe’s",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "John Doe’s",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(
+                onClick = { isFavorite = !isFavorite },
+            ) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = null,
+                    tint = if (isFavorite) Color.Red else Color.Gray
+                )
+            }
+        }
 
         Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             RatingBar(rating = 3.9f)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("3.9 (200+ opinii)")
+            Text("3.9 (200+ opinii)") // TODO: reformat w/ resources
         }
 
         Text(
-            text = "Restauracja / Bar",
+            text = "Restauracja / Bar", // TODO: Restaurant type headline
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         Text(
-            text = "Adres: ul. Marszałkowska 2, 00-000\nKoszt dostawy 5,99 zł",
+            text =  stringResource(R.string.label_restaurant_address) + ": ul. Marszałkowska 2, 00-000",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Text(
+            text = stringResource(R.string.label_delivery_cost) + " 5,99zł",
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
@@ -160,17 +187,17 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
     }
-//
-//    FloatingActionMenu(
-//        onDineInClick = { // Na miejscu
-//            delivery = "Dine in"
-//        },
-//        onDeliveryClick = {
-//            delivery = "Delivery"
-//        },
-//        onTakeawayClick = {
-//            delivery = "Delivery"
-//        }
-//    )
 
+    //
+    //    FloatingActionMenu(
+    //        onDineInClick = { // Na miejscu
+    //            delivery = "Dine in"
+    //        },
+    //        onDeliveryClick = {
+    //            delivery = "Delivery"
+    //        },
+    //        onTakeawayClick = {
+    //            delivery = "Delivery"
+    //        }
+    //    )
 }
