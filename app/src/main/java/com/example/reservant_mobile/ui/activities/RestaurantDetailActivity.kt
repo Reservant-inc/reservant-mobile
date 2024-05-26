@@ -61,7 +61,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
 
         Text(
             text = "Restauracja / Bar",
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
@@ -142,7 +142,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
-        
+
 
         repeat(2) { index ->
             MenuItemCard(
