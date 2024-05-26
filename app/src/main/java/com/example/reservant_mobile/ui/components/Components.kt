@@ -2046,21 +2046,6 @@ fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () 
 }
 
 @Composable
-fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(2.dp)
-    ) {
-        Text(category)
-    }
-}
-
-@Composable
 fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
