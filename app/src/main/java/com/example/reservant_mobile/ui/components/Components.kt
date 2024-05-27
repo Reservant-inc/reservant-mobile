@@ -123,6 +123,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -2442,4 +2443,22 @@ private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerSt
             .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
             .zIndex(5f)
     )
+}
+
+@Composable
+fun ImageCard(
+    image: Painter
+){
+    Card(
+        modifier = Modifier.size(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
 }

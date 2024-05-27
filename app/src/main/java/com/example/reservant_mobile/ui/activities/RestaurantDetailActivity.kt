@@ -182,23 +182,6 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
     }
 }
 
-@Composable
-fun ImageCard(
-    image: Painter
-){
-    Card(
-        modifier = Modifier.size(100.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Image(
-            painter = image,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-    }
-}
 
 // TODO: MenuItemDTO
 @Composable
@@ -253,7 +236,6 @@ fun EventsContent(
             Text("Event details")
             Spacer(modifier = Modifier.height(16.dp))
         }
-
 
 //        events.forEach { event ->
 //            Text(event.name, style = MaterialTheme.typography.headlineSmall)
