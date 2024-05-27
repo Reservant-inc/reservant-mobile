@@ -33,7 +33,12 @@ class RestaurantDetailViewModel(
     private suspend fun loadRestaurant() {
         try {
             isLoading = true
-            restaurant = restaurantService.getRestaurant(restaurantId).value
+            val result = restaurantService.getRestaurant(restaurantId)
+            if(!result.isError){
+                restaurant = result.value
+            }else{
+                errorMessage = "Error while fetching restaurant: ${result.errors}"
+            }
         } catch (e: Exception) {
             errorMessage = "Failed to load restaurant details: ${e.message}"
         } finally {
