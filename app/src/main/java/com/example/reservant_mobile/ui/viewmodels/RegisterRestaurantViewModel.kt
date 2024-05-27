@@ -75,20 +75,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     }
 
     fun validateSecondStep(context: Context): Boolean {
+        if (isRestaurantRegistrationSecondStepInvalid(context)) {
+            return false
+        }
 
-        val isBusinessPermissionValid = !isBusinessPermissionInvalid(context)
-        val isIdCardValid = !isIdCardInvalid(context)
-
-        val isRentalContractValid = rentalContract.value.isBlank() || !isRentalContractInvalid(context)
-        val isAlcoholLicenseValid = alcoholLicense.value.isBlank() || !isAlcoholLicenseInvalid(context)
-
-        val isGroupValid = !isGroupInvalid()
-
-        val isValid = isBusinessPermissionValid && isIdCardValid && isRentalContractValid && isAlcoholLicenseValid && isGroupValid
-
-        result2 = Result(isError = !isValid, value = isValid)
-
-        return isValid
+        return false
     }
 
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
@@ -140,7 +131,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     }
 
     fun isRestaurantRegistrationInvalid(context: Context): Boolean {
-        return isNameInvalid() ||
+        return  isNameInvalid() ||
                 isNipInvalid() ||
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
@@ -148,18 +139,29 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isDescriptionInvalid() ||
                 isBusinessPermissionInvalid(context) ||
                 isIdCardInvalid(context) ||
+                isAlcoholLicenseInvalid(context) ||
+                isRentalContractInvalid(context) ||
                 isLogoInvalid(context) ||
                 isRestaurantTypeInvalid() ||
                 areTagsInvalid()
     }
 
     fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
-        return isNameInvalid() ||
+        return  isNameInvalid() ||
                 isNipInvalid() ||
                 isAddressInvalid() ||
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
                 isRestaurantTypeInvalid()
+    }
+
+    fun isRestaurantRegistrationSecondStepInvalid(context: Context): Boolean {
+        return  isBusinessPermissionInvalid(context) ||
+                isIdCardInvalid(context) ||
+                isAlcoholLicenseInvalid(context) ||
+                isRentalContractInvalid(context) ||
+                isGroupInvalid()
+
     }
 
     fun isNameInvalid(): Boolean {
