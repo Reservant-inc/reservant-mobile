@@ -23,5 +23,6 @@ data class RestaurantDTO (
     val photos:List<String> = emptyList(),
     val isVerified:Boolean = false,
     val description:String = "",
+    val reservationDeposit: String? = "",
     val tags:List<String> = emptyList()
 )

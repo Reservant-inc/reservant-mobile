@@ -68,7 +68,7 @@ fun HomeActivity() {
                         }
                     )
 
-                    //tab layout
+
                     FloatingTabSwitch(map)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
@@ -81,7 +81,7 @@ fun HomeActivity() {
                     RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
                 }
                 composable<RestaurantDetailRoutes.Details>{
-                    RestaurantDetailActivity(navControllerHome = innerNavController)
+                    RestaurantDetailActivity(navControllerHome = innerNavController, 1)
                 }
             }
         }
