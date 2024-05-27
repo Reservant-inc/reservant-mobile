@@ -1658,7 +1658,8 @@ fun MenuCard(
                 }
 
                 Row (
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
                 ){
                     val buttonModifier = Modifier
                         .align(Alignment.Bottom)
