@@ -114,10 +114,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -128,7 +126,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -1612,44 +1611,49 @@ fun MenuCard(
     ) {
         Column {
             Image(
-                painterResource(id = R.drawable.ic_logo),
+                painterResource(id = R.drawable.pizza),
                 contentDescription = "",
                 modifier = Modifier.fillMaxWidth()
             )
-
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
                 Column(
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
                 ) {
+
+                    val namePadding = when {
+                        menu.alternateName == null -> 8.dp
+                        else -> 2.dp
+                    }
+
                     Text(
                         text = menu.name,
                         style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(start = 8.dp, end = 8.dp, bottom = namePadding, top = 8.dp)
                     )
 
                     menu.alternateName?.let {
                         Text(
-                            text = menu.name,
+                            text = it,
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Light,
                             modifier = Modifier
-                                .padding(8.dp)
+                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                         )
                     }
 
-                    Text(
-                        text = menu.menuType,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                    )
                     menu.dateUntil?.let {
                         Text(
-                            text = it,
+                            text = buildAnnotatedString {
+                                append(stringResource(id = R.string.label_limited_time))
+                                append(": ")
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                                append(it)
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -1657,10 +1661,10 @@ fun MenuCard(
                     }
                 }
 
-                Row (
+                Row(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                ){
+                ) {
                     val buttonModifier = Modifier
                         .align(Alignment.Bottom)
                         .size(50.dp)
@@ -1681,6 +1685,14 @@ fun MenuCard(
                         contentDescription = "delete"
                     )
                 }
+
+                /*Text(
+                    text = menu.menuType,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(8.dp)
+                )*/
 
             }
         }
