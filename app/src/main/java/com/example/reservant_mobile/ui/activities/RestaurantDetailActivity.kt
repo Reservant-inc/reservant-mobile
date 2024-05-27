@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,9 +30,9 @@ import com.example.reservant_mobile.R
 
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
+import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.RatingBar
-import com.example.reservant_mobile.ui.theme.secondaryLight
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
