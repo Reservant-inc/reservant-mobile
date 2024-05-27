@@ -17,6 +17,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -2123,15 +2124,43 @@ fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, o
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TagList(tags: List<String>) {
-    FlowRow(
-        modifier = Modifier.padding(vertical = 8.dp)
+fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        tags.forEach { tag ->
-            TagItem(tag = tag)
+        for (tag in tags) {
+            TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
+    }
+}
+
+@Composable
+fun TagItem(tag: String, onRemove: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(4.dp)
+            .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clickable { onRemove() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = tag,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontSize = 12.sp
+        )
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Remove tag",
+            tint = Color.White,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .size(16.dp)
+                .clickable { onRemove() }
+        )
     }
 }
 
@@ -2366,22 +2395,6 @@ fun FloatingActionMenu(
             )
         }
     }
-}
-
-@Composable
-fun TagItem(tag: String) {
-    Text(
-        text = tag,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 12.sp,
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50)
-            )
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    )
 }
 
 @Composable
