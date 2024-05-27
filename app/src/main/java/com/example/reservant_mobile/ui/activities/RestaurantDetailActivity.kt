@@ -38,10 +38,7 @@ import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 @Composable
 fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId: Int) {
     val restaurantDetailVM: RestaurantDetailViewModel = viewModel()
-    val restaurant = restaurantDetailVM.restaurant
-    val isLoading = restaurantDetailVM.isLoading
-    val errorMessage = restaurantDetailVM.errorMessage
-
+    
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
