@@ -114,7 +114,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                     )
 
                     Text(
-                        text = stringResource(R.string.label_delivery_cost) + " 5,70zł",
+                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
