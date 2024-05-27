@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
@@ -37,14 +38,16 @@ import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @Composable
 fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId: Int) {
-    val restaurantDetailVM: RestaurantDetailViewModel = viewModel()
-    
+    val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                RestaurantDetailViewModel(restaurantId) as T
+        }
+    )
+
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
-    LaunchedEffect(restaurantId) {
-        restaurantDetailVM.loadRestaurant(restaurantId)
-    }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         when {
@@ -87,7 +90,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                             Icon(
                                 imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
-                                tint = if (isFavorite) secondaryLight else Color.Gray
+                                tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
                             )
                         }
                     }

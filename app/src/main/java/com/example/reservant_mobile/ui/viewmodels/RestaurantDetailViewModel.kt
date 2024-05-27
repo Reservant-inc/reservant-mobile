@@ -10,7 +10,16 @@ import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import kotlinx.coroutines.launch
 
-class RestaurantDetailViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
+class RestaurantDetailViewModel(
+    private val restaurantId: Int,
+    private val restaurantService: IRestaurantService = RestaurantService()
+) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            loadRestaurant()
+        }
+    }
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
         private set
@@ -21,10 +30,10 @@ class RestaurantDetailViewModel(private val restaurantService: IRestaurantServic
     var errorMessage: String? by mutableStateOf(null)
         private set
 
-    suspend fun loadRestaurant(id: Int) {
+    private suspend fun loadRestaurant() {
         try {
             isLoading = true
-            restaurant = restaurantService.getRestaurant(id).value
+            restaurant = restaurantService.getRestaurant(restaurantId).value
         } catch (e: Exception) {
             errorMessage = "Failed to load restaurant details: ${e.message}"
         } finally {
