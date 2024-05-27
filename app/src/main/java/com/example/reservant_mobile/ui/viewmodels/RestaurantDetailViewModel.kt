@@ -45,11 +45,4 @@ class RestaurantDetailViewModel(
             isLoading = false
         }
     }
-
-
-
-
-
-
-
 }
