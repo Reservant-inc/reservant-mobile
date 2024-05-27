@@ -2498,18 +2498,18 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
         }
     }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun MainMapView(
     mapView: MapView,
-    startPoint: GeoPoint
+    startPoint: GeoPoint,
+    modifier:Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by mutableStateOf(startPoint)
+    val geoPoint by remember {mutableStateOf(startPoint)}
     val mapViewState = rememberMapViewWithLifecycle(mapView)
 
     AndroidView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         factory = { mapViewState },
         update = {
             view -> view.controller.setCenter(geoPoint)
