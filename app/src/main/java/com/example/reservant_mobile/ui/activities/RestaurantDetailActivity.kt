@@ -48,18 +48,18 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         when {
-            isLoading -> {
+            restaurantDetailVM.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
-            errorMessage != null -> {
+            restaurantDetailVM.errorMessage != null -> {
                 Text(
-                    text = errorMessage ?: "Unknown error",
+                    text = restaurantDetailVM.errorMessage ?: "Unknown error",
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
-            restaurant != null -> {
-                restaurant?.let { restaurant ->
+            restaurantDetailVM.restaurant != null -> {
+                restaurantDetailVM.restaurant?.let { restaurant ->
                     Image(
                         painter = painterResource(R.drawable.restaurant_photo),
                         contentDescription = null,
