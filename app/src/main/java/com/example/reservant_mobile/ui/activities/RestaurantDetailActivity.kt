@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -132,18 +133,9 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         repeat(3) {
-                            Card(
-                                modifier = Modifier.size(100.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(8.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.restaurant_photo),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
+                            ImageCard(
+                                painterResource(R.drawable.pizza)
+                            )
                         }
                         Card(
                             modifier = Modifier
@@ -187,6 +179,24 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
 
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
+    }
+}
+
+@Composable
+fun ImageCard(
+    image: Painter
+){
+    Card(
+        modifier = Modifier.size(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
     }
 }
 
