@@ -21,16 +21,14 @@ class RestaurantDetailViewModel(private val restaurantService: IRestaurantServic
     var errorMessage: String? by mutableStateOf(null)
         private set
 
-    fun loadRestaurant(id: Int) {
-        viewModelScope.launch {
-            try {
-                isLoading = true
-                restaurant = restaurantService.getRestaurant(id).value
-            } catch (e: Exception) {
-                errorMessage = "Failed to load restaurant details: ${e.message}"
-            } finally {
-                isLoading = false
-            }
+    suspend fun loadRestaurant(id: Int) {
+        try {
+            isLoading = true
+            restaurant = restaurantService.getRestaurant(id).value
+        } catch (e: Exception) {
+            errorMessage = "Failed to load restaurant details: ${e.message}"
+        } finally {
+            isLoading = false
         }
     }
 
