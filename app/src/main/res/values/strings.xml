@@ -105,4 +105,6 @@
     <string name="label_gallery">Gallery</string>
     <string name="label_more">More</string>
     <string name="label_delivery_cost">Delivery cost</string>
+    <string name="label_menu_price">Price</string>
+    <string name="label_events">Events</string>
 </resources>

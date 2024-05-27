@@ -153,8 +153,8 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController) {
 
         FloatingTabSwitch(
             pages = listOf(
-                "Menu" to { MenuContent() },
-                "Wydarzenia" to { EventsContent() }
+                stringResource(R.string.label_menu) to { MenuContent() },
+                stringResource(R.string.label_events) to { EventsContent() }
             )
         )
     }
@@ -175,7 +175,7 @@ fun MenuContent() {
         repeat(2) { index ->
             MenuItemCard(
                 name = "Nazwa pozycji ${index + 1}",
-                price = "Cena: ${10 + index} zł",
+                price = stringResource(R.string.label_menu_price)+ ": 15zl",
                 imageResource = R.drawable.pizza,
                 description = "Opis pozycji ${index + 1} (jeśli jest)",
                 onInfoClick = { /* TODO: Handle info */ },
