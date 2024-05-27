@@ -61,9 +61,9 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
             restaurantDetailVM.errorMessage != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
                 ) {
                     Text(
+                        modifier = Modifier.align(Alignment.Center),
                         text = restaurantDetailVM.errorMessage ?: "Unknown error",
                         color = MaterialTheme.colorScheme.error
                     )
