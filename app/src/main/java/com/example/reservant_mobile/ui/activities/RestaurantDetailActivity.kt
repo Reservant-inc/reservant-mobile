@@ -158,7 +158,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                                 )
                                 Text(
                                     text = stringResource(R.string.label_more),
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     style = MaterialTheme.typography.headlineSmall,
                                     modifier = Modifier.align(Alignment.Center)
                                 )
