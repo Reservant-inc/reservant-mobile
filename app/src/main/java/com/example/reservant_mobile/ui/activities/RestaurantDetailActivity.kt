@@ -48,129 +48,139 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
-
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    Box(modifier = Modifier.fillMaxSize()) {
         when {
             restaurantDetailVM.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
             restaurantDetailVM.errorMessage != null -> {
-                Text(
-                    text = restaurantDetailVM.errorMessage ?: "Unknown error",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = restaurantDetailVM.errorMessage ?: "Unknown error",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
             restaurantDetailVM.restaurant != null -> {
-                restaurantDetailVM.restaurant?.let { restaurant ->
-                    Image(
-                        painter = painterResource(R.drawable.restaurant_photo),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = restaurant.name,
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = { isFavorite = !isFavorite },
-                        ) {
-                            Icon(
-                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                contentDescription = null,
-                                tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
-                            )
-                        }
-                    }
-
-                    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        RatingBar(rating = 3.9f)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("3.9 (200+ opinii)")
-                    }
-
-                    Text(
-                        text = restaurant.restaurantType,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.label_gallery),
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        repeat(3) {
-                            ImageCard(
-                                painterResource(R.drawable.pizza)
-                            )
-                        }
-                        Card(
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    restaurantDetailVM.restaurant?.let { restaurant ->
+                        Image(
+                            painter = painterResource(R.drawable.restaurant_photo),
+                            contentDescription = null,
                             modifier = Modifier
-                                .size(100.dp)
-                                .clickable { showGallery = true },
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(8.dp)
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.8f))
+                            Text(
+                                text = restaurant.name,
+                                style = MaterialTheme.typography.headlineMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                                onClick = { isFavorite = !isFavorite },
                             ) {
-                                Image(
-                                    painter = painterResource(R.drawable.restaurant_photo),
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    alpha = 0.35f
-                                )
-                                Text(
-                                    text = stringResource(R.string.label_more),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    modifier = Modifier.align(Alignment.Center)
+                                    tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
                                 )
                             }
                         }
-                    }
 
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            stringResource(R.string.label_menu) to { MenuContent() },
-                            stringResource(R.string.label_events) to { EventsContent() }
+                        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            RatingBar(rating = 3.9f)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("3.9 (200+ opinii)")
+                        }
+
+                        Text(
+                            text = restaurant.restaurantType,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
-                    )
+
+                        Text(
+                            text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Text(
+                            text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Text(
+                            text = stringResource(R.string.label_gallery),
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            repeat(3) {
+                                ImageCard(
+                                    painterResource(R.drawable.pizza)
+                                )
+                            }
+                            Card(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clickable { showGallery = true },
+                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(8.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Black.copy(alpha = 0.8f))
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.restaurant_photo),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop,
+                                        alpha = 0.35f
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.label_more),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+                                }
+                            }
+                        }
+
+                        FloatingTabSwitch(
+                            pages = listOf(
+                                stringResource(R.string.label_menu) to { MenuContent() },
+                                stringResource(R.string.label_events) to { EventsContent() }
+                            )
+                        )
+                    }
                 }
             }
         }

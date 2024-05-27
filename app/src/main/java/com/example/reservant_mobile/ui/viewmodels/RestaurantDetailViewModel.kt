@@ -15,34 +15,33 @@ class RestaurantDetailViewModel(
     private val restaurantService: IRestaurantService = RestaurantService()
 ) : ViewModel() {
 
+    var restaurant: RestaurantDTO? by mutableStateOf(null)
+    var isLoading: Boolean by mutableStateOf(false)
+    var errorMessage: String? by mutableStateOf(null)
+
     init {
         viewModelScope.launch {
-            loadRestaurant()
+            loadRestaurant(restaurantId)
         }
     }
 
-    var restaurant: RestaurantDTO? by mutableStateOf(null)
-        private set
-
-    var isLoading: Boolean by mutableStateOf(false)
-        private set
-
-    var errorMessage: String? by mutableStateOf(null)
-        private set
-
-    private suspend fun loadRestaurant() {
-        try {
+    private fun loadRestaurant(id: Int) {
+        viewModelScope.launch {
             isLoading = true
-            val result = restaurantService.getRestaurant(restaurantId)
-            if(!result.isError){
-                restaurant = result.value
-            }else{
-                errorMessage = "Error while fetching restaurant: ${result.errors}"
+            errorMessage = null
+            try {
+                val response = restaurantService.getRestaurant(id)
+
+                if(!response.isError){
+                    restaurant = response.value
+                }else{
+                    errorMessage = "Error while loading restaurant: ${response.errors}"
+                }
+            } catch (e: Exception) {
+                errorMessage = e.message
+            } finally {
+                isLoading = false
             }
-        } catch (e: Exception) {
-            errorMessage = "Failed to load restaurant details: ${e.message}"
-        } finally {
-            isLoading = false
         }
     }
 }
