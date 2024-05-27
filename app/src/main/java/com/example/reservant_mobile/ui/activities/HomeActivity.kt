@@ -26,7 +26,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
+import com.example.reservant_mobile.ui.components.MainBottomSheet
 import com.example.reservant_mobile.ui.components.MainMapView
+import com.example.reservant_mobile.ui.components.RestaurantCard
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
@@ -100,7 +102,16 @@ fun HomeActivity() {
                     restaurantMarker.title = "Restaurant is here"
                     mv.overlays.add(restaurantMarker)
 
-                 MainMapView(mv, startPoint)
+                    val sheetContent = listOf(
+                        "Restarant 1" to "Adres 1",
+                        "Restarant 2" to "Adres 2",
+                        "Restarant 3" to "Adres 3",
+                        "Restarant 4" to "Adres 4",)
+
+                    MainBottomSheet (
+                        body= { modifier -> MainMapView(mv, startPoint, modifier) },
+                        sheetContent = sheetContent)
+
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()

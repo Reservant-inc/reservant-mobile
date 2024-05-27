@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -75,6 +76,7 @@ import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -96,6 +98,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -109,8 +112,10 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -169,6 +174,7 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
@@ -2498,21 +2504,58 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
         }
     }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun MainMapView(
     mapView: MapView,
-    startPoint: GeoPoint
+    startPoint: GeoPoint,
+    modifier:Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by mutableStateOf(startPoint)
+    val geoPoint by remember {mutableStateOf(startPoint)}
     val mapViewState = rememberMapViewWithLifecycle(mapView)
 
     AndroidView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         factory = { mapViewState },
         update = {
             view -> view.controller.setCenter(geoPoint)
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainBottomSheet(
+    body: @Composable (modifier:Modifier) -> Unit,
+    sheetContent: List<Pair<String, String>>
+) {
+    val scaffoldState = rememberBottomSheetScaffoldState()
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 150.dp,
+        sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        sheetContent = {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .height(450.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(sheetContent){item ->
+                    RestaurantCard(
+                        imageUrl = "",
+                        name = item.first,
+                        location = item.second)
+                }
+
+            }
+        }) { innerPadding -> body.invoke(
+        Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+        )
+    }
+
 }
