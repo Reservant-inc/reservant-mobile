@@ -243,7 +243,7 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
     override suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>{
         val res = api.post(MyRestaurants.Id.Employees(
             parent = MyRestaurants.Id(id = id.toString())
-        ), emp)
+        ), listOf(emp))
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)

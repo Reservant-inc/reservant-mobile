@@ -2483,7 +2483,6 @@ fun rememberMapViewWithLifecycle(mapView: MapView): MapView {
             lifecycle.removeObserver(lifecycleObserver)
         }
     }
-
     return mapView
 }
 
@@ -2516,5 +2515,4 @@ fun MainMapView(
             view -> view.controller.setCenter(geoPoint)
         }
     )
-
 }

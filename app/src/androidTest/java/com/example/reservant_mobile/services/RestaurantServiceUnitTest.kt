@@ -47,7 +47,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
             firstName = "Johny",
             lastName = "Test",
             phoneNumber = "+48123456789",
-            password = "P@ssw0rd"
+            password = "P@ssw0rd",
         )
     }
 
@@ -60,7 +60,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun register_and_delete_restaurant()= runTest{
         assertThat(ser.registerRestaurant(restaurant).value).isTrue()
-        val id = ser.getRestaurants().value!!.last().id
+        val id = ser.getRestaurants().value!!.last().restaurantId
         assertThat(ser.deleteRestaurant(id).value).isTrue()
     }
 
@@ -71,7 +71,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_restaurant_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.last().id
+        val id = ser.getRestaurants().value!!.last().restaurantId
         assertThat(ser.editRestaurant(id, restaurant).value).isNotNull()
     }
 
@@ -88,17 +88,17 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun add_and_delete_group_return_not_null()= runTest{
         assertThat(ser.addGroup(restaurantGroup).value).isTrue()
-        val id =ser.getGroups().value!!.last().id
-        assertThat(ser.deleteGroup(id).value).isTrue()
+        val id = ser.getGroups().value!!.last().restaurantGroupId
+        assertThat(id?.let { ser.deleteGroup(it).value }).isTrue()
 
     }
 
     @Test
     fun move_restaurant_to_group_return_not_null()= runTest{
-        val restaurantId = ser.getRestaurants().value!!.last().id
-        val groupId = ser.getGroups().value!!.last().id
+        val restaurantId = ser.getRestaurants().value!!.last().restaurantId
+        val groupId = ser.getGroups().value!!.last().restaurantGroupId
 
-        assertThat(ser.moveToGroup(restaurantId, groupId).value).isNotNull()
+        assertThat(groupId?.let { ser.moveToGroup(restaurantId, it).value }).isNotNull()
     }
 
     @Test
@@ -108,13 +108,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_employee_return_not_null()= runTest{
-        val id = ser.getEmployees().value!!.last().id
+        val id = ser.getEmployees().value!!.last().userId
         assertThat(ser.getEmployee(id).value).isNotNull()
     }
 
     @Test
     fun get_restaurant_employees_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.last().id
+        val id = ser.getRestaurants().value!!.last().restaurantId
         assertThat(ser.getEmployees(id).value).isNotNull()
     }
 
@@ -126,7 +126,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun add_and_remove_employee_from_restaurant()= runTest{
-        val restaurantId = ser.getRestaurants().value!!.first().id
+        val restaurantId = ser.getRestaurants().value!!.first().restaurantId
         assertThat(ser.addEmployeeToRestaurant(restaurantId, restaurantEmployee).value).isTrue()
         val empId = ser.getEmployees(restaurantId).value!!.last().employmentId
         assertThat(ser.deleteEmployment(empId!!).value).isTrue()
@@ -135,7 +135,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_employee_return_not_null()= runTest{
-        val id = ser.getEmployees().value!!.last().id
+        val id = ser.getEmployees().value!!.last().userId
         assertThat(ser.editEmployee(id, restaurantEmployee).value).isNotNull()
     }
 

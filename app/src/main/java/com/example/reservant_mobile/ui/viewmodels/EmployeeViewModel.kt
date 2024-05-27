@@ -29,7 +29,7 @@ class EmployeeViewModel(
     val password: FormField = FormField(RestaurantEmployeeDTO::password.name)
     val phoneNum: FormField = FormField(RestaurantEmployeeDTO::phoneNumber.name)
 
-    val id: FormField = FormField(RestaurantEmployeeDTO::id.name)
+    val id: FormField = FormField(RestaurantEmployeeDTO::userId.name)
     var isHallEmployee by mutableStateOf(false)
     var isBackdoorEmployee by mutableStateOf(false)
 
@@ -64,7 +64,7 @@ class EmployeeViewModel(
 
     fun editEmployee(employee: RestaurantEmployeeDTO) {
         employees = employees.map { existingEmployee ->
-            if (existingEmployee.id == employee.id) {
+            if (existingEmployee.userId == employee.userId) {
                 RestaurantEmployeeDTO(
                     login = login.value,
                     firstName = firstName.value,
@@ -99,7 +99,7 @@ class EmployeeViewModel(
 
         val position = if (response.value != null) {
             RestaurantEmployeeDTO(
-                id = response.value.id,
+                userId = response.value.userId,
                 isHallEmployee = isHallEmployee,
                 isBackdoorEmployee = isBackdoorEmployee
             )

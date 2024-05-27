@@ -4,10 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
+import kotlinx.coroutines.launch
 
 
 class RestaurantManagementViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
@@ -15,8 +17,11 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     private var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
 
-    suspend fun initialize() {
-        loadGroups()
+
+    init {
+        viewModelScope.launch {
+            loadGroups()
+        }
     }
 
     private suspend fun loadGroups(){
@@ -37,7 +42,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
 
     suspend fun deleteRestaurant(id: Int) {
         restaurantService.deleteRestaurant(id)
-        this.initialize() // Reloading groups
+        loadGroups() // Reloading groups
     }
 
 }

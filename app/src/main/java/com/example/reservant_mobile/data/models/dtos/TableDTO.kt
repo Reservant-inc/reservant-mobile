@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TableDTO (
-    val id: Int,
+    val tableId: Int,
     val capacity: Int
 )
