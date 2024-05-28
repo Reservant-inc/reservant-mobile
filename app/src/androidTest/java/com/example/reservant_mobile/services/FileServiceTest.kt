@@ -1,6 +1,5 @@
 package com.example.reservant_mobile.services
 
-import com.example.reservant_mobile.data.services.ContentService
 import com.example.reservant_mobile.data.services.FileService
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -10,7 +9,6 @@ import org.junit.Test
 
 class FileServiceTest: ServiceTest() {
     private val service: FileService = FileService()
-    private val contentService: ContentService = ContentService()
 
     @Before
     fun setup() = runBlocking {
@@ -24,7 +22,7 @@ class FileServiceTest: ServiceTest() {
 
     @Test
     fun getImageTest() = runTest {
-        val res = contentService.getImage("/uploads/test-jd.png")
+        val res = service.getImage("/uploads/test-jd.png")
         assertThat(res.value).isNotNull()
     }
 

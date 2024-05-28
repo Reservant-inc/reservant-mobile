@@ -1,5 +1,7 @@
 package com.example.reservant_mobile.data.services
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.endpoints.File
 import com.example.reservant_mobile.data.endpoints.Uploads
@@ -67,4 +69,20 @@ class FileService(private var api: APIService = APIService()) {
         return Result(isError = true, errors = mapOf(Pair("TOAST", R.string.error_unknown)), value = null)
     }
 
+    suspend fun getImage(imagePath: String): Result<Bitmap?>{
+        val res = getFile(imagePath)
+
+        return when{
+            !res.isError -> Result(
+                isError = false,
+                value = BitmapFactory.decodeByteArray(res.value, 0, res.value!!.size)
+            )
+            else -> Result(
+                isError = true,
+                value = null,
+                errors = res.errors
+            )
+        }
+
+    }
 }
