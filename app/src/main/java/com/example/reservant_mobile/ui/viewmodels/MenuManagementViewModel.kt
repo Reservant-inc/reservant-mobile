@@ -34,15 +34,20 @@ class MenuManagementViewModel(
         menus = service.getMenus(restaurantId).value?.toMutableList() ?: mutableListOf()
     }
 
-    suspend fun addMenu(){
-        val menu = RestaurantMenuDTO(
+    private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO{
+        return RestaurantMenuDTO(
+            menuId = menuId,
             name = name.value,
             restaurantId = restaurantId,
-            alternateName = alternateName.value,
+            alternateName = alternateName.value.ifEmpty { null },
             menuType = menuType.value,
             dateFrom = dateFrom.value,
-            dateUntil = dateUntil.value
+            dateUntil = dateUntil.value.ifEmpty { null }
         )
+    }
+
+    suspend fun addMenu(){
+        val menu = createMenuDTO()
 
         val result = service.addMenu(menu)
 
@@ -53,15 +58,7 @@ class MenuManagementViewModel(
     }
 
     suspend fun editMenu(menu: RestaurantMenuDTO) {
-        val editedMenu = RestaurantMenuDTO(
-            menuId = menu.menuId,
-            name = name.value,
-            restaurantId = menu.restaurantId,
-            alternateName = alternateName.value.ifEmpty { null },
-            menuType = menuType.value,
-            dateFrom = dateFrom.value,
-            dateUntil = dateUntil.value
-        )
+        val editedMenu = createMenuDTO(menu.menuId)
 
         val result = service.editMenu(editedMenu.menuId!!, editedMenu)
 

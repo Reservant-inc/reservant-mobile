@@ -1,10 +1,6 @@
 package com.example.reservant_mobile.ui.components
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.LOCATION_SERVICE
-import android.graphics.drawable.BitmapDrawable
-import android.location.Location
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,10 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -28,7 +22,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,18 +34,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -65,7 +55,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -74,7 +63,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -98,7 +86,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -115,7 +102,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -130,7 +116,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -141,26 +126,24 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
@@ -174,7 +157,6 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
@@ -183,6 +165,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlin.math.floor
@@ -1514,6 +1497,86 @@ fun Content() {
 }
 
 @Composable
+fun MenuPopup(
+    title:  @Composable (() -> Unit),
+    hide: () -> Unit,
+    onConfirm: () -> Unit,
+    clear: () -> Unit,
+    name: FormField,
+    altName: FormField,
+    menuType: FormField,
+    dateFrom: FormField,
+    dateUntil: FormField,
+){
+    AlertDialog(
+        onDismissRequest = {
+            hide()
+            clear()
+        },
+        title = title,
+        text = {
+            Column {
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_restaurant_name),
+                    inputText = name.value,
+                    onValueChange = {name.value = it}
+                )
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_alternate_name),
+                    optional = true,
+                    inputText = altName.value,
+                    onValueChange = {altName.value = it}
+                )
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_menu_type),
+                    inputText = menuType.value,
+                    onValueChange = {menuType.value = it}
+                )
+                MyDatePickerDialog (
+                    label = { Text(text = stringResource(id = R.string.label_date_from))},
+                    allowFutureDates = true,
+                    startStringValue = dateFrom.value,
+                    startDate = dateFrom.value.ifEmpty { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) },
+                    onBirthdayChange = {dateFrom.value = it}
+                )
+                MyDatePickerDialog (
+                    label = { Text(text = buildAnnotatedString {
+                        append(stringResource(id = R.string.label_date_to))
+                        pushStyle(SpanStyle(Color.Gray, fontWeight = FontWeight.Light, fontStyle = FontStyle.Italic))
+                        append(stringResource(id = R.string.label_optional))
+                    })},
+                    allowFutureDates = true,
+                    startStringValue = dateUntil.value,
+                    startDate = dateUntil.value.ifEmpty { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) },
+                    onBirthdayChange = {dateUntil.value = it}
+                )
+
+            }
+        },
+        dismissButton = {
+            ButtonComponent(
+                onClick = {
+                    hide()
+                    clear()
+                },
+                label = stringResource(id = R.string.label_cancel)
+            )
+        },
+        confirmButton = {
+            ButtonComponent(
+                onClick = {
+                    hide()
+                    onConfirm()
+                    clear()
+                },
+                label = stringResource(id = R.string.label_save)
+            )
+        },
+
+        )
+}
+
+@Composable
 fun MenuCard(
     name: FormField,
     altName: FormField,
@@ -1552,69 +1615,18 @@ fun MenuCard(
             altName.value = menu.alternateName ?: ""
             menuType.value = menu.menuType
             dateFrom.value = menu.dateFrom
-            dateUntil.value = menu.dateUntil ?: LocalDate.now().toString()
+            dateUntil.value = menu.dateUntil ?: ""
 
-
-            AlertDialog(
-                onDismissRequest = {
-                    showEditPopup = false
-                    clearFields()
-                },
+            MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
-                text = {
-                    Column {
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_restaurant_name),
-                            inputText = name.value,
-                            onValueChange = {name.value = it}
-                        )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_alternate_name),
-                            inputText = altName.value,
-                            onValueChange = {altName.value = it}
-                        )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_menu_type),
-                            inputText = menuType.value,
-                            onValueChange = {menuType.value = it}
-                        )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_from))},
-                            allowFutureDates = true,
-                            startStringValue = dateFrom.value,
-                            startDate = dateFrom.value,
-                            onBirthdayChange = {dateFrom.value = it}
-                        )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_to))},
-                            allowFutureDates = true,
-                            startStringValue = dateUntil.value,
-                            startDate = dateUntil.value,
-                            onBirthdayChange = {dateUntil.value = it}
-                        )
-
-                    }
-                },
-                dismissButton = {
-                    ButtonComponent(
-                        onClick = {
-                            showEditPopup = false
-                            clearFields()
-                        },
-                        label = stringResource(id = R.string.label_cancel)
-                    )
-                },
-                confirmButton = {
-                    ButtonComponent(
-                        onClick = {
-                            showEditPopup = false
-                            onEditClick()
-                            clearFields()
-                        },
-                        label = stringResource(id = R.string.label_save)
-                    )
-                },
-
+                hide = { showEditPopup = false },
+                onConfirm = onEditClick,
+                clear = clearFields,
+                name = name,
+                altName = altName,
+                menuType = menuType,
+                dateFrom = dateFrom,
+                dateUntil = dateUntil
             )
         }
     }
@@ -1629,39 +1641,89 @@ fun MenuCard(
     ) {
         Column {
             Image(
-                painterResource(id = R.drawable.ic_logo),
+                painterResource(id = R.drawable.pizza),
                 contentDescription = "",
                 modifier = Modifier.fillMaxWidth()
             )
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
 
-            Row {
-                val buttonModifier = Modifier
-                    .align(Alignment.Bottom)
-                    .size(50.dp)
-                    .padding(6.dp)
-
-                Text(
-                    text = menu.menuType,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                Column(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .weight(1f)
+                        .align(Alignment.TopStart)
+                ) {
+
+                    val namePadding = when {
+                        menu.alternateName == null -> 8.dp
+                        else -> 2.dp
+                    }
+
+                    Text(
+                        text = menu.name,
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp, bottom = namePadding, top = 8.dp)
+                    )
+
+                    menu.alternateName?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Light,
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                        )
+                    }
+
+                    menu.dateUntil?.let {
+                        Text(
+                            text = buildAnnotatedString {
+                                append(stringResource(id = R.string.label_limited_time))
+                                append(": ")
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                                append(it)
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                ) {
+                    val buttonModifier = Modifier
                         .align(Alignment.Bottom)
-                )
+                        .size(50.dp)
+                        .padding(6.dp)
 
-                SecondaryButton(
-                    modifier = buttonModifier,
-                    onClick = {showEditPopup = true},
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditMenuItem"
-                )
 
-                SecondaryButton(
-                    modifier = buttonModifier,
-                    onClick = { showConfirmDeletePopup = true },
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "delete"
-                )
+                    SecondaryButton(
+                        modifier = buttonModifier,
+                        onClick = {showEditPopup = true},
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "EditMenuItem"
+                    )
+
+                    SecondaryButton(
+                        modifier = buttonModifier,
+                        onClick = { showConfirmDeletePopup = true },
+                        imageVector = Icons.Filled.DeleteForever,
+                        contentDescription = "delete"
+                    )
+                }
+
+                /*Text(
+                    text = menu.menuType,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(8.dp)
+                )*/
+
             }
         }
     }
@@ -1681,66 +1743,16 @@ fun AddMenuButton(
 
     when{
         showAddDialog -> {
-            AlertDialog(
-                onDismissRequest = {
-                    showAddDialog = false
-                    clearFields()
-                },
-                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
-                text = {
-                    Column {
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_restaurant_name),
-                            inputText = name.value,
-                            onValueChange = {name.value = it}
-                        )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_alternate_name),
-                            inputText = altName.value,
-                            optional = true,
-                            onValueChange = {altName.value = it}
-                        )
-                        InputUserInfo(
-                            label = stringResource(id = R.string.label_menu_type),
-                            inputText = menuType.value,
-                            onValueChange = {menuType.value = it}
-                        )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_from))},
-                            allowFutureDates = true,
-                            startStringValue = dateFrom.value,
-                            startDate = LocalDate.now().toString(),
-                            onBirthdayChange = {dateFrom.value = it}
-                        )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_to))},
-                            allowFutureDates = true,
-                            startStringValue = dateUntil.value,
-                            startDate = LocalDate.now().toString(),
-                            onBirthdayChange = {dateUntil.value = it}
-                        )
-
-                    }
-                },
-                dismissButton = {
-                    ButtonComponent(
-                        onClick = {
-                            showAddDialog = false
-                            clearFields()
-                        },
-                        label = stringResource(id = R.string.label_cancel)
-                    )
-                },
-                confirmButton = {
-                    ButtonComponent(
-                        onClick = {
-                            showAddDialog = false
-                            addMenu()
-                            clearFields()
-                        },
-                        label = stringResource(id = R.string.label_save)
-                    )
-                },
+            MenuPopup(
+                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
+                hide = { showAddDialog = false },
+                onConfirm = addMenu,
+                clear = clearFields,
+                name = name,
+                altName = altName,
+                menuType = menuType,
+                dateFrom = dateFrom,
+                dateUntil = dateUntil
             )
         }
     }
@@ -1978,7 +1990,12 @@ fun MyFloatingActionButton(
         onClick = onClick,
         modifier = Modifier
             .padding(allPadding)
-            .padding(top = topPadding, bottom = bottomPadding, start = startPadding, end = endPadding),
+            .padding(
+                top = topPadding,
+                bottom = bottomPadding,
+                start = startPadding,
+                end = endPadding
+            ),
         content = {
             Icon(
                 imageVector = Icons.Default.Add,
