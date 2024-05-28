@@ -98,6 +98,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
@@ -1219,7 +1221,6 @@ fun BottomNavigation(navController: NavHostController) {
 }
 
 
-
 @Composable
 fun Heading() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -1547,6 +1548,7 @@ fun MenuCard(
                 dismissText = stringResource(id = R.string.label_cancel)
             )
         }
+
         showEditPopup -> {
 
             name.value = menu.name
@@ -1567,31 +1569,31 @@ fun MenuCard(
                         InputUserInfo(
                             label = stringResource(id = R.string.label_restaurant_name),
                             inputText = name.value,
-                            onValueChange = {name.value = it}
+                            onValueChange = { name.value = it }
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_alternate_name),
                             inputText = altName.value,
-                            onValueChange = {altName.value = it}
+                            onValueChange = { altName.value = it }
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_menu_type),
                             inputText = menuType.value,
-                            onValueChange = {menuType.value = it}
+                            onValueChange = { menuType.value = it }
                         )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                        MyDatePickerDialog(
+                            label = { Text(text = stringResource(id = R.string.label_date_from)) },
                             allowFutureDates = true,
                             startStringValue = dateFrom.value,
                             startDate = dateFrom.value,
-                            onBirthdayChange = {dateFrom.value = it}
+                            onBirthdayChange = { dateFrom.value = it }
                         )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                        MyDatePickerDialog(
+                            label = { Text(text = stringResource(id = R.string.label_date_to)) },
                             allowFutureDates = true,
                             startStringValue = dateUntil.value,
                             startDate = dateUntil.value,
-                            onBirthdayChange = {dateUntil.value = it}
+                            onBirthdayChange = { dateUntil.value = it }
                         )
 
                     }
@@ -1616,7 +1618,7 @@ fun MenuCard(
                     )
                 },
 
-            )
+                )
         }
     }
 
@@ -1652,7 +1654,7 @@ fun MenuCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = {showEditPopup = true},
+                    onClick = { showEditPopup = true },
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "EditMenuItem"
                 )
@@ -1677,10 +1679,10 @@ fun AddMenuButton(
     dateUntil: FormField,
     clearFields: () -> Unit,
     addMenu: () -> Unit
-){
-    var showAddDialog by remember { mutableStateOf(false)}
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
 
-    when{
+    when {
         showAddDialog -> {
             AlertDialog(
                 onDismissRequest = {
@@ -1693,32 +1695,32 @@ fun AddMenuButton(
                         InputUserInfo(
                             label = stringResource(id = R.string.label_restaurant_name),
                             inputText = name.value,
-                            onValueChange = {name.value = it}
+                            onValueChange = { name.value = it }
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_alternate_name),
                             inputText = altName.value,
                             optional = true,
-                            onValueChange = {altName.value = it}
+                            onValueChange = { altName.value = it }
                         )
                         InputUserInfo(
                             label = stringResource(id = R.string.label_menu_type),
                             inputText = menuType.value,
-                            onValueChange = {menuType.value = it}
+                            onValueChange = { menuType.value = it }
                         )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_from))},
+                        MyDatePickerDialog(
+                            label = { Text(text = stringResource(id = R.string.label_date_from)) },
                             allowFutureDates = true,
                             startStringValue = dateFrom.value,
                             startDate = LocalDate.now().toString(),
-                            onBirthdayChange = {dateFrom.value = it}
+                            onBirthdayChange = { dateFrom.value = it }
                         )
-                        MyDatePickerDialog (
-                            label = { Text(text = stringResource(id = R.string.label_date_to))},
+                        MyDatePickerDialog(
+                            label = { Text(text = stringResource(id = R.string.label_date_to)) },
                             allowFutureDates = true,
                             startStringValue = dateUntil.value,
                             startDate = LocalDate.now().toString(),
-                            onBirthdayChange = {dateUntil.value = it}
+                            onBirthdayChange = { dateUntil.value = it }
                         )
 
                     }
@@ -1848,13 +1850,18 @@ fun DeletePopup(
     icon: ImageVector,
     title: String,
     text: String,
-    confirmText:String = "Confirm",
+    confirmText: String = "Confirm",
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
     enabled: Boolean = true,
-    deleteButtonContent: @Composable (RowScope.() -> Unit) = {Text(confirmText, color = MaterialTheme.colorScheme.error)}
-){
+    deleteButtonContent: @Composable (RowScope.() -> Unit) = {
+        Text(
+            confirmText,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
+) {
     AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1910,7 +1917,7 @@ fun CountDownPopup(
             allowConfirm = timer == 0
         }
     }
-    
+
     /*AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1946,7 +1953,7 @@ fun CountDownPopup(
             }
         }
     )*/
-    
+
     DeletePopup(
         icon = icon,
         title = title,
@@ -1957,7 +1964,7 @@ fun CountDownPopup(
             if (allowConfirm) onConfirm()
         },
         enabled = allowConfirm
-    ){
+    ) {
         if (allowConfirm) {
             Text(confirmText, color = MaterialTheme.colorScheme.error)
         } else {
@@ -1979,7 +1986,12 @@ fun MyFloatingActionButton(
         onClick = onClick,
         modifier = Modifier
             .padding(allPadding)
-            .padding(top = topPadding, bottom = bottomPadding, start = startPadding, end = endPadding),
+            .padding(
+                top = topPadding,
+                bottom = bottomPadding,
+                start = startPadding,
+                end = endPadding
+            ),
         content = {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -2081,7 +2093,11 @@ fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick:
 }
 
 @Composable
-fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+fun TagSelectionScreen(
+    vm: RegisterRestaurantViewModel,
+    onDismiss: () -> Unit,
+    onTagSelected: (String, Boolean) -> Unit,
+) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
 
@@ -2124,14 +2140,13 @@ fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, o
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
-    Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+    FlowRow(
+        modifier = Modifier.padding(vertical = 8.dp)
     ) {
-        for (tag in tags) {
+        tags.forEach { tag ->
             TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
@@ -2139,30 +2154,25 @@ fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
 
 @Composable
 fun TagItem(tag: String, onRemove: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .padding(4.dp)
-            .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .clickable { onRemove() },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = tag,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 12.sp
-        )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Remove tag",
-            tint = Color.White,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .size(16.dp)
-                .clickable { onRemove() }
-        )
-    }
+    InputChip(
+        onClick = { onRemove() },
+        label = { Text(tag) },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove tag"
+            )
+        },
+        colors = InputChipDefaults.inputChipColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            labelColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.padding(4.dp),
+        selected = true
+    )
 }
+
 
 @Composable
 fun MenuItemCard(
@@ -2402,7 +2412,7 @@ fun FloatingTabSwitch(
     pages: List<Pair<String, @Composable () -> Unit>>
 ) {
     val pagerState = rememberPagerState(
-        pageCount = {pages.size}
+        pageCount = { pages.size }
     )
     val coroutineScope = rememberCoroutineScope()
     val cornerShape = RoundedCornerShape(50)
@@ -2418,7 +2428,7 @@ fun FloatingTabSwitch(
         HorizontalPager(
             state = pagerState,
             userScrollEnabled = true
-        ) {page ->
+        ) { page ->
             pages[page].second.invoke()
         }
         TabRow(
@@ -2430,17 +2440,17 @@ fun FloatingTabSwitch(
             indicator = indicator,
             divider = {}
         ) {
-            pages.forEachIndexed{ index, tabItem ->
+            pages.forEachIndexed { index, tabItem ->
                 val selected = pagerState.currentPage == index
                 Tab(
                     modifier = Modifier.zIndex(6f),
-                text = {
-                    if (selected) {
-                        Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
-                    } else {
-                        Text(text = tabItem.first)
-                    }
-                },
+                    text = {
+                        if (selected) {
+                            Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
+                        } else {
+                            Text(text = tabItem.first)
+                        }
+                    },
                     selected = selected,
                     onClick = {
                         coroutineScope.launch {
@@ -2521,17 +2531,17 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
 fun MainMapView(
     mapView: MapView,
     startPoint: GeoPoint,
-    modifier:Modifier = Modifier.fillMaxSize()
+    modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by remember {mutableStateOf(startPoint)}
+    val geoPoint by remember { mutableStateOf(startPoint) }
     val mapViewState = rememberMapViewWithLifecycle(mapView)
 
     AndroidView(
         modifier = modifier,
         factory = { mapViewState },
-        update = {
-            view -> view.controller.setCenter(geoPoint)
+        update = { view ->
+            view.controller.setCenter(geoPoint)
         }
     )
 }
@@ -2539,7 +2549,7 @@ fun MainMapView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainBottomSheet(
-    body: @Composable (modifier:Modifier) -> Unit,
+    body: @Composable (modifier: Modifier) -> Unit,
     sheetContent: List<Pair<String, String>>
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -2556,18 +2566,20 @@ fun MainBottomSheet(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(sheetContent){item ->
+                items(sheetContent) { item ->
                     RestaurantCard(
                         imageUrl = "",
                         name = item.first,
-                        location = item.second)
+                        location = item.second
+                    )
                 }
 
             }
-        }) { innerPadding -> body.invoke(
-        Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        }) { innerPadding ->
+        body.invoke(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         )
     }
 
