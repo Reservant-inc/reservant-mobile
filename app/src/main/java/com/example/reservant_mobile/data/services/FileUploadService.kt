@@ -29,7 +29,7 @@ class FileUploadService(private var api: APIService = APIService()) {
          }
         )
 
-        val res = api.post(content, Uploads())
+        val res = api.post(Uploads(), content)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
 
