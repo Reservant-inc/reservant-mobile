@@ -41,7 +41,7 @@ fun MenuItemManagementActivity(menuId: Int, restaurantId: Int) {
             item {
                 IconWithHeader(
                     icon = Icons.Rounded.FoodBank,
-                    text = stringResource(id = R.string.label_menu_item_management).replace(" ", "\n")
+                    text = stringResource(id = R.string.label_menu_item_management)
                 )
             }
             items(viewmodel.items) { item ->
