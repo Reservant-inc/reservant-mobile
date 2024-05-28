@@ -74,7 +74,7 @@
     <string name="error_not_found">Could not find resource</string>
     <string name="label_group">Group</string>
     <string name="label_new_restaurant">New Restaurant</string>
-    <string name="confirm_delete_title">Are you sure you want do delete the menu?</string>
+    <string name="confirm_delete_title">Are you sure you want do delete the item?</string>
     <string name="confirm_delete_text">This action is irreversible</string>
     <string name="label_yes_capital">Yes</string>
     <string name="label_cancel">Cancel</string>
@@ -111,4 +111,9 @@
     <string name="delete_restaurant_title">Delete a restaurant</string>
     <string name="delete_restaurant_message">Are you sure you want to delete</string>
     <string name="label_limited_time">Available until</string>
+    <string name="label_menu_item_management">Menu item management</string>
+    <string name="label_menu_item_photo">Menu Item Photo</string>
+    <string name="label_edit_menu_item">Edit menu item</string>
+    <string name="label_price">Price</string>
+    <string name="label_alcohol">Alcohol Percentage</string>
 </resources>

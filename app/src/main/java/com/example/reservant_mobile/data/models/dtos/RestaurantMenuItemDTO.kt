@@ -10,5 +10,8 @@ data class RestaurantMenuItemDTO (
     val name: String,
     val alternateName: String? = null,
     val alcoholPercentage: Double?,
-    val photo: String
+    val photoFileName: String? = null,
+    val photo: String? = null,
+    val stringPrice: String? = null,
+    val stringAlcoholPercentage: String? = null
 )

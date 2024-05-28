@@ -14,7 +14,8 @@ data object RestaurantManagementRoutes {
 
     @Serializable
     data class MenuItem(
-        val menuId: Int
+        val menuId: Int,
+        val restaurantId: Int
     )
 
     @Serializable
