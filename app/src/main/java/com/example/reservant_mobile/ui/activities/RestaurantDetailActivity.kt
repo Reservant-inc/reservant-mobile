@@ -64,7 +64,7 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                 ) {
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = restaurantDetailVM.errorMessage ?: "Unknown error",
+                        text = restaurantDetailVM.errorMessage ?: "Sorry! something went wrong.",
                         color = MaterialTheme.colorScheme.error
                     )
                 }
