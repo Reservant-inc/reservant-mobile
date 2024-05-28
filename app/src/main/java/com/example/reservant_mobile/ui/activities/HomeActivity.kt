@@ -111,7 +111,6 @@ fun HomeActivity() {
                     MainBottomSheet (
                         body= { modifier -> MainMapView(mv, startPoint, modifier) },
                         sheetContent = sheetContent)
-
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
@@ -123,7 +122,7 @@ fun HomeActivity() {
                     RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
                 }
                 composable<RestaurantDetailRoutes.Details>{
-                    RestaurantDetailActivity(navControllerHome = innerNavController)
+                    RestaurantDetailActivity(navControllerHome = innerNavController, 1)
                 }
             }
         }
