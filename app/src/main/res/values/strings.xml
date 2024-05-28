@@ -107,6 +107,7 @@
     <string name="label_delivery_cost">Delivery cost</string>
     <string name="label_menu_price">Price</string>
     <string name="label_events">Events</string>
+    <string name="error_text">\"Sorry! Something went wrong:(</string>
     <string name="delete_restaurant_title">Delete a restaurant</string>
     <string name="delete_restaurant_message">Are you sure you want to delete</string>
     <string name="label_limited_time">Available until</string>

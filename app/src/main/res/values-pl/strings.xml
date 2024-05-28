@@ -102,6 +102,7 @@
     <string name="label_delivery_cost">Koszt dostawy</string>
     <string name="label_menu_price">Cena</string>
     <string name="label_events">Wydarzenia</string>
+    <string name="error_text">Coś poszło nie tak:(</string>
     <string name="delete_restaurant_title">Usuwanie restauracji</string>
     <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
     <string name="label_limited_time">Dostępne do</string>
