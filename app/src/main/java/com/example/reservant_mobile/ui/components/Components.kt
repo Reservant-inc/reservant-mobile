@@ -1562,6 +1562,7 @@ fun Modifier.shimmer(): Modifier = composed {
 
 @Composable
 fun MenuCard(
+    isLoading: Boolean = false,
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1665,13 +1666,10 @@ fun MenuCard(
             )
         }
     }
-
-    val loading by remember {
-        mutableStateOf(true)
-    }
+    
 
     val loadingModifier = when {
-        loading -> Modifier
+        isLoading -> Modifier
             .shimmer()
             .alpha(0F)
         else -> Modifier

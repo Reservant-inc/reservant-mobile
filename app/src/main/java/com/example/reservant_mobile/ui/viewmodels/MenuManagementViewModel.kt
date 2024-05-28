@@ -18,6 +18,8 @@ class MenuManagementViewModel(
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
 
+    var isLoading by mutableStateOf(true)
+
     var name = FormField(RestaurantMenuDTO::name.name)
     var alternateName = FormField(RestaurantMenuDTO::alternateName.name)
     var menuType = FormField(RestaurantMenuDTO::menuType.name)
@@ -32,6 +34,7 @@ class MenuManagementViewModel(
 
     private suspend fun fetchMenus(){
         menus = service.getMenus(restaurantId).value?.toMutableList() ?: mutableListOf()
+        isLoading = false
     }
 
     suspend fun addMenu(){
