@@ -1053,6 +1053,7 @@ fun IconWithHeader(
                 modifier = Modifier
                     .padding(4.dp, 16.dp, 8.dp, 4.dp)
                     .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
             )
         }
     }
