@@ -97,4 +97,7 @@
     <string name="label_date_from">Data od</string>
     <string name="label_date_to">Data do</string>
     <string name="label_add_menu">Dodaj menu</string>
+    <string name="delete_restaurant_title">Usuwanie restauracji</string>
+    <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
+    <string name="label_limited_time">Dostępne do</string>
 </resources>
