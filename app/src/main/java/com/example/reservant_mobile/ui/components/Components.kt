@@ -141,6 +141,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -1490,8 +1491,16 @@ fun EditEmployeeDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    vm.editEmployee(employee)
-                    onDismiss()
+                    vm.viewModelScope.launch {
+                        isLoading = true
+                        formSent = true
+
+                        if (vm.editEmployee(employee)) {
+                            onDismiss()
+                        }
+
+                        isLoading = false
+                    }
                 },
                 label = stringResource(R.string.label_save)
             )
@@ -1549,7 +1558,7 @@ fun Modifier.shimmer(): Modifier = composed {
 
 @Composable
 fun MenuPopup(
-    title:  @Composable (() -> Unit),
+    title: @Composable (() -> Unit),
     hide: () -> Unit,
     onConfirm: () -> Unit,
     clear: () -> Unit,
@@ -1558,7 +1567,7 @@ fun MenuPopup(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
-){
+) {
     AlertDialog(
         onDismissRequest = {
             hide()
@@ -1570,36 +1579,48 @@ fun MenuPopup(
                 InputUserInfo(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
-                    onValueChange = {name.value = it}
+                    onValueChange = { name.value = it }
                 )
                 InputUserInfo(
                     label = stringResource(id = R.string.label_alternate_name),
                     optional = true,
                     inputText = altName.value,
-                    onValueChange = {altName.value = it}
+                    onValueChange = { altName.value = it }
                 )
                 InputUserInfo(
                     label = stringResource(id = R.string.label_menu_type),
                     inputText = menuType.value,
-                    onValueChange = {menuType.value = it}
+                    onValueChange = { menuType.value = it }
                 )
-                MyDatePickerDialog (
-                    label = { Text(text = stringResource(id = R.string.label_date_from))},
+                MyDatePickerDialog(
+                    label = { Text(text = stringResource(id = R.string.label_date_from)) },
                     allowFutureDates = true,
                     startStringValue = dateFrom.value,
-                    startDate = dateFrom.value.ifEmpty { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) },
-                    onBirthdayChange = {dateFrom.value = it}
+                    startDate = dateFrom.value.ifEmpty {
+                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                    },
+                    onBirthdayChange = { dateFrom.value = it }
                 )
-                MyDatePickerDialog (
-                    label = { Text(text = buildAnnotatedString {
-                        append(stringResource(id = R.string.label_date_to))
-                        pushStyle(SpanStyle(Color.Gray, fontWeight = FontWeight.Light, fontStyle = FontStyle.Italic))
-                        append(stringResource(id = R.string.label_optional))
-                    })},
+                MyDatePickerDialog(
+                    label = {
+                        Text(text = buildAnnotatedString {
+                            append(stringResource(id = R.string.label_date_to))
+                            pushStyle(
+                                SpanStyle(
+                                    Color.Gray,
+                                    fontWeight = FontWeight.Light,
+                                    fontStyle = FontStyle.Italic
+                                )
+                            )
+                            append(stringResource(id = R.string.label_optional))
+                        })
+                    },
                     allowFutureDates = true,
                     startStringValue = dateUntil.value,
-                    startDate = dateUntil.value.ifEmpty { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) },
-                    onBirthdayChange = {dateUntil.value = it}
+                    startDate = dateUntil.value.ifEmpty {
+                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                    },
+                    onBirthdayChange = { dateUntil.value = it }
                 )
 
             }
@@ -1763,7 +1784,7 @@ fun MenuCard(
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = {showEditPopup = true},
+                        onClick = { showEditPopup = true },
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "EditMenuItem"
                     )
@@ -1825,61 +1846,234 @@ fun AddMenuButton(
 
 @Composable
 fun MenuItemCard(
+    name: FormField,
+    altName: FormField,
+    price: FormField,
+    alcoholPercentage: FormField,
+    photo: FormField,
     menuItem: RestaurantMenuItemDTO,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    clearFields: () -> Unit,
+    context: Context
 ) {
+
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
+    var showEditPopup by remember { mutableStateOf(false) }
+
+
+    when {
+        showConfirmDeletePopup -> {
+            CountDownPopup(
+                icon = Icons.Filled.DeleteForever,
+                title = stringResource(id = R.string.confirm_delete_title),
+                text = stringResource(id = R.string.confirm_delete_text),
+                onConfirm = {
+                    onDeleteClick()
+                    showConfirmDeletePopup = false
+                },
+                onDismissRequest = { showConfirmDeletePopup = false },
+                confirmText = stringResource(id = R.string.label_yes_capital),
+                dismissText = stringResource(id = R.string.label_cancel)
+            )
+        }
+
+        showEditPopup -> {
+
+            name.value = menuItem.name
+            altName.value = menuItem.alternateName ?: ""
+            price.value = menuItem.price.toString()
+            alcoholPercentage.value = menuItem.alcoholPercentage.toString()
+            photo.value = menuItem.photoFileName ?: ""
+
+            MenuItemPopup(
+                title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
+                hide = { showEditPopup = false },
+                onConfirm = onEditClick,
+                clear = clearFields,
+                name = name,
+                altName = altName,
+                price = price,
+                alcoholPercentage = alcoholPercentage,
+                photo = photo,
+                context = context
+            )
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Column {
-            Text(
-                text = menuItem.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                modifier = Modifier.padding(8.dp)
-            )
-
-            Text(
-                text = "Price: ${menuItem.price} zł",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-
-            if (menuItem.alcoholPercentage != null) {
+        Row {
+            Column {
                 Text(
-                    text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                    text = menuItem.name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxSize(0.5f)
+                )
+
+                Text(
+                    text = "Price: ${menuItem.price} zł",
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onEditClick,
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditMenuItem"
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
                 )
 
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onDeleteClick,
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "DeleteMenuItem"
-                )
+                if (menuItem.alcoholPercentage != null) {
+                    Text(
+                        text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    SecondaryButton(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(50.dp),
+                        onClick = { showEditPopup = true },
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "EditMenuItem"
+                    )
+
+                    SecondaryButton(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(50.dp),
+                        onClick = { showConfirmDeletePopup = true },
+                        imageVector = Icons.Filled.DeleteForever,
+                        contentDescription = "DeleteMenuItem"
+                    )
+                }
             }
+
+            //TODO podmienić na zdj z backendu
+            Image(
+                painterResource(id = R.drawable.pizza),
+                contentDescription = "",
+                modifier = Modifier.fillMaxHeight()
+            )
+
         }
     }
+}
+
+@Composable
+fun MenuItemPopup(
+    title: @Composable (() -> Unit),
+    hide: () -> Unit,
+    onConfirm: () -> Unit,
+    clear: () -> Unit,
+    name: FormField,
+    altName: FormField,
+    price: FormField,
+    alcoholPercentage: FormField,
+    photo: FormField,
+    context: Context
+) {
+    AlertDialog(
+        onDismissRequest = {
+            hide()
+            clear()
+        },
+        title = title,
+        text = {
+            Column {
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_restaurant_name),
+                    inputText = name.value,
+                    onValueChange = { name.value = it }
+                )
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_alternate_name),
+                    optional = true,
+                    inputText = altName.value,
+                    onValueChange = { altName.value = it }
+                )
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_price),
+                    inputText = price.value,
+                    onValueChange = { price.value = it },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                InputUserInfo(
+                    label = stringResource(id = R.string.label_alcohol),
+                    inputText = alcoholPercentage.value,
+                    onValueChange = { alcoholPercentage.value = it },
+                    optional = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                InputUserFile(
+                    label = stringResource(id = R.string.label_menu_item_photo),
+                    onFilePicked = { file -> photo.value = file.toString() },
+                    context = context
+                )
+
+            }
+        },
+        dismissButton = {
+            ButtonComponent(
+                onClick = {
+                    hide()
+                    clear()
+                },
+                label = stringResource(id = R.string.label_cancel)
+            )
+        },
+        confirmButton = {
+            ButtonComponent(
+                onClick = {
+                    hide()
+                    onConfirm()
+                    clear()
+                },
+                label = stringResource(id = R.string.label_save)
+            )
+        },
+
+        )
+}
+
+@Composable
+fun AddMenuItemButton(
+    name: FormField,
+    altName: FormField,
+    price: FormField,
+    alcoholPercentage: FormField,
+    photo: FormField,
+    clearFields: () -> Unit,
+    addMenu: () -> Unit,
+    context: Context
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
+
+    when {
+        showAddDialog -> {
+            MenuItemPopup(
+                title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
+                hide = { showAddDialog = false },
+                onConfirm = addMenu,
+                clear = clearFields,
+                name = name,
+                altName = altName,
+                price = price,
+                alcoholPercentage = alcoholPercentage,
+                photo = photo,
+                context = context
+            )
+        }
+    }
+
+    MyFloatingActionButton(
+        onClick = { showAddDialog = true }
+    )
 }
 
 
@@ -2147,7 +2341,26 @@ fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () 
 }
 
 @Composable
-fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        modifier = modifier.padding(2.dp)
+    ) {
+        Text(category)
+    }
+}
+
+@Composable
+fun TagSelectionScreen(
+    vm: RegisterRestaurantViewModel,
+    onDismiss: () -> Unit,
+    onTagSelected: (String, Boolean) -> Unit,
+) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
 
