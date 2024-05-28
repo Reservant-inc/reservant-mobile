@@ -16,10 +16,10 @@ class RestaurantDetailViewModel(
     private val restaurantService: IRestaurantService = RestaurantService()
 ) : ViewModel() {
 
+    var result: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value=null))
+
     var restaurant: RestaurantDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
-    var errorMessage: String? by mutableStateOf(null)
-    var errorToast: Int? by mutableStateOf(null)
 
     init {
         viewModelScope.launch {
@@ -30,26 +30,28 @@ class RestaurantDetailViewModel(
     private fun loadRestaurant(id: Int) {
         viewModelScope.launch {
             isLoading = true
-            errorMessage = null
-            errorToast = null
-            try {
-                val response = restaurantService.getRestaurant(id)
 
-                if (!response.isError) {
-                    restaurant = response.value
-                } else {
-                    response.errors?.get("TOAST")?.let {
-                        errorToast = it
-                    } ?: run {
-                        errorMessage = "Error while loading restaurant: ${response.errors}"
-                    }
+            try {
+                result = restaurantService.getRestaurant(id)
+
+                if (!result.isError) {
+                    restaurant = result.value
                 }
+
             } catch (e: Exception) {
-                errorMessage = e.message
+                println("[LOAD RESTAURANTS ERROR]" + e.message)
             } finally {
                 isLoading = false
             }
         }
+    }
+
+    public fun getToastError(): Int{
+        if(!result.isError){
+            return -1
+        }
+
+        return result.errors!!.getOrDefault("TOAST", -1)
     }
 
 }

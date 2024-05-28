@@ -1,12 +1,11 @@
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -29,12 +28,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
-
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.RatingBar
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
@@ -52,9 +51,8 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        if (restaurantDetailVM.errorToast != null) {
-            Toast.makeText(LocalContext.current, restaurantDetailVM.errorToast!!, Toast.LENGTH_LONG).show()
-            restaurantDetailVM.errorToast = null
+        if (restaurantDetailVM.result.isError) {
+            ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
         }
 
         when {
@@ -64,17 +62,6 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
-                }
-            }
-            restaurantDetailVM.errorMessage != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = restaurantDetailVM.errorMessage ?: "Sorry! something went wrong.",
-                        color = MaterialTheme.colorScheme.error
-                    )
                 }
             }
             restaurantDetailVM.restaurant != null -> {
@@ -189,6 +176,17 @@ fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId:
                             )
                         )
                     }
+                }
+            }
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Sorry! something went wrong.",
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }

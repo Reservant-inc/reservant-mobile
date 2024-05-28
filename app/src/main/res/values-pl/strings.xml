@@ -102,4 +102,5 @@
     <string name="label_delivery_cost">Koszt dostawy</string>
     <string name="label_menu_price">Cena</string>
     <string name="label_events">Wydarzenia</string>
+    <string name="error_text">Coś poszło nie tak:(</string>
 </resources>

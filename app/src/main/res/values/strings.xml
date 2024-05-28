@@ -107,4 +107,5 @@
     <string name="label_delivery_cost">Delivery cost</string>
     <string name="label_menu_price">Price</string>
     <string name="label_events">Events</string>
+    <string name="error_text">\"Sorry! Something went wrong:(</string>
 </resources>
