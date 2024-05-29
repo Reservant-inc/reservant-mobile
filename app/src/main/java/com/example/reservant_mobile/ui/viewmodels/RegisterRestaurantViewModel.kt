@@ -12,7 +12,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.DataType
-import com.example.reservant_mobile.data.services.FileUploadService
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
@@ -126,15 +126,15 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        val fDto = file?.let { FileUploadService().sendFile(type, it).value }
+        val fDto = file?.let { FileService().sendFile(type, it).value }
         return fDto?.fileName ?: ""
     }
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        var fDto = file?.let { FileUploadService().sendFile(DataType.PNG, it).value }
+        var fDto = file?.let { FileService().sendFile(DataType.PNG, it).value }
         if (fDto == null) {
-            fDto = file?.let { FileUploadService().sendFile(DataType.JPG, it).value }
+            fDto = file?.let { FileService().sendFile(DataType.JPG, it).value }
         }
         return fDto?.fileName ?: ""
     }
