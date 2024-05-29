@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.rounded.People
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.ui.components.AddEmployeeDialog
+import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.EditEmployeeDialog
 import com.example.reservant_mobile.ui.components.EmployeeCard
 import com.example.reservant_mobile.ui.components.IconWithHeader
