@@ -101,4 +101,5 @@
     <string name="label_date_from">Date from</string>
     <string name="label_date_to">Date to</string>
     <string name="label_add_menu">Add menu</string>
+    <string name="error_registerRestaurant_invalid_group">Invalid group</string>
 </resources>
