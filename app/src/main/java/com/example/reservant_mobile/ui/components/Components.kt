@@ -1929,6 +1929,14 @@ fun MenuItemCard(
                         .fillMaxSize(0.5f)
                 )
 
+                if (menuItem.alternateName != null) {
+                    Text(
+                        text = menuItem.alternateName,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                    )
+                }
+
                 Text(
                     text = "Price: ${menuItem.price} zł",
                     style = MaterialTheme.typography.labelSmall,
