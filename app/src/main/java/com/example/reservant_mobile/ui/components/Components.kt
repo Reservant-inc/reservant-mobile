@@ -1096,6 +1096,26 @@ fun EmployeeCard(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    var showConfirmDeletePopup by remember { mutableStateOf(false) }
+
+    when {
+        showConfirmDeletePopup -> {
+            CountDownPopup(
+                icon = Icons.Filled.DeleteForever,
+                title = stringResource(id = R.string.confirm_delete_title),
+                text = stringResource(id = R.string.confirm_delete_text),
+                onConfirm = {
+                    onDeleteClick()
+                    showConfirmDeletePopup = false
+                },
+                onDismissRequest = { showConfirmDeletePopup = false },
+                confirmText = stringResource(id = R.string.label_yes_capital),
+                dismissText = stringResource(id = R.string.label_cancel)
+            )
+        }
+    }
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1172,7 +1192,7 @@ fun EmployeeCard(
 
                 SecondaryButton(
                     modifier = buttonModifier,
-                    onClick = onDeleteClick,
+                    onClick = {showConfirmDeletePopup = true},
                     imageVector = Icons.Filled.DeleteForever,
                     contentDescription = "DeleteEmployee"
                 )
