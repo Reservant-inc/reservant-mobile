@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
@@ -76,21 +77,80 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     suspend fun validateSecondStep(context: Context): Boolean {
 
-         val permission = sendFile(businessPermission.value, context, DataType.PDF)
-         val card = sendFile(idCard.value, context, DataType.PDF)
-         val rental = if (rentalContract.value.isBlank()) "" else sendFile(rentalContract.value, context, DataType.PDF)
-         val license = if (alcoholLicense.value.isBlank()) "" else sendFile(alcoholLicense.value, context, DataType.PDF)
 
-        if (isRestaurantRegistrationSecondStepInvalid(context) || permission.isEmpty() || card.isEmpty()) {
-            businessPermission.value = permission.toUri().toString()
-            idCard.value = card.toUri().toString()
+        val permission = if (!businessPermission.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )) sendFile(
+            businessPermission.value,
+            context,
+            DataType.PDF
+        ) else null
+
+        val card =
+            if (!idCard.value.endsWith(
+                    ".pdf",
+                    ignoreCase = true
+                )) sendFile(idCard.value, context, DataType.PDF) else null
+
+        val rental =
+            if (rentalContract.value.isBlank() || rentalContract.value == "null") null else sendFile(
+                rentalContract.value,
+                context,
+                DataType.PDF
+            )
+        val license =
+            if (alcoholLicense.value.isBlank() || alcoholLicense.value == "null") null else sendFile(
+                alcoholLicense.value,
+                context,
+                DataType.PDF
+            )
+
+        if (permission != null) {
+            if (!permission.isError)
+                businessPermission.value = permission.value?.fileName ?: ""
+            else
+                businessPermission.value = "Bledny plik"
+        }
+        if (card != null) {
+            if (!card.isError)
+                idCard.value = card.value?.fileName ?: ""
+            else
+                idCard.value = "Bledny plik"
+        }
+
+        if (rental != null) {
+            if (!rental.isError) {
+                rentalContract.value = rental.value?.fileName ?: ""
+            } else {
+                rentalContract.value = "Bledny plik"
+            }
+        }
+
+        if (license != null) {
+            if (!license.isError)
+                alcoholLicense.value = license.value?.fileName ?: ""
+            else
+                alcoholLicense.value = "Bledny plik"
+        }
+
+        if (isRestaurantRegistrationSecondStepInvalid(context)) {
             return false
         }
 
-        businessPermission.value = permission
-        idCard.value = card
-        rentalContract.value = rental
-        alcoholLicense.value = license
+        if(!rentalContract.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )){
+            rentalContract.value = ""
+        }
+
+        if(!alcoholLicense.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )){
+            alcoholLicense.value = ""
+        }
 
         return true
     }
@@ -127,10 +187,9 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         tags = restaurantService.getRestaurantTags().value ?: listOf()
     }
 
-    suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
+    suspend fun sendFile(uri: String?, context: Context, type: DataType): Result<FileUploadDTO?>? {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        val fDto = file?.let { FileService().sendFile(type, it).value }
-        return fDto?.fileName ?: ""
+        return file?.let { FileService().sendFile(type, it) }
     }
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
@@ -223,7 +282,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isBusinessPermissionInvalid(context: Context): Boolean {
         val value = businessPermission.value
-        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+        return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
         )
@@ -231,7 +290,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isIdCardInvalid(context: Context): Boolean {
         val value = idCard.value
-        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+        return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
         )
@@ -239,18 +298,18 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isAlcoholLicenseInvalid(context: Context): Boolean {
         val value = alcoholLicense.value
-        return if (value.isBlank())
+        return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
     }
 
     fun isRentalContractInvalid(context: Context): Boolean {
         val value = rentalContract.value
-        return if (value.isBlank())
+        return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
     }
 
 
@@ -259,7 +318,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return if (value.isBlank()) {
             false
         } else {
-            val fileName = getFileName(context, value.toUri())
+            val fileName = getFileName(context, value)
             !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(
                 ".jpg",
                 ignoreCase = true
