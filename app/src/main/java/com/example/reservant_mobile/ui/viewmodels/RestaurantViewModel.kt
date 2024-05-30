@@ -5,9 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
+import com.example.reservant_mobile.data.models.dtos.PointDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
@@ -19,7 +21,7 @@ import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import com.example.reservant_mobile.data.utils.getFileName
 
-class RegisterRestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :
+class RestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :
     ViewModel() {
 
     // Wynik rejestracji
@@ -45,13 +47,36 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     // Tagowanie i inne
     var tags = listOf(String())
-    var selectedTags = mutableStateListOf<String>()
+    var selectedTags: List<String> by mutableStateOf(listOf())
     var delivery by mutableStateOf(false)
 
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
 
+    var restaurantId by mutableStateOf<Int?>(null)
+
+    suspend fun assignData(id: Int, group: RestaurantGroupDTO) {
+        restaurantId = id
+        val restaurant = restaurantService.getRestaurant(restaurantId!!)
+        if(restaurant.value != null) {
+            name.value = restaurant.value.name
+            restaurantType.value = restaurant.value.restaurantType
+            nip.value = restaurant.value.nip
+            address.value = restaurant.value.address
+            postalCode.value = restaurant.value.postalIndex
+            city.value = restaurant.value.city
+            rentalContract.value = restaurant.value.rentalContract.orEmpty().drop(9)
+            alcoholLicense.value = restaurant.value.alcoholLicense.orEmpty().drop(9)
+            businessPermission.value = restaurant.value.businessPermission.orEmpty().drop(9)
+            idCard.value = restaurant.value.idCard.orEmpty().drop(9)
+            logo.value = restaurant.value.logo.orEmpty().drop(9)
+            description.value = restaurant.value.description
+            delivery = restaurant.value.provideDelivery
+            selectedTags = restaurant.value.tags
+            selectedGroup = group
+        }
+    }
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid(context)) {
             return false
@@ -62,6 +87,16 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         result = restaurantService.registerRestaurant(restaurant)
 
         return result.value
+    }
+
+    suspend fun editRestaurant(context: Context): Boolean {
+        if (isRestaurantRegistrationInvalid(context)) {
+            return false
+        }
+
+        val restaurant = getRestaurantData(context)
+
+        return restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
     }
 
     suspend fun validateFirstStep(context: Context): Boolean {
@@ -155,9 +190,25 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return true
     }
 
+    suspend fun validateLogo(context: Context): Boolean{
+        val card =
+            if (!logo.value.endsWith(
+                    ".pdf",
+                    ignoreCase = true
+                )) sendFile(idCard.value, context, DataType.PDF) else null
+
+        if (card != null) {
+            if (!card.isError)
+                idCard.value = card.value?.fileName ?: ""
+            else
+                idCard.value = "Bledny plik"
+        }
+    }
+
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
 
         return RestaurantDTO(
+            restaurantId = restaurantId?: -1,
             name = name.value,
             restaurantType = restaurantType.value,
             nip = nip.value,
@@ -171,10 +222,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             logo = sendPhoto(logo.value, context),
             description = description.value,
             provideDelivery = delivery,
-            tags = selectedTags.toList(),
+            tags = selectedTags,
             groupId = selectedGroup?.restaurantGroupId,
             photos = emptyList(),
-            tables = emptyList()
+            tables = emptyList(),
+            location = PointDTO(latitude = 52.39625635, longitude = 20.91364863552046)
         )
     }
 
@@ -189,7 +241,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): Result<FileUploadDTO?>? {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        val fDto = file?.let { FileUploadService().sendFile(type, it) }
+        val fDto = file?.let { FileService().sendFile(type, it) }
         return fDto
     }
 

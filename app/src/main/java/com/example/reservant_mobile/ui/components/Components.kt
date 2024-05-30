@@ -123,6 +123,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -167,7 +168,7 @@ import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
-import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -2076,7 +2077,7 @@ fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () 
 }
 
 @Composable
-fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+fun TagSelectionScreen(vm: RestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
 

@@ -112,4 +112,5 @@
     <string name="delete_restaurant_message">Are you sure you want to delete</string>
     <string name="label_limited_time">Available until</string>
     <string name="error_registerRestaurant_invalid_group">Invalid group</string>
+    <string name="label_edit_restaurant">Edit restaurant</string>
 </resources>
