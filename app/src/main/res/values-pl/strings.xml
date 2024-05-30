@@ -106,4 +106,5 @@
     <string name="delete_restaurant_title">Usuwanie restauracji</string>
     <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
     <string name="label_limited_time">Dostępne do</string>
+    <string name="error_registerRestaurant_invalid_group">Niepoprawna grupa</string>
 </resources>

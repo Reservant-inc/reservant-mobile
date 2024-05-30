@@ -317,7 +317,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                     val newGroups = groups + RestaurantGroupDTO(name = registerRestaurantViewModel.name.value)
                     OutLinedDropdownMenu(
                         selectedOption = selectedGroup?.name
-                            ?: stringResource(R.string.label_management_choose_group),
+                            ?: "",
                         itemsList = newGroups.map { it.name },
                         onOptionSelected = { name ->
                             registerRestaurantViewModel.viewModelScope.launch {
@@ -325,7 +325,14 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                                     newGroups.find { it.name == name }
                             }
                         },
-                        label = stringResource(R.string.label_add_to_group)
+                        label = stringResource(R.string.label_add_to_group),
+                        isError = registerRestaurantViewModel.isGroupInvalid(),
+                        errorText = stringResource(
+                            if (registerRestaurantViewModel.getAlcoholLicenseError() != -1)
+                                registerRestaurantViewModel.getAlcoholLicenseError()
+                            else
+                                R.string.error_registerRestaurant_invalid_group
+                        )
                     )
                 }
 

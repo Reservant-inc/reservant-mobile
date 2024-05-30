@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
@@ -74,26 +75,88 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return result.value
     }
 
-    fun validateSecondStep(context: Context): Boolean {
+    suspend fun validateSecondStep(context: Context): Boolean {
 
-        val isBusinessPermissionValid = !isBusinessPermissionInvalid(context)
-        val isIdCardValid = !isIdCardInvalid(context)
 
-        val isRentalContractValid = rentalContract.value.isBlank() || !isRentalContractInvalid(context)
-        val isAlcoholLicenseValid = alcoholLicense.value.isBlank() || !isAlcoholLicenseInvalid(context)
+        val permission = if (!businessPermission.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )) sendFile(
+            businessPermission.value,
+            context,
+            DataType.PDF
+        ) else null
 
-        val isGroupValid = !isGroupInvalid()
+        val card =
+            if (!idCard.value.endsWith(
+                    ".pdf",
+                    ignoreCase = true
+                )) sendFile(idCard.value, context, DataType.PDF) else null
 
-        val isValid = isBusinessPermissionValid && isIdCardValid && isRentalContractValid && isAlcoholLicenseValid && isGroupValid
+        val rental =
+            if (rentalContract.value.isBlank() || rentalContract.value == "null") null else sendFile(
+                rentalContract.value,
+                context,
+                DataType.PDF
+            )
+        val license =
+            if (alcoholLicense.value.isBlank() || alcoholLicense.value == "null") null else sendFile(
+                alcoholLicense.value,
+                context,
+                DataType.PDF
+            )
 
-        result2 = Result(isError = !isValid, value = isValid)
+        if (permission != null) {
+            if (!permission.isError)
+                businessPermission.value = permission.value?.fileName ?: ""
+            else
+                businessPermission.value = "Bledny plik"
+        }
+        if (card != null) {
+            if (!card.isError)
+                idCard.value = card.value?.fileName ?: ""
+            else
+                idCard.value = "Bledny plik"
+        }
 
-        return isValid
+        if (rental != null) {
+            if (!rental.isError) {
+                rentalContract.value = rental.value?.fileName ?: ""
+            } else {
+                rentalContract.value = "Bledny plik"
+            }
+        }
+
+        if (license != null) {
+            if (!license.isError)
+                alcoholLicense.value = license.value?.fileName ?: ""
+            else
+                alcoholLicense.value = "Bledny plik"
+        }
+
+        if (isRestaurantRegistrationSecondStepInvalid(context)) {
+            return false
+        }
+
+        if(!rentalContract.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )){
+            rentalContract.value = ""
+        }
+
+        if(!alcoholLicense.value.endsWith(
+                ".pdf",
+                ignoreCase = true
+            )){
+            alcoholLicense.value = ""
+        }
+
+        return true
     }
 
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
-        val rental = if (rentalContract.value.isBlank()) null else sendFile(rentalContract.value, context, DataType.PDF)
-        val alcohol = if (alcoholLicense.value.isBlank()) null else sendFile(alcoholLicense.value, context, DataType.PDF)
+
         return RestaurantDTO(
             name = name.value,
             restaurantType = restaurantType.value,
@@ -101,10 +164,10 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
             address = address.value,
             postalIndex = postalCode.value,
             city = city.value,
-            rentalContract = rental,
-            alcoholLicense = alcohol,
-            businessPermission = sendFile(businessPermission.value, context, DataType.PDF),
-            idCard = sendFile(idCard.value, context, DataType.PDF),
+            rentalContract = rentalContract.value.ifBlank { null },
+            alcoholLicense = alcoholLicense.value.ifBlank { null },
+            businessPermission = businessPermission.value,
+            idCard = idCard.value,
             logo = sendPhoto(logo.value, context),
             description = description.value,
             provideDelivery = delivery,
@@ -115,19 +178,19 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         )
     }
 
-    suspend fun getGroups(){
+    suspend fun getGroups() {
         groups = restaurantService.getGroups().value
     }
 
-    suspend fun getTags(){
+    suspend fun getTags() {
         //Przypisujemy pustą listę listOf(), jeśli getRestaurantTags() jest null
         tags = restaurantService.getRestaurantTags().value ?: listOf()
     }
 
-    suspend fun sendFile(uri: String?, context: Context, type: DataType): String {
+    suspend fun sendFile(uri: String?, context: Context, type: DataType): Result<FileUploadDTO?>? {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        val fDto = file?.let { FileService().sendFile(type, it).value }
-        return fDto?.fileName ?: ""
+        val fDto = file?.let { FileUploadService().sendFile(type, it) }
+        return fDto
     }
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
@@ -148,6 +211,8 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isDescriptionInvalid() ||
                 isBusinessPermissionInvalid(context) ||
                 isIdCardInvalid(context) ||
+                isAlcoholLicenseInvalid(context) ||
+                isRentalContractInvalid(context) ||
                 isLogoInvalid(context) ||
                 isRestaurantTypeInvalid() ||
                 areTagsInvalid()
@@ -160,6 +225,15 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
                 isRestaurantTypeInvalid()
+    }
+
+    fun isRestaurantRegistrationSecondStepInvalid(context: Context): Boolean {
+        return isBusinessPermissionInvalid(context) ||
+                isIdCardInvalid(context) ||
+                isAlcoholLicenseInvalid(context) ||
+                isRentalContractInvalid(context) ||
+                isGroupInvalid()
+
     }
 
     fun isNameInvalid(): Boolean {
@@ -202,13 +276,14 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     fun isDescriptionInvalid(): Boolean {
         return description.value.isBlank()
     }
+
     fun isGroupInvalid(): Boolean {
         return selectedGroup == null
     }
 
     fun isBusinessPermissionInvalid(context: Context): Boolean {
         val value = businessPermission.value
-        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+        return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
         )
@@ -216,7 +291,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isIdCardInvalid(context: Context): Boolean {
         val value = idCard.value
-        return value.isBlank() || !getFileName(context, value.toUri()).endsWith(
+        return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
         )
@@ -224,18 +299,18 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
 
     fun isAlcoholLicenseInvalid(context: Context): Boolean {
         val value = alcoholLicense.value
-        return if (value.isBlank())
+        return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
     }
 
     fun isRentalContractInvalid(context: Context): Boolean {
         val value = rentalContract.value
-        return if (value.isBlank())
+        return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value.toUri()).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
     }
 
 
@@ -244,8 +319,11 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return if (value.isBlank()) {
             false
         } else {
-            val fileName = getFileName(context, value.toUri())
-            !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(".jpg", ignoreCase = true))
+            val fileName = getFileName(context, value)
+            !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(
+                ".jpg",
+                ignoreCase = true
+            ))
         }
     }
 
