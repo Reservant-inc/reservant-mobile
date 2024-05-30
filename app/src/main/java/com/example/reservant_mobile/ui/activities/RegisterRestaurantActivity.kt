@@ -269,6 +269,7 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
+                    defaultValue = restaurantViewModel.businessPermission.value,
                     onFilePicked = { file ->
                         restaurantViewModel.businessPermission.value = file.toString();
                     },
@@ -286,6 +287,7 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_ownerId),
+                    defaultValue = restaurantViewModel.idCard.value,
                     onFilePicked = { file ->
                         restaurantViewModel.idCard.value = file.toString();
                     },
@@ -303,6 +305,7 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_lease),
+                    defaultValue = restaurantViewModel.rentalContract.value,
                     onFilePicked = { file ->
                         restaurantViewModel.rentalContract.value = file.toString();
                     },
@@ -321,6 +324,7 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_license),
+                    defaultValue = restaurantViewModel.alcoholLicense.value,
                     onFilePicked = { file ->
                         restaurantViewModel.alcoholLicense.value = file.toString();
                     },
@@ -390,11 +394,6 @@ fun RegisterRestaurantActivity(
             }
         }
         composable<RegisterRestaurantRoutes.Description> {
-            // TODO: tags
-            val tags =
-                listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -483,6 +482,7 @@ fun RegisterRestaurantActivity(
                 Column {
                     InputUserFile(
                         label = stringResource(id = R.string.label_restaurant_logo),
+                        defaultValue = restaurantViewModel.logo.value,
                         onFilePicked = { file ->
                             restaurantViewModel.logo.value = file.toString();
                         },

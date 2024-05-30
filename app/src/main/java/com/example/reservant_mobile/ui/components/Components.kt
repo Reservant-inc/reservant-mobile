@@ -265,6 +265,7 @@ fun InputUserInfo(
 @Composable
 fun InputUserFile(
     label: String = "",
+    defaultValue: String = "",
     onFilePicked: (Uri?) -> Unit,
     modifier: Modifier = Modifier,
     context: Context,
@@ -289,6 +290,10 @@ fun InputUserFile(
     }
     if (fileName == null && optional) {
         beginValidation = false
+    }
+
+    if (fileName == null && defaultValue.isNotBlank()){
+        fileName = defaultValue
     }
 
     OutlinedTextField(

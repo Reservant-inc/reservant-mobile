@@ -59,7 +59,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
     suspend fun assignData(id: Int, group: RestaurantGroupDTO) {
         restaurantId = id
         val restaurant = restaurantService.getRestaurant(restaurantId!!)
-        if(restaurant.value != null) {
+        if (restaurant.value != null) {
             name.value = restaurant.value.name
             restaurantType.value = restaurant.value.restaurantType
             nip.value = restaurant.value.nip
@@ -77,7 +77,9 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             selectedGroup = group
         }
     }
+
     suspend fun registerRestaurant(context: Context): Boolean {
+        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
@@ -90,13 +92,14 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
     }
 
     suspend fun editRestaurant(context: Context): Boolean {
+        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
 
         val restaurant = getRestaurantData(context)
 
-        return restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
+        return !restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
     }
 
     suspend fun validateFirstStep(context: Context): Boolean {
@@ -116,7 +119,8 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
         val permission = if (!businessPermission.value.endsWith(
                 ".pdf",
                 ignoreCase = true
-            )) sendFile(
+            )
+        ) sendFile(
             businessPermission.value,
             context,
             DataType.PDF
@@ -126,7 +130,8 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             if (!idCard.value.endsWith(
                     ".pdf",
                     ignoreCase = true
-                )) sendFile(idCard.value, context, DataType.PDF) else null
+                )
+            ) sendFile(idCard.value, context, DataType.PDF) else null
 
         val rental =
             if (rentalContract.value.isBlank() || rentalContract.value == "null") null else sendFile(
@@ -173,42 +178,49 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             return false
         }
 
-        if(!rentalContract.value.endsWith(
+        if (!rentalContract.value.endsWith(
                 ".pdf",
                 ignoreCase = true
-            )){
+            )
+        ) {
             rentalContract.value = ""
         }
 
-        if(!alcoholLicense.value.endsWith(
+        if (!alcoholLicense.value.endsWith(
                 ".pdf",
                 ignoreCase = true
-            )){
+            )
+        ) {
             alcoholLicense.value = ""
         }
 
         return true
     }
 
-    suspend fun validateLogo(context: Context): Boolean{
-        val card =
+    suspend fun validateLogo(context: Context): Boolean {
+        val logo =
             if (!logo.value.endsWith(
                     ".pdf",
                     ignoreCase = true
-                )) sendFile(idCard.value, context, DataType.PDF) else null
+                )
+            ) sendPhoto(logo.value, context) else null
 
-        if (card != null) {
-            if (!card.isError)
-                idCard.value = card.value?.fileName ?: ""
+        if (logo != null) {
+            if (!logo.isError)
+                idCard.value = logo.value?.fileName ?: ""
             else
                 idCard.value = "Bledny plik"
         }
+        if (isLogoInvalid(context)) {
+            return false
+        }
+        return true
     }
 
     suspend fun getRestaurantData(context: Context): RestaurantDTO {
 
         return RestaurantDTO(
-            restaurantId = restaurantId?: -1,
+            restaurantId = restaurantId ?: -1,
             name = name.value,
             restaurantType = restaurantType.value,
             nip = nip.value,
@@ -219,7 +231,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             alcoholLicense = alcoholLicense.value.ifBlank { null },
             businessPermission = businessPermission.value,
             idCard = idCard.value,
-            logo = sendPhoto(logo.value, context),
+            logo = logo.value,
             description = description.value,
             provideDelivery = delivery,
             tags = selectedTags,
@@ -245,13 +257,15 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
         return fDto
     }
 
-    suspend fun sendPhoto(uri: String?, context: Context): String {
+    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        var fDto = file?.let { FileService().sendFile(DataType.PNG, it).value }
-        if (fDto == null) {
-            fDto = file?.let { FileService().sendFile(DataType.JPG, it).value }
+        var fDto = file?.let { FileService().sendFile(DataType.PNG, it) }
+        if (fDto != null) {
+            if (fDto.value == null) {
+                fDto = file?.let { FileService().sendFile(DataType.JPG, it) }
+            }
         }
-        return fDto?.fileName ?: ""
+        return fDto
     }
 
     fun isRestaurantRegistrationInvalid(context: Context): Boolean {
@@ -368,15 +382,19 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
 
     fun isLogoInvalid(context: Context): Boolean {
         val value = logo.value
-        return if (value.isBlank()) {
-            false
-        } else {
-            val fileName = getFileName(context, value)
-            !(fileName.endsWith(".png", ignoreCase = true) || fileName.endsWith(
-                ".jpg",
-                ignoreCase = true
-            ))
-        }
+        return value.isBlank() ||
+                !(getFileName(context, value)
+                    .endsWith(
+                        ".png",
+                        ignoreCase = true
+                    )
+                        || getFileName(
+                    context,
+                    value
+                ).endsWith(
+                    ".jpg",
+                    ignoreCase = true
+                ))
     }
 
 
