@@ -2,10 +2,8 @@ package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
@@ -84,7 +82,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             return false
         }
 
-        val restaurant = getRestaurantData(context)
+        val restaurant = getRestaurantData()
 
         result = restaurantService.registerRestaurant(restaurant)
 
@@ -97,17 +95,17 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             return false
         }
 
-        val restaurant = getRestaurantData(context)
+        val restaurant = getRestaurantData()
 
         return !restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
     }
 
-    suspend fun validateFirstStep(context: Context): Boolean {
+    suspend fun validateFirstStep(): Boolean {
         if (isRestaurantRegistrationFirstStepInvalid()) {
             return false
         }
 
-        val restaurant = getRestaurantData(context)
+        val restaurant = getRestaurantData()
 
         result = restaurantService.validateFirstStep(restaurant)
         return result.value
@@ -198,18 +196,18 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
     }
 
     suspend fun validateLogo(context: Context): Boolean {
-        val logo =
+        val restaurantLogo =
             if (!logo.value.endsWith(
                     ".pdf",
                     ignoreCase = true
                 )
             ) sendPhoto(logo.value, context) else null
 
-        if (logo != null) {
-            if (!logo.isError)
-                idCard.value = logo.value?.fileName ?: ""
+        if (restaurantLogo != null) {
+            if (!restaurantLogo.isError)
+                logo.value = restaurantLogo.value?.fileName ?: ""
             else
-                idCard.value = "Bledny plik"
+                logo.value = "Bledny plik"
         }
         if (isLogoInvalid(context)) {
             return false
@@ -217,7 +215,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
         return true
     }
 
-    suspend fun getRestaurantData(context: Context): RestaurantDTO {
+    private fun getRestaurantData(): RestaurantDTO {
 
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
@@ -268,7 +266,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
         return fDto
     }
 
-    fun isRestaurantRegistrationInvalid(context: Context): Boolean {
+    private fun isRestaurantRegistrationInvalid(context: Context): Boolean {
         return isNameInvalid() ||
                 isNipInvalid() ||
                 isAddressInvalid() ||
@@ -283,6 +281,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
                 isRestaurantTypeInvalid() ||
                 areTagsInvalid()
     }
+
 
     fun isRestaurantRegistrationFirstStepInvalid(): Boolean {
         return isNameInvalid() ||
