@@ -32,7 +32,7 @@ import kotlinx.serialization.Serializable
 
 class APIService{
 
-    private val backendUrl= "http://10.0.2.2:5147"
+    private val backendUrl= "http://172.21.40.127:12038"
 
     private val localService = LocalBearerService()
     private val client = HttpClient(CIO){
