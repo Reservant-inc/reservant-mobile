@@ -1,37 +1,21 @@
 package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.ui.components.MainBottomSheet
-import com.example.reservant_mobile.ui.components.MainMapView
+import com.example.reservant_mobile.ui.components.OsmMapView
 import com.example.reservant_mobile.ui.components.RestaurantDetailBottomSheet
+import com.example.reservant_mobile.ui.components.RestaurantsBottomSheet
 import com.example.reservant_mobile.ui.viewmodels.MapViewModel
-import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapActivity(){
     val mapViewModel = viewModel<MapViewModel>()
@@ -95,7 +79,7 @@ fun MapActivity(){
         "Restarant 3" to "Adres 3",
         "Restarant 4" to "Adres 4",)
 
-    MainBottomSheet (
-        body= { modifier -> MainMapView(mv, startPoint, modifier) },
+    RestaurantsBottomSheet (
+        body= { modifier -> OsmMapView(mv, startPoint, modifier) },
         sheetContent = sheetContent)
 }

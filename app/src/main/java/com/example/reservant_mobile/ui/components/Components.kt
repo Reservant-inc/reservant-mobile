@@ -2587,7 +2587,7 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
     }
 
 @Composable
-fun MainMapView(
+fun OsmMapView(
     mapView: MapView,
     startPoint: GeoPoint,
     modifier: Modifier = Modifier.fillMaxSize()
@@ -2607,7 +2607,7 @@ fun MainMapView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainBottomSheet(
+fun RestaurantsBottomSheet(
     body: @Composable (modifier: Modifier) -> Unit,
     sheetContent: List<Pair<String, String>>
 ) {

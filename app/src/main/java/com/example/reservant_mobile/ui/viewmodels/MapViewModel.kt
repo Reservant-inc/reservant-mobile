@@ -1,8 +1,6 @@
 package com.example.reservant_mobile.ui.viewmodels
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toBitmap
