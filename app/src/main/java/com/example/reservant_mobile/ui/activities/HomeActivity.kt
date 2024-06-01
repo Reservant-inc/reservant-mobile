@@ -63,54 +63,7 @@ fun HomeActivity() {
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
                 composable<MainRoutes.Home>{
-                    val startPoint = GeoPoint(52.237049, 21.017532)
-                    // Init map
-                    val context = LocalContext.current
-                    val mv = MapView(context).apply {
-
-                        setTileSource(TileSourceFactory.OpenTopo)
-                        setMultiTouchControls(true)
-                        // Enable rotation
-                        val rotationGestureOverlay = RotationGestureOverlay(this)
-                        rotationGestureOverlay.isEnabled
-                        overlays.add(rotationGestureOverlay)
-
-                        minZoomLevel = 3.0
-                        maxZoomLevel = 20.0
-                        controller.setZoom(17.0)
-                        controller.setCenter(startPoint)
-
-                        // START POINT MARKER
-                        val startMarker = Marker(this)
-                        startMarker.position = startPoint
-                        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        //Fixme: proper mark icons
-                        var bitmap =  context.getDrawable( R.drawable.ic_logo)?.toBitmap(50, 50)
-                        startMarker.icon = BitmapDrawable(context.resources, bitmap)
-                        startMarker.title = "You are here"
-                        overlays.add(startMarker)
-                    }
-
-                    // EXAMPLE RESTAURANT MARKER
-                    //Fixme: wrap me in function
-                    val restaurantMarker = Marker(mv)
-                    restaurantMarker.position = GeoPoint(52.240055, 21.017532)
-                    restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    //Fixme: proper mark icons
-                    val bitmap =  context.getDrawable( R.drawable.pizza)?.toBitmap(65, 65)
-                    restaurantMarker.icon = BitmapDrawable(context.resources, bitmap)
-                    restaurantMarker.title = "Restaurant is here"
-                    mv.overlays.add(restaurantMarker)
-
-                    val sheetContent = listOf(
-                        "Restarant 1" to "Adres 1",
-                        "Restarant 2" to "Adres 2",
-                        "Restarant 3" to "Adres 3",
-                        "Restarant 4" to "Adres 4",)
-
-                    MainBottomSheet (
-                        body= { modifier -> MainMapView(mv, startPoint, modifier) },
-                        sheetContent = sheetContent)
+                    MapActivity()
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
