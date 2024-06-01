@@ -93,6 +93,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -110,6 +111,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -2632,12 +2634,32 @@ fun MainBottomSheet(
                 }
 
             }
-        }) { innerPadding ->
-        body.invoke(
+        },
+        content = { innerPadding -> body.invoke(
             Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         )
-    }
+        }
+    )
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RestaurantDetailBottomSheet(onDismiss: () -> Unit){
+    val modalBottomSheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss()},
+        sheetState = modalBottomSheetState,
+    ) {
+        Column(
+            modifier = Modifier.height(400.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Restairant")
+        }
+    }
 }
