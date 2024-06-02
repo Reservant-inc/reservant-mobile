@@ -2667,6 +2667,7 @@ fun RestaurantDetailBottomSheet(
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
+        modifier = Modifier.height(400.dp)
     ) {
         val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
             factory = object : ViewModelProvider.Factory {
