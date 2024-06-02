@@ -15,6 +15,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -89,6 +90,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -1211,7 +1214,6 @@ fun BottomNavigation(navController: NavHostController) {
 }
 
 
-
 @Composable
 fun Heading() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -1652,6 +1654,7 @@ fun MenuCard(
                 dismissText = stringResource(id = R.string.label_cancel)
             )
         }
+
         showEditPopup -> {
 
             name.value = menu.name
@@ -1751,7 +1754,6 @@ fun MenuCard(
                         .size(50.dp)
                         .padding(6.dp)
 
-
                     SecondaryButton(
                         modifier = buttonModifier,
                         onClick = {showEditPopup = true},
@@ -1789,10 +1791,10 @@ fun AddMenuButton(
     dateUntil: FormField,
     clearFields: () -> Unit,
     addMenu: () -> Unit
-){
-    var showAddDialog by remember { mutableStateOf(false)}
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
 
-    when{
+    when {
         showAddDialog -> {
             MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
@@ -1910,13 +1912,18 @@ fun DeletePopup(
     icon: ImageVector,
     title: String,
     text: String,
-    confirmText:String = "Confirm",
+    confirmText: String = "Confirm",
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
     enabled: Boolean = true,
-    deleteButtonContent: @Composable (RowScope.() -> Unit) = {Text(confirmText, color = MaterialTheme.colorScheme.error)}
-){
+    deleteButtonContent: @Composable (RowScope.() -> Unit) = {
+        Text(
+            confirmText,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
+) {
     AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1972,7 +1979,7 @@ fun CountDownPopup(
             allowConfirm = timer == 0
         }
     }
-    
+
     /*AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -2008,7 +2015,7 @@ fun CountDownPopup(
             }
         }
     )*/
-    
+
     DeletePopup(
         icon = icon,
         title = title,
@@ -2019,7 +2026,7 @@ fun CountDownPopup(
             if (allowConfirm) onConfirm()
         },
         enabled = allowConfirm
-    ){
+    ) {
         if (allowConfirm) {
             Text(confirmText, color = MaterialTheme.colorScheme.error)
         } else {
@@ -2178,15 +2185,33 @@ fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, o
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TagList(tags: List<String>) {
+fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
     FlowRow(
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
         tags.forEach { tag ->
-            TagItem(tag = tag)
+            TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
 }
+
+@Composable
+fun TagItem(tag: String, onRemove: () -> Unit) {
+    InputChip(
+        onClick = { onRemove() },
+        label = { Text(tag) },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove tag"
+            )
+        },
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.padding(4.dp),
+        selected = false
+    )
+}
+
 
 @Composable
 fun MenuItemCard(
@@ -2422,27 +2447,11 @@ fun FloatingActionMenu(
 }
 
 @Composable
-fun TagItem(tag: String) {
-    Text(
-        text = tag,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 12.sp,
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50)
-            )
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    )
-}
-
-@Composable
 fun FloatingTabSwitch(
     pages: List<Pair<String, @Composable () -> Unit>>
 ) {
     val pagerState = rememberPagerState(
-        pageCount = {pages.size}
+        pageCount = { pages.size }
     )
     val coroutineScope = rememberCoroutineScope()
     val cornerShape = RoundedCornerShape(50)
@@ -2458,7 +2467,7 @@ fun FloatingTabSwitch(
         HorizontalPager(
             state = pagerState,
             userScrollEnabled = true
-        ) {page ->
+        ) { page ->
             pages[page].second.invoke()
         }
         TabRow(
@@ -2470,17 +2479,17 @@ fun FloatingTabSwitch(
             indicator = indicator,
             divider = {}
         ) {
-            pages.forEachIndexed{ index, tabItem ->
+            pages.forEachIndexed { index, tabItem ->
                 val selected = pagerState.currentPage == index
                 Tab(
                     modifier = Modifier.zIndex(6f),
-                text = {
-                    if (selected) {
-                        Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
-                    } else {
-                        Text(text = tabItem.first)
-                    }
-                },
+                    text = {
+                        if (selected) {
+                            Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
+                        } else {
+                            Text(text = tabItem.first)
+                        }
+                    },
                     selected = selected,
                     onClick = {
                         coroutineScope.launch {
@@ -2579,17 +2588,17 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
 fun MainMapView(
     mapView: MapView,
     startPoint: GeoPoint,
-    modifier:Modifier = Modifier.fillMaxSize()
+    modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by remember {mutableStateOf(startPoint)}
+    val geoPoint by remember { mutableStateOf(startPoint) }
     val mapViewState = rememberMapViewWithLifecycle(mapView)
 
     AndroidView(
         modifier = modifier,
         factory = { mapViewState },
-        update = {
-            view -> view.controller.setCenter(geoPoint)
+        update = { view ->
+            view.controller.setCenter(geoPoint)
         }
     )
 }
@@ -2597,7 +2606,7 @@ fun MainMapView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainBottomSheet(
-    body: @Composable (modifier:Modifier) -> Unit,
+    body: @Composable (modifier: Modifier) -> Unit,
     sheetContent: List<Pair<String, String>>
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -2614,18 +2623,20 @@ fun MainBottomSheet(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(sheetContent){item ->
+                items(sheetContent) { item ->
                     RestaurantCard(
                         imageUrl = "",
                         name = item.first,
-                        location = item.second)
+                        location = item.second
+                    )
                 }
 
             }
-        }) { innerPadding -> body.invoke(
-        Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        }) { innerPadding ->
+        body.invoke(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         )
     }
 

@@ -356,10 +356,6 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             }
         }
         composable<RegisterRestaurantRoutes.Description> {
-            // TODO: tags
-            val tags = listOf("na miejscu", "na wynos", "azjatyckie", "włoskie", "tag1", "tag2", "inne")
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -375,23 +371,28 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 ProgressBar(currentStep = 3)
 
-                TagList(tags = registerRestaurantViewModel.selectedTags)
-                
-                ButtonComponent(onClick = { showTagDialog = true }, label = stringResource(id = R.string.label_choose_tags))
 
-                if (showTagDialog) {
-                    TagSelectionScreen(
-                        vm = registerRestaurantViewModel,
-                        onDismiss = { showTagDialog = false },
-                        onTagSelected = { tag, isSelected ->
-                            if (isSelected) {
-                                registerRestaurantViewModel.selectedTags.add(tag)
-                            } else {
-                                registerRestaurantViewModel.selectedTags.remove(tag)
+                    TagList(tags = registerRestaurantViewModel.selectedTags, onRemoveTag = { tag ->
+                        registerRestaurantViewModel.selectedTags.remove(tag)
+                    })
+
+                    ButtonComponent(onClick = { showTagDialog = true }, label = stringResource(id = R.string.label_choose_tags))
+
+                    if (showTagDialog) {
+                        TagSelectionScreen(
+                            vm = registerRestaurantViewModel,
+                            onDismiss = { showTagDialog = false },
+                            onTagSelected = { tag, isSelected ->
+                                if (isSelected) {
+                                    registerRestaurantViewModel.selectedTags.add(tag)
+                                } else {
+                                    registerRestaurantViewModel.selectedTags.remove(tag)
+                                }
                             }
-                        }
-                    )
-                }
+                        )
+                    }
+
+
 
                 Row(
                     modifier = Modifier
