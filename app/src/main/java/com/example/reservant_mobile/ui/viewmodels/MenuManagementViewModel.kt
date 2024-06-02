@@ -18,6 +18,8 @@ class MenuManagementViewModel(
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
 
+    var isLoading by mutableStateOf(true)
+
     var name = FormField(RestaurantMenuDTO::name.name)
     var alternateName = FormField(RestaurantMenuDTO::alternateName.name)
     var menuType = FormField(RestaurantMenuDTO::menuType.name)
@@ -32,17 +34,23 @@ class MenuManagementViewModel(
 
     private suspend fun fetchMenus(){
         menus = service.getMenus(restaurantId).value?.toMutableList() ?: mutableListOf()
+        isLoading = false
+    }
+
+    private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO{
+        return RestaurantMenuDTO(
+            menuId = menuId,
+            name = name.value,
+            restaurantId = restaurantId,
+            alternateName = alternateName.value.ifEmpty { null },
+            menuType = menuType.value,
+            dateFrom = dateFrom.value,
+            dateUntil = dateUntil.value.ifEmpty { null }
+        )
     }
 
     suspend fun addMenu(){
-        val menu = RestaurantMenuDTO(
-            name = name.value,
-            restaurantId = restaurantId,
-            alternateName = alternateName.value,
-            menuType = menuType.value,
-            dateFrom = dateFrom.value,
-            dateUntil = dateUntil.value
-        )
+        val menu = createMenuDTO()
 
         val result = service.addMenu(menu)
 
@@ -53,15 +61,7 @@ class MenuManagementViewModel(
     }
 
     suspend fun editMenu(menu: RestaurantMenuDTO) {
-        val editedMenu = RestaurantMenuDTO(
-            menuId = menu.menuId,
-            name = name.value,
-            restaurantId = menu.restaurantId,
-            alternateName = alternateName.value.ifEmpty { null },
-            menuType = menuType.value,
-            dateFrom = dateFrom.value,
-            dateUntil = dateUntil.value
-        )
+        val editedMenu = createMenuDTO(menu.menuId)
 
         val result = service.editMenu(editedMenu.menuId!!, editedMenu)
 

@@ -97,4 +97,13 @@
     <string name="label_date_from">Data od</string>
     <string name="label_date_to">Data do</string>
     <string name="label_add_menu">Dodaj menu</string>
+    <string name="label_gallery">Galeria</string>
+    <string name="label_more">Więcej</string>
+    <string name="label_delivery_cost">Koszt dostawy</string>
+    <string name="label_menu_price">Cena</string>
+    <string name="label_events">Wydarzenia</string>
+    <string name="error_text">Coś poszło nie tak:(</string>
+    <string name="delete_restaurant_title">Usuwanie restauracji</string>
+    <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
+    <string name="label_limited_time">Dostępne do</string>
 </resources>

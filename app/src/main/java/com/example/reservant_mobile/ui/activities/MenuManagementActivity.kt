@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
@@ -55,6 +56,32 @@ fun MenuManagementActivity(restaurantId: Int) {
                             text = stringResource(id = R.string.label_menu_management).replace(" ", "\n")
                         )
                     }
+
+                    when {
+                        viewmodel.isLoading -> repeat(3){
+                            item{
+                                MenuCard(
+                                    isLoading = true,
+                                    name = viewmodel.name,
+                                    altName = viewmodel.alternateName,
+                                    menuType = viewmodel.menuType,
+                                    dateFrom = viewmodel.dateFrom,
+                                    dateUntil = viewmodel.dateUntil,
+                                    menu = RestaurantMenuDTO(
+                                        name = "",
+                                        menuType = "",
+                                        dateFrom = ""
+                                    ),
+                                    onEditClick = { },
+                                    onDeleteClick = { },
+                                    onClick = { },
+                                    clearFields = { }
+                                )
+                            }
+                        }
+                    }
+
+
                     items(viewmodel.menus) { menu ->
                         MenuCard(
                             name = viewmodel.name,
