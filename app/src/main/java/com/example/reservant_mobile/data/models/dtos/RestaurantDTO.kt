@@ -10,6 +10,7 @@ data class RestaurantDTO (
     val nip: String = "",
     val address: String,
     val postalIndex: String = "",
+    val location: LocationDTO? = null,
     val city: String,
     val groupId: Int? = null,
     val groupName: String = "",
