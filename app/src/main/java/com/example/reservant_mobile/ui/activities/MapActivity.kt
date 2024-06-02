@@ -3,6 +3,7 @@ package com.example.reservant_mobile.ui.activities
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,6 +21,8 @@ import org.osmdroid.util.GeoPoint
 fun MapActivity(){
     val mapViewModel = viewModel<MapViewModel>()
     var showRestaurantBottomSheet by remember { mutableStateOf(false) }
+    var showRestaurantId by remember { mutableIntStateOf(0) }
+
 
     // Init map
     val context = LocalContext.current
@@ -27,7 +30,7 @@ fun MapActivity(){
     val mv = mapViewModel.initMapView(context, startPoint)
 
     if (showRestaurantBottomSheet) {
-        RestaurantDetailBottomSheet() {
+        RestaurantDetailBottomSheet(showRestaurantId) {
             showRestaurantBottomSheet = false
         }
     }
@@ -38,6 +41,7 @@ fun MapActivity(){
         "Restaurant 1" +
                 ""
     ) { _, _ ->
+        showRestaurantId = 1
         showRestaurantBottomSheet = true
         true
     }
@@ -45,9 +49,10 @@ fun MapActivity(){
     mapViewModel.addRestaurantMarker(
         GeoPoint(52.240055, 21.027532),
         context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 1" +
+        "Restaurant 2" +
                 ""
     ) { _, _ ->
+        showRestaurantId = 2
         showRestaurantBottomSheet = true
         true
     }
@@ -55,9 +60,10 @@ fun MapActivity(){
     mapViewModel.addRestaurantMarker(
         GeoPoint(52.250055, 21.027532),
         context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 1" +
+        "Restaurant 3" +
                 ""
     ) { _, _ ->
+        showRestaurantId = 3
         showRestaurantBottomSheet = true
         true
     }
@@ -65,9 +71,10 @@ fun MapActivity(){
     mapViewModel.addRestaurantMarker(
         GeoPoint(52.210055, 21.007532),
         context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 1" +
+        "Restaurant 4" +
                 ""
     ) { _, _ ->
+        showRestaurantId = 4
         showRestaurantBottomSheet = true
         true
     }
