@@ -15,6 +15,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
+import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.MapTileIndex
 
 class MapViewModel(): ViewModel() {
     private object OsmMap {
@@ -25,9 +27,19 @@ class MapViewModel(): ViewModel() {
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
 
         val mv = MapView(context).apply {
-            setTileSource(TileSourceFactory.OpenTopo)
+
+            val customTiles = object : XYTileSource(
+                "openstreetmap.fr", 1, 20, 256, ".png",
+                arrayOf("https://a.tile.openstreetmap.fr/hot/")
+            ) {
+                override fun getTileURLString(pMapTileIndex: Long): String {
+                    return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
+                            MapTileIndex.getX(pMapTileIndex) + "/" +
+                            MapTileIndex.getY(pMapTileIndex) + ".png"
+                }
+            }
+            setTileSource(customTiles)
             setMultiTouchControls(true)
-            // Enable rotation
             val rotationGestureOverlay = RotationGestureOverlay(this)
             rotationGestureOverlay.isEnabled
             overlays.add(rotationGestureOverlay)
