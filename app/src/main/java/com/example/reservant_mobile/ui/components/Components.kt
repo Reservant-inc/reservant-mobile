@@ -45,9 +45,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -60,6 +62,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -67,7 +70,10 @@ import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -92,6 +98,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalDrawerSheet
@@ -155,8 +162,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -174,6 +184,7 @@ import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -2647,19 +2658,116 @@ fun RestaurantsBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantDetailBottomSheet(onDismiss: () -> Unit){
+fun RestaurantDetailBottomSheet(
+    restaurantId: Int,
+    onDismiss: () -> Unit
+){
     val modalBottomSheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
     ) {
-        Column(
-            modifier = Modifier.height(400.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Restairant")
+        val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
+            factory = object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    RestaurantDetailViewModel(restaurantId) as T
+            }
+        )
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            if (restaurantDetailVM.result.isError) {
+                ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
+            }
+
+            when {
+                restaurantDetailVM.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                restaurantDetailVM.restaurant != null -> {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        restaurantDetailVM.restaurant?.let { restaurant ->
+
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                repeat(5) {
+                                    ImageCard(
+                                        painterResource(R.drawable.pizza)
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = restaurant.name,
+                                        style = MaterialTheme.typography.headlineLarge,
+                                        modifier = Modifier.weight(1f)
+                                    )
+
+                                    Text(
+                                        text = restaurant.restaurantType,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+
+                                    Text(
+                                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+                                }
+
+                                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    RatingBar(rating = 3.9f)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("3.9 (200+ opinii)")
+                                }
+
+                            }
+
+                            ButtonComponent(
+                                modifier = Modifier.padding(10.dp),
+                                onClick = { /*TODO*/ },
+                                label = "Pokaż więcej szczegółów"
+                            )
+                        }
+                    }
+                }
+                else -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "Sorry! something went wrong.",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
         }
     }
 }
