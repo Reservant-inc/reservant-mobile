@@ -2163,13 +2163,9 @@ fun TagItem(tag: String, onRemove: () -> Unit) {
                 contentDescription = "Remove tag"
             )
         },
-        colors = InputChipDefaults.inputChipColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            labelColor = MaterialTheme.colorScheme.onPrimary
-        ),
         shape = RoundedCornerShape(50),
         modifier = Modifier.padding(4.dp),
-        selected = true
+        selected = false
     )
 }
 
