@@ -976,16 +976,21 @@ fun RestaurantCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
     ) {
-        Column {
+        Row (
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxWidth()
+        ){
             Image(
                 painter = painterResource(R.drawable.ic_logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                    .height(100.dp)
+                    .width(100.dp),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
             )
             Column(
                 modifier = Modifier
@@ -2626,13 +2631,13 @@ fun RestaurantsBottomSheet(
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 150.dp,
+        sheetPeekHeight = 100.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         sheetContent = {
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .height(450.dp)
+                    .height(475.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
