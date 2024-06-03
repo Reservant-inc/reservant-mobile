@@ -328,7 +328,7 @@ fun SearchBarWithFilter() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(CardDefaults.cardColors().containerColor, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -367,7 +367,7 @@ fun SearchBarWithFilter() {
             Icon(
                 imageVector = Icons.Default.FilterList,
                 contentDescription = "Filter",
-                tint = Color(0xFFAD1457)
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
     }
