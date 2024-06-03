@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -310,7 +311,7 @@ fun ReviewsContent(
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        SearchBar()
+        SearchBarWithFilter()
         Spacer(modifier = Modifier.height(16.dp))
 
         reviews.forEach { review ->
@@ -321,38 +322,54 @@ fun ReviewsContent(
 }
 
 @Composable
-fun SearchBar() {
+fun SearchBarWithFilter() {
     var text by remember { mutableStateOf("") }
 
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White, RoundedCornerShape(8.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.CenterStart
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BasicTextField(
-            value = text,
-            onValueChange = { text = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 36.dp),
-            singleLine = true,
-            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
-        )
-        if (text.isEmpty()) {
-            Text(
-                text = "Search...",
-                color = Color.Gray,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            BasicTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 36.dp),
+                singleLine = true,
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
+            )
+            if (text.isEmpty()) {
+                Text(
+                    text = "Szukaj...",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
-        Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        )
+        IconButton(
+            onClick = { /* TODO: Handle filter action */ },
+            modifier = Modifier.padding(start = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.FilterList,
+                contentDescription = "Filter",
+                tint = Color(0xFFAD1457)
+            )
+        }
     }
 }
 
