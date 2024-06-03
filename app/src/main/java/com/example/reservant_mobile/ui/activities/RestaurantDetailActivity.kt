@@ -327,7 +327,7 @@ fun ReviewsContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(64.dp))
         SearchBarWithFilter()
@@ -347,7 +347,7 @@ fun SearchBarWithFilter() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(8.dp))
+            .background(CardDefaults.cardColors().containerColor, RoundedCornerShape(8.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
