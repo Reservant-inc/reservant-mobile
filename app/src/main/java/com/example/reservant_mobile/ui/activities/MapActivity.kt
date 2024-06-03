@@ -245,7 +245,7 @@ fun RestaurantDetailPreview(
                                     navController.navigate(RestaurantDetailRoutes.Details)
                                 },
 
-                                label = "Pokaż więcej szczegółów"
+                                label = stringResource(id = R.string.label_show_more_details)
                             )
                         }
                     }
