@@ -29,14 +29,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MyFloatingActionButton
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.RestaurantInfoView
-import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
@@ -151,7 +149,6 @@ fun RestaurantManagementActivity() {
                     Spacer(modifier = Modifier.padding(bottom = 64.dp))
                 }
 
-                // FloatingActionButton positioned at the bottom right
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -168,6 +165,12 @@ fun RestaurantManagementActivity() {
         composable<RestaurantManagementRoutes.Menu> {
             MenuManagementActivity(
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Menu>().restaurantId
+            )
+        }
+
+        composable<RegisterRestaurantRoutes.Inputs> {
+            RegisterRestaurantActivity(
+                navController
             )
         }
 
