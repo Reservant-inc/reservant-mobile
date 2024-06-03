@@ -12,19 +12,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.navigation.AuthRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import kotlinx.coroutines.GlobalScope
+import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
+import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
+
+    val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {
         Column(
@@ -67,9 +74,13 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
             ButtonComponent(
                 label = "Logout",
                 onClick = {
-                    GlobalScope.launch {
-                        UserService().logoutUser()
-                        navController.navigate(AuthRoutes.Landing)
+                    loginViewModel.viewModelScope.launch{
+                        loginViewModel.logout()
+                        navController.navigate(AuthRoutes.Landing){
+                            popUpTo(MainRoutes.Home){
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             )
