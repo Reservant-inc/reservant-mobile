@@ -2667,7 +2667,7 @@ fun RestaurantDetailBottomSheet(
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
-        modifier = Modifier.height(400.dp)
+        modifier = Modifier.height(450.dp)
     ) {
         val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
             factory = object : ViewModelProvider.Factory {
@@ -2711,28 +2711,44 @@ fun RestaurantDetailBottomSheet(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Column {
+                                Column(
+                                    modifier = Modifier.width(220.dp),
+                                    verticalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     Text(
                                         text = restaurant.name,
-                                        style = MaterialTheme.typography.headlineLarge,
-                                        modifier = Modifier.weight(1f)
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
                                     )
 
                                     Text(
                                         text = restaurant.restaurantType,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                        modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
                                     )
 
-                                    Text(
-                                        text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(horizontal = 16.dp)
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(bottom = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Icon(
+                                            modifier = Modifier
+                                                .padding(start = 16.dp),
+                                            imageVector = Icons.Rounded.LocationOn,
+                                            contentDescription = "Restaurant location"
+
+                                        )
+                                        Text(
+                                            text = "${restaurant.city}\n${restaurant.address}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
+
 
                                     Text(
                                         text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
@@ -2750,8 +2766,11 @@ fun RestaurantDetailBottomSheet(
                             }
 
                             ButtonComponent(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .wrapContentHeight(align = Alignment.CenterVertically),
                                 onClick = { /*TODO*/ },
+
                                 label = "Pokaż więcej szczegółów"
                             )
                         }
