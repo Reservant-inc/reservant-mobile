@@ -32,6 +32,7 @@ import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -179,15 +180,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                 }
             }
             else -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Sorry! something went wrong.",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+                MissingPage(errorStringId = R.string.error_not_found)
             }
         }
     }

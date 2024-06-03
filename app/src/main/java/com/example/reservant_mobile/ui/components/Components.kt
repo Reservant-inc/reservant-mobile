@@ -67,6 +67,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -2651,4 +2652,30 @@ fun RestaurantsBottomSheet(
         }
     )
 
+}
+
+@Composable
+fun MissingPage(
+    errorStringId: Int,
+    modifier:Modifier = Modifier
+        .fillMaxSize()
+){
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Icon(
+            modifier = Modifier
+                .height(100.dp)
+                .width(100.dp),
+            imageVector = Icons.Rounded.Error,
+            contentDescription = "Missing page error",
+            tint = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = stringResource(id = errorStringId)
+        )
+    }
 }
