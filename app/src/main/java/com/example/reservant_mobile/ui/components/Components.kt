@@ -1822,67 +1822,6 @@ fun AddMenuButton(
     )
 }
 
-
-@Composable
-fun MenuItemCard(
-    menuItem: RestaurantMenuItemDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column {
-            Text(
-                text = menuItem.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                modifier = Modifier.padding(8.dp)
-            )
-
-            Text(
-                text = "Price: ${menuItem.price} zł",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-
-            if (menuItem.alcoholPercentage != null) {
-                Text(
-                    text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onEditClick,
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditMenuItem"
-                )
-
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onDeleteClick,
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "DeleteMenuItem"
-                )
-            }
-        }
-    }
-}
-
-
 @Composable
 fun SecondaryButton(
     modifier: Modifier,
@@ -2222,12 +2161,12 @@ fun TagItem(tag: String, onRemove: () -> Unit) {
 
 @Composable
 fun MenuItemCard(
-    name: String,
-    price: String,
-    description: String,
-    imageResource: Int,
+    menuItem: RestaurantMenuItemDTO,
+    role: String,
     onInfoClick: () -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -2235,72 +2174,128 @@ fun MenuItemCard(
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Top
-            ) {
-                Row(verticalAlignment = Alignment.Top) {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.weight(1f)
+        when (role) {
+            Roles.CUSTOMER -> {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Row(verticalAlignment = Alignment.Top) {
+                            Text(
+                                text = menuItem.name,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                                onClick = onInfoClick,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .offset(y = (-4).dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Info,
+                                    contentDescription = "Info",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        Text(
+                            text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.offset(y = (-4).dp)
+                        )
+                        if (!menuItem.name.isNullOrEmpty()) {
+                            Text(
+                                text = menuItem.name,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Image(
+                        painter = painterResource(R.drawable.pizza), // Use actual resource if available
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(end = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
                     )
                     IconButton(
-                        onClick = onInfoClick,
+                        onClick = onAddClick,
                         modifier = Modifier
-                            .size(24.dp)
-                            .offset(y = (-4).dp)
+                            .size(36.dp)
+                            .align(Alignment.CenterVertically)
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Info",
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.offset(y = (-4).dp)
-                )
-                if (description.isNotEmpty()) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Image(
-                painter = painterResource(imageResource),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxSize()
-            )
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier
-                    .size(36.dp)
-                    .align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            Roles.RESTAURANT_OWNER -> {
+                Column {
+                    Text(
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Text(
+                        text = "Price: ${menuItem.price} zł",
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                    )
+
+                    if (menuItem.alcoholPercentage != null) {
+                        Text(
+                            text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(50.dp),
+                            onClick = onEditClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "EditMenuItem"
+                            )
+                        }
+
+                        IconButton(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(50.dp),
+                            onClick = onDeleteClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.DeleteForever,
+                                contentDescription = "DeleteMenuItem"
+                            )
+                        }
+                    }
+                }
             }
         }
     }

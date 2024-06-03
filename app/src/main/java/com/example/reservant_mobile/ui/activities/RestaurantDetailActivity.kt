@@ -28,6 +28,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Roles
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
@@ -201,21 +203,51 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 // TODO: MenuItemDTO
 @Composable
 fun MenuContent(
-//    menuItems: List<MenuItemDTO>
+//    menuItems: List<RestaurantMenuItemDTO>
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
 
-        repeat(3){
+        // Sample data to demonstrate the use of MenuItemCard
+        val sampleMenuItems = listOf(
+            RestaurantMenuItemDTO(
+                menuItemId = 1,
+                restaurantId = 1,
+                price = 15.0,
+                name = "Position name 1",
+                alternateName = null,
+                alcoholPercentage = null,
+                photo = "imageResource"
+            ),
+            RestaurantMenuItemDTO(
+                menuItemId = 2,
+                restaurantId = 1,
+                price = 20.0,
+                name = "Position name 2",
+                alternateName = null,
+                alcoholPercentage = 5.0,
+                photo = "imageResource"
+            ),
+            RestaurantMenuItemDTO(
+                menuItemId = 3,
+                restaurantId = 1,
+                price = 25.0,
+                name = "Position name 3",
+                alternateName = null,
+                alcoholPercentage = null,
+                photo = "imageResource"
+            )
+        )
+
+        sampleMenuItems.forEach { menuItem ->
             MenuItemCard(
-                name = "Position name",
-                price = stringResource(R.string.label_menu_price) + ": 15zl",
-                imageResource = R.drawable.pizza,
-                description = "Position description",
+                menuItem = menuItem,
+                role = Roles.CUSTOMER,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
@@ -223,10 +255,8 @@ fun MenuContent(
 
 //        menuItems.forEach { menuItem ->
 //            MenuItemCard(
-//                name = menuItem.name,
-//                price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
-//                imageResource = R.drawable.pizza, // Change to menuItem.imageResource if available
-//                description = menuItem.description,
+//                menuItem = menuItem,
+//                role = MenuItemCardRole.DETAIL,
 //                onInfoClick = { /* TODO: Handle info */ },
 //                onAddClick = { /* TODO: Handle add */ }
 //            )
