@@ -27,26 +27,19 @@ class RestaurantDetailViewModel(
         }
     }
 
-    private fun loadRestaurant(id: Int) {
-        viewModelScope.launch {
-            isLoading = true
+    private suspend fun loadRestaurant(id: Int) {
+        isLoading = true
 
-            try {
-                result = restaurantService.getRestaurant(id)
+        result = restaurantService.getRestaurant(id)
 
-                if (!result.isError) {
-                    restaurant = result.value
-                }
-
-            } catch (e: Exception) {
-                println("[LOAD RESTAURANTS ERROR]" + e.message)
-            } finally {
-                isLoading = false
-            }
+        if (!result.isError) {
+            restaurant = result.value
         }
+
+        isLoading = false
     }
 
-    public fun getToastError(): Int{
+    fun getToastError(): Int{
         if(!result.isError){
             return -1
         }
