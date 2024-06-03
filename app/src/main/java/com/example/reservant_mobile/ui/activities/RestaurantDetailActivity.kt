@@ -52,7 +52,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().padding(bottom = 4.dp)) {
 
         if (restaurantDetailVM.result.isError) {
             ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
