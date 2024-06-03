@@ -51,6 +51,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
@@ -2172,126 +2173,100 @@ fun MenuItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        when (role) {
-            Roles.CUSTOMER -> {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Row(verticalAlignment = Alignment.Top) {
-                            Text(
-                                text = menuItem.name,
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(
-                                onClick = onInfoClick,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .offset(y = (-4).dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Info,
-                                    contentDescription = "Info",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                        Text(
-                            text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.offset(y = (-4).dp)
-                        )
-                        if (!menuItem.name.isNullOrEmpty()) {
-                            Text(
-                                text = menuItem.name,
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Image(
-                        painter = painterResource(R.drawable.pizza), // Use actual resource if available
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(end = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
-                    IconButton(
-                        onClick = onAddClick,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-            Roles.RESTAURANT_OWNER -> {
-                Column {
                     Text(
                         text = menuItem.name,
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                        modifier = Modifier.padding(8.dp)
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
-
                     Text(
-                        text = "Price: ${menuItem.price} zł",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
                     if (menuItem.alcoholPercentage != null) {
                         Text(
                             text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+                }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
+                Image(
+                    painter = painterResource(R.drawable.pizza), // Replace with actual resource if available
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                when (role) {
+                    Roles.CUSTOMER -> {
                         IconButton(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(50.dp),
-                            onClick = onEditClick
+                            onClick = onInfoClick,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Info,
+                                contentDescription = "Info",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(
+                            onClick = onAddClick,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AddShoppingCart,
+                                contentDescription = "Add",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    Roles.RESTAURANT_OWNER -> {
+                        IconButton(
+                            onClick = onEditClick,
+                            modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
-                                contentDescription = "EditMenuItem"
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
-
                         IconButton(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(50.dp),
-                            onClick = onDeleteClick
+                            onClick = onDeleteClick,
+                            modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.DeleteForever,
-                                contentDescription = "DeleteMenuItem"
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
