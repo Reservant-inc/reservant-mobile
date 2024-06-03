@@ -115,4 +115,5 @@
     <string name="label_price">Cena</string>
     <string name="label_alcohol">Zawartość alkoholu</string>
     <string name="lable_logout_action">Wyloguj się</string>
+    <string name="label_reviews">Oceny</string>
 </resources>
