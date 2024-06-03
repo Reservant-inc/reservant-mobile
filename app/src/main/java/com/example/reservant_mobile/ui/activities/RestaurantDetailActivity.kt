@@ -340,6 +340,7 @@ fun ReviewsContent(
     }
 }
 
+// TODO: verify colors
 @Composable
 fun SearchBarWithFilter() {
     var text by remember { mutableStateOf("") }
