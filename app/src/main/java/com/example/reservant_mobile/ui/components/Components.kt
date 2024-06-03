@@ -1797,7 +1797,7 @@ fun AddMenuButton(
     when {
         showAddDialog -> {
             MenuPopup(
-                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
+                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
                 hide = { showAddDialog = false },
                 onConfirm = addMenu,
                 clear = clearFields,
