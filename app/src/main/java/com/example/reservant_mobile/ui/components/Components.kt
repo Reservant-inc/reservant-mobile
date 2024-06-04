@@ -2555,15 +2555,21 @@ fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
 }
 
 @Composable
-fun TagItem(tag: String, onRemove: () -> Unit) {
+fun TagItem(
+    tag: String,
+    onRemove: () -> Unit = {},
+    removable: Boolean = true
+) {
     InputChip(
         onClick = { onRemove() },
         label = { Text(tag) },
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove tag"
-            )
+            if(removable){
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove tag"
+                )
+            }
         },
         shape = RoundedCornerShape(50),
         modifier = Modifier.padding(4.dp),
