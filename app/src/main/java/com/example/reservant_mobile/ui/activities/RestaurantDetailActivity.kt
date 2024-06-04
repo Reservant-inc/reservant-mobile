@@ -64,6 +64,7 @@ import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.MissingPage
+import com.example.reservant_mobile.ui.components.MenuTypeButton
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -212,7 +213,8 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                                 stringResource(R.string.label_menu) to { MenuContent() },
                                 stringResource(R.string.label_events) to { EventsContent() },
                                 stringResource(R.string.label_reviews) to { ReviewsContent() }
-                            )
+                            ),
+                            paneScroll = false
                         )
                     }
                 }
@@ -241,7 +243,7 @@ fun MenuContent(
             //.verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-
+        
         // Sample data to demonstrate the use of MenuItemCard
         val sampleMenuItems = listOf(
             RestaurantMenuItemDTO(
@@ -274,6 +276,18 @@ fun MenuContent(
         )
 
         sampleMenuItems.forEach { menuItem ->
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ){
+            repeat(5){
+                MenuTypeButton(
+                    menuType = "Menu",
+                    onClick = {}
+                )
+            }
+        }
+
+        repeat(3){
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
