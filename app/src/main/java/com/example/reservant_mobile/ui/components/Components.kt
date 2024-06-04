@@ -111,6 +111,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1558,6 +1559,7 @@ fun MenuPopup(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
+    isSaving: Boolean = false
 ){
     AlertDialog(
         onDismissRequest = {
@@ -1616,11 +1618,11 @@ fun MenuPopup(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    hide()
                     onConfirm()
                     clear()
                 },
-                label = stringResource(id = R.string.label_save)
+                label = stringResource(id = R.string.label_save),
+                isLoading = isSaving
             )
         },
 
@@ -1629,7 +1631,8 @@ fun MenuPopup(
 
 @Composable
 fun MenuCard(
-    isLoading: Boolean = false,
+    showConfirmDeletePopup: MutableState<Boolean> = mutableStateOf(false),
+    showEditPopup: MutableState<Boolean> = mutableStateOf(false),
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1639,31 +1642,28 @@ fun MenuCard(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     clearFields: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isFetching: Boolean = false,
+    isSaving: Boolean = false,
 ) {
 
-    var showConfirmDeletePopup by remember { mutableStateOf(false) }
-    var showEditPopup by remember { mutableStateOf(false) }
-
-
     when {
-        showConfirmDeletePopup -> {
+        showConfirmDeletePopup.value -> {
             CountDownPopup(
                 icon = Icons.Filled.DeleteForever,
                 title = stringResource(id = R.string.confirm_delete_title),
                 text = stringResource(id = R.string.confirm_delete_text),
                 onConfirm = {
                     onDeleteClick()
-                    showConfirmDeletePopup = false
                 },
-                onDismissRequest = { showConfirmDeletePopup = false },
+                onDismissRequest = {showConfirmDeletePopup.value = false},
                 confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.label_cancel)
+                dismissText = stringResource(id = R.string.label_cancel),
+                isSaving = isSaving
             )
         }
 
-        showEditPopup -> {
-
+        showEditPopup.value -> {
             name.value = menu.name
             altName.value = menu.alternateName ?: ""
             menuType.value = menu.menuType
@@ -1672,21 +1672,22 @@ fun MenuCard(
 
             MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
-                hide = { showEditPopup = false },
+                hide = {showEditPopup.value = false},
                 onConfirm = onEditClick,
                 clear = clearFields,
                 name = name,
                 altName = altName,
                 menuType = menuType,
                 dateFrom = dateFrom,
-                dateUntil = dateUntil
+                dateUntil = dateUntil,
+                isSaving = isSaving
             )
         }
     }
     
 
     val loadingModifier = when {
-        isLoading -> Modifier
+        isFetching -> Modifier
             .shimmer()
             .alpha(0F)
         else -> Modifier
@@ -1763,14 +1764,14 @@ fun MenuCard(
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = {showEditPopup = true},
+                        onClick = { showEditPopup.value = true },
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "EditMenuItem"
                     )
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = { showConfirmDeletePopup = true },
+                        onClick = { showConfirmDeletePopup.value = true },
                         imageVector = Icons.Filled.DeleteForever,
                         contentDescription = "delete"
                     )
@@ -1969,6 +1970,7 @@ fun CountDownPopup(
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
+    isSaving: Boolean = false
 ) {
 
     var allowConfirm by remember {
@@ -1987,42 +1989,6 @@ fun CountDownPopup(
         }
     }
 
-    /*AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = title)
-        },
-        text = {
-            Text(text = text)
-        },
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            OutlinedButton(
-                onClick = {
-                    if (allowConfirm) onConfirm()
-                },
-                enabled = allowConfirm
-            ) {
-                if (allowConfirm) {
-                    Text(confirmText, color = MaterialTheme.colorScheme.error)
-                } else {
-                    Text(timer.toString())
-                }
-            }
-        },
-        dismissButton = {
-            FilledTonalButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(dismissText)
-            }
-        }
-    )*/
-
     DeletePopup(
         icon = icon,
         title = title,
@@ -2034,10 +2000,14 @@ fun CountDownPopup(
         },
         enabled = allowConfirm
     ) {
-        if (allowConfirm) {
-            Text(confirmText, color = MaterialTheme.colorScheme.error)
-        } else {
+        if (!allowConfirm) {
             Text(timer.toString())
+        } else if (isSaving) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(25.dp)
+            )
+        } else {
+            Text(confirmText, color = MaterialTheme.colorScheme.error)
         }
     }
 }

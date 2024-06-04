@@ -20,7 +20,8 @@ class MenuManagementViewModel(
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
 
-    var isLoading by mutableStateOf(true)
+    var isFetching by mutableStateOf(true)
+    var isSaving by mutableStateOf(false)
 
     var name = FormField(RestaurantMenuDTO::name.name)
     var alternateName = FormField(RestaurantMenuDTO::alternateName.name)
@@ -29,24 +30,22 @@ class MenuManagementViewModel(
     var dateUntil = FormField(RestaurantMenuDTO::dateUntil.name)
 
     var fetchResult: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value = null))
-    var result: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value = null))
+    var result by mutableStateOf(Result(isError = false, value = null))
 
     init {
         viewModelScope.launch {
+            isFetching = true
             fetchMenus()
+            isFetching = false
         }
     }
 
     private suspend fun fetchMenus(){
-        isLoading = true
-
         fetchResult = service.getMenus(restaurantId)
 
         if (!fetchResult.isError){
             menus = fetchResult.value!!.toMutableList()
         }
-
-        isLoading = false
     }
 
     private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO{
@@ -62,33 +61,54 @@ class MenuManagementViewModel(
     }
 
     suspend fun addMenu(){
+        isSaving = true
+
         val menu = createMenuDTO()
 
         val result = service.addMenu(menu)
+        this.result.isError = result.isError
 
-        if(!result.isError){
+        if (result.isError){
+            this.result.errors = result.errors
+        } else {
             fetchMenus()
         }
 
+        isSaving = false
     }
 
     suspend fun editMenu(menu: RestaurantMenuDTO) {
+        isSaving = true
+
         val editedMenu = createMenuDTO(menu.menuId)
 
         val result = service.editMenu(editedMenu.menuId!!, editedMenu)
+        println("returned: ${result.isError}")
+        this.result.isError = result.isError
 
-        if (!result.isError){
+        if (result.isError){
+            this.result.errors = result.errors
+        } else {
             fetchMenus()
         }
 
+        isSaving = false
     }
 
     suspend fun deleteMenu(id: Int){
+        isSaving = true
+
         val result = service.deleteMenu(id)
 
-        if (!result.isError){
+        this.result.isError = result.isError
+
+        if (result.isError){
+            this.result.errors = result.errors
+        } else {
             fetchMenus()
         }
+
+        isSaving = false
     }
 
     fun clearFields(){

@@ -7,7 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,10 +65,10 @@ fun MenuManagementActivity(restaurantId: Int) {
                     }
 
                     when {
-                        viewmodel.isLoading -> repeat(3){
+                        viewmodel.isFetching -> repeat(3){
                             item{
                                 MenuCard(
-                                    isLoading = true,
+                                    isFetching = true,
                                     name = viewmodel.name,
                                     altName = viewmodel.alternateName,
                                     menuType = viewmodel.menuType,
@@ -83,6 +87,10 @@ fun MenuManagementActivity(restaurantId: Int) {
                             }
                         }
                         viewmodel.menus.isNotEmpty() -> items(viewmodel.menus) { menu ->
+
+                            val showConfirmDeletePopup = remember { mutableStateOf(false) }
+                            val showEditPopup = remember { mutableStateOf(false) }
+
                             MenuCard(
                                 name = viewmodel.name,
                                 altName = viewmodel.alternateName,
@@ -93,11 +101,17 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 onEditClick = {
                                     viewmodel.viewModelScope.launch {
                                         viewmodel.editMenu(menu)
+                                        if (!viewmodel.result.isError && !viewmodel.isSaving){
+                                            showEditPopup.value = false
+                                        }
                                     }
                                 },
                                 onDeleteClick = {
                                     viewmodel.viewModelScope.launch {
                                         menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
+                                        if (!viewmodel.result.isError){
+                                            showConfirmDeletePopup.value = false
+                                        }
                                     }
                                 },
                                 clearFields = viewmodel::clearFields,
@@ -108,12 +122,24 @@ fun MenuManagementActivity(restaurantId: Int) {
                                         )
                                     }
 
-                                }
+                                },
+                                isSaving = viewmodel.isSaving,
+                                showConfirmDeletePopup = showConfirmDeletePopup,
+                                showEditPopup = showEditPopup
                             )
+
+                            if (viewmodel.result.isError){
+                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.result))
+                                viewmodel.result.isError = false
+                            }
                         }
-                        else -> item{
+                        else -> item {
                             //TODO: pagemissing
-                            ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
+                            Text(text = "There will be something here soon :)")
+                            if (viewmodel.fetchResult.isError){
+                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
+                                viewmodel.fetchResult.isError = false
+                            }
                         }
                     }
 
