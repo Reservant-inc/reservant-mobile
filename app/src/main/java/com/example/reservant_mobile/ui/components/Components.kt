@@ -1798,28 +1798,29 @@ fun AddMenuButton(
     dateFrom: FormField,
     dateUntil: FormField,
     clearFields: () -> Unit,
-    addMenu: () -> Unit
+    addMenu: () -> Unit,
+    isSaving: Boolean = false,
+    showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
-    var showAddDialog by remember { mutableStateOf(false) }
-
     when {
-        showAddDialog -> {
+        showAddDialog.value -> {
             MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_add_menu)) },
-                hide = { showAddDialog = false },
+                hide = { showAddDialog.value = false },
                 onConfirm = addMenu,
                 clear = clearFields,
                 name = name,
                 altName = altName,
                 menuType = menuType,
                 dateFrom = dateFrom,
-                dateUntil = dateUntil
+                dateUntil = dateUntil,
+                isSaving = isSaving
             )
         }
     }
 
     MyFloatingActionButton(
-        onClick = { showAddDialog = true }
+        onClick = { showAddDialog.value = true }
     )
 }
 

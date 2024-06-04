@@ -101,7 +101,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 onEditClick = {
                                     viewmodel.viewModelScope.launch {
                                         viewmodel.editMenu(menu)
-                                        if (!viewmodel.result.isError && !viewmodel.isSaving){
+                                        if (!viewmodel.result.isError){
                                             showEditPopup.value = false
                                         }
                                     }
@@ -132,6 +132,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.result))
                                 viewmodel.result.isError = false
                             }
+
                         }
                         else -> item {
                             //TODO: pagemissing
@@ -149,6 +150,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                         .align(Alignment.BottomEnd)
                         //.padding(8.dp)
                 ){
+                    val showAddDialog = remember { mutableStateOf(false) }
+
                     AddMenuButton(
                         name = viewmodel.name,
                         altName = viewmodel.alternateName,
@@ -159,10 +162,23 @@ fun MenuManagementActivity(restaurantId: Int) {
                         addMenu = {
                             viewmodel.viewModelScope.launch {
                                 viewmodel.addMenu()
+                                if (!viewmodel.result.isError){
+                                    showAddDialog.value = false
+                                }
+
                             }
-                        }
+                        },
+                        isSaving = viewmodel.isSaving,
+                        showAddDialog = showAddDialog
                     )
+
+                    if (viewmodel.result.isError){
+                        ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.result))
+                        viewmodel.result.isError = false
+                    }
                 }
+
+
             }
 
         }
