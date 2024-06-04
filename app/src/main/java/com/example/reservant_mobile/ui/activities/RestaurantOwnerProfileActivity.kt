@@ -27,7 +27,7 @@ import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
+fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: () -> Unit){
 
     val loginViewModel = viewModel<LoginViewModel>()
 
@@ -56,7 +56,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
 
             ButtonComponent(
                 label = "Temporary theme changer",
-                onClick = { darkTheme.value = !darkTheme.value }
+                onClick = { themeChange() }
             )
 
             ButtonComponent(
