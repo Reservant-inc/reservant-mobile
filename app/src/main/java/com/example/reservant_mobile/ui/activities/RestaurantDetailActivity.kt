@@ -224,7 +224,7 @@ fun MenuContent(
                 menuItemId = 1,
                 restaurantId = 1,
                 price = 15.0,
-                name = "Position name 1",
+                name = "Position name 11111111111",
                 alternateName = null,
                 alcoholPercentage = null,
                 photo = "imageResource"
@@ -233,7 +233,7 @@ fun MenuContent(
                 menuItemId = 2,
                 restaurantId = 1,
                 price = 20.0,
-                name = "Position name 2",
+                name = "Position name 2222",
                 alternateName = null,
                 alcoholPercentage = 5.0,
                 photo = "imageResource"
