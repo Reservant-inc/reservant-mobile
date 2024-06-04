@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
@@ -69,7 +70,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 
     Box(modifier = Modifier.fillMaxSize().padding(bottom = 4.dp)) {
 
-        if (restaurantDetailVM.result.isError) {
+        if (restaurantDetailVM.resultRestaurant.isError) {
             ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
         }
 
@@ -82,12 +83,11 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                     CircularProgressIndicator()
                 }
             }
-            restaurantDetailVM.restaurant != null -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                ) {
+
+
+            restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null-> {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+
                     restaurantDetailVM.restaurant?.let { restaurant ->
                         Image(
                             painter = painterResource(R.drawable.restaurant_photo),
@@ -206,7 +206,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 
                         FloatingTabSwitch(
                             pages = listOf(
-                                stringResource(R.string.label_menu) to { MenuContent() },
+                                stringResource(R.string.label_menu) to { MenuContent(restaurantDetailVM.menus!!) },
                                 stringResource(R.string.label_events) to { EventsContent() },
                                 stringResource(R.string.label_reviews) to { ReviewsContent() }
                             ),
@@ -227,11 +227,12 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 }
 
 
-// TODO: MenuItemDTO
 @Composable
 fun MenuContent(
-//    menuItems: List<RestaurantMenuItemDTO>
+    menus: List<RestaurantMenuDTO>
 ) {
+    var selectedMenuItems by remember { mutableStateOf<List<RestaurantMenuItemDTO>?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -271,35 +272,18 @@ fun MenuContent(
             )
         )
 
-        sampleMenuItems.forEach { menuItem ->
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ){
-            repeat(5){
-                MenuTypeButton(
-                    menuType = "Menu",
-                    onClick = {}
-                )
-            }
-        }
-
-        repeat(3){
+        selectedMenuItems?.forEach { menuItem ->
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
+                name = menuItem.name,
+                price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
+                imageResource = R.drawable.pizza,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
         }
 
-//        menuItems.forEach { menuItem ->
-//            MenuItemCard(
-//                menuItem = menuItem,
-//                role = MenuItemCardRole.DETAIL,
-//                onInfoClick = { /* TODO: Handle info */ },
-//                onAddClick = { /* TODO: Handle add */ }
-//            )
-//        }
     }
 }
 

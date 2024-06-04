@@ -59,7 +59,7 @@ fun HomeActivity() {
                     RestaurantOwnerProfileActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Details>{
-                    RestaurantDetailActivity(2)
+                    RestaurantDetailActivity(1)
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
