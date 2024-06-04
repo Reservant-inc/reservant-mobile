@@ -2270,7 +2270,8 @@ fun MenuItemCard(
                     painter = painterResource(R.drawable.pizza),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(150.dp, 100.dp)
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
                         .padding(start = 8.dp, end = 8.dp)
                 )
             }
