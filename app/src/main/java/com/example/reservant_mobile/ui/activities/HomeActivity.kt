@@ -13,8 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
-import com.example.reservant_mobile.ui.components.MainBottomSheet
-import com.example.reservant_mobile.ui.components.MainMapView
 import com.example.reservant_mobile.ui.navigation.AuthRoutes
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes

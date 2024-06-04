@@ -23,8 +23,6 @@ import com.example.reservant_mobile.ui.navigation.AuthRoutes
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
-import kotlinx.coroutines.GlobalScope
-import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
 import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
@@ -70,7 +68,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                     navController.navigate(RestaurantRoutes.Details(restaurantId = 1))
                 },
             )
-//            FIXME: proper navigation
+
             ButtonComponent(
                 label = "Logout",
                 onClick = {
