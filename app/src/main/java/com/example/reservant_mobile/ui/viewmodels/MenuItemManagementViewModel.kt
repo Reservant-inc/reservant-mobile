@@ -1,23 +1,26 @@
 package com.example.reservant_mobile.ui.viewmodels
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
-import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.services.DataType
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.RestaurantMenuService
+import com.example.reservant_mobile.data.utils.getFileFromUri
 import kotlinx.coroutines.launch
 
 class MenuItemManagementViewModel(
     private val menuId: Int,
     private val restaurantId: Int,
-    private val service: IRestaurantMenuService = RestaurantMenuService()
+    private val service: IRestaurantMenuService = RestaurantMenuService(),
+    private val fileService: FileService = FileService()
 ): ViewModel() {
     var items by mutableStateOf<List<RestaurantMenuItemDTO>>(emptyList())
 
@@ -43,7 +46,16 @@ class MenuItemManagementViewModel(
         }
     }
 
-    private fun createMenuItemDTO(menuItemId: Int? = null): RestaurantMenuItemDTO {
+    suspend fun sendPhoto(uri: String?, context: Context): String {
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        var fDto = file?.let { fileService.sendFile(DataType.PNG, it).value }
+        if (fDto == null) {
+            fDto = file?.let { fileService.sendFile(DataType.JPG, it).value }
+        }
+        return fDto?.fileName ?: ""
+    }
+
+    private suspend fun createMenuItemDTO(menuItemId: Int? = null, context: Context): RestaurantMenuItemDTO {
         return RestaurantMenuItemDTO(
             menuItemId  = menuItemId,
             name = name.value,
@@ -57,11 +69,15 @@ class MenuItemManagementViewModel(
 
 
 
-    suspend fun createMenuItem(){
-        val menuitem = createMenuItemDTO()
+
+    suspend fun createMenuItem(context: Context){
+        val menuitem = createMenuItemDTO(context = context)
 
         val result = service.createMenuItem(menuitem)
 
+        //TODO z jakiegoś powodu result.isError zwraca true, a dalej zwraca poprawne dane
+        //TODO result.menuitemid np to null ale nie wiem dlaczego bo zwraca dane normalnie ta koncowka
+        println(result.errors)
         if(!result.isError){
             val menuItemId = result.value?.menuItemId
             val resultadd = service.addItemsToMenu(menuId, listOf(menuItemId!!))
@@ -73,8 +89,9 @@ class MenuItemManagementViewModel(
 
     }
 
-    suspend fun addMenuItemToMenu(){
-        val menuitem = createMenuItemDTO()
+
+    suspend fun addMenuItemToMenu(context: Context){
+        val menuitem = createMenuItemDTO(context = context)
 
         val result = service.createMenuItem(menuitem)
 
@@ -92,8 +109,9 @@ class MenuItemManagementViewModel(
         }
     }
 
-    suspend fun editMenuItem(menuItem: RestaurantMenuItemDTO) {
-        val editedMenuItem = createMenuItemDTO(menuItem.menuItemId)
+
+    suspend fun editMenuItem(menuItem: RestaurantMenuItemDTO, context: Context) {
+        val editedMenuItem = createMenuItemDTO(menuItem.menuItemId, context)
 
         val result = service.editMenuItem(menuItem.menuItemId!!, editedMenuItem)
 

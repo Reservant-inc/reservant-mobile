@@ -33,6 +33,7 @@ fun MenuItemManagementActivity(menuId: Int, restaurantId: Int) {
                 MenuItemManagementViewModel(menuId = menuId, restaurantId = restaurantId) as T
         }
     )
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -54,7 +55,8 @@ fun MenuItemManagementActivity(menuId: Int, restaurantId: Int) {
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
-                            viewmodel.editMenuItem(item)
+
+                            viewmodel.editMenuItem(item, context)
                         }
                     },
                     onDeleteClick = {
@@ -63,7 +65,7 @@ fun MenuItemManagementActivity(menuId: Int, restaurantId: Int) {
                         }
                     },
                     clearFields = viewmodel::clearFields,
-                    context = LocalContext.current
+                    context = context
                 )
             }
         }
@@ -81,10 +83,10 @@ fun MenuItemManagementActivity(menuId: Int, restaurantId: Int) {
                 clearFields = viewmodel::clearFields,
                 addMenu = {
                     viewmodel.viewModelScope.launch {
-                        viewmodel.addMenuItemToMenu()
+                        viewmodel.createMenuItem(context)
                     }
                 },
-                context = LocalContext.current
+                context = context
             )
         }
     }
