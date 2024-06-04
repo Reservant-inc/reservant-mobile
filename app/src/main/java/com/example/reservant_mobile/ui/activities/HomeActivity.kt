@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.theme.AppTheme
 
@@ -38,7 +38,7 @@ fun HomeActivity() {
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
                 composable<MainRoutes.Home>{
-                    MapActivity(navController = innerNavController)
+                    MapActivity()
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity()
@@ -49,8 +49,8 @@ fun HomeActivity() {
                 composable<MainRoutes.Profile>{
                     RestaurantOwnerProfileActivity(navController = innerNavController, darkTheme = darkTheme)
                 }
-                composable<RestaurantDetailRoutes.Details>{
-                    RestaurantDetailActivity(navControllerHome = innerNavController, 1)
+                composable<RestaurantRoutes.Details>{
+                    RestaurantDetailActivity(1)
                 }
             }
         }

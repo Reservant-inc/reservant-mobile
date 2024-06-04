@@ -38,7 +38,7 @@ import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
 @Composable
-fun RestaurantDetailActivity(navControllerHome: NavHostController, restaurantId: Int) {
+fun RestaurantDetailActivity(restaurantId: Int) {
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =

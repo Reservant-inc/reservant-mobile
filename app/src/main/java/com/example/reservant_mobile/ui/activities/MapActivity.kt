@@ -1,6 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
-import android.annotation.SuppressLint
+import RestaurantDetailActivity
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,90 +40,123 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.OsmMapView
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.RestaurantsBottomSheet
 import com.example.reservant_mobile.ui.components.ShowErrorToast
-import com.example.reservant_mobile.ui.navigation.RestaurantDetailRoutes
+import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.MapViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import org.osmdroid.util.GeoPoint
 
 @Composable
-fun MapActivity(navController: NavHostController){
-    val mapViewModel = viewModel<MapViewModel>()
-    var showRestaurantBottomSheet by remember { mutableStateOf(false) }
-    var showRestaurantId by remember { mutableIntStateOf(0) }
+fun MapActivity(){
+
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
+        composable<RestaurantRoutes.Map> {
+            val mapViewModel = viewModel<MapViewModel>()
+            var showRestaurantBottomSheet by remember { mutableStateOf(false) }
+            var showRestaurantId by remember { mutableIntStateOf(0) }
+
+            // Init map
+            val context = LocalContext.current
+            val startPoint = GeoPoint(52.237049, 21.017532)
+            val mv = mapViewModel.initMapView(context, startPoint)
+
+            if (showRestaurantBottomSheet) {
+                RestaurantDetailPreview(navController, showRestaurantId) {
+                    showRestaurantBottomSheet = false
+                }
+            }
+
+            mapViewModel.addRestaurantMarker(
+                GeoPoint(52.240055, 21.017532),
+                context.getDrawable(R.drawable.restaurant_photo)!!,
+                "Restaurant 1" +
+                        ""
+            ) { _, _ ->
+                showRestaurantId = 1
+                showRestaurantBottomSheet = true
+                true
+            }
+
+            mapViewModel.addRestaurantMarker(
+                GeoPoint(52.240055, 21.027532),
+                context.getDrawable(R.drawable.restaurant_photo)!!,
+                "Restaurant 2" +
+                        ""
+            ) { _, _ ->
+                showRestaurantId = 2
+                showRestaurantBottomSheet = true
+                true
+            }
+
+            mapViewModel.addRestaurantMarker(
+                GeoPoint(52.250055, 21.027532),
+                context.getDrawable(R.drawable.restaurant_photo)!!,
+                "Restaurant 3" +
+                        ""
+            ) { _, _ ->
+                showRestaurantId = 3
+                showRestaurantBottomSheet = true
+                true
+            }
+
+            mapViewModel.addRestaurantMarker(
+                GeoPoint(52.210055, 21.007532),
+                context.getDrawable(R.drawable.restaurant_photo)!!,
+                "Restaurant 4" +
+                        ""
+            ) { _, _ ->
+                showRestaurantId = 4
+                showRestaurantBottomSheet = true
+                true
+            }
 
 
-    // Init map
-    val context = LocalContext.current
-    val startPoint = GeoPoint(52.237049, 21.017532)
-    val mv = mapViewModel.initMapView(context, startPoint)
+            val sheetContent = listOf(
+                RestaurantDTO(
+                    restaurantId = 1,
+                    name = "John Doe's Restaurant",
+                    address = "ul. Konstruktorska 15",
+                    city = "Piaseczno"
+                ),
+                RestaurantDTO(
+                    restaurantId = 2,
+                    name = "Maciek's Pizza",
+                    address = "ul. Bajeczna 15",
+                    city = "Warszawa"
+                ),
+                RestaurantDTO(
+                    restaurantId = 3,
+                    name = "Best Thai",
+                    address = "ul. Krótka 10",
+                    city = "Kraków"
+                )
+            )
 
-    if (showRestaurantBottomSheet) {
-        RestaurantDetailPreview(navController,showRestaurantId) {
-            showRestaurantBottomSheet = false
+            RestaurantsBottomSheet(
+                body= { modifier -> OsmMapView(mv, startPoint, modifier) },
+                sheetContent = sheetContent,
+                navController = navController
+            )
+        }
+        composable<RestaurantRoutes.Details> {
+            RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
         }
     }
 
-    mapViewModel.addRestaurantMarker(
-        GeoPoint(52.240055, 21.017532),
-        context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 1" +
-                ""
-    ) { _, _ ->
-        showRestaurantId = 1
-        showRestaurantBottomSheet = true
-        true
-    }
 
-    mapViewModel.addRestaurantMarker(
-        GeoPoint(52.240055, 21.027532),
-        context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 2" +
-                ""
-    ) { _, _ ->
-        showRestaurantId = 2
-        showRestaurantBottomSheet = true
-        true
-    }
-
-    mapViewModel.addRestaurantMarker(
-        GeoPoint(52.250055, 21.027532),
-        context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 3" +
-                ""
-    ) { _, _ ->
-        showRestaurantId = 3
-        showRestaurantBottomSheet = true
-        true
-    }
-
-    mapViewModel.addRestaurantMarker(
-        GeoPoint(52.210055, 21.007532),
-        context.getDrawable(R.drawable.restaurant_photo)!!,
-        "Restaurant 4" +
-                ""
-    ) { _, _ ->
-        showRestaurantId = 4
-        showRestaurantBottomSheet = true
-        true
-    }
-
-
-    val sheetContent = listOf(
-        "Restarant 1" to "Adres 1",
-        "Restarant 2" to "Adres 2",
-        "Restarant 3" to "Adres 3",
-        "Restarant 4" to "Adres 4",)
-
-    RestaurantsBottomSheet (
-        body= { modifier -> OsmMapView(mv, startPoint, modifier) },
-        sheetContent = sheetContent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -242,7 +275,7 @@ fun RestaurantDetailPreview(
                                     .wrapContentHeight(align = Alignment.CenterVertically),
                                 onClick = {
                                     onDismiss()
-                                    navController.navigate(RestaurantDetailRoutes.Details)
+                                    navController.navigate(RestaurantRoutes.Details)
                                 },
 
                                 label = stringResource(id = R.string.label_show_more_details)

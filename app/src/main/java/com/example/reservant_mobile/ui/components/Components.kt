@@ -168,6 +168,7 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
@@ -949,15 +950,18 @@ fun CountryPickerView(
 
 @Composable
 fun RestaurantCard(
+    onClick: () -> Unit,
     imageUrl: String,
     name: String,
-    location: String
+    location: String,
+    city: String
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
@@ -987,7 +991,7 @@ fun RestaurantCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = location,
+                    text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -2610,7 +2614,8 @@ fun OsmMapView(
 @Composable
 fun RestaurantsBottomSheet(
     body: @Composable (modifier: Modifier) -> Unit,
-    sheetContent: List<Pair<String, String>>
+    sheetContent: List<RestaurantDTO>,
+    navController: NavController
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
 
@@ -2628,9 +2633,11 @@ fun RestaurantsBottomSheet(
             ) {
                 items(sheetContent) { item ->
                     RestaurantCard(
+                        onClick = {navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))},
                         imageUrl = "",
-                        name = item.first,
-                        location = item.second
+                        name = item.name,
+                        location = item.address,
+                        city = item.city
                     )
                 }
 
