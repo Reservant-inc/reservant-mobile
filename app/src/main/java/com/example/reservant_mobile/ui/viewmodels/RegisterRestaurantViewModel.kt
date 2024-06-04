@@ -290,7 +290,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
-        )
+        ) || isFileSizeInvalid(context, value)
     }
 
     fun isIdCardInvalid(context: Context): Boolean {
@@ -298,7 +298,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return value.isBlank() || !getFileName(context, value).endsWith(
             ".pdf",
             ignoreCase = true
-        )
+        ) || isFileSizeInvalid(context, value)
     }
 
     fun isAlcoholLicenseInvalid(context: Context): Boolean {
@@ -306,7 +306,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(context, value)
     }
 
     fun isRentalContractInvalid(context: Context): Boolean {
@@ -314,7 +314,7 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value).endsWith(".pdf", ignoreCase = true)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(context, value)
     }
 
 
@@ -336,6 +336,13 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
         val fileName = uri.substringAfterLast('/')
         return !fileName.contains(".") || fileName.substringAfterLast(".").isEmpty()
     }
+
+    fun isFileSizeInvalid(context: Context, uri: String?): Boolean {
+        val byteArray = uri?.let { getFileFromUri(context, it.toUri()) }
+
+        return (byteArray?.size ?: 0) > 1024000
+    }
+
 
 
     fun areTagsInvalid(): Boolean {
