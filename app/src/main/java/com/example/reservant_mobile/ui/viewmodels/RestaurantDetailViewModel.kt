@@ -35,48 +35,38 @@ class RestaurantDetailViewModel(
     init {
         isLoading = true
         viewModelScope.launch {
-            try{
-                loadRestaurant(restaurantId)
-                loadMenus(restaurantId)
-            } catch (e: Exception) {
-                println("[LOADING RESTAURANT ERROR]" + e.message)
-            } finally {
-                isLoading = false
-            }
+            loadRestaurant(restaurantId)
+            loadMenus(restaurantId)
+            menus?.get(0)?.menuId?.let { loadFullMenu(it) }
+        }
+    }
+
+    private suspend fun loadRestaurant(id: Int) {
+        isLoading = true
+
+        resultRestaurant = restaurantService.getRestaurant(id)
+        if (!resultRestaurant.isError) {
             restaurant = resultRestaurant.value
         }
+        isLoading = false
     }
 
+    private suspend fun loadMenus(id: Int) {
 
-    private fun loadRestaurant(id: Int) {
-        viewModelScope.launch {
-
-            resultRestaurant = restaurantService.getRestaurant(id)
-            if (!resultRestaurant.isError) {
-                restaurant = resultRestaurant.value
-            }
-
+        resultMenus = menuService.getMenus(id)
+        if (!resultMenus.isError) {
+            menus = resultMenus.value
         }
+
     }
 
-    private fun loadMenus(id: Int) {
-        viewModelScope.launch {
+    suspend fun loadFullMenu(menuId: Int) {
 
-            resultMenus = menuService.getMenus(id)
-            if (!resultMenus.isError) {
-                menus = resultMenus.value
-            }
-
+        val result = menuService.getMenu(menuId)
+        if (!result.isError) {
+            currentMenu =  result.value
         }
-    }
 
-    public fun loadFullMenu(menuId: Int) {
-        viewModelScope.launch {
-            val result = menuService.getMenu(menuId)
-            if (!result.isError) {
-                currentMenu =  result.value
-            }
-        }
     }
 
     fun getToastError(): Int{
