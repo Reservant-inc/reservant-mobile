@@ -2328,11 +2328,10 @@ fun RatingBar(rating: Float) {
 fun MenuTypeButton(
     modifier: Modifier = Modifier,
     menuType: String,
-    menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (List<RestaurantMenuItemDTO>?) -> Unit
+    onMenuClick: () -> Unit
 ) {
     Button(
-        onClick = { onMenuClick(menuItems) },
+        onClick = { onMenuClick() },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,

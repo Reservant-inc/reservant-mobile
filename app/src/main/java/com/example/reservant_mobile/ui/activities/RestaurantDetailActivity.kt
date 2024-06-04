@@ -209,17 +209,16 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                         FloatingTabSwitch(
                             pages = listOf(
                                 stringResource(R.string.label_menu) to {
-
                                     MenuContent(
                                         restaurantDetailVM.menus!!,
-                                        onMenuClick = {
+                                        onMenuClick = { menuId ->
                                             restaurantDetailVM.viewModelScope.launch {
-                                                restaurantDetailVM.loadFullMenu(1)
+                                                restaurantDetailVM.loadFullMenu(menuId)
                                             }
                                         },
-                                        menuItems = if(restaurantDetailVM.currentMenu != null) restaurantDetailVM.currentMenu!!.menuItems else null
-                                    )},
-
+                                        menuItems = restaurantDetailVM.currentMenu?.menuItems
+                                    )
+                                },
                                 stringResource(R.string.label_events) to { EventsContent() },
                                 stringResource(R.string.label_reviews) to { ReviewsContent() }
                             ),
@@ -244,9 +243,8 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 fun MenuContent(
     menus: List<RestaurantMenuDTO>,
     menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (List<RestaurantMenuItemDTO>?) -> Unit
+    onMenuClick: (Int) -> Unit
 ) {
-    var selectedMenuItems by remember { mutableStateOf<List<RestaurantMenuItemDTO>?>(null) }
 
     Column(
         modifier = Modifier
@@ -262,13 +260,12 @@ fun MenuContent(
             for (menu in menus) {
                 MenuTypeButton(
                     menuType = menu.name,
-                    menuItems = menu.menuItems,
-                    onMenuClick = { onMenuClick(menuItems) }
+                    onMenuClick = { menu.menuId?.let { onMenuClick(it) } }
                 )
             }
         }
 
-        selectedMenuItems?.forEach { menuItem ->
+        menuItems?.forEach { menuItem ->
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
