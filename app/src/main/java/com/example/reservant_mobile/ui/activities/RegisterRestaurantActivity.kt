@@ -202,10 +202,11 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 ButtonComponent(
-                    label = stringResource(id = R.string.label_next),
+                    label = stringResource(id = R.string.label_next), isLoading = isLoading,
                     onClick = {
                         registerRestaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent = true
 
                             val result = registerRestaurantViewModel.validateFirstStep(context)
 
@@ -338,26 +339,25 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(Modifier.height(8.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                )
+
                 ButtonComponent(
-                    label = stringResource(R.string.label_register_restaurant),
+                    label = stringResource(R.string.label_register_restaurant), isLoading = isLoading,
                     onClick = {
                         registerRestaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent = true
 
-                            val result = registerRestaurantViewModel.validateSecondStep(context)
-
-                            if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.Description);
+                            if (registerRestaurantViewModel.validateSecondStep(context)) {
+                                navController.navigate(RegisterRestaurantRoutes.Description)
                             }
 
                             isLoading = false
                         }
                     }
-                )
-
-                ShowErrorToast(
-                    context = LocalContext.current,
-                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
                 )
 
             }
@@ -479,7 +479,7 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 ButtonComponent(
-                    label = stringResource(id = R.string.label_register_restaurant),
+                    label = stringResource(id = R.string.label_register_restaurant), isLoading = isLoading,
                     onClick = {
                         registerRestaurantViewModel.viewModelScope.launch {
                             isLoading = true
