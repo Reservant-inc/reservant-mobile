@@ -70,7 +70,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
             )
 
             ButtonComponent(
-                label = "Logout",
+                label = stringResource(id = R.string.lable_logout_action),
                 onClick = {
                     loginViewModel.viewModelScope.launch{
                         loginViewModel.logout()

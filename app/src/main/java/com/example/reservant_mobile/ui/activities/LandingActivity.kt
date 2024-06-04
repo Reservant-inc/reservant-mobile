@@ -11,11 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.Logo
 import com.example.reservant_mobile.ui.navigation.AuthRoutes
@@ -47,9 +49,13 @@ fun LandingActivity() {
                     ) {
                         Logo()
 
-                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Login) }, label = "Login")
+                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Login) }, label = stringResource(
+                            id = R.string.label_login_action
+                        ))
 
-                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Register) }, label = "Sign up")
+                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Register) }, label = stringResource(
+                            id = R.string.label_signup
+                        ))
                     }
                 }
             }
