@@ -100,14 +100,6 @@ class MenuManagementViewModel(
     }
 
     fun <T> getToastError(result: Result<T>): Int {
-        return getFieldError(result, "TOAST")
-    }
-
-    private fun <T> getFieldError(result: Result<T>, name: String): Int {
-        if (!result.isError) {
-            return -1
-        }
-
-        return result.errors?.getOrDefault(name, -1) ?: -1
+        return FormField("TOAST").getError(result)
     }
 }
