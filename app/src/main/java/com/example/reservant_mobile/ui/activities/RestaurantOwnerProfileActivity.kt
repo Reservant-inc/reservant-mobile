@@ -60,7 +60,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                     .padding(16.dp),
                 label = "Restaurant Detail Preview",
                 onClick = {
-                    navController.navigate(RestaurantRoutes.Details)
+                    navController.navigate(RestaurantRoutes.Details(restaurantId = 1))
                 },
             )
 //            FIXME: proper navigation
