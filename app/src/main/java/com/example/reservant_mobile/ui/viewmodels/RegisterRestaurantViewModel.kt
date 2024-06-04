@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import com.example.reservant_mobile.data.endpoints.File
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
@@ -188,9 +189,13 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
     }
 
     suspend fun sendFile(uri: String?, context: Context, type: DataType): Result<FileUploadDTO?>? {
+        if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
+            return null
+        }
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
         return file?.let { FileService().sendFile(type, it) }
     }
+
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
@@ -324,6 +329,12 @@ class RegisterRestaurantViewModel(private val restaurantService: IRestaurantServ
                 ignoreCase = true
             ))
         }
+    }
+
+    fun isFileNameInvalid(uri: String?): Boolean {
+        if (uri.isNullOrEmpty()) return true
+        val fileName = uri.substringAfterLast('/')
+        return !fileName.contains(".") || fileName.substringAfterLast(".").isEmpty()
     }
 
 
