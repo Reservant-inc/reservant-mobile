@@ -257,7 +257,7 @@ fun RestaurantDetailPreview(
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            if (restaurantDetailVM.result.isError) {
+            if (restaurantDetailVM.resultRestaurant.isError) {
                 ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
             }
 

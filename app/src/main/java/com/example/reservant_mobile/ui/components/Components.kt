@@ -2465,9 +2465,14 @@ fun RatingBar(rating: Float) {
 }
 
 @Composable
-fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () -> Unit) {
+fun MenuTypeButton(
+    modifier: Modifier = Modifier,
+    menuType: String,
+    menuItems: List<RestaurantMenuItemDTO>?,
+    onMenuClick: (List<RestaurantMenuItemDTO>?) -> Unit
+) {
     Button(
-        onClick = onClick,
+        onClick = { onMenuClick(menuItems) },
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -2582,6 +2587,9 @@ fun TagItem(
 fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
     role: String,
+    name: String,
+    price: String,
+    imageResource: Int,
     onInfoClick: () -> Unit,
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
@@ -2680,14 +2688,34 @@ fun MenuItemCard(
                     }
 
                 }
-
-                Image(
-                    painter = painterResource(R.drawable.pizza),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 8.dp, end = 8.dp)
+                Text(
+                    text = price,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.offset(y = (-4).dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Image(
+                painter = painterResource(imageResource),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(end = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .fillMaxSize()
+            )
+            IconButton(
+                onClick = onAddClick,
+                modifier = Modifier
+                    .size(36.dp)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
