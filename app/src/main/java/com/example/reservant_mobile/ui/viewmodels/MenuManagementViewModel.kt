@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
+import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.RestaurantMenuService
 import kotlinx.coroutines.launch
@@ -26,6 +28,9 @@ class MenuManagementViewModel(
     var dateFrom = FormField(RestaurantMenuDTO::dateFrom.name)
     var dateUntil = FormField(RestaurantMenuDTO::dateUntil.name)
 
+    var fetchResult: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value = null))
+    var result: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value = null))
+
     init {
         viewModelScope.launch {
             fetchMenus()
@@ -33,7 +38,14 @@ class MenuManagementViewModel(
     }
 
     private suspend fun fetchMenus(){
-        menus = service.getMenus(restaurantId).value?.toMutableList() ?: mutableListOf()
+        isLoading = true
+
+        fetchResult = service.getMenus(restaurantId)
+
+        if (!fetchResult.isError){
+            menus = fetchResult.value!!.toMutableList()
+        }
+
         isLoading = false
     }
 
@@ -85,5 +97,17 @@ class MenuManagementViewModel(
         menuType.value = ""
         dateFrom.value = ""
         dateUntil.value = ""
+    }
+
+    fun <T> getToastError(result: Result<T>): Int {
+        return getFieldError(result, "TOAST")
+    }
+
+    private fun <T> getFieldError(result: Result<T>, name: String): Int {
+        if (!result.isError) {
+            return -1
+        }
+
+        return result.errors?.getOrDefault(name, -1) ?: -1
     }
 }

@@ -10,11 +10,13 @@ import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +27,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 import kotlinx.coroutines.launch
@@ -79,38 +82,41 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 )
                             }
                         }
+                        viewmodel.menus.isNotEmpty() -> items(viewmodel.menus) { menu ->
+                            MenuCard(
+                                name = viewmodel.name,
+                                altName = viewmodel.alternateName,
+                                menuType = viewmodel.menuType,
+                                dateFrom = viewmodel.dateFrom,
+                                dateUntil = viewmodel.dateUntil,
+                                menu = menu,
+                                onEditClick = {
+                                    viewmodel.viewModelScope.launch {
+                                        viewmodel.editMenu(menu)
+                                    }
+                                },
+                                onDeleteClick = {
+                                    viewmodel.viewModelScope.launch {
+                                        menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
+                                    }
+                                },
+                                clearFields = viewmodel::clearFields,
+                                onClick = {
+                                    if (menu.menuId != null) {
+                                        navController.navigate(
+                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
+                                        )
+                                    }
+
+                                }
+                            )
+                        }
+                        else -> item{
+                            //TODO: pagemissing
+                            ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
+                        }
                     }
 
-
-                    items(viewmodel.menus) { menu ->
-                        MenuCard(
-                            name = viewmodel.name,
-                            altName = viewmodel.alternateName,
-                            menuType = viewmodel.menuType,
-                            dateFrom = viewmodel.dateFrom,
-                            dateUntil = viewmodel.dateUntil,
-                            menu = menu,
-                            onEditClick = {
-                                viewmodel.viewModelScope.launch {
-                                    viewmodel.editMenu(menu)
-                                }
-                            },
-                            onDeleteClick = {
-                                viewmodel.viewModelScope.launch {
-                                    menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
-                                }
-                            },
-                            clearFields = viewmodel::clearFields,
-                            onClick = {
-                                if (menu.menuId != null) {
-                                    navController.navigate(
-                                        RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
-                                    )
-                                }
-
-                            }
-                        )
-                    }
                 }
                 Box(
                     modifier = Modifier
