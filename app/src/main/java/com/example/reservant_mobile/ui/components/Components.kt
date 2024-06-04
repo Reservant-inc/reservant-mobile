@@ -15,7 +15,6 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -91,7 +90,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -170,6 +168,7 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
 import kotlinx.coroutines.delay
@@ -951,28 +950,36 @@ fun CountryPickerView(
 
 @Composable
 fun RestaurantCard(
+    onClick: () -> Unit,
     imageUrl: String,
     name: String,
-    location: String
+    location: String,
+    city: String
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
     ) {
-        Column {
+        Row (
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxWidth()
+        ){
             Image(
                 painter = painterResource(R.drawable.ic_logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                    .height(100.dp)
+                    .width(100.dp),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
             )
             Column(
                 modifier = Modifier
@@ -984,7 +991,7 @@ fun RestaurantCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = location,
+                    text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -2585,7 +2592,7 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
     }
 
 @Composable
-fun MainMapView(
+fun OsmMapView(
     mapView: MapView,
     startPoint: GeoPoint,
     modifier: Modifier = Modifier.fillMaxSize()
@@ -2605,39 +2612,43 @@ fun MainMapView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainBottomSheet(
+fun RestaurantsBottomSheet(
     body: @Composable (modifier: Modifier) -> Unit,
-    sheetContent: List<Pair<String, String>>
+    sheetContent: List<RestaurantDTO>,
+    navController: NavController
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 150.dp,
+        sheetPeekHeight = 100.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         sheetContent = {
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .height(450.dp)
+                    .height(475.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(sheetContent) { item ->
                     RestaurantCard(
+                        onClick = {navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))},
                         imageUrl = "",
-                        name = item.first,
-                        location = item.second
+                        name = item.name,
+                        location = item.address,
+                        city = item.city
                     )
                 }
 
             }
-        }) { innerPadding ->
-        body.invoke(
+        },
+        content = { innerPadding -> body.invoke(
             Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         )
-    }
+        }
+    )
 
 }
