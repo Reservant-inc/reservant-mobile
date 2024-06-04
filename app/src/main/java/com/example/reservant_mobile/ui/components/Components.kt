@@ -2702,7 +2702,8 @@ fun FloatingActionMenu(
 
 @Composable
 fun FloatingTabSwitch(
-    pages: List<Pair<String, @Composable () -> Unit>>
+    pages: List<Pair<String, @Composable () -> Unit>>,
+    paneScroll: Boolean = true
 ) {
     val pagerState = rememberPagerState(
         pageCount = { pages.size }
@@ -2720,7 +2721,7 @@ fun FloatingTabSwitch(
     ) {
         HorizontalPager(
             state = pagerState,
-            userScrollEnabled = true
+            userScrollEnabled = paneScroll
         ) { page ->
             pages[page].second.invoke()
         }
