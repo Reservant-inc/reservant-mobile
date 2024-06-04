@@ -7,13 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
-import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
-import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.DataType
-import com.example.reservant_mobile.data.services.FileUploadService
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.RestaurantMenuService
 import com.example.reservant_mobile.data.utils.getFileFromUri
@@ -22,7 +19,8 @@ import kotlinx.coroutines.launch
 class MenuItemManagementViewModel(
     private val menuId: Int,
     private val restaurantId: Int,
-    private val service: IRestaurantMenuService = RestaurantMenuService()
+    private val service: IRestaurantMenuService = RestaurantMenuService(),
+    private val fileService: FileService = FileService()
 ): ViewModel() {
     var items by mutableStateOf<List<RestaurantMenuItemDTO>>(emptyList())
 
@@ -50,9 +48,9 @@ class MenuItemManagementViewModel(
 
     suspend fun sendPhoto(uri: String?, context: Context): String {
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        var fDto = file?.let { FileUploadService().sendFile(DataType.PNG, it).value }
+        var fDto = file?.let { fileService.sendFile(DataType.PNG, it).value }
         if (fDto == null) {
-            fDto = file?.let { FileUploadService().sendFile(DataType.JPG, it).value }
+            fDto = file?.let { fileService.sendFile(DataType.JPG, it).value }
         }
         return fDto?.fileName ?: ""
     }
@@ -65,11 +63,9 @@ class MenuItemManagementViewModel(
             alternateName = alternateName.value.ifEmpty { null },
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
-            photoFileName = sendPhoto(photo.value, context),
+            photoFileName = photo.value
         )
     }
-
-
 
     suspend fun createMenuItem(context: Context){
         val menuitem = createMenuItemDTO(context = context)
