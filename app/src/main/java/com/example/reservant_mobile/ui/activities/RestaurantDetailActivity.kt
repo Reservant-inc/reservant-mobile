@@ -72,7 +72,6 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
-                        .heightIn(max = 1000.dp)
                 ) {
                     restaurantDetailVM.restaurant?.let { restaurant ->
                         Image(
@@ -213,9 +212,9 @@ fun MenuContent(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            //.verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
 
