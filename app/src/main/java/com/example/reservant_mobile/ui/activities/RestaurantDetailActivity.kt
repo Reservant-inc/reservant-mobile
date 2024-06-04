@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
@@ -71,6 +72,7 @@ import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagItem
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -225,7 +227,18 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 
                         FloatingTabSwitch(
                             pages = listOf(
-                                stringResource(R.string.label_menu) to { MenuContent(restaurantDetailVM.menus!!) },
+                                stringResource(R.string.label_menu) to {
+
+                                    MenuContent(
+                                        restaurantDetailVM.menus!!,
+                                        onMenuClick = {
+                                            restaurantDetailVM.viewModelScope.launch {
+                                                restaurantDetailVM.loadFullMenu(1)
+                                            }
+                                        },
+                                        menuItems = if(restaurantDetailVM.currentMenu != null) restaurantDetailVM.currentMenu!!.menuItems else null
+                                    )},
+
                                 stringResource(R.string.label_events) to { EventsContent() },
                                 stringResource(R.string.label_reviews) to { ReviewsContent() }
                             ),
@@ -248,7 +261,9 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 
 @Composable
 fun MenuContent(
-    menus: List<RestaurantMenuDTO>
+    menus: List<RestaurantMenuDTO>,
+    menuItems: List<RestaurantMenuItemDTO>?,
+    onMenuClick: (List<RestaurantMenuItemDTO>?) -> Unit
 ) {
     var selectedMenuItems by remember { mutableStateOf<List<RestaurantMenuItemDTO>?>(null) }
 
@@ -259,37 +274,18 @@ fun MenuContent(
             //.verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        
-        // Sample data to demonstrate the use of MenuItemCard
-        val sampleMenuItems = listOf(
-            RestaurantMenuItemDTO(
-                menuItemId = 1,
-                restaurantId = 1,
-                price = 15.0,
-                name = "Position name 11111111111",
-                alternateName = null,
-                alcoholPercentage = null,
-                photo = "imageResource"
-            ),
-            RestaurantMenuItemDTO(
-                menuItemId = 2,
-                restaurantId = 1,
-                price = 20.0,
-                name = "Position name 2222",
-                alternateName = null,
-                alcoholPercentage = 5.0,
-                photo = "imageResource"
-            ),
-            RestaurantMenuItemDTO(
-                menuItemId = 3,
-                restaurantId = 1,
-                price = 25.0,
-                name = "Position name 3",
-                alternateName = null,
-                alcoholPercentage = null,
-                photo = "imageResource"
-            )
-        )
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState())
+        ) {
+            for (menu in menus) {
+                MenuTypeButton(
+                    menuType = menu.name,
+                    menuItems = menu.menuItems,
+                    onMenuClick = { onMenuClick(menuItems) }
+                )
+            }
+        }
 
         selectedMenuItems?.forEach { menuItem ->
             MenuItemCard(

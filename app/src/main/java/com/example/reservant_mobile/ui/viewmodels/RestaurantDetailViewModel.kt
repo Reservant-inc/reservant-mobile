@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.data.models.dtos.EventDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.IRestaurantService
@@ -25,7 +26,8 @@ class RestaurantDetailViewModel(
     var resultMenus: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value=null))
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
-    var menus: List<RestaurantMenuDTO>? by mutableStateOf(null)
+    var menus: List<RestaurantMenuDTO>? by mutableStateOf(emptyList())
+    var currentMenu: RestaurantMenuDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
     var eventsLoading: Boolean by mutableStateOf(true)
 
@@ -65,6 +67,15 @@ class RestaurantDetailViewModel(
                 menus = resultMenus.value
             }
 
+        }
+    }
+
+    public fun loadFullMenu(menuId: Int) {
+        viewModelScope.launch {
+            val result = menuService.getMenu(menuId)
+            if (!result.isError) {
+                currentMenu =  result.value
+            }
         }
     }
 
