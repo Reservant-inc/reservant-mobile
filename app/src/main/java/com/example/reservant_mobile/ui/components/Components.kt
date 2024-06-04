@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
+import android.icu.number.Scale
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
@@ -153,6 +155,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -171,6 +174,7 @@ import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -1822,67 +1826,6 @@ fun AddMenuButton(
     )
 }
 
-
-@Composable
-fun MenuItemCard(
-    menuItem: RestaurantMenuItemDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column {
-            Text(
-                text = menuItem.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                modifier = Modifier.padding(8.dp)
-            )
-
-            Text(
-                text = "Price: ${menuItem.price} zł",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-
-            if (menuItem.alcoholPercentage != null) {
-                Text(
-                    text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onEditClick,
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditMenuItem"
-                )
-
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onDeleteClick,
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "DeleteMenuItem"
-                )
-            }
-        }
-    }
-}
-
-
 @Composable
 fun SecondaryButton(
     modifier: Modifier,
@@ -2222,86 +2165,121 @@ fun TagItem(tag: String, onRemove: () -> Unit) {
 
 @Composable
 fun MenuItemCard(
-    name: String,
-    price: String,
-    description: String,
-    imageResource: Int,
+    menuItem: RestaurantMenuItemDTO,
+    role: String,
     onInfoClick: () -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Top
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.Top) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.weight(1f)
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
-                    IconButton(
-                        onClick = onInfoClick,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .offset(y = (-4).dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.primary
+                    Text(
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (menuItem.alcoholPercentage != null) {
+                        Text(
+                            text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        when (role) {
+                            Roles.CUSTOMER -> {
+                                IconButton(
+                                    onClick = onInfoClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Info,
+                                        contentDescription = "Info",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = onAddClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.AddShoppingCart,
+                                        contentDescription = "Add",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            Roles.RESTAURANT_OWNER -> {
+                                IconButton(
+                                    onClick = onEditClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Edit",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = onDeleteClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                 }
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.offset(y = (-4).dp)
-                )
-                if (description.isNotEmpty()) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Image(
-                painter = painterResource(imageResource),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxSize()
-            )
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier
-                    .size(36.dp)
-                    .align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.primary
+
+                Image(
+                    painter = painterResource(R.drawable.pizza),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 8.dp, end = 8.dp)
                 )
             }
+
+
+            //Spacer(modifier = Modifier.height(8.dp))
+
+
         }
     }
 }
