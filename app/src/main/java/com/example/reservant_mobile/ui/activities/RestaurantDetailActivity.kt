@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -67,6 +68,7 @@ import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.MenuTypeButton
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
+import com.example.reservant_mobile.ui.components.TagItem
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
@@ -144,10 +146,23 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                             Text("3.9 (200+ opinii)")
                         }
 
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .scale(0.9f)
+                        ) {
+                            for(tag in restaurant.tags){
+                                TagItem(
+                                    tag = tag,
+                                    removable = false
+                                )
+                            }
+                        }
+
                         Text(
                             text = restaurant.restaurantType,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                         )
 
                         Text(
