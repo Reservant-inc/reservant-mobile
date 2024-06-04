@@ -2191,12 +2191,12 @@ fun MenuItemCard(
                 ) {
                     Text(
                         text = menuItem.name,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
                     Text(
                         text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (menuItem.alcoholPercentage != null) {
@@ -2210,20 +2210,21 @@ fun MenuItemCard(
                 }
 
                 Image(
-                    painter = painterResource(R.drawable.pizza), // Replace with actual resource if available
-                    contentScale = ContentScale.Crop,
+                    painter = painterResource(R.drawable.pizza),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(100.dp, 90.dp)
                         .clip(RoundedCornerShape(16.dp))
+                        .padding(top = 28.dp, end = 16.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+
+            //Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.Start
             ) {
                 when (role) {
                     Roles.CUSTOMER -> {
