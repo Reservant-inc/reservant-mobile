@@ -2,7 +2,7 @@ package com.example.reservant_mobile.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-object RestaurantRoutes {
+data object RestaurantRoutes {
 
     @Serializable
     object Map
