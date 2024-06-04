@@ -32,48 +32,38 @@ class RestaurantDetailViewModel(
     init {
         isLoading = true
         viewModelScope.launch {
-            try{
-                loadRestaurant(restaurantId)
-                loadMenus(restaurantId)
-            } catch (e: Exception) {
-                println("[LOADING RESTAURANT ERROR]" + e.message)
-            } finally {
-                isLoading = false
-            }
-            restaurant = result.value
-        }
-        return true
-    }
-
-    private fun loadRestaurant(id: Int) {
-        viewModelScope.launch {
-
-            resultRestaurant = restaurantService.getRestaurant(id)
-            if (!resultRestaurant.isError) {
-                restaurant = resultRestaurant.value
-            }
-
+            loadRestaurant(restaurantId)
+            loadMenus(restaurantId)
+            menus?.get(0)?.menuId?.let { loadFullMenu(it) }
         }
     }
 
-    private fun loadMenus(id: Int) {
-        viewModelScope.launch {
+    private suspend fun loadRestaurant(id: Int) {
+        isLoading = true
 
-            resultMenus = menuService.getMenus(id)
-            if (!resultMenus.isError) {
-                menus = resultMenus.value
-            }
-
+        resultRestaurant = restaurantService.getRestaurant(id)
+        if (!resultRestaurant.isError) {
+            restaurant = resultRestaurant.value
         }
+        isLoading = false
     }
 
-    public fun loadFullMenu(menuId: Int) {
-        viewModelScope.launch {
-            val result = menuService.getMenu(menuId)
-            if (!result.isError) {
-                currentMenu =  result.value
-            }
+    private suspend fun loadMenus(id: Int) {
+
+        resultMenus = menuService.getMenus(id)
+        if (!resultMenus.isError) {
+            menus = resultMenus.value
         }
+
+    }
+
+    suspend fun loadFullMenu(menuId: Int) {
+
+        val result = menuService.getMenu(menuId)
+        if (!result.isError) {
+            currentMenu =  result.value
+        }
+
     }
 
     fun getToastError(): Int{
