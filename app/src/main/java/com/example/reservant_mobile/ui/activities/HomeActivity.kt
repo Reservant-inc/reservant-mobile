@@ -63,7 +63,7 @@ fun HomeActivity() {
                     LaunchedEffect(Unit) {
                         bottomBarState.value = false
                     }
-                    LandingActivity(navController = innerNavController)
+                    LandingActivity()
                 }
             }
         }
