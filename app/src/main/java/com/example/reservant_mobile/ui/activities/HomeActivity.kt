@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +25,8 @@ import com.example.reservant_mobile.ui.theme.AppTheme
 @Composable
 fun HomeActivity() {
     val innerNavController = rememberNavController()
+    val bottomBarState = remember { (mutableStateOf(true)) }
+
 
     val isSystemInDarkMode = isSystemInDarkTheme()
 
@@ -34,7 +37,10 @@ fun HomeActivity() {
     AppTheme (darkTheme = darkTheme.value) {
         Scaffold(
             bottomBar = {
-                BottomNavigation(innerNavController)
+                 BottomNavigation(
+                     navController =  innerNavController,
+                     bottomBarState = bottomBarState
+                 )
             }
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
@@ -54,6 +60,9 @@ fun HomeActivity() {
                     RestaurantDetailActivity(1)
                 }
                 composable<AuthRoutes.Landing>{
+                    LaunchedEffect(Unit) {
+                        bottomBarState.value = false
+                    }
                     LandingActivity(navController = innerNavController)
                 }
             }

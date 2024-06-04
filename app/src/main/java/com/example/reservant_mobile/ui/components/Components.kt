@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -12,6 +13,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -112,6 +115,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1190,7 +1194,10 @@ fun EmployeeCard(
 
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>
+) {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
@@ -1201,24 +1208,32 @@ fun BottomNavigation(navController: NavHostController) {
 
     var selectedItem by remember { mutableStateOf(items.first()) }
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.route.toString()) },
-                label = { Text(stringResource(id = item.label)) },
-                selected = selectedItem == item,
-                alwaysShowLabel = true,
-                onClick = {
-                    if (selectedItem != item) {
-                        navController.navigate(item.route)
-                        selectedItem = item
-                    }
+
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                items.forEach { item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.icon, contentDescription = item.route.toString()) },
+                        label = { Text(stringResource(id = item.label)) },
+                        selected = selectedItem == item,
+                        alwaysShowLabel = true,
+                        onClick = {
+                            if (selectedItem != item) {
+                                navController.navigate(item.route)
+                                selectedItem = item
+                            }
+                        }
+                    )
                 }
-            )
+            }
         }
-    }
+    )
 }
 
 
