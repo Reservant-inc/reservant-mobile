@@ -276,7 +276,7 @@ fun RestaurantDetailPreview(
                                     .wrapContentHeight(align = Alignment.CenterVertically),
                                 onClick = {
                                     onDismiss()
-                                    navController.navigate(RestaurantRoutes.Details)
+                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  1))
                                 },
 
                                 label = stringResource(id = R.string.label_show_more_details)
