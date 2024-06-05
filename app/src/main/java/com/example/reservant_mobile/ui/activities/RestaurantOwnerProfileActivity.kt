@@ -75,9 +75,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: ()
                     loginViewModel.viewModelScope.launch{
                         loginViewModel.logout()
                         navController.navigate(AuthRoutes.Landing){
-                            popUpTo(MainRoutes.Home){
-                                inclusive = true
-                            }
+                            popUpTo(0)
                         }
                     }
                 }
