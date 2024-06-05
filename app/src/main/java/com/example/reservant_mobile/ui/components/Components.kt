@@ -89,6 +89,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -167,6 +168,7 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
+import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlinx.coroutines.delay
@@ -897,28 +899,36 @@ fun CountryPickerView(
 
 @Composable
 fun RestaurantCard(
+    onClick: () -> Unit,
     imageUrl: String,
     name: String,
-    location: String
+    location: String,
+    city: String
 ) {
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
     ) {
-        Column {
+        Row (
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxWidth()
+        ){
             Image(
                 painter = painterResource(R.drawable.ic_logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
+                    .height(100.dp)
+                    .width(100.dp),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
             )
             Column(
                 modifier = Modifier
@@ -930,7 +940,7 @@ fun RestaurantCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = location,
+                    text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -1158,7 +1168,6 @@ fun BottomNavigation(navController: NavHostController) {
         }
     }
 }
-
 
 
 @Composable
@@ -1601,6 +1610,7 @@ fun MenuCard(
                 dismissText = stringResource(id = R.string.label_cancel)
             )
         }
+
         showEditPopup -> {
 
             name.value = menu.name
@@ -1700,7 +1710,6 @@ fun MenuCard(
                         .size(50.dp)
                         .padding(6.dp)
 
-
                     SecondaryButton(
                         modifier = buttonModifier,
                         onClick = {showEditPopup = true},
@@ -1738,13 +1747,13 @@ fun AddMenuButton(
     dateUntil: FormField,
     clearFields: () -> Unit,
     addMenu: () -> Unit
-){
-    var showAddDialog by remember { mutableStateOf(false)}
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
 
-    when{
+    when {
         showAddDialog -> {
             MenuPopup(
-                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
+                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
                 hide = { showAddDialog = false },
                 onConfirm = addMenu,
                 clear = clearFields,
@@ -1859,13 +1868,18 @@ fun DeletePopup(
     icon: ImageVector,
     title: String,
     text: String,
-    confirmText:String = "Confirm",
+    confirmText: String = "Confirm",
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
     enabled: Boolean = true,
-    deleteButtonContent: @Composable (RowScope.() -> Unit) = {Text(confirmText, color = MaterialTheme.colorScheme.error)}
-){
+    deleteButtonContent: @Composable (RowScope.() -> Unit) = {
+        Text(
+            confirmText,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
+) {
     AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1921,7 +1935,7 @@ fun CountDownPopup(
             allowConfirm = timer == 0
         }
     }
-    
+
     /*AlertDialog(
         icon = {
             Icon(icon, contentDescription = "Example Icon")
@@ -1957,7 +1971,7 @@ fun CountDownPopup(
             }
         }
     )*/
-    
+
     DeletePopup(
         icon = icon,
         title = title,
@@ -1968,7 +1982,7 @@ fun CountDownPopup(
             if (allowConfirm) onConfirm()
         },
         enabled = allowConfirm
-    ){
+    ) {
         if (allowConfirm) {
             Text(confirmText, color = MaterialTheme.colorScheme.error)
         } else {
@@ -2127,15 +2141,33 @@ fun TagSelectionScreen(vm: RestaurantViewModel, onDismiss: () -> Unit, onTagSele
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TagList(tags: List<String>) {
+fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
     FlowRow(
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
         tags.forEach { tag ->
-            TagItem(tag = tag)
+            TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
 }
+
+@Composable
+fun TagItem(tag: String, onRemove: () -> Unit) {
+    InputChip(
+        onClick = { onRemove() },
+        label = { Text(tag) },
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Remove tag"
+            )
+        },
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.padding(4.dp),
+        selected = false
+    )
+}
+
 
 @Composable
 fun MenuItemCard(
@@ -2371,27 +2403,11 @@ fun FloatingActionMenu(
 }
 
 @Composable
-fun TagItem(tag: String) {
-    Text(
-        text = tag,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 12.sp,
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(50)
-            )
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    )
-}
-
-@Composable
 fun FloatingTabSwitch(
     pages: List<Pair<String, @Composable () -> Unit>>
 ) {
     val pagerState = rememberPagerState(
-        pageCount = {pages.size}
+        pageCount = { pages.size }
     )
     val coroutineScope = rememberCoroutineScope()
     val cornerShape = RoundedCornerShape(50)
@@ -2407,7 +2423,7 @@ fun FloatingTabSwitch(
         HorizontalPager(
             state = pagerState,
             userScrollEnabled = true
-        ) {page ->
+        ) { page ->
             pages[page].second.invoke()
         }
         TabRow(
@@ -2419,17 +2435,17 @@ fun FloatingTabSwitch(
             indicator = indicator,
             divider = {}
         ) {
-            pages.forEachIndexed{ index, tabItem ->
+            pages.forEachIndexed { index, tabItem ->
                 val selected = pagerState.currentPage == index
                 Tab(
                     modifier = Modifier.zIndex(6f),
-                text = {
-                    if (selected) {
-                        Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
-                    } else {
-                        Text(text = tabItem.first)
-                    }
-                },
+                    text = {
+                        if (selected) {
+                            Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
+                        } else {
+                            Text(text = tabItem.first)
+                        }
+                    },
                     selected = selected,
                     onClick = {
                         coroutineScope.launch {
@@ -2525,57 +2541,63 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
     }
 
 @Composable
-fun MainMapView(
+fun OsmMapView(
     mapView: MapView,
     startPoint: GeoPoint,
-    modifier:Modifier = Modifier.fillMaxSize()
+    modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by remember {mutableStateOf(startPoint)}
+    val geoPoint by remember { mutableStateOf(startPoint) }
     val mapViewState = rememberMapViewWithLifecycle(mapView)
 
     AndroidView(
         modifier = modifier,
         factory = { mapViewState },
-        update = {
-            view -> view.controller.setCenter(geoPoint)
+        update = { view ->
+            view.controller.setCenter(geoPoint)
         }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainBottomSheet(
-    body: @Composable (modifier:Modifier) -> Unit,
-    sheetContent: List<Pair<String, String>>
+fun RestaurantsBottomSheet(
+    body: @Composable (modifier: Modifier) -> Unit,
+    sheetContent: List<RestaurantDTO>,
+    navController: NavController
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 150.dp,
+        sheetPeekHeight = 100.dp,
         sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         sheetContent = {
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .height(450.dp)
+                    .height(475.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(sheetContent){item ->
+                items(sheetContent) { item ->
                     RestaurantCard(
+                        onClick = {navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))},
                         imageUrl = "",
-                        name = item.first,
-                        location = item.second)
+                        name = item.name,
+                        location = item.address,
+                        city = item.city
+                    )
                 }
 
             }
-        }) { innerPadding -> body.invoke(
-        Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
+        },
+        content = { innerPadding -> body.invoke(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         )
-    }
+        }
+    )
 
 }

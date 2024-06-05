@@ -64,8 +64,10 @@ fun RegisterRestaurantActivity(
     val navController = rememberNavController()
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
-    val selectedGroup = restaurantViewModel.selectedGroup
-    val groups = restaurantViewModel.groups
+    var formSent2 by remember { mutableStateOf(false) }
+    var formSent3 by remember { mutableStateOf(false) }
+    var selectedGroup = registerRestaurantViewModel.selectedGroup
+    var groups = registerRestaurantViewModel.groups
     val context = LocalContext.current
 
     var showTagDialog by remember { mutableStateOf(false) }
@@ -220,10 +222,11 @@ fun RegisterRestaurantActivity(
                 )
 
                 ButtonComponent(
-                    label = stringResource(id = R.string.label_next),
+                    label = stringResource(id = R.string.label_next), isLoading = isLoading,
                     onClick = {
                         restaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent = true
 
                             val result = restaurantViewModel.validateFirstStep(context)
 
@@ -282,7 +285,7 @@ fun RegisterRestaurantActivity(
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent
+                    formSent = formSent2
                 )
 
                 InputUserFile(
@@ -300,7 +303,7 @@ fun RegisterRestaurantActivity(
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent
+                    formSent = formSent2
                 )
 
                 InputUserFile(
@@ -318,7 +321,7 @@ fun RegisterRestaurantActivity(
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent,
+                    formSent = formSent2,
                     deletable = true
                 )
 
@@ -337,7 +340,7 @@ fun RegisterRestaurantActivity(
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent,
+                    formSent = formSent2,
                     deletable = true
                 )
 
@@ -363,32 +366,32 @@ fun RegisterRestaurantActivity(
                                 restaurantViewModel.getAlcoholLicenseError()
                             else
                                 R.string.error_registerRestaurant_invalid_group
-                        )
+                        ),
+                        formSent = formSent2
                     )
                 }
 
                 Spacer(Modifier.height(8.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                )
+
                 ButtonComponent(
-                    label = stringResource(R.string.label_register_restaurant),
+                    label = stringResource(R.string.label_register_restaurant), isLoading = isLoading,
                     onClick = {
                         restaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent2 = true
 
-                            val result = restaurantViewModel.validateSecondStep(context)
-
-                            if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.Description);
+                            if (registerRestaurantViewModel.validateSecondStep(context)) {
+                                navController.navigate(RegisterRestaurantRoutes.Description)
                             }
 
                             isLoading = false
                         }
                     }
-                )
-
-                ShowErrorToast(
-                    context = LocalContext.current,
-                    id = restaurantViewModel.getToastError(restaurantViewModel.result2)
                 )
 
             }
@@ -435,9 +438,10 @@ fun RegisterRestaurantActivity(
                                 restaurantViewModel.selectedTags =
                                     restaurantViewModel.selectedTags.filter { it != tag }
                             }
-                        }
-                    )
-                }
+                        )
+                    }
+
+
 
                 Row(
                     modifier = Modifier
@@ -494,7 +498,7 @@ fun RegisterRestaurantActivity(
                             else
                                 R.string.error_registerRestaurant_invalid_file
                         ),
-                        formSent = formSent
+                        formSent = formSent3
                     )
                     InputUserInfo(
                         inputText = restaurantViewModel.description.value,
@@ -507,7 +511,7 @@ fun RegisterRestaurantActivity(
                             else
                                 R.string.error_registerRestaurant_invalid_description
                         ),
-                        formSent = formSent
+                        formSent = formSent3
                     )
                 }
 
@@ -519,11 +523,11 @@ fun RegisterRestaurantActivity(
 
                 if (restaurantId == null && group == null) {
                     ButtonComponent(
-                        label = stringResource(id = R.string.label_register_restaurant),
+                        label = stringResource(id = R.string.label_register_restaurant), isLoading = isLoading,
                         onClick = {
                             restaurantViewModel.viewModelScope.launch {
                                 isLoading = true
-                                formSent = true
+                                formSent3 = true
 
                                 if (restaurantViewModel.registerRestaurant(context)) {
                                     navControllerHome.navigate(MainRoutes.Home)
