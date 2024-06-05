@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.data.endpoints.File
 import com.example.reservant_mobile.data.models.dtos.FileUploadDTO
+import com.example.reservant_mobile.data.models.dtos.LocationDTO
 import com.example.reservant_mobile.data.models.dtos.PointDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
@@ -237,7 +238,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             groupId = selectedGroup?.restaurantGroupId,
             photos = emptyList(),
             tables = emptyList(),
-            location = PointDTO(latitude = 52.39625635, longitude = 20.91364863552046)
+            location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046)
         )
     }
 
@@ -259,7 +260,11 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
     }
 
 
-    suspend fun sendPhoto(uri: String?, context: Context): String {
+    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
+        if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
+            return null
+        }
+
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
         var fDto = file?.let { FileService().sendFile(DataType.PNG, it) }
         if (fDto != null) {
@@ -397,7 +402,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
                 ).endsWith(
                     ".jpg",
                     ignoreCase = true
-                ))
+                ))  || isFileSizeInvalid(context, value)
     }
 
     fun isFileNameInvalid(uri: String?): Boolean {

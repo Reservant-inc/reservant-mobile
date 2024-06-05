@@ -66,8 +66,8 @@ fun RegisterRestaurantActivity(
     var formSent by remember { mutableStateOf(false) }
     var formSent2 by remember { mutableStateOf(false) }
     var formSent3 by remember { mutableStateOf(false) }
-    var selectedGroup = registerRestaurantViewModel.selectedGroup
-    var groups = registerRestaurantViewModel.groups
+    var selectedGroup = restaurantViewModel.selectedGroup
+    var groups = restaurantViewModel.groups
     val context = LocalContext.current
 
     var showTagDialog by remember { mutableStateOf(false) }
@@ -106,13 +106,12 @@ fun RegisterRestaurantActivity(
 
                 Spacer(modifier = Modifier.padding(top = 8.dp))
 
-                if(restaurantId == null && group == null) {
+                if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                     )
-                }
-                else{
+                } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
@@ -222,13 +221,16 @@ fun RegisterRestaurantActivity(
                 )
 
                 ButtonComponent(
-                    label = stringResource(id = R.string.label_next), isLoading = isLoading,
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                        R.string.label_edit_restaurant
+                    ),
+                    isLoading = isLoading,
                     onClick = {
                         restaurantViewModel.viewModelScope.launch {
                             isLoading = true
                             formSent = true
 
-                            val result = restaurantViewModel.validateFirstStep(context)
+                            val result = restaurantViewModel.validateFirstStep()
 
                             if (result) {
                                 navController.navigate(RegisterRestaurantRoutes.Files)
@@ -253,13 +255,12 @@ fun RegisterRestaurantActivity(
             ) {
 
                 Spacer(modifier = Modifier.height(30.dp))
-                if(restaurantId == null && group == null) {
+                if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                     )
-                }
-                else{
+                } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
@@ -375,17 +376,20 @@ fun RegisterRestaurantActivity(
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
+                    id = restaurantViewModel.getToastError(restaurantViewModel.result2)
                 )
 
                 ButtonComponent(
-                    label = stringResource(R.string.label_register_restaurant), isLoading = isLoading,
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                        R.string.label_edit_restaurant
+                    ),
+                    isLoading = isLoading,
                     onClick = {
                         restaurantViewModel.viewModelScope.launch {
                             isLoading = true
                             formSent2 = true
 
-                            if (registerRestaurantViewModel.validateSecondStep(context)) {
+                            if (restaurantViewModel.validateSecondStep(context)) {
                                 navController.navigate(RegisterRestaurantRoutes.Description)
                             }
 
@@ -405,13 +409,12 @@ fun RegisterRestaurantActivity(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                if(restaurantId == null && group == null) {
+                if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
                     )
-                }
-                else{
+                } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
@@ -420,7 +423,12 @@ fun RegisterRestaurantActivity(
 
                 ProgressBar(currentStep = 3)
 
-                TagList(tags = restaurantViewModel.selectedTags)
+                TagList(
+                    tags = restaurantViewModel.selectedTags,
+                    onRemoveTag = { tag ->
+                        restaurantViewModel.selectedTags =
+                            restaurantViewModel.selectedTags.filter { it != tag }
+                    })
 
                 ButtonComponent(
                     onClick = { showTagDialog = true },
@@ -438,8 +446,9 @@ fun RegisterRestaurantActivity(
                                 restaurantViewModel.selectedTags =
                                     restaurantViewModel.selectedTags.filter { it != tag }
                             }
-                        )
-                    }
+                        }
+                    )
+                }
 
 
 
@@ -523,7 +532,8 @@ fun RegisterRestaurantActivity(
 
                 if (restaurantId == null && group == null) {
                     ButtonComponent(
-                        label = stringResource(id = R.string.label_register_restaurant), isLoading = isLoading,
+                        label = stringResource(id = R.string.label_register_restaurant),
+                        isLoading = isLoading,
                         onClick = {
                             restaurantViewModel.viewModelScope.launch {
                                 isLoading = true
@@ -539,6 +549,7 @@ fun RegisterRestaurantActivity(
                     )
                 } else {
                     ButtonComponent(label = stringResource(id = R.string.label_edit_restaurant),
+                        isLoading = isLoading,
                         onClick = {
                             restaurantViewModel.viewModelScope.launch {
                                 isLoading = true

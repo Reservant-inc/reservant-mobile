@@ -26,5 +26,4 @@ data class RestaurantDTO (
     val location: LocationDTO? = null,
     val reservationDeposit:Double? = null,
     val tags:List<String> = emptyList(),
-    val location:PointDTO? = null
 )
