@@ -6,6 +6,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -13,6 +14,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,6 +72,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -113,6 +117,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1193,7 +1198,10 @@ fun EmployeeCard(
 
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>
+) {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
@@ -1204,24 +1212,32 @@ fun BottomNavigation(navController: NavHostController) {
 
     var selectedItem by remember { mutableStateOf(items.first()) }
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.route.toString()) },
-                label = { Text(stringResource(id = item.label)) },
-                selected = selectedItem == item,
-                alwaysShowLabel = true,
-                onClick = {
-                    if (selectedItem != item) {
-                        navController.navigate(item.route)
-                        selectedItem = item
-                    }
+
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                items.forEach { item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.icon, contentDescription = item.route.toString()) },
+                        label = { Text(stringResource(id = item.label)) },
+                        selected = selectedItem == item,
+                        alwaysShowLabel = true,
+                        onClick = {
+                            if (selectedItem != item) {
+                                navController.navigate(item.route)
+                                selectedItem = item
+                            }
+                        }
+                    )
                 }
-            )
+            }
         }
-    }
+    )
 }
 
 
@@ -2629,4 +2645,30 @@ fun RestaurantsBottomSheet(
         }
     )
 
+}
+
+@Composable
+fun MissingPage(
+    errorStringId: Int,
+    modifier:Modifier = Modifier
+        .fillMaxSize()
+){
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Icon(
+            modifier = Modifier
+                .height(100.dp)
+                .width(100.dp),
+            imageVector = Icons.Rounded.Error,
+            contentDescription = "Missing page error",
+            tint = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = stringResource(id = errorStringId)
+        )
+    }
 }

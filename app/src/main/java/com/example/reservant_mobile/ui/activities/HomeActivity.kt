@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.ui.components.BottomNavigation
+import com.example.reservant_mobile.ui.navigation.AuthRoutes
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
@@ -23,6 +25,8 @@ import com.example.reservant_mobile.ui.theme.AppTheme
 @Composable
 fun HomeActivity() {
     val innerNavController = rememberNavController()
+    val bottomBarState = remember { (mutableStateOf(true)) }
+
 
     val isSystemInDarkMode = isSystemInDarkTheme()
 
@@ -33,7 +37,10 @@ fun HomeActivity() {
     AppTheme (darkTheme = darkTheme.value) {
         Scaffold(
             bottomBar = {
-                BottomNavigation(innerNavController)
+                 BottomNavigation(
+                     navController =  innerNavController,
+                     bottomBarState = bottomBarState
+                 )
             }
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
@@ -51,6 +58,12 @@ fun HomeActivity() {
                 }
                 composable<RestaurantRoutes.Details>{
                     RestaurantDetailActivity(1)
+                }
+                composable<AuthRoutes.Landing>{
+                    LaunchedEffect(Unit) {
+                        bottomBarState.value = false
+                    }
+                    LandingActivity()
                 }
             }
         }
