@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">reservant-mobile</string>
-    <string name="label_login_action">Login</string>
+    <string name="label_login_action">Log in</string>
     <string name="label_signup">Sign up</string>
     <string name="label_login">Login</string>
     <string name="label_password">Password</string>
@@ -112,4 +112,5 @@
     <string name="delete_restaurant_message">Are you sure you want to delete</string>
     <string name="label_limited_time">Available until</string>
     <string name="label_show_more_details">Show more details</string>
+    <string name="lable_logout_action">Log out</string>
 </resources>

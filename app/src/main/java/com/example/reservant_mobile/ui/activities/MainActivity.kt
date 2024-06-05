@@ -3,6 +3,7 @@ package com.example.reservant_mobile.ui.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -20,35 +21,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val splashScreen = installSplashScreen()
-        var startPoint: Any? = null
-        splashScreen.setKeepOnScreenCondition { startPoint == null }
+
+        var isLoading = true
+        var startPoint: @Composable ()->Unit
+        splashScreen.setKeepOnScreenCondition { isLoading }
 
         lifecycleScope.launch {
-            startPoint = if(LoginViewModel().refreshToken())
-                MainRoutes.Home
-            else
-                AuthRoutes.Landing
+             startPoint = if(LoginViewModel().refreshToken()) {
+                 {HomeActivity()}
+             } else {
+                 {LandingActivity()}
+             }
 
             setContent {
                 AppTheme {
-                    val navController = rememberNavController()
-                    NavHost(
-                        navController = navController,
-                        startDestination = startPoint!!
-                    ) {
-                        composable<AuthRoutes.Landing> {
-                            LandingActivity(navController = navController)
-                        }
-                        composable<AuthRoutes.Login> {
-                            LoginActivity(navController = navController)
-                        }
-                        composable<AuthRoutes.Register> {
-                            RegisterActivity(navController = navController)
-                        }
-                        composable<MainRoutes.Home> {
-                            HomeActivity()
-                        }
-                    }
+                    isLoading=false
+                    startPoint()
                 }
             }
 
