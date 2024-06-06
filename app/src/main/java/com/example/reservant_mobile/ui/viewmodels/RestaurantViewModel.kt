@@ -21,7 +21,10 @@ import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import com.example.reservant_mobile.data.utils.getFileName
 
-class RestaurantViewModel(private val restaurantService: IRestaurantService = RestaurantService()) :
+class RestaurantViewModel(
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val fileService: FileService = FileService()
+) :
     ViewModel() {
 
     // Wynik rejestracji
@@ -256,7 +259,7 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
             return null
         }
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        return file?.let { FileService().sendFile(type, it) }
+        return file?.let { fileService.sendFile(type, it) }
     }
 
 
@@ -266,10 +269,10 @@ class RestaurantViewModel(private val restaurantService: IRestaurantService = Re
         }
 
         val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        var fDto = file?.let { FileService().sendFile(DataType.PNG, it) }
+        var fDto = file?.let { fileService.sendFile(DataType.PNG, it) }
         if (fDto != null) {
             if (fDto.value == null) {
-                fDto = file?.let { FileService().sendFile(DataType.JPG, it) }
+                fDto = file?.let { fileService.sendFile(DataType.JPG, it) }
             }
         }
         return fDto
