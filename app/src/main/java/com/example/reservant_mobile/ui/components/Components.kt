@@ -1,10 +1,12 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
+import android.icu.number.Scale
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -12,11 +14,14 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +56,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.AttachFile
@@ -67,6 +73,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
@@ -111,7 +118,9 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -122,6 +131,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
@@ -153,6 +163,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -171,6 +182,7 @@ import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -1138,7 +1150,10 @@ fun EmployeeCard(
 
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>
+) {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
@@ -1148,25 +1163,48 @@ fun BottomNavigation(navController: NavHostController) {
     )
 
     var selectedItem by remember { mutableStateOf(items.first()) }
+    val outlineVariant = MaterialTheme.colorScheme.outlineVariant
+    var outlineColor by remember { mutableStateOf(outlineVariant) }
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.route.toString()) },
-                label = { Text(stringResource(id = item.label)) },
-                selected = selectedItem == item,
-                alwaysShowLabel = true,
-                onClick = {
-                    if (selectedItem != item) {
-                        navController.navigate(item.route)
-                        selectedItem = item
-                    }
-                }
-            )
-        }
+    if (isSystemInDarkTheme()){
+        outlineColor = MaterialTheme.colorScheme.outline
     }
+
+
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.drawBehind {
+                drawLine(
+                    color = outlineColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = 1.5f
+                )
+                }
+            ) {
+                items.forEach { item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.icon, contentDescription = item.route.toString()) },
+                        label = { Text(stringResource(id = item.label)) },
+                        selected = selectedItem == item,
+                        alwaysShowLabel = true,
+                        onClick = {
+                            if (selectedItem != item) {
+                                navController.navigate(item.route)
+                                selectedItem = item
+                            }
+                        }
+                    )    
+
+                }
+            }
+        }
+    )
 }
 
 
@@ -1507,6 +1545,7 @@ fun MenuPopup(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
+    isSaving: Boolean = false
 ){
     AlertDialog(
         onDismissRequest = {
@@ -1565,11 +1604,11 @@ fun MenuPopup(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    hide()
                     onConfirm()
                     clear()
                 },
-                label = stringResource(id = R.string.label_save)
+                label = stringResource(id = R.string.label_save),
+                isLoading = isSaving
             )
         },
 
@@ -1578,7 +1617,8 @@ fun MenuPopup(
 
 @Composable
 fun MenuCard(
-    isLoading: Boolean = false,
+    showConfirmDeletePopup: MutableState<Boolean> = mutableStateOf(false),
+    showEditPopup: MutableState<Boolean> = mutableStateOf(false),
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1588,31 +1628,28 @@ fun MenuCard(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     clearFields: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isFetching: Boolean = false,
+    isSaving: Boolean = false,
 ) {
 
-    var showConfirmDeletePopup by remember { mutableStateOf(false) }
-    var showEditPopup by remember { mutableStateOf(false) }
-
-
     when {
-        showConfirmDeletePopup -> {
+        showConfirmDeletePopup.value -> {
             CountDownPopup(
                 icon = Icons.Filled.DeleteForever,
                 title = stringResource(id = R.string.confirm_delete_title),
                 text = stringResource(id = R.string.confirm_delete_text),
                 onConfirm = {
                     onDeleteClick()
-                    showConfirmDeletePopup = false
                 },
-                onDismissRequest = { showConfirmDeletePopup = false },
+                onDismissRequest = {showConfirmDeletePopup.value = false},
                 confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.label_cancel)
+                dismissText = stringResource(id = R.string.label_cancel),
+                isSaving = isSaving
             )
         }
 
-        showEditPopup -> {
-
+        showEditPopup.value -> {
             name.value = menu.name
             altName.value = menu.alternateName ?: ""
             menuType.value = menu.menuType
@@ -1621,21 +1658,22 @@ fun MenuCard(
 
             MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
-                hide = { showEditPopup = false },
+                hide = {showEditPopup.value = false},
                 onConfirm = onEditClick,
                 clear = clearFields,
                 name = name,
                 altName = altName,
                 menuType = menuType,
                 dateFrom = dateFrom,
-                dateUntil = dateUntil
+                dateUntil = dateUntil,
+                isSaving = isSaving
             )
         }
     }
     
 
     val loadingModifier = when {
-        isLoading -> Modifier
+        isFetching -> Modifier
             .shimmer()
             .alpha(0F)
         else -> Modifier
@@ -1712,14 +1750,14 @@ fun MenuCard(
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = {showEditPopup = true},
+                        onClick = { showEditPopup.value = true },
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "EditMenuItem"
                     )
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = { showConfirmDeletePopup = true },
+                        onClick = { showConfirmDeletePopup.value = true },
                         imageVector = Icons.Filled.DeleteForever,
                         contentDescription = "delete"
                     )
@@ -1746,91 +1784,31 @@ fun AddMenuButton(
     dateFrom: FormField,
     dateUntil: FormField,
     clearFields: () -> Unit,
-    addMenu: () -> Unit
+    addMenu: () -> Unit,
+    isSaving: Boolean = false,
+    showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
-    var showAddDialog by remember { mutableStateOf(false) }
-
     when {
-        showAddDialog -> {
+        showAddDialog.value -> {
             MenuPopup(
                 title = { Text(text = stringResource(id = R.string.label_add_menu)) },
-                hide = { showAddDialog = false },
+                hide = { showAddDialog.value = false },
                 onConfirm = addMenu,
                 clear = clearFields,
                 name = name,
                 altName = altName,
                 menuType = menuType,
                 dateFrom = dateFrom,
-                dateUntil = dateUntil
+                dateUntil = dateUntil,
+                isSaving = isSaving
             )
         }
     }
 
     MyFloatingActionButton(
-        onClick = { showAddDialog = true }
+        onClick = { showAddDialog.value = true }
     )
 }
-
-
-@Composable
-fun MenuItemCard(
-    menuItem: RestaurantMenuItemDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column {
-            Text(
-                text = menuItem.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                modifier = Modifier.padding(8.dp)
-            )
-
-            Text(
-                text = "Price: ${menuItem.price} zł",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-            )
-
-            if (menuItem.alcoholPercentage != null) {
-                Text(
-                    text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onEditClick,
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditMenuItem"
-                )
-
-                SecondaryButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(50.dp),
-                    onClick = onDeleteClick,
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "DeleteMenuItem"
-                )
-            }
-        }
-    }
-}
-
 
 @Composable
 fun SecondaryButton(
@@ -1918,6 +1896,7 @@ fun CountDownPopup(
     dismissText: String = "Cancel",
     onDismissRequest: () -> Unit = {},
     onConfirm: () -> Unit,
+    isSaving: Boolean = false
 ) {
 
     var allowConfirm by remember {
@@ -1936,42 +1915,6 @@ fun CountDownPopup(
         }
     }
 
-    /*AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = title)
-        },
-        text = {
-            Text(text = text)
-        },
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            OutlinedButton(
-                onClick = {
-                    if (allowConfirm) onConfirm()
-                },
-                enabled = allowConfirm
-            ) {
-                if (allowConfirm) {
-                    Text(confirmText, color = MaterialTheme.colorScheme.error)
-                } else {
-                    Text(timer.toString())
-                }
-            }
-        },
-        dismissButton = {
-            FilledTonalButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text(dismissText)
-            }
-        }
-    )*/
-
     DeletePopup(
         icon = icon,
         title = title,
@@ -1983,10 +1926,14 @@ fun CountDownPopup(
         },
         enabled = allowConfirm
     ) {
-        if (allowConfirm) {
-            Text(confirmText, color = MaterialTheme.colorScheme.error)
-        } else {
+        if (!allowConfirm) {
             Text(timer.toString())
+        } else if (isSaving) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(25.dp)
+            )
+        } else {
+            Text(confirmText, color = MaterialTheme.colorScheme.error)
         }
     }
 }
@@ -2171,86 +2118,121 @@ fun TagItem(tag: String, onRemove: () -> Unit) {
 
 @Composable
 fun MenuItemCard(
-    name: String,
-    price: String,
-    description: String,
-    imageResource: Int,
+    menuItem: RestaurantMenuItemDTO,
+    role: String,
     onInfoClick: () -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Top
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.Top) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = name,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.weight(1f)
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
-                    IconButton(
-                        onClick = onInfoClick,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .offset(y = (-4).dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.primary
+                    Text(
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (menuItem.alcoholPercentage != null) {
+                        Text(
+                            text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        when (role) {
+                            Roles.CUSTOMER -> {
+                                IconButton(
+                                    onClick = onInfoClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Info,
+                                        contentDescription = "Info",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = onAddClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.AddShoppingCart,
+                                        contentDescription = "Add",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            Roles.RESTAURANT_OWNER -> {
+                                IconButton(
+                                    onClick = onEditClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Edit",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = onDeleteClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                 }
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.offset(y = (-4).dp)
-                )
-                if (description.isNotEmpty()) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Image(
-                painter = painterResource(imageResource),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxSize()
-            )
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier
-                    .size(36.dp)
-                    .align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.primary
+
+                Image(
+                    painter = painterResource(R.drawable.pizza),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 8.dp, end = 8.dp)
                 )
             }
+
+
+            //Spacer(modifier = Modifier.height(8.dp))
+
+
         }
     }
 }
@@ -2600,4 +2582,30 @@ fun RestaurantsBottomSheet(
         }
     )
 
+}
+
+@Composable
+fun MissingPage(
+    errorStringId: Int,
+    modifier:Modifier = Modifier
+        .fillMaxSize()
+){
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Icon(
+            modifier = Modifier
+                .height(100.dp)
+                .width(100.dp),
+            imageVector = Icons.Rounded.Error,
+            contentDescription = "Missing page error",
+            tint = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = stringResource(id = errorStringId)
+        )
+    }
 }

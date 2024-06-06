@@ -12,19 +12,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.services.UserService
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.navigation.AuthRoutes
+import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
-import kotlinx.coroutines.GlobalScope
+import com.example.reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: MutableState<Boolean>){
+fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: () -> Unit){
+
+    val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {
         Column(
@@ -51,7 +56,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
 
             ButtonComponent(
                 label = "Temporary theme changer",
-                onClick = { darkTheme.value = !darkTheme.value }
+                onClick = { themeChange() }
             )
 
             ButtonComponent(
@@ -60,16 +65,18 @@ fun RestaurantOwnerProfileActivity(navController: NavController, darkTheme: Muta
                     .padding(16.dp),
                 label = "Restaurant Detail Preview",
                 onClick = {
-                    navController.navigate(RestaurantRoutes.Details)
+                    navController.navigate(RestaurantRoutes.Details(restaurantId = 1))
                 },
             )
-//            FIXME: proper navigation
+
             ButtonComponent(
-                label = "Logout",
+                label = stringResource(id = R.string.lable_logout_action),
                 onClick = {
-                    GlobalScope.launch {
-                        UserService().logoutUser()
-                        navController.navigate(AuthRoutes.Landing)
+                    loginViewModel.viewModelScope.launch{
+                        loginViewModel.logout()
+                        navController.navigate(AuthRoutes.Landing){
+                            popUpTo(0)
+                        }
                     }
                 }
             )

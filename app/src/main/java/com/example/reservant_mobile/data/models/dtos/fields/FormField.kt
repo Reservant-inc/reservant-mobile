@@ -8,4 +8,11 @@ class FormField(
     val name: String
 ){
     var value by mutableStateOf("")
+    fun <T> getError(result: Result<T>): Int{
+        if (!result.isError) {
+            return -1
+        }
+
+        return result.errors?.getOrDefault(name, -1) ?: -1
+    }
 }

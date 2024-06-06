@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.viewmodels.MenuItemManagementViewModel
 
@@ -29,7 +30,9 @@ fun MenuItemManagementActivity(menuId: Int) {
             MenuItemCard(
                 menuItem = item,
                 onEditClick = {}, //TODO
-                onDeleteClick = { viewmodel.deleteMenu(item) }
+                onInfoClick = {}, //TODO
+                onDeleteClick = { viewmodel.deleteMenu(item) },
+                role = Roles.RESTAURANT_OWNER
             )
         }
     }

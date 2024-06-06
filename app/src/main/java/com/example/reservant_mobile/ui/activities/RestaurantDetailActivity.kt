@@ -3,6 +3,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,10 +29,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Roles
+import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -49,7 +53,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().padding(bottom = 4.dp)) {
 
         if (restaurantDetailVM.result.isError) {
             ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
@@ -65,7 +69,11 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                 }
             }
             restaurantDetailVM.restaurant != null -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
                     restaurantDetailVM.restaurant?.let { restaurant ->
                         Image(
                             painter = painterResource(R.drawable.restaurant_photo),
@@ -179,15 +187,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                 }
             }
             else -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Sorry! something went wrong.",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+                MissingPage(errorStringId = R.string.error_not_found)
             }
         }
     }
@@ -201,21 +201,51 @@ fun RestaurantDetailActivity(restaurantId: Int) {
 // TODO: MenuItemDTO
 @Composable
 fun MenuContent(
-//    menuItems: List<MenuItemDTO>
+//    menuItems: List<RestaurantMenuItemDTO>
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp)
+            //.verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
 
-        repeat(3){
+        // Sample data to demonstrate the use of MenuItemCard
+        val sampleMenuItems = listOf(
+            RestaurantMenuItemDTO(
+                menuItemId = 1,
+                restaurantId = 1,
+                price = 15.0,
+                name = "Position name 11111111111",
+                alternateName = null,
+                alcoholPercentage = null,
+                photo = "imageResource"
+            ),
+            RestaurantMenuItemDTO(
+                menuItemId = 2,
+                restaurantId = 1,
+                price = 20.0,
+                name = "Position name 2222",
+                alternateName = null,
+                alcoholPercentage = 5.0,
+                photo = "imageResource"
+            ),
+            RestaurantMenuItemDTO(
+                menuItemId = 3,
+                restaurantId = 1,
+                price = 25.0,
+                name = "Position name 3",
+                alternateName = null,
+                alcoholPercentage = null,
+                photo = "imageResource"
+            )
+        )
+
+        sampleMenuItems.forEach { menuItem ->
             MenuItemCard(
-                name = "Position name",
-                price = stringResource(R.string.label_menu_price) + ": 15zl",
-                imageResource = R.drawable.pizza,
-                description = "Position description",
+                menuItem = menuItem,
+                role = Roles.CUSTOMER,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
@@ -223,10 +253,8 @@ fun MenuContent(
 
 //        menuItems.forEach { menuItem ->
 //            MenuItemCard(
-//                name = menuItem.name,
-//                price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
-//                imageResource = R.drawable.pizza, // Change to menuItem.imageResource if available
-//                description = menuItem.description,
+//                menuItem = menuItem,
+//                role = MenuItemCardRole.DETAIL,
 //                onInfoClick = { /* TODO: Handle info */ },
 //                onAddClick = { /* TODO: Handle add */ }
 //            )

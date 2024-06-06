@@ -48,6 +48,7 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.ImageCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.OsmMapView
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.RestaurantsBottomSheet
@@ -275,7 +276,7 @@ fun RestaurantDetailPreview(
                                     .wrapContentHeight(align = Alignment.CenterVertically),
                                 onClick = {
                                     onDismiss()
-                                    navController.navigate(RestaurantRoutes.Details)
+                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  1))
                                 },
 
                                 label = stringResource(id = R.string.label_show_more_details)
@@ -287,11 +288,7 @@ fun RestaurantDetailPreview(
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "Sorry! something went wrong.",
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        MissingPage(errorStringId = R.string.error_not_found)
                     }
                 }
             }

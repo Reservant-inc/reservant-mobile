@@ -31,6 +31,10 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
         return result.value
     }
 
+    suspend fun logout(){
+        userService.logoutUser()
+    }
+
     suspend fun refreshToken(): Boolean{
         return LocalBearerService().getBearerToken().isNotEmpty() && userService.refreshToken()
     }
