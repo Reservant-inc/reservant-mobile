@@ -37,6 +37,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.IconWithHeader
@@ -49,26 +50,37 @@ import com.example.reservant_mobile.ui.components.TagList
 import com.example.reservant_mobile.ui.components.TagSelectionScreen
 import com.example.reservant_mobile.ui.navigation.MainRoutes
 import com.example.reservant_mobile.ui.navigation.RegisterRestaurantRoutes
-import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
-
-    val registerRestaurantViewModel = viewModel<RegisterRestaurantViewModel>()
+fun RegisterRestaurantActivity(
+    navControllerHome: NavHostController,
+    restaurantId: Int? = null,
+    group: RestaurantGroupDTO? = null
+) {
+    val restaurantViewModel = viewModel<RestaurantViewModel>()
     val navController = rememberNavController()
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
-    var selectedGroup = registerRestaurantViewModel.selectedGroup
-    var groups = registerRestaurantViewModel.groups
+    var formSent2 by remember { mutableStateOf(false) }
+    var formSent3 by remember { mutableStateOf(false) }
+    var selectedGroup = restaurantViewModel.selectedGroup
+    var groups = restaurantViewModel.groups
     val context = LocalContext.current
 
     var showTagDialog by remember { mutableStateOf(false) }
 
-    registerRestaurantViewModel.viewModelScope.launch {
-        registerRestaurantViewModel.getGroups()
-        registerRestaurantViewModel.getTags()
+    if (restaurantId != null && group != null) {
+        restaurantViewModel.viewModelScope.launch {
+            restaurantViewModel.assignData(restaurantId, group)
+        }
+    }
+
+    restaurantViewModel.viewModelScope.launch {
+        restaurantViewModel.getGroups()
+        restaurantViewModel.getTags()
     }
 
     NavHost(
@@ -94,22 +106,29 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 Spacer(modifier = Modifier.padding(top = 8.dp))
 
-                IconWithHeader(
-                    icon = Icons.Rounded.RestaurantMenu,
-                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
-                )
+                if (restaurantId == null && group == null) {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                    )
+                } else {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                    )
+                }
 
                 ProgressBar(currentStep = 1)
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.name.value,
-                    onValueChange = { registerRestaurantViewModel.name.value = it },
+                    inputText = restaurantViewModel.name.value,
+                    onValueChange = { restaurantViewModel.name.value = it },
                     label = stringResource(id = R.string.label_restaurant_name),
                     optional = false,
-                    isError = registerRestaurantViewModel.isNameInvalid(),
+                    isError = restaurantViewModel.isNameInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getNameError() != -1)
-                            registerRestaurantViewModel.getNameError()
+                        if (restaurantViewModel.getNameError() != -1)
+                            restaurantViewModel.getNameError()
                         else
                             R.string.error_registerRestaurant_invalid_name
                     ),
@@ -117,15 +136,15 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.nip.value,
-                    onValueChange = { registerRestaurantViewModel.nip.value = it },
+                    inputText = restaurantViewModel.nip.value,
+                    onValueChange = { restaurantViewModel.nip.value = it },
                     label = stringResource(id = R.string.label_restaurant_nip),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     optional = false,
-                    isError = registerRestaurantViewModel.isNipInvalid(),
+                    isError = restaurantViewModel.isNipInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getNipError() != -1)
-                            registerRestaurantViewModel.getNipError()
+                        if (restaurantViewModel.getNipError() != -1)
+                            restaurantViewModel.getNipError()
                         else
                             R.string.error_registerRestaurant_invalid_nip
                     ),
@@ -133,14 +152,14 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 OutLinedDropdownMenu(
-                    selectedOption = registerRestaurantViewModel.restaurantType.value,
+                    selectedOption = restaurantViewModel.restaurantType.value,
                     label = stringResource(R.string.label_restaurant_type),
                     itemsList = options,
-                    onOptionSelected = { registerRestaurantViewModel.restaurantType.value = it },
-                    isError = registerRestaurantViewModel.isRestaurantTypeInvalid(),
+                    onOptionSelected = { restaurantViewModel.restaurantType.value = it },
+                    isError = restaurantViewModel.isRestaurantTypeInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getRestaurantTypeError() != -1)
-                            registerRestaurantViewModel.getRestaurantTypeError()
+                        if (restaurantViewModel.getRestaurantTypeError() != -1)
+                            restaurantViewModel.getRestaurantTypeError()
                         else
                             R.string.error_registerRestaurant_invalid_restaurantType
                     ),
@@ -148,14 +167,14 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.address.value,
-                    onValueChange = { registerRestaurantViewModel.address.value = it },
+                    inputText = restaurantViewModel.address.value,
+                    onValueChange = { restaurantViewModel.address.value = it },
                     label = stringResource(id = R.string.label_restaurant_address),
                     optional = false,
-                    isError = registerRestaurantViewModel.isAddressInvalid(),
+                    isError = restaurantViewModel.isAddressInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getAdressError() != -1)
-                            registerRestaurantViewModel.getAdressError()
+                        if (restaurantViewModel.getAdressError() != -1)
+                            restaurantViewModel.getAdressError()
                         else
                             R.string.error_registerRestaurant_invalid_adress
                     ),
@@ -163,15 +182,15 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.postalCode.value,
-                    onValueChange = { registerRestaurantViewModel.postalCode.value = it },
+                    inputText = restaurantViewModel.postalCode.value,
+                    onValueChange = { restaurantViewModel.postalCode.value = it },
                     label = stringResource(id = R.string.label_restaurant_postal),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     optional = false,
-                    isError = registerRestaurantViewModel.isPostalCodeInvalid(),
+                    isError = restaurantViewModel.isPostalCodeInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getPostalError() != -1)
-                            registerRestaurantViewModel.getPostalError()
+                        if (restaurantViewModel.getPostalError() != -1)
+                            restaurantViewModel.getPostalError()
                         else
                             R.string.error_registerRestaurant_invalid_postal
                     ),
@@ -179,14 +198,14 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 )
 
                 InputUserInfo(
-                    inputText = registerRestaurantViewModel.city.value,
-                    onValueChange = { registerRestaurantViewModel.city.value = it },
+                    inputText = restaurantViewModel.city.value,
+                    onValueChange = { restaurantViewModel.city.value = it },
                     label = stringResource(id = R.string.label_restaurant_city),
                     optional = false,
-                    isError = registerRestaurantViewModel.isCityInvalid(),
+                    isError = restaurantViewModel.isCityInvalid(),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getCityError() != -1)
-                            registerRestaurantViewModel.getCityError()
+                        if (restaurantViewModel.getCityError() != -1)
+                            restaurantViewModel.getCityError()
                         else
                             R.string.error_registerRestaurant_invalid_city
                     ),
@@ -198,16 +217,20 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result)
+                    id = restaurantViewModel.getToastError(restaurantViewModel.result)
                 )
 
                 ButtonComponent(
-                    label = stringResource(id = R.string.label_next),
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                        R.string.label_edit_restaurant
+                    ),
+                    isLoading = isLoading,
                     onClick = {
-                        registerRestaurantViewModel.viewModelScope.launch {
+                        restaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent = true
 
-                            val result = registerRestaurantViewModel.validateFirstStep(context)
+                            val result = restaurantViewModel.validateFirstStep()
 
                             if (result) {
                                 navController.navigate(RegisterRestaurantRoutes.Files)
@@ -232,10 +255,17 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
             ) {
 
                 Spacer(modifier = Modifier.height(30.dp))
-                IconWithHeader(
-                    icon = Icons.Rounded.RestaurantMenu,
-                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
-                )
+                if (restaurantId == null && group == null) {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                    )
+                } else {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                    )
+                }
 
                 ProgressBar(currentStep = 2)
 
@@ -243,114 +273,129 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
+                    defaultValue = restaurantViewModel.businessPermission.value,
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.businessPermission.value = file.toString();
+                        restaurantViewModel.businessPermission.value = file.toString();
                     },
                     context = context,
                     optional = false,
-                    isError = registerRestaurantViewModel.isBusinessPermissionInvalid(context),
+                    isError = restaurantViewModel.isBusinessPermissionInvalid(context),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getBusinessPermissionError() != -1)
-                            registerRestaurantViewModel.getBusinessPermissionError()
+                        if (restaurantViewModel.getBusinessPermissionError() != -1)
+                            restaurantViewModel.getBusinessPermissionError()
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent
+                    formSent = formSent2
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_ownerId),
+                    defaultValue = restaurantViewModel.idCard.value,
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.idCard.value = file.toString();
+                        restaurantViewModel.idCard.value = file.toString();
                     },
                     context = context,
                     optional = false,
-                    isError = registerRestaurantViewModel.isIdCardInvalid(context),
+                    isError = restaurantViewModel.isIdCardInvalid(context),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getIdCardError() != -1)
-                            registerRestaurantViewModel.getIdCardError()
+                        if (restaurantViewModel.getIdCardError() != -1)
+                            restaurantViewModel.getIdCardError()
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent
+                    formSent = formSent2
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_lease),
+                    defaultValue = restaurantViewModel.rentalContract.value,
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.rentalContract.value = file.toString();
+                        restaurantViewModel.rentalContract.value = file.toString();
                     },
                     context = context,
                     optional = true,
-                    isError = registerRestaurantViewModel.isRentalContractInvalid(context),
+                    isError = restaurantViewModel.isRentalContractInvalid(context),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getRentalContractError() != -1)
-                            registerRestaurantViewModel.getRentalContractError()
+                        if (restaurantViewModel.getRentalContractError() != -1)
+                            restaurantViewModel.getRentalContractError()
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent,
+                    formSent = formSent2,
                     deletable = true
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_license),
+                    defaultValue = restaurantViewModel.alcoholLicense.value,
                     onFilePicked = { file ->
-                        registerRestaurantViewModel.alcoholLicense.value = file.toString();
+                        restaurantViewModel.alcoholLicense.value = file.toString();
                     },
                     context = context,
                     optional = true,
-                    isError = registerRestaurantViewModel.isAlcoholLicenseInvalid(context),
+                    isError = restaurantViewModel.isAlcoholLicenseInvalid(context),
                     errorText = stringResource(
-                        if (registerRestaurantViewModel.getAlcoholLicenseError() != -1)
-                            registerRestaurantViewModel.getAlcoholLicenseError()
+                        if (restaurantViewModel.getAlcoholLicenseError() != -1)
+                            restaurantViewModel.getAlcoholLicenseError()
                         else
                             R.string.error_registerRestaurant_invalid_file
                     ),
-                    formSent = formSent,
+                    formSent = formSent2,
                     deletable = true
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 if (groups != null) {
-                    val newGroups = groups + RestaurantGroupDTO(name = registerRestaurantViewModel.name.value)
+                    val newGroups =
+                        groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
                     OutLinedDropdownMenu(
                         selectedOption = selectedGroup?.name
-                            ?: stringResource(R.string.label_management_choose_group),
+                            ?: "",
                         itemsList = newGroups.map { it.name },
                         onOptionSelected = { name ->
-                            registerRestaurantViewModel.viewModelScope.launch {
-                                registerRestaurantViewModel.selectedGroup =
+                            restaurantViewModel.viewModelScope.launch {
+                                restaurantViewModel.selectedGroup =
                                     newGroups.find { it.name == name }
                             }
                         },
-                        label = stringResource(R.string.label_add_to_group)
+                        label = stringResource(R.string.label_add_to_group),
+                        isError = restaurantViewModel.isGroupInvalid(),
+                        errorText = stringResource(
+                            if (restaurantViewModel.getAlcoholLicenseError() != -1)
+                                restaurantViewModel.getAlcoholLicenseError()
+                            else
+                                R.string.error_registerRestaurant_invalid_group
+                        ),
+                        formSent = formSent2
                     )
                 }
 
                 Spacer(Modifier.height(8.dp))
 
+                ShowErrorToast(
+                    context = LocalContext.current,
+                    id = restaurantViewModel.getToastError(restaurantViewModel.result2)
+                )
+
                 ButtonComponent(
-                    label = stringResource(R.string.label_register_restaurant),
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                        R.string.label_edit_restaurant
+                    ),
+                    isLoading = isLoading,
                     onClick = {
-                        registerRestaurantViewModel.viewModelScope.launch {
+                        restaurantViewModel.viewModelScope.launch {
                             isLoading = true
+                            formSent2 = true
 
-                            val result = registerRestaurantViewModel.validateSecondStep(context)
-
-                            if (result) {
-                                navController.navigate(RegisterRestaurantRoutes.Description);
+                            if (restaurantViewModel.validateSecondStep(context)) {
+                                navController.navigate(RegisterRestaurantRoutes.Description)
                             }
 
                             isLoading = false
                         }
                     }
-                )
-
-                ShowErrorToast(
-                    context = LocalContext.current,
-                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result2)
                 )
 
             }
@@ -364,33 +409,46 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                IconWithHeader(
-                    icon = Icons.Rounded.RestaurantMenu,
-                    text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
-                )
+                if (restaurantId == null && group == null) {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                    )
+                } else {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                    )
+                }
 
                 ProgressBar(currentStep = 3)
 
-
-                    TagList(tags = registerRestaurantViewModel.selectedTags, onRemoveTag = { tag ->
-                        registerRestaurantViewModel.selectedTags.remove(tag)
+                TagList(
+                    tags = restaurantViewModel.selectedTags,
+                    onRemoveTag = { tag ->
+                        restaurantViewModel.selectedTags =
+                            restaurantViewModel.selectedTags.filter { it != tag }
                     })
 
-                    ButtonComponent(onClick = { showTagDialog = true }, label = stringResource(id = R.string.label_choose_tags))
+                ButtonComponent(
+                    onClick = { showTagDialog = true },
+                    label = stringResource(id = R.string.label_choose_tags)
+                )
 
-                    if (showTagDialog) {
-                        TagSelectionScreen(
-                            vm = registerRestaurantViewModel,
-                            onDismiss = { showTagDialog = false },
-                            onTagSelected = { tag, isSelected ->
-                                if (isSelected) {
-                                    registerRestaurantViewModel.selectedTags.add(tag)
-                                } else {
-                                    registerRestaurantViewModel.selectedTags.remove(tag)
-                                }
+                if (showTagDialog) {
+                    TagSelectionScreen(
+                        vm = restaurantViewModel,
+                        onDismiss = { showTagDialog = false },
+                        onTagSelected = { tag, isSelected ->
+                            if (isSelected) {
+                                restaurantViewModel.selectedTags += tag
+                            } else {
+                                restaurantViewModel.selectedTags =
+                                    restaurantViewModel.selectedTags.filter { it != tag }
                             }
-                        )
-                    }
+                        }
+                    )
+                }
 
 
 
@@ -407,13 +465,13 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
 
                     Row {
                         RadioButton(
-                            selected = registerRestaurantViewModel.delivery,
-                            onClick = { registerRestaurantViewModel.delivery = true }
+                            selected = restaurantViewModel.delivery,
+                            onClick = { restaurantViewModel.delivery = true }
                         )
                         Text(
                             text = stringResource(id = R.string.label_yes),
                             modifier = Modifier
-                                .clickable { registerRestaurantViewModel.delivery = true }
+                                .clickable { restaurantViewModel.delivery = true }
                                 .padding(end = 8.dp)
                                 .padding(top = 16.dp)
                         )
@@ -421,13 +479,13 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                         Spacer(modifier = Modifier.width(16.dp))
 
                         RadioButton(
-                            selected = !registerRestaurantViewModel.delivery,
-                            onClick = { registerRestaurantViewModel.delivery = false }
+                            selected = !restaurantViewModel.delivery,
+                            onClick = { restaurantViewModel.delivery = false }
                         )
                         Text(
                             text = stringResource(id = R.string.label_no),
                             modifier = Modifier
-                                .clickable { registerRestaurantViewModel.delivery = false }
+                                .clickable { restaurantViewModel.delivery = false }
                                 .padding(start = 8.dp)
                                 .padding(top = 16.dp)
                         )
@@ -437,55 +495,74 @@ fun RegisterRestaurantActivity(navControllerHome: NavHostController) {
                 Column {
                     InputUserFile(
                         label = stringResource(id = R.string.label_restaurant_logo),
+                        defaultValue = restaurantViewModel.logo.value,
                         onFilePicked = { file ->
-                            registerRestaurantViewModel.logo.value = file.toString();
+                            restaurantViewModel.logo.value = file.toString();
                         },
                         context = context,
-                        isError = registerRestaurantViewModel.isLogoInvalid(context),
+                        isError = restaurantViewModel.isLogoInvalid(context),
                         errorText = stringResource(
-                            if (registerRestaurantViewModel.getIdCardError() != -1)
-                                registerRestaurantViewModel.getIdCardError()
+                            if (restaurantViewModel.getIdCardError() != -1)
+                                restaurantViewModel.getIdCardError()
                             else
                                 R.string.error_registerRestaurant_invalid_file
                         ),
-                        formSent = formSent
+                        formSent = formSent3
                     )
                     InputUserInfo(
-                        inputText = registerRestaurantViewModel.description.value,
-                        onValueChange = { registerRestaurantViewModel.description.value = it },
+                        inputText = restaurantViewModel.description.value,
+                        onValueChange = { restaurantViewModel.description.value = it },
                         label = stringResource(id = R.string.label_restaurant_description),
-                        isError = registerRestaurantViewModel.isDescriptionInvalid(),
+                        isError = restaurantViewModel.isDescriptionInvalid(),
                         errorText = stringResource(
-                            if (registerRestaurantViewModel.getDescriptionError() != -1)
-                                registerRestaurantViewModel.getDescriptionError()
+                            if (restaurantViewModel.getDescriptionError() != -1)
+                                restaurantViewModel.getDescriptionError()
                             else
                                 R.string.error_registerRestaurant_invalid_description
                         ),
-                        formSent = formSent
+                        formSent = formSent3
                     )
                 }
 
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = registerRestaurantViewModel.getToastError(registerRestaurantViewModel.result3)
+                    id = restaurantViewModel.getToastError(restaurantViewModel.result3)
                 )
 
-                ButtonComponent(
-                    label = stringResource(id = R.string.label_register_restaurant),
-                    onClick = {
-                        registerRestaurantViewModel.viewModelScope.launch {
-                            isLoading = true
-                            formSent = true
+                if (restaurantId == null && group == null) {
+                    ButtonComponent(
+                        label = stringResource(id = R.string.label_register_restaurant),
+                        isLoading = isLoading,
+                        onClick = {
+                            restaurantViewModel.viewModelScope.launch {
+                                isLoading = true
+                                formSent3 = true
 
-                            if (registerRestaurantViewModel.registerRestaurant(context)) {
-                                navControllerHome.navigate(MainRoutes.Home)
+                                if (restaurantViewModel.registerRestaurant(context)) {
+                                    navControllerHome.navigate(MainRoutes.Home)
+                                }
+
+                                isLoading = false
                             }
-
-                            isLoading = false
                         }
-                    }
-                )
+                    )
+                } else {
+                    ButtonComponent(label = stringResource(id = R.string.label_edit_restaurant),
+                        isLoading = isLoading,
+                        onClick = {
+                            restaurantViewModel.viewModelScope.launch {
+                                isLoading = true
+                                formSent = true
+
+                                if (restaurantViewModel.editRestaurant(context)) {
+                                    navControllerHome.navigate(MainRoutes.Home)
+                                }
+
+                                isLoading = false
+                            }
+                        })
+                }
                 Spacer(modifier = Modifier.height(64.dp))
             }
         }

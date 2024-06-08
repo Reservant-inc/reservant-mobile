@@ -50,7 +50,7 @@ fun HomeActivity() {
                     MapActivity()
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
-                    RestaurantManagementActivity()
+                    RestaurantManagementActivity(navControllerHome = innerNavController)
                 }
                 composable<RegisterRestaurantRoutes.Register>{
                     RegisterRestaurantActivity(navControllerHome = innerNavController)

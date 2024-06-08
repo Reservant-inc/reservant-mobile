@@ -16,7 +16,7 @@ data class RestaurantDTO (
     val rentalContract: String? = null,
     val alcoholLicense: String? = null,
     val businessPermission: String? = null,
-    val idCard: String = "",
+    val idCard: String? = null,
     val tables:List<TableDTO> = emptyList(),
     val provideDelivery:Boolean = false,
     val logo:String? = null,
@@ -25,5 +25,5 @@ data class RestaurantDTO (
     val description:String = "",
     val location: LocationDTO? = null,
     val reservationDeposit:Double? = null,
-    val tags:List<String> = emptyList()
+    val tags:List<String> = emptyList(),
 )

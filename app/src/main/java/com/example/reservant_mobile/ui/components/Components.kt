@@ -181,7 +181,7 @@ import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
-import com.example.reservant_mobile.ui.viewmodels.RegisterRestaurantViewModel
+import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -279,6 +279,7 @@ fun InputUserInfo(
 @Composable
 fun InputUserFile(
     label: String = "",
+    defaultValue: String = "",
     onFilePicked: (Uri?) -> Unit,
     modifier: Modifier = Modifier,
     context: Context,
@@ -293,7 +294,7 @@ fun InputUserFile(
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        fileName = uri?.let { getFileName(context, it) }
+        fileName = uri?.let { getFileName(context, it.toString()) }
         onFilePicked(uri)
     }
     var beginValidation: Boolean by remember { mutableStateOf(false) }
@@ -303,6 +304,10 @@ fun InputUserFile(
     }
     if (fileName == null && optional) {
         beginValidation = false
+    }
+
+    if (fileName == null && defaultValue.isNotBlank()){
+        fileName = defaultValue
     }
 
     OutlinedTextField(
@@ -815,62 +820,6 @@ fun TagsDetailView(tags: List<String>) {
             label = stringResource(R.string.label_restaurant_tags),
             value = tagsString
         )
-    }
-}
-
-@Composable
-fun OutLinedDropdownMenu(
-    selectedOption: String,
-    itemsList: List<String>,
-    onOptionSelected: (String) -> Unit,
-    label: String,
-    shape: RoundedCornerShape = roundedShape,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = selectedOption,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(label) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            interactionSource = interactionSource,
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Hide" else "Show"
-                )
-            }
-        )
-
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                if (interaction is PressInteraction.Release) {
-                    expanded = true
-                }
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsList.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
     }
 }
 
@@ -2094,7 +2043,7 @@ fun MenuTypeButton(modifier: Modifier = Modifier, menuType: String, onClick: () 
 }
 
 @Composable
-fun TagSelectionScreen(vm: RegisterRestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
+fun TagSelectionScreen(vm: RestaurantViewModel, onDismiss: () -> Unit, onTagSelected: (String, Boolean) -> Unit,) {
     val selectedTags = vm.selectedTags
     val tags = vm.tags
 

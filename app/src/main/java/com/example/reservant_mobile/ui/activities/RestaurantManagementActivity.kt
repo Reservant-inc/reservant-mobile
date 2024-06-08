@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -42,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun RestaurantManagementActivity() {
+fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     val restaurantManageVM = viewModel<RestaurantManagementViewModel>()
     val navController = rememberNavController()
@@ -106,7 +107,10 @@ fun RestaurantManagementActivity() {
 
                         RestaurantInfoView(
                             restaurant = restaurant,
-                            onEditClick = { /*TODO*/ },
+                            onEditClick = { navController.navigate(
+                            RestaurantManagementRoutes.Edit(restaurantId = restaurant.restaurantId)
+                            )
+                        },
                             onManageEmployeeClick = {
                                 navController.navigate(
                                     RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
@@ -177,6 +181,14 @@ fun RestaurantManagementActivity() {
         composable<RestaurantManagementRoutes.Employee> {
             EmployeeManagementActivity(
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Employee>().restaurantId
+            )
+        }
+
+        composable<RestaurantManagementRoutes.Edit> {
+            RegisterRestaurantActivity(
+                navControllerHome = navControllerHome,
+                group = selectedGroup,
+                restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
             )
         }
     }
