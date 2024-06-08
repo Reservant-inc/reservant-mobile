@@ -1605,7 +1605,6 @@ fun MenuPopup(
             ButtonComponent(
                 onClick = {
                     onConfirm()
-                    clear()
                 },
                 label = stringResource(id = R.string.label_save),
                 isLoading = isSaving

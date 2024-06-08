@@ -77,7 +77,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     menu = RestaurantMenuDTO(
                                         name = "",
                                         menuType = "",
-                                        dateFrom = ""
+                                        dateFrom = "",
+                                        photo = ""
                                     ),
                                     onEditClick = { },
                                     onDeleteClick = { },
@@ -102,6 +103,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     viewmodel.viewModelScope.launch {
                                         viewmodel.editMenu(menu)
                                         if (!viewmodel.result.isError){
+                                            viewmodel.clearFields()
                                             showEditPopup.value = false
                                         }
                                     }

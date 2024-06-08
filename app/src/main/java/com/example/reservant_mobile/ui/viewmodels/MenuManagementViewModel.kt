@@ -56,7 +56,8 @@ class MenuManagementViewModel(
             alternateName = alternateName.value.ifEmpty { null },
             menuType = menuType.value,
             dateFrom = dateFrom.value,
-            dateUntil = dateUntil.value.ifEmpty { null }
+            dateUntil = dateUntil.value.ifEmpty { null },
+            photo = "exampleImage"
         )
     }
 
