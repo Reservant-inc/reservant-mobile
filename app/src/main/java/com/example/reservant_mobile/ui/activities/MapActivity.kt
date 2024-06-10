@@ -87,49 +87,49 @@ fun MapActivity(){
             mapViewModel.viewModelScope.launch {
                 val img: Bitmap? = FileService().getImage("test-jd.png").value
 
-                    mapViewModel.addRestaurantMarker(
-                        GeoPoint(52.240055, 21.017532),
-                        img,
-                        "Restaurant 1" +
-                                ""
-                    ) { _, _ ->
-                        showRestaurantId = 1
-                        showRestaurantBottomSheet = true
-                        true
-                    }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.240055, 21.017532),
+                    img,
+                    "Restaurant 1" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 1
+                    showRestaurantBottomSheet = true
+                    true
+                }
 
-                    mapViewModel.addRestaurantMarker(
-                        GeoPoint(52.240055, 21.027532),
-                        img,
-                        "Restaurant 2" +
-                                ""
-                    ) { _, _ ->
-                        showRestaurantId = 2
-                        showRestaurantBottomSheet = true
-                        true
-                    }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.240055, 21.027532),
+                    img,
+                    "Restaurant 2" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 2
+                    showRestaurantBottomSheet = true
+                    true
+                }
 
-                    mapViewModel.addRestaurantMarker(
-                        GeoPoint(52.250055, 21.027532),
-                        img,
-                        "Restaurant 3" +
-                                ""
-                    ) { _, _ ->
-                        showRestaurantId = 3
-                        showRestaurantBottomSheet = true
-                        true
-                    }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.250055, 21.027532),
+                    img,
+                    "Restaurant 3" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 3
+                    showRestaurantBottomSheet = true
+                    true
+                }
 
-                    mapViewModel.addRestaurantMarker(
-                        GeoPoint(52.210055, 21.007532),
-                        img,
-                        "Restaurant 4" +
-                                ""
-                    ) { _, _ ->
-                        showRestaurantId = 4
-                        showRestaurantBottomSheet = true
-                        true
-                    }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.210055, 21.007532),
+                    img,
+                    "Restaurant 4" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 4
+                    showRestaurantBottomSheet = true
+                    true
+                }
             }
 
 
