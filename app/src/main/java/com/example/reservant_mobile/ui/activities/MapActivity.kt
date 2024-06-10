@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.activities
 
 import RestaurantDetailActivity
+import android.graphics.Bitmap
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -46,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MissingPage
@@ -56,6 +59,7 @@ import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.MapViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
+import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -80,48 +84,52 @@ fun MapActivity(){
                 }
             }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.240055, 21.017532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 1" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 1
-                showRestaurantBottomSheet = true
-                true
-            }
+            mapViewModel.viewModelScope.launch {
+                val img: Bitmap? = FileService().getImage("test-jd.png").value
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.240055, 21.027532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 2" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 2
-                showRestaurantBottomSheet = true
-                true
-            }
+                    mapViewModel.addRestaurantMarker(
+                        GeoPoint(52.240055, 21.017532),
+                        img,
+                        "Restaurant 1" +
+                                ""
+                    ) { _, _ ->
+                        showRestaurantId = 1
+                        showRestaurantBottomSheet = true
+                        true
+                    }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.250055, 21.027532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 3" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 3
-                showRestaurantBottomSheet = true
-                true
-            }
+                    mapViewModel.addRestaurantMarker(
+                        GeoPoint(52.240055, 21.027532),
+                        img,
+                        "Restaurant 2" +
+                                ""
+                    ) { _, _ ->
+                        showRestaurantId = 2
+                        showRestaurantBottomSheet = true
+                        true
+                    }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.210055, 21.007532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 4" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 4
-                showRestaurantBottomSheet = true
-                true
+                    mapViewModel.addRestaurantMarker(
+                        GeoPoint(52.250055, 21.027532),
+                        img,
+                        "Restaurant 3" +
+                                ""
+                    ) { _, _ ->
+                        showRestaurantId = 3
+                        showRestaurantBottomSheet = true
+                        true
+                    }
+
+                    mapViewModel.addRestaurantMarker(
+                        GeoPoint(52.210055, 21.007532),
+                        img,
+                        "Restaurant 4" +
+                                ""
+                    ) { _, _ ->
+                        showRestaurantId = 4
+                        showRestaurantBottomSheet = true
+                        true
+                    }
             }
 
 
