@@ -1,22 +1,23 @@
 package com.example.reservant_mobile.ui.viewmodels
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.ViewModel
-import com.example.reservant_mobile.R
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import androidx.core.graphics.drawable.toDrawable
+import androidx.lifecycle.ViewModel
+import com.example.reservant_mobile.R
 import org.osmdroid.tileprovider.tilesource.XYTileSource
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MapViewModel(): ViewModel() {
     private object OsmMap {
@@ -65,15 +66,42 @@ class MapViewModel(): ViewModel() {
         OsmMap.view.overlays.add(startMarker)
     }
 
-    fun addRestaurantMarker(position: GeoPoint, icon: Drawable, title: String, onClick: (Marker, MapView) -> Boolean) {
+    fun addRestaurantMarker(position: GeoPoint, icon: Bitmap?, title: String, onClick: (Marker, MapView) -> Boolean) {
         val restaurantMarker = CustomMarker(OsmMap.view)
         restaurantMarker.position = position
         restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-        restaurantMarker.icon = BitmapDrawable(OsmMap.view.context.resources, icon.toBitmap(60,60))
+
+        restaurantMarker.icon = if(icon!= null)
+            getMarkerDrawable(icon)
+        else
+            OsmMap.view.context.getDrawable(R.drawable.restaurant_template_icon)
+
         restaurantMarker.title = title
         restaurantMarker.setInfoWindow(null)
         restaurantMarker.setOnMarkerClickListener(onClick)
         OsmMap.view.overlays.add(0,restaurantMarker)
+    }
+
+    private fun getMarkerDrawable(icon: Bitmap): Drawable{
+        val res = OsmMap.view.context.resources
+        val roundedDrawable = RoundedBitmapDrawableFactory.create(res, icon)
+        roundedDrawable.isCircular = true
+
+        val borderWidth = 6f
+        val width = 100
+        val height = 100
+
+        val borderedBitmap = Bitmap.createBitmap(width + 2 * borderWidth.toInt(), height + 2 * borderWidth.toInt(), Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(borderedBitmap)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.color = Color.BLACK
+        paint.style = Paint.Style.FILL
+        canvas.drawCircle((width / 2 + borderWidth), (height / 2 + borderWidth), (width / 2 + borderWidth), paint)
+        roundedDrawable.setBounds(borderWidth.toInt(), borderWidth.toInt(), width + borderWidth.toInt(), height + borderWidth.toInt())
+        roundedDrawable.draw(canvas)
+
+        return borderedBitmap.toDrawable(res)
     }
 
 }
