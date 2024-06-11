@@ -40,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -60,7 +59,6 @@ import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.MapViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
-import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -85,7 +83,7 @@ fun MapActivity(){
                 }
             }
 
-            mapViewModel.viewModelScope.launch {
+            LaunchedEffect(key1 = true) {
                 val img: Bitmap? = FileService().getImage("test-jd.png").value
 
                 mapViewModel.addRestaurantMarker(
@@ -191,7 +189,8 @@ fun RestaurantDetailPreview(
         )
 
         LaunchedEffect(key1 = Unit) {
-            restaurantDetailVM.loadRestaurant(restaurantId)
+            if(!restaurantDetailVM.loadRestaurant(restaurantId))
+                restaurantDetailVM.restaurant = null
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
