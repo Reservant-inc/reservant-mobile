@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.activities
 
 import RestaurantDetailActivity
+import android.graphics.Bitmap
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MissingPage
@@ -80,48 +83,52 @@ fun MapActivity(){
                 }
             }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.240055, 21.017532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 1" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 1
-                showRestaurantBottomSheet = true
-                true
-            }
+            LaunchedEffect(key1 = true) {
+                val img: Bitmap? = FileService().getImage("test-jd.png").value
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.240055, 21.027532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 2" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 2
-                showRestaurantBottomSheet = true
-                true
-            }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.240055, 21.017532),
+                    img,
+                    "Restaurant 1" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 1
+                    showRestaurantBottomSheet = true
+                    true
+                }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.250055, 21.027532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 3" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 3
-                showRestaurantBottomSheet = true
-                true
-            }
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.240055, 21.027532),
+                    img,
+                    "Restaurant 2" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 2
+                    showRestaurantBottomSheet = true
+                    true
+                }
 
-            mapViewModel.addRestaurantMarker(
-                GeoPoint(52.210055, 21.007532),
-                context.getDrawable(R.drawable.restaurant_photo)!!,
-                "Restaurant 4" +
-                        ""
-            ) { _, _ ->
-                showRestaurantId = 4
-                showRestaurantBottomSheet = true
-                true
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.250055, 21.027532),
+                    img,
+                    "Restaurant 3" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 3
+                    showRestaurantBottomSheet = true
+                    true
+                }
+
+                mapViewModel.addRestaurantMarker(
+                    GeoPoint(52.210055, 21.007532),
+                    img,
+                    "Restaurant 4" +
+                            ""
+                ) { _, _ ->
+                    showRestaurantId = 4
+                    showRestaurantBottomSheet = true
+                    true
+                }
             }
 
 
@@ -180,6 +187,11 @@ fun RestaurantDetailPreview(
                     RestaurantDetailViewModel(restaurantId) as T
             }
         )
+
+        LaunchedEffect(key1 = Unit) {
+            if(!restaurantDetailVM.loadRestaurant(restaurantId))
+                restaurantDetailVM.restaurant = null
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
 
