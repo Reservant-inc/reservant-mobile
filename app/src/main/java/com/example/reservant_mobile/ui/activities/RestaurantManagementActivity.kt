@@ -2,7 +2,6 @@ package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -17,22 +17,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MyFloatingActionButton
@@ -63,7 +66,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     val restaurantManageVM = viewModel<RestaurantManagementViewModel>()
     val navController = rememberNavController()
-
+    val fileService = FileService()
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
     var selectedRestaurant: RestaurantDTO? by remember { mutableStateOf(null) }
@@ -72,6 +75,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
         composable<RestaurantManagementRoutes.Restaurant> {
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -122,6 +126,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     }
 
                     selectedGroup?.restaurants?.forEach { restaurant ->
+                        var img: ImageBitmap? = null
+                        LaunchedEffect(key1 = true) {
+                            img = restaurant.logo?.let { it1 -> fileService.getImage(it1).value?.asImageBitmap() }
+                            println(img)
+                        }
 
                         Card(
                             shape = RoundedCornerShape(16.dp),
@@ -133,44 +142,54 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             modifier = Modifier
                                 .padding(8.dp)
                                 .fillMaxWidth()
-                                .background(Color.White)
+                                .heightIn(100.dp, 150.dp)
                         ) {
-                            Box(modifier = Modifier.height(100.dp)) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.pizza),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Gray.copy(alpha = 0.7f))
-                                )
+                            Box() {
+                                if(img!=null)
+                                    Image(
+                                        bitmap = img!!,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        alpha = 0.2f
+                                    )
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(16.dp),
-                                    verticalArrangement = Arrangement.Center
+                                    verticalArrangement = Arrangement.Top
                                 ) {
                                     Text(
-                                        text = restaurant.name,
+                                        text = restaurant.name+ " - "+ restaurant.restaurantType,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = restaurant.address,
                                         fontSize = 14.sp,
-                                        color = Color.Black
+                                    )
+                                    if(restaurant.postalIndex.isNotEmpty())
+                                    Text(
+                                        text = restaurant.postalIndex,
+                                        fontSize = 14.sp,
+                                    )
+                                    Text(
+                                        text = restaurant.city,
+                                        fontSize = 14.sp,
                                     )
                                 }
-                                Icon(
-                                    imageVector = Icons.Rounded.Delete,
-                                    contentDescription = "Delete",
-                                    tint = Color.Black,
+                                IconButton(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
                                         .padding(8.dp)
-                                        .size(24.dp)
-                                )
+                                        .size(24.dp),
+                                    onClick = { showDeletePopup = true }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = "Delete",
+
+                                    )
+                                }
                             }
                         }
 
