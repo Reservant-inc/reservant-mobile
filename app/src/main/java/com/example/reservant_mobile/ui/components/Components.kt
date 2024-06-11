@@ -1,8 +1,6 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.icu.number.Scale
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -121,7 +119,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -139,7 +136,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -167,7 +163,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -186,7 +181,6 @@ import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
-import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -1033,22 +1027,33 @@ fun IconWithHeader(
 @Composable
 fun LogoWithReturn(navController: NavController = rememberNavController()) {
     Box(modifier = Modifier.fillMaxWidth()) {
-        Button(
-            modifier = Modifier
-                .align(Alignment.CenterStart), onClick = { navController.popBackStack() },
-            colors = ButtonColors(
-                Color.Transparent, Color.Black,
-                Color.Transparent, Color.Black
-            )
-        ) {
-            Icon(
-                Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = "back",
-                modifier = Modifier.size(35.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
+        ReturnButton(
+            navController = navController,
+            modifier = Modifier.align(Alignment.CenterStart)
+        )
         Logo(modifier = Modifier.align(Alignment.Center))
+    }
+}
+
+@Composable
+fun ReturnButton(
+    navController: NavController,
+    modifier: Modifier = Modifier
+){
+    Button(
+        onClick = { navController.popBackStack() },
+        colors = ButtonColors(
+            Color.Transparent, Color.Black,
+            Color.Transparent, Color.Black
+        ),
+        modifier = modifier
+    ) {
+        Icon(
+            Icons.AutoMirrored.Rounded.ArrowBack,
+            contentDescription = "back",
+            modifier = Modifier.size(35.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }
 
