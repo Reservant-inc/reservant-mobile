@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.icu.number.Scale
 import android.net.Uri
 import android.widget.Toast
@@ -137,6 +138,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -1623,6 +1626,7 @@ fun MenuCard(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
+    photo: ImageBitmap? = null,
     menu: RestaurantMenuDTO,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -1687,11 +1691,20 @@ fun MenuCard(
             .then(loadingModifier)
     ) {
         Column {
-            Image(
-                painterResource(id = R.drawable.pizza),
-                contentDescription = "",
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (photo != null){
+                Image(
+                    bitmap = photo,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Image(
+                    painterResource(id = R.drawable.pizza),
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {

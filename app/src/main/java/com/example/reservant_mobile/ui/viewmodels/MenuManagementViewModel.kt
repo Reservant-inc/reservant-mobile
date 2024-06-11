@@ -1,21 +1,23 @@
 package com.example.reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
+import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.RestaurantMenuService
 import kotlinx.coroutines.launch
 
 class MenuManagementViewModel(
     private val restaurantId: Int,
-    private val service: IRestaurantMenuService = RestaurantMenuService()
+    private val service: IRestaurantMenuService = RestaurantMenuService(),
+    private val fileService: FileService = FileService()
 ): ViewModel() {
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
@@ -46,6 +48,15 @@ class MenuManagementViewModel(
         if (!fetchResult.isError){
             menus = fetchResult.value!!.toMutableList()
         }
+    }
+
+    suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
+        val photoString = menu.photo.substringAfter("uploads/")
+        val result = fileService.getImage(photoString)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
     }
 
     private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO{
