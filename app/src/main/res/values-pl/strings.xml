@@ -106,10 +106,13 @@
     <string name="delete_restaurant_title">Usuwanie restauracji</string>
     <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
     <string name="label_limited_time">Dostępne do</string>
+    <string name="error_registerRestaurant_invalid_group">Niepoprawna grupa</string>
+    <string name="label_edit_restaurant">Modyfikuj restauracje</string>
     <string name="label_show_more_details">Pokaż więcej szczegółów</string>
     <string name="label_menu_item_management">Zarzadzanie pozycją menu</string>
     <string name="label_menu_item_photo">Zdjęcie pozycji w menu</string>
     <string name="label_edit_menu_item">Edytuj pozycję w menu</string>
     <string name="label_price">Cena</string>
     <string name="label_alcohol">Zawartość alkoholu</string>
+    <string name="lable_logout_action">Wyloguj się</string>
 </resources>

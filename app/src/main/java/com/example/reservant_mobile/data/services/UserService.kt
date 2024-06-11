@@ -27,6 +27,13 @@ class UserService(private var api: APIService = APIService()) : IUserService {
         lateinit var firstName: String
         lateinit var lastName: String
         lateinit var roles:List<String>
+
+        fun clearData(){
+            userId = ""
+            login = ""
+            firstName = ""
+            lastName = ""
+        }
     }
     
     private suspend fun wrapUser(u:UserDTO){
@@ -83,6 +90,7 @@ class UserService(private var api: APIService = APIService()) : IUserService {
     }
 
     override suspend fun logoutUser() {
+        User.clearData()
         api.clearToken()
     }
 

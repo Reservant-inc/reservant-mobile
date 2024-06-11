@@ -96,7 +96,6 @@ class APIService{
             }
         )
     }
-
     suspend inline fun <reified T : Any> post(resource: T, obj: @Serializable Any): Result<HttpResponse?> {
         return responseWrapper(
             try {

@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,9 +8,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -25,6 +35,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
 import kotlinx.coroutines.launch
@@ -58,10 +69,10 @@ fun MenuManagementActivity(restaurantId: Int) {
                     }
 
                     when {
-                        viewmodel.isLoading -> repeat(3){
+                        viewmodel.isFetching -> repeat(3){
                             item{
                                 MenuCard(
-                                    isLoading = true,
+                                    isFetching = true,
                                     name = viewmodel.name,
                                     altName = viewmodel.alternateName,
                                     menuType = viewmodel.menuType,
@@ -70,7 +81,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     menu = RestaurantMenuDTO(
                                         name = "",
                                         menuType = "",
-                                        dateFrom = ""
+                                        dateFrom = "",
+                                        photo = ""
                                     ),
                                     onEditClick = { },
                                     onDeleteClick = { },
@@ -79,20 +91,15 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 )
                             }
                         }
-                    }
+                        viewmodel.menus.isNotEmpty() -> items(viewmodel.menus) { menu ->
 
+                            val showConfirmDeletePopup = remember { mutableStateOf(false) }
+                            val showEditPopup = remember { mutableStateOf(false) }
+                            var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-                    items(viewmodel.menus) { menu ->
-                        MenuCard(
-                            name = viewmodel.name,
-                            altName = viewmodel.alternateName,
-                            menuType = viewmodel.menuType,
-                            dateFrom = viewmodel.dateFrom,
-                            dateUntil = viewmodel.dateUntil,
-                            menu = menu,
-                            onEditClick = {
+                            LaunchedEffect(key1 = Unit) {
                                 viewmodel.viewModelScope.launch {
-                                    viewmodel.editMenu(menu)
+                                    bitmap = viewmodel.getPhoto(menu)
                                 }
                             },
                             onDeleteClick = {
@@ -109,14 +116,70 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 }
 
                             }
-                        )
+
+                            MenuCard(
+                                name = viewmodel.name,
+                                altName = viewmodel.alternateName,
+                                menuType = viewmodel.menuType,
+                                dateFrom = viewmodel.dateFrom,
+                                dateUntil = viewmodel.dateUntil,
+                                menu = menu,
+                                photo = bitmap?.asImageBitmap(),
+                                onEditClick = {
+                                    viewmodel.viewModelScope.launch {
+                                        viewmodel.editMenu(menu)
+                                        if (!viewmodel.result.isError){
+                                            viewmodel.clearFields()
+                                            showEditPopup.value = false
+                                        }
+                                    }
+                                },
+                                onDeleteClick = {
+                                    viewmodel.viewModelScope.launch {
+                                        menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
+                                        if (!viewmodel.result.isError){
+                                            showConfirmDeletePopup.value = false
+                                        }
+                                    }
+                                },
+                                clearFields = viewmodel::clearFields,
+                                onClick = {
+                                    if (menu.menuId != null) {
+                                        navController.navigate(
+                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
+                                        )
+                                    }
+
+                                },
+                                isSaving = viewmodel.isSaving,
+                                showConfirmDeletePopup = showConfirmDeletePopup,
+                                showEditPopup = showEditPopup
+                            )
+
+                            if (viewmodel.result.isError){
+                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.result))
+                                viewmodel.result.isError = false
+                            }
+
+                        }
+                        else -> item {
+                            //TODO: pagemissing
+                            Text(text = "There will be something here soon :)")
+                            if (viewmodel.fetchResult.isError){
+                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
+                                viewmodel.fetchResult.isError = false
+                            }
+                        }
                     }
+
                 }
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         //.padding(8.dp)
                 ){
+                    val showAddDialog = remember { mutableStateOf(false) }
+
                     AddMenuButton(
                         name = viewmodel.name,
                         altName = viewmodel.alternateName,
@@ -127,10 +190,23 @@ fun MenuManagementActivity(restaurantId: Int) {
                         addMenu = {
                             viewmodel.viewModelScope.launch {
                                 viewmodel.addMenu()
+                                if (!viewmodel.result.isError){
+                                    showAddDialog.value = false
+                                }
+
                             }
-                        }
+                        },
+                        isSaving = viewmodel.isSaving,
+                        showAddDialog = showAddDialog
                     )
+
+                    if (viewmodel.result.isError){
+                        ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.result))
+                        viewmodel.result.isError = false
+                    }
                 }
+
+
             }
 
         }
