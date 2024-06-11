@@ -172,10 +172,10 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         fontSize = 14.sp,
                                     )
                                     if(restaurant.postalIndex.isNotEmpty())
-                                    Text(
-                                        text = restaurant.postalIndex,
-                                        fontSize = 14.sp,
-                                    )
+                                        Text(
+                                            text = restaurant.postalIndex,
+                                            fontSize = 14.sp,
+                                        )
                                     Text(
                                         text = restaurant.city,
                                         fontSize = 14.sp,
