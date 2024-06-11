@@ -1,17 +1,27 @@
 package com.example.reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,8 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -30,6 +45,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.IconWithHeader
@@ -50,6 +66,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
+    var selectedRestaurant: RestaurantDTO? by remember { mutableStateOf(null) }
+
     var showDeletePopup by remember { mutableStateOf(false) }
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
@@ -92,7 +110,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             )
                         } else if (groups.size == 1) {
                             restaurantManageVM.viewModelScope.launch {
-                                selectedGroup = groups[0].restaurantGroupId?.let { it1 ->
+                                selectedGroup = groups.first().restaurantGroupId?.let { it1 ->
                                     restaurantManageVM.getGroup(it1)
                                 }
                             }
@@ -105,27 +123,56 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
                     selectedGroup?.restaurants?.forEach { restaurant ->
 
-                        RestaurantInfoView(
-                            restaurant = restaurant,
-                            onEditClick = { navController.navigate(
-                            RestaurantManagementRoutes.Edit(restaurantId = restaurant.restaurantId)
-                            )
-                        },
-                            onManageEmployeeClick = {
-                                navController.navigate(
-                                    RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
-                                )
+                        Card(
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            onClick = {
+                                selectedRestaurant = restaurant
+                                navController.navigate(RestaurantManagementRoutes.RestaurantPreview)
                             },
-                            onManageMenuClick = {
-                                navController.navigate(
-                                    RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                                .background(Color.White)
+                        ) {
+                            Box(modifier = Modifier.height(100.dp)) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.pizza),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Gray.copy(alpha = 0.7f))
                                 )
-                            },
-                            onManageSubscriptionClick = { /*TODO*/ },
-                            onDeleteClick = {
-                                showDeletePopup = true
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = restaurant.name,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = restaurant.address,
+                                        fontSize = 14.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                                Icon(
+                                    imageVector = Icons.Rounded.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.Black,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(8.dp)
+                                        .size(24.dp)
+                                )
                             }
-                        )
+                        }
 
                         when {
                             showDeletePopup -> {
@@ -153,6 +200,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     Spacer(modifier = Modifier.padding(bottom = 64.dp))
                 }
 
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -165,6 +213,30 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     )
                 }
             }
+        }
+        composable<RestaurantManagementRoutes.RestaurantPreview> {
+            val restaurant:RestaurantDTO = selectedRestaurant!!
+            RestaurantInfoView(
+                restaurant = restaurant,
+                onEditClick = { navController.navigate(
+                    RestaurantManagementRoutes.Edit(restaurantId = restaurant.restaurantId)
+                )
+                },
+                onManageEmployeeClick = {
+                    navController.navigate(
+                        RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
+                    )
+                },
+                onManageMenuClick = {
+                    navController.navigate(
+                        RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
+                    )
+                },
+                onManageSubscriptionClick = { /*TODO*/ },
+                onDeleteClick = {
+                    showDeletePopup = true
+                }
+            )
         }
         composable<RestaurantManagementRoutes.Menu> {
             MenuManagementActivity(
@@ -192,4 +264,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             )
         }
     }
+}
+
+@Composable
+fun RestaurantPreview(
+    restaurant: RestaurantDTO
+){
+
 }
