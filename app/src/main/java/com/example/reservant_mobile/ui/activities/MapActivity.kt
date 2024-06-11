@@ -26,6 +26,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -188,6 +189,10 @@ fun RestaurantDetailPreview(
                     RestaurantDetailViewModel(restaurantId) as T
             }
         )
+
+        LaunchedEffect(key1 = Unit) {
+            restaurantDetailVM.loadRestaurant(restaurantId)
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
 

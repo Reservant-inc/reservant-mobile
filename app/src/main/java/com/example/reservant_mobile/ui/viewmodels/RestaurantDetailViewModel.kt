@@ -12,7 +12,7 @@ import com.example.reservant_mobile.data.services.RestaurantService
 import kotlinx.coroutines.launch
 
 class RestaurantDetailViewModel(
-    private val restaurantId: Int,
+    private var restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService()
 ) : ViewModel() {
 
@@ -23,26 +23,24 @@ class RestaurantDetailViewModel(
 
     init {
         viewModelScope.launch {
+            restaurantId=0
             loadRestaurant(restaurantId)
         }
     }
 
-    private fun loadRestaurant(id: Int) {
-        viewModelScope.launch {
+    suspend fun loadRestaurant(id: Int){
+        if (id != restaurantId){
+            restaurantId = id
+
             isLoading = true
 
-            try {
-                result = restaurantService.getRestaurant(id)
+            result = restaurantService.getRestaurant(restaurantId)
 
-                if (!result.isError) {
-                    restaurant = result.value
-                }
-
-            } catch (e: Exception) {
-                println("[LOAD RESTAURANTS ERROR]" + e.message)
-            } finally {
-                isLoading = false
+            if (!result.isError) {
+                restaurant = result.value
             }
+
+            isLoading = false
         }
     }
 
