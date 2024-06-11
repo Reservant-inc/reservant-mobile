@@ -20,6 +20,7 @@ import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import com.example.reservant_mobile.data.utils.getFileName
+import java.util.UUID
 
 class RestaurantViewModel(
     private val restaurantService: IRestaurantService = RestaurantService(),
@@ -201,12 +202,14 @@ class RestaurantViewModel(
     }
 
     suspend fun validateLogo(context: Context): Boolean {
-        val restaurantLogo =
-            if (!logo.value.endsWith(
-                    ".pdf",
-                    ignoreCase = true
-                )
-            ) sendPhoto(logo.value, context) else null
+        val restaurantLogo = if (
+            !logo.value.endsWith(".png", ignoreCase = true) &&
+            !logo.value.endsWith(".jpg", ignoreCase = true)
+        ) {
+            sendPhoto(logo.value, context)
+        } else {
+            null
+        }
 
         if (restaurantLogo != null) {
             if (!restaurantLogo.isError)
@@ -379,7 +382,10 @@ class RestaurantViewModel(
         return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(context, value)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(
+                context,
+                value
+            )
     }
 
     fun isRentalContractInvalid(context: Context): Boolean {
@@ -387,7 +393,10 @@ class RestaurantViewModel(
         return if (value.isBlank() || value == "null")
             false
         else
-            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(context, value)
+            !getFileName(context, value).endsWith(".pdf", ignoreCase = true) || isFileSizeInvalid(
+                context,
+                value
+            )
     }
 
 
@@ -405,7 +414,7 @@ class RestaurantViewModel(
                 ).endsWith(
                     ".jpg",
                     ignoreCase = true
-                ))  || isFileSizeInvalid(context, value)
+                )) || isFileSizeInvalid(context, value)
     }
 
     fun isFileNameInvalid(uri: String?): Boolean {
@@ -414,12 +423,39 @@ class RestaurantViewModel(
         return !fileName.contains(".") || fileName.substringAfterLast(".").isEmpty()
     }
 
+    fun isUuid(name: String): Boolean {
+        return try {
+            UUID.fromString(name)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
+    fun getFileNameWithoutExtension(name: String): String {
+        val lastDotIndex = name.lastIndexOf('.')
+        return if (lastDotIndex != -1) {
+            name.substring(0, lastDotIndex)
+        } else {
+            name
+        }
+    }
+
     fun isFileSizeInvalid(context: Context, uri: String?): Boolean {
-        val byteArray = uri?.let { getFileFromUri(context, it.toUri()) }
+        if (uri == null) {
+            return false
+        }
+
+        val fileNameWithoutExtension = getFileNameWithoutExtension(uri)
+
+        if (isUuid(fileNameWithoutExtension)) {
+            return false
+        }
+
+        val byteArray = getFileFromUri(context, uri.toUri())
 
         return (byteArray?.size ?: 0) > 1024000
     }
-
 
 
     fun areTagsInvalid(): Boolean {
