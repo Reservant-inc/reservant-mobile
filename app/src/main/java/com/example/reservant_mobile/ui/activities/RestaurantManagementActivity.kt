@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -142,7 +143,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             modifier = Modifier
                                 .padding(8.dp)
                                 .fillMaxWidth()
-                                .heightIn(100.dp, 150.dp)
+                                .heightIn(80.dp, 150.dp)
                         ) {
                             Box() {
                                 if(img!=null)
@@ -150,19 +151,20 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         bitmap = img!!,
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
-                                        alpha = 0.2f
+                                        alpha = 0.2f,
+                                        modifier = Modifier.fillMaxSize()
                                     )
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(16.dp),
-                                    verticalArrangement = Arrangement.Top
+                                    verticalArrangement = Arrangement.Center
                                 ) {
                                     Text(
                                         text = restaurant.name+ " - "+ restaurant.restaurantType,
                                         fontWeight = FontWeight.Bold,
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(14.dp))
                                     Text(
                                         text = restaurant.address,
                                         fontSize = 14.sp,
