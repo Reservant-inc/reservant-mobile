@@ -59,6 +59,17 @@ class EmployeeViewModel(
         }
     }
 
+    fun clearFields() {
+        login.value = ""
+        firstName.value = ""
+        lastName.value = ""
+        password.value = ""
+        phoneNum.value = ""
+        id.value = ""
+        isHallEmployee = false
+        isBackdoorEmployee = false
+    }
+
     fun deleteEmployee(employee: RestaurantEmployeeDTO) {
         viewModelScope.launch {
             isLoading = true

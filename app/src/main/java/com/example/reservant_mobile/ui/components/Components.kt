@@ -1278,6 +1278,7 @@ fun Heading() {
 
 @Composable
 fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
+    vm.clearFields()
     var formSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -1578,6 +1579,7 @@ fun MenuPopup(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
+    isSaving: Boolean = false
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -1803,7 +1805,7 @@ fun MenuCard(
 
                     SecondaryButton(
                         modifier = buttonModifier,
-                        onClick = { showEditPopup = true },
+                        onClick = { showEditPopup.value = true },
                         imageVector = Icons.Filled.Edit,
                         contentDescription = "EditMenuItem"
                     )
@@ -2354,7 +2356,7 @@ fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick:
 
 @Composable
 fun TagSelectionScreen(
-    vm: RegisterRestaurantViewModel,
+    vm: RestaurantViewModel,
     onDismiss: () -> Unit,
     onTagSelected: (String, Boolean) -> Unit,
 ) {

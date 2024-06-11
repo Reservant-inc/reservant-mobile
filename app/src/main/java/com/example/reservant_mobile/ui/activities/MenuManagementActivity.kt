@@ -101,20 +101,6 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 viewmodel.viewModelScope.launch {
                                     bitmap = viewmodel.getPhoto(menu)
                                 }
-                            },
-                            onDeleteClick = {
-                                viewmodel.viewModelScope.launch {
-                                    menu.menuId?.let { id -> viewmodel.deleteMenu(id) }
-                                }
-                            },
-                            clearFields = viewmodel::clearFields,
-                            onClick = {
-                                if (menu.menuId != null) {
-                                    navController.navigate(
-                                        RestaurantManagementRoutes.MenuItem(menuId = menu.menuId, restaurantId = restaurantId)
-                                    )
-                                }
-
                             }
 
                             MenuCard(
@@ -146,7 +132,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 onClick = {
                                     if (menu.menuId != null) {
                                         navController.navigate(
-                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
+                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId, restaurantId = restaurantId)
                                         )
                                     }
 
