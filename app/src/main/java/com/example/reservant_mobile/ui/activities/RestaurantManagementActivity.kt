@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -129,8 +128,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     selectedGroup?.restaurants?.forEach { restaurant ->
                         var img: ImageBitmap? = null
                         LaunchedEffect(key1 = true) {
-                            img = restaurant.logo?.let { it1 -> fileService.getImage(it1).value?.asImageBitmap() }
-                            println(img)
+                            if(restaurant.logo!=null){
+                                val photoString:String = restaurant.logo.substringAfter("uploads/")
+                                img = fileService.getImage(photoString).value?.asImageBitmap()
+                                println("PHOTO"+img)
+                            }
                         }
 
                         Card(
