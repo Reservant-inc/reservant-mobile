@@ -1,12 +1,14 @@
 package com.example.reservant_mobile.ui.navigation
 
-import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import kotlinx.serialization.Serializable
 
 data object RestaurantManagementRoutes {
 
     @Serializable
     object Restaurant
+
+    @Serializable
+    object RestaurantPreview
 
     @Serializable
     data class Menu(
