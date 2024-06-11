@@ -51,7 +51,8 @@ class MenuManagementViewModel(
     }
 
     suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
-        val result = fileService.getImage(menu.photo)
+        val photoString = menu.photo.substringAfter("uploads/")
+        val result = fileService.getImage(photoString)
         if (!result.isError){
             return result.value!!
         }
