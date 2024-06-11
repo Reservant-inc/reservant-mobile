@@ -21,6 +21,7 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.accept
+import io.ktor.client.request.get
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -90,6 +91,18 @@ class APIService{
         return responseWrapper(
             try {
                 getHttpClient().get(resource)
+            } catch (e: Exception){
+                println("[GET ERROR]: "+e.message)
+                null
+            }
+        )
+    }
+
+    //should only be used if the used parameters contain / characters
+    suspend fun get(url: String): Result<HttpResponse?> {
+        return responseWrapper(
+            try {
+                getHttpClient().get("$backendUrl$url")
             } catch (e: Exception){
                 println("[GET ERROR]: "+e.message)
                 null

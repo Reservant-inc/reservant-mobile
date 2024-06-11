@@ -48,7 +48,7 @@ class FileService(private var api: APIService = APIService()) {
     }
 
     suspend fun getFile(fileName: String): Result<ByteArray?>{
-        val res = api.get(Uploads.FileName(fileName= fileName))
+        val res = api.get(fileName)
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)

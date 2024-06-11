@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,12 +10,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -91,6 +95,13 @@ fun MenuManagementActivity(restaurantId: Int) {
 
                             val showConfirmDeletePopup = remember { mutableStateOf(false) }
                             val showEditPopup = remember { mutableStateOf(false) }
+                            var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+                            LaunchedEffect(key1 = Unit) {
+                                viewmodel.viewModelScope.launch {
+                                    bitmap = viewmodel.getPhoto(menu)
+                                }
+                            }
 
                             MenuCard(
                                 name = viewmodel.name,
@@ -99,6 +110,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 dateFrom = viewmodel.dateFrom,
                                 dateUntil = viewmodel.dateUntil,
                                 menu = menu,
+                                photo = bitmap?.asImageBitmap(),
                                 onEditClick = {
                                     viewmodel.viewModelScope.launch {
                                         viewmodel.editMenu(menu)
