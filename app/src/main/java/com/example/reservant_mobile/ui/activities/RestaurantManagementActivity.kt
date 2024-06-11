@@ -126,7 +126,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     }
 
                     selectedGroup?.restaurants?.forEach { restaurant ->
-                        var img: ImageBitmap? = null
+                        var img by remember { mutableStateOf<ImageBitmap?>(null) }
                         LaunchedEffect(key1 = true) {
                             if(restaurant.logo!=null){
                                 val photoString:String = restaurant.logo.substringAfter("uploads/")
@@ -200,8 +200,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         when {
                             showDeletePopup -> {
                                 val confirmText = stringResource(R.string.delete_restaurant_message) +
-                                        "\n" + restaurant.name +
-                                        " - " + restaurant.restaurantType + " ?";
+                                        "\n" + restaurant.name + " ?";
                                 CountDownPopup(
                                     icon = Icons.Default.Delete,
                                     title = stringResource(R.string.delete_restaurant_title),
