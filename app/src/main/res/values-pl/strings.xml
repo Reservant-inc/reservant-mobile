@@ -110,4 +110,5 @@
     <string name="label_edit_restaurant">Modyfikuj restauracje</string>
     <string name="label_show_more_details">Pokaż więcej szczegółów</string>
     <string name="lable_logout_action">Wyloguj się</string>
+    <string name="label_orders">Zamówienia</string>
 </resources>

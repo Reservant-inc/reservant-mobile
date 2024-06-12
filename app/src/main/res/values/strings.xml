@@ -115,4 +115,5 @@
     <string name="label_edit_restaurant">Edit restaurant</string>
     <string name="label_show_more_details">Show more details</string>
     <string name="lable_logout_action">Log out</string>
+    <string name="label_orders">Orders</string>
 </resources>
