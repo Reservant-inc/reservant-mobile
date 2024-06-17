@@ -80,8 +80,32 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     var showDeletePopup by remember { mutableStateOf(false) }
 
+
+
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
         composable<RestaurantManagementRoutes.Restaurant> {
+
+            if(showDeletePopup )  {
+                val restaurant = restaurantManageVM.selectedRestaurant
+                if(restaurant!= null){
+                    val confirmText = stringResource(R.string.delete_restaurant_message) +
+                            "\n" + restaurant.name + " ?";
+                    CountDownPopup(
+                        icon = Icons.Default.Delete,
+                        title = stringResource(R.string.delete_restaurant_title),
+                        text = confirmText,
+                        confirmText = stringResource(R.string.label_yes_capital),
+                        dismissText = stringResource(R.string.label_cancel),
+                        onDismissRequest = { showDeletePopup = false },
+                        onConfirm = {
+                            restaurantManageVM.viewModelScope.launch {
+                                restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
+                                showDeletePopup = false
+                            }
+                        }
+                    )
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -194,7 +218,10 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         .align(Alignment.TopEnd)
                                         .padding(8.dp)
                                         .size(24.dp),
-                                    onClick = { showDeletePopup = true }
+                                    onClick = {
+                                        restaurantManageVM.selectedRestaurant = restaurant
+                                        showDeletePopup = true
+                                    }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.Delete,
@@ -202,27 +229,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
                                     )
                                 }
-                            }
-                        }
-
-                        when {
-                            showDeletePopup -> {
-                                val confirmText = stringResource(R.string.delete_restaurant_message) +
-                                        "\n" + restaurant.name + " ?";
-                                CountDownPopup(
-                                    icon = Icons.Default.Delete,
-                                    title = stringResource(R.string.delete_restaurant_title),
-                                    text = confirmText,
-                                    confirmText = stringResource(R.string.label_yes_capital),
-                                    dismissText = stringResource(R.string.label_cancel),
-                                    onDismissRequest = { showDeletePopup = false },
-                                    onConfirm = {
-                                        restaurantManageVM.viewModelScope.launch {
-                                            restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
-                                            showDeletePopup = false
-                                        }
-                                    }
-                                )
                             }
                         }
                     }
