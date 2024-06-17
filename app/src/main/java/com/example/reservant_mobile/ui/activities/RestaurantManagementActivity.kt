@@ -3,6 +3,7 @@ package com.example.reservant_mobile.ui.activities
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +32,7 @@ import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +66,8 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.CountDownPopup
 import com.example.reservant_mobile.ui.components.DetailItem
 import com.example.reservant_mobile.ui.components.IconWithHeader
+import com.example.reservant_mobile.ui.components.ImageCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.MyFloatingActionButton
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ReturnButton
@@ -81,32 +89,32 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
     var showDeletePopup by remember { mutableStateOf(false) }
 
 
+    if(showDeletePopup )  {
+        val restaurant = restaurantManageVM.selectedRestaurant
+        if(restaurant!= null){
+            val confirmText = stringResource(R.string.delete_restaurant_message) +
+                    "\n" + restaurant.name + " ?";
+            CountDownPopup(
+                icon = Icons.Default.Delete,
+                title = stringResource(R.string.delete_restaurant_title),
+                text = confirmText,
+                confirmText = stringResource(R.string.label_yes_capital),
+                dismissText = stringResource(R.string.label_cancel),
+                onDismissRequest = { showDeletePopup = false },
+                onConfirm = {
+                    restaurantManageVM.viewModelScope.launch {
+                        restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
+                        showDeletePopup = false
+                    }
+                }
+            )
+        }
+    }
+
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
         composable<RestaurantManagementRoutes.Restaurant> {
-
-            if(showDeletePopup )  {
-                val restaurant = restaurantManageVM.selectedRestaurant
-                if(restaurant!= null){
-                    val confirmText = stringResource(R.string.delete_restaurant_message) +
-                            "\n" + restaurant.name + " ?";
-                    CountDownPopup(
-                        icon = Icons.Default.Delete,
-                        title = stringResource(R.string.delete_restaurant_title),
-                        text = confirmText,
-                        confirmText = stringResource(R.string.label_yes_capital),
-                        dismissText = stringResource(R.string.label_cancel),
-                        onDismissRequest = { showDeletePopup = false },
-                        onConfirm = {
-                            restaurantManageVM.viewModelScope.launch {
-                                restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
-                                showDeletePopup = false
-                            }
-                        }
-                    )
-                }
-            }
-
+            
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -150,9 +158,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 }
                             }
                         } else {
-                            Text(
-                                text = "You have no restaurants :("
-                            )
+                            MissingPage(errorStringId = R.string.label_no_restaurants_found)
                         }
                     }
 
@@ -344,39 +350,81 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     label = stringResource(R.string.label_restaurant_tables),
                                     value = "${restaurant.tables.size}"
                                 )
+
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp),
+                                    color = MaterialTheme.colorScheme.outline,
+                                    thickness = 2.dp
+                                )
+
+                                Text(
+                                    text = stringResource(id = R.string.label_gallery),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp)
+                                )
+
+                                Row(
+                                    modifier = Modifier
+                                        .horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    repeat(5) {
+                                        ImageCard(
+                                            painterResource(R.drawable.pizza)
+                                        )
+                                    }
+                                }
                             }
 
                         }
                     }
 
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 10.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ){
-                        OptionItem(
+                    val options:List<Option> = listOf(
+                        Option(
                             onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
                             )},
                             icon = Icons.Outlined.People,
-                            title = "Pracownicy")
-
-                        OptionItem(
+                            titleStringId = R.string.label_employees
+                        ),
+                        Option(
                             onClick = {  navController.navigate(
                                 RestaurantManagementRoutes.Menu(restaurantId = restaurant.restaurantId)
                             )},
                             icon = Icons.Outlined.RestaurantMenu,
-                            title = "Menu")
-
-                        OptionItem(
+                            titleStringId = R.string.label_menu
+                        ),
+                        Option(
                             onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
                             )},
                             icon = Icons.Outlined.BarChart,
-                            title = "Statystyki")
+                            titleStringId = R.string.label_stats
+                        ),
+                        Option(
+                            onClick = {
+                                showDeletePopup = true
+                            },
+                            icon = Icons.Outlined.Delete,
+                            titleStringId = R.string.label_delete
+                        ),
+                    )
+                    LazyVerticalGrid(
+                        modifier = Modifier
+                            .padding(vertical = 10.dp)
+                            .heightIn(200.dp, 500.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        columns = GridCells.Adaptive(minSize = 108.dp)
+                    ) {
+                        items(options) {option ->
+                            OptionItem(option = option)
+                        }
                     }
-
                 }
             }
         }
@@ -407,21 +455,25 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         }
     }
 }
+data class Option(
+    val onClick: ()->Unit,
+    val icon:ImageVector,
+    val titleStringId: Int
+)
 
 @Composable
 fun OptionItem(
-    onClick: ()->Unit,
-    icon:ImageVector,
-    title: String
+    option: Option,
+    modifier:Modifier = Modifier
+        .padding(horizontal = 10.dp, vertical = 25.dp)
+        .size(100.dp)
 ){
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        onClick = onClick,
+        onClick = option.onClick,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
-        modifier = Modifier
-            .padding(horizontal = 10.dp, vertical = 25.dp)
-            .size(100.dp)
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier
@@ -431,13 +483,13 @@ fun OptionItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = icon,
+                imageVector = option.icon,
                 contentDescription = null,
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = title,
+                text = stringResource(id = option.titleStringId),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
