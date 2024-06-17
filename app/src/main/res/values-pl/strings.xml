@@ -102,7 +102,7 @@
     <string name="label_delivery_cost">Koszt dostawy</string>
     <string name="label_menu_price">Cena</string>
     <string name="label_events">Wydarzenia</string>
-    <string name="error_text">Coś poszło nie tak:(</string>
+    <string name="error_text">Coś poszło nie tak</string>
     <string name="delete_restaurant_title">Usuwanie restauracji</string>
     <string name="delete_restaurant_message">Czy napewno chcesz usunąć</string>
     <string name="label_limited_time">Dostępne do</string>
@@ -114,10 +114,14 @@
     <string name="label_edit_menu_item">Edytuj pozycję w menu</string>
     <string name="label_price">Cena</string>
     <string name="label_alcohol">Zawartość alkoholu</string>
-    <string name="lable_logout_action">Wyloguj się</string>
+    <string name="label_logout_action">Wyloguj się</string>
     <string name="label_orders">Zamówienia</string>
     <string name="label_search">Szukaj...</string>
     <string name="label_filters">Filtry</string>
     <string name="label_date">Data</string>
     <string name="label_total_cost">Koszt całkowity</string>
+    <string name="label_no_restaurants_found">Nie znależiono żadnych restauracji</string>
+    <string name="label_stats">Statystyki</string>
+    <string name="label_employees">Pracownicy</string>
+    <string name="label_delete">Usuń</string>
 </resources>
