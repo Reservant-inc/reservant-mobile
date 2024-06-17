@@ -32,6 +32,7 @@ import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -156,6 +157,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 selectedGroup = groups.first().restaurantGroupId?.let { it1 ->
                                     restaurantManageVM.getGroup(it1)
                                 }
+                            }
+                        } else if (restaurantManageVM.isLoading){
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
                             }
                         } else {
                             MissingPage(errorStringId = R.string.label_no_restaurants_found)

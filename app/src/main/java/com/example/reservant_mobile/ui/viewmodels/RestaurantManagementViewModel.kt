@@ -19,6 +19,8 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
     var selectedRestaurantLogo: Bitmap? by mutableStateOf(null)
+    var isLoading: Boolean by mutableStateOf(false)
+
 
     private val fileService = FileService()
 
@@ -30,19 +32,25 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
     }
 
     private suspend fun loadGroups(){
+        isLoading = true
         groups = restaurantService.getGroups().value;
+        isLoading = false
     }
 
     suspend fun getGroup(groupId: Int): RestaurantGroupDTO? {
-        return restaurantService.getGroup(groupId).value
+        isLoading = true
+        val group =  restaurantService.getGroup(groupId).value
+        isLoading = false
+        return group
     }
 
     suspend fun getPhoto(restaurant: RestaurantDTO): Bitmap? {
         if(restaurant.logo == null)
             return null
-
+        isLoading = true
         val photoString = restaurant.logo.substringAfter("uploads/")
         val result = fileService.getImage(photoString)
+        isLoading = false
         if (!result.isError){
             return result.value!!
         }
