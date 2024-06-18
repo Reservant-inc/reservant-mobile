@@ -11,12 +11,15 @@ import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.constants.Regex
+import com.example.reservant_mobile.data.services.IUserService
+import com.example.reservant_mobile.data.services.UserService
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class EmployeeViewModel(
     private val restaurantId: Int,
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val userService: IUserService = UserService()
 ) : ViewModel() {
     var employees by mutableStateOf<List<RestaurantEmployeeDTO>>(emptyList())
     var isLoading by mutableStateOf(false)
@@ -29,7 +32,7 @@ class EmployeeViewModel(
     val password: FormField = FormField(RestaurantEmployeeDTO::password.name)
     val phoneNum: FormField = FormField(RestaurantEmployeeDTO::phoneNumber.name)
 
-    val id: FormField = FormField(RestaurantEmployeeDTO::userId.name)
+    val id: FormField = FormField(RestaurantEmployeeDTO::employeeId.name)
     var isHallEmployee by mutableStateOf(false)
     var isBackdoorEmployee by mutableStateOf(false)
 
@@ -56,28 +59,67 @@ class EmployeeViewModel(
         }
     }
 
+    fun clearFields() {
+        login.value = ""
+        firstName.value = ""
+        lastName.value = ""
+        password.value = ""
+        phoneNum.value = ""
+        id.value = ""
+        isHallEmployee = false
+        isBackdoorEmployee = false
+    }
+
     fun deleteEmployee(employee: RestaurantEmployeeDTO) {
-        employees = employees.filter {
-            it != employee
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val result = employee.employmentId?.let { restaurantService.deleteEmployment(it) }
+                if (result != null) {
+                    if (!result.isError && result.value) {
+                        employees = employees.filter { it.employmentId != employee.employmentId }
+                    }
+                }
+            } catch (e: Exception) {
+                result.isError = true
+            } finally {
+                isLoading = false
+            }
         }
     }
 
-    fun editEmployee(employee: RestaurantEmployeeDTO) {
-        employees = employees.map { existingEmployee ->
-            if (existingEmployee.userId == employee.userId) {
-                RestaurantEmployeeDTO(
-                    login = login.value,
-                    firstName = firstName.value,
-                    lastName = lastName.value,
-                    phoneNumber = phoneNum.value,
-                    password = password.value,
-                    isHallEmployee = isHallEmployee,
-                    isBackdoorEmployee = isBackdoorEmployee
-                )
-            } else {
-                existingEmployee
+    //TODO prawdopodobnie dodać email i date urodzenia ale najpierw trzeba skonsultować z backndem
+    suspend fun editEmployee(employee: RestaurantEmployeeDTO): Boolean {
+        if (isEditInvalid()) {
+            return false
+        }
+        val newEmployee = RestaurantEmployeeDTO(
+            login = login.value,
+            firstName = firstName.value,
+            lastName = lastName.value,
+            phoneNumber = phoneNum.value,
+            password = password.value
+        )
+        val response = restaurantService.editEmployee(employee.employeeId, newEmployee)
+
+        val position = if (response.value != null) {
+            RestaurantEmployeeDTO(
+                employmentId = employee.employmentId,
+                isHallEmployee = isHallEmployee,
+                isBackdoorEmployee = isBackdoorEmployee
+            )
+        } else {
+            return false
+        }
+
+        //TODO brakuje końcówki w serwisie
+//        result = restaurantService.editRestaurant(restaurantId, position)
+        if (result.value) {
+            viewModelScope.launch {
+                fetchEmployees()
             }
         }
+        return result.value
     }
 
 
@@ -99,7 +141,8 @@ class EmployeeViewModel(
 
         val position = if (response.value != null) {
             RestaurantEmployeeDTO(
-                userId = response.value.userId,
+                //TODO prawodopodobnie do zmiany na employeeId jak wejdzie zmiana na Backendzie
+                employeeId = response.value.userId,
                 isHallEmployee = isHallEmployee,
                 isBackdoorEmployee = isBackdoorEmployee
             )
@@ -116,11 +159,19 @@ class EmployeeViewModel(
         return result.value
     }
 
-    fun isRegisterInvalid(): Boolean {
+    private fun isRegisterInvalid(): Boolean {
         return isLoginInvalid() ||
                 isFirstNameInvalid() ||
                 isLastNameInvalid() ||
+                isPhoneInvalid() ||
                 isPasswordInvalid()
+    }
+
+    private fun isEditInvalid(): Boolean {
+        return isLoginInvalid() ||
+                isFirstNameInvalid() ||
+                isLastNameInvalid() ||
+                isPhoneInvalid()
     }
 
     fun isLoginInvalid(): Boolean {

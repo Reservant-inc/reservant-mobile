@@ -19,7 +19,7 @@ interface IRestaurantMenuService{
     suspend fun editMenu(id: Any, menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>
     suspend fun deleteMenu(id: Any): Result<Boolean>
     suspend fun addItemsToMenu(menuId: Any, itemsIds:List<Int>): Result<RestaurantMenuDTO?>
-    suspend fun createMenuItems(menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?>
+    suspend fun createMenuItem(menuItems: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?>
     suspend fun getMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItem(id:Any): Result<RestaurantMenuItemDTO?>
     suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?>
@@ -82,7 +82,7 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
 
     }
 
-    override suspend fun createMenuItems(menuItems: List<RestaurantMenuItemDTO>): Result<List<RestaurantMenuItemDTO>?> {
+    override suspend fun createMenuItem(menuItems: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?> {
         val res = api.post( MenuItems(), menuItems)
         return resultWrapper(res)
     }

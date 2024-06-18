@@ -132,7 +132,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 onClick = {
                                     if (menu.menuId != null) {
                                         navController.navigate(
-                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId)
+                                            RestaurantManagementRoutes.MenuItem(menuId = menu.menuId, restaurantId = restaurantId)
                                         )
                                     }
 
@@ -199,7 +199,8 @@ fun MenuManagementActivity(restaurantId: Int) {
 
         composable<RestaurantManagementRoutes.MenuItem> {
             MenuItemManagementActivity(
-                menuId = it.toRoute<RestaurantManagementRoutes.MenuItem>().menuId
+                menuId = it.toRoute<RestaurantManagementRoutes.MenuItem>().menuId,
+                restaurantId = it.toRoute<RestaurantManagementRoutes.MenuItem>().restaurantId
             )
         }
 
