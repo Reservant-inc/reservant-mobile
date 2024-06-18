@@ -69,6 +69,7 @@ fun RegisterRestaurantActivity(
     var selectedGroup = restaurantViewModel.selectedGroup
     var groups = restaurantViewModel.groups
     val context = LocalContext.current
+    val maxSize = 1024
 
     var showTagDialog by remember { mutableStateOf(false) }
 
@@ -284,7 +285,7 @@ fun RegisterRestaurantActivity(
                         if (restaurantViewModel.getBusinessPermissionError() != -1)
                             restaurantViewModel.getBusinessPermissionError()
                         else
-                            R.string.error_registerRestaurant_invalid_file
+                            R.string.error_registerRestaurant_invalid_file, maxSize
                     ),
                     formSent = formSent2
                 )
@@ -302,7 +303,7 @@ fun RegisterRestaurantActivity(
                         if (restaurantViewModel.getIdCardError() != -1)
                             restaurantViewModel.getIdCardError()
                         else
-                            R.string.error_registerRestaurant_invalid_file
+                            R.string.error_registerRestaurant_invalid_file, maxSize
                     ),
                     formSent = formSent2
                 )
@@ -320,7 +321,7 @@ fun RegisterRestaurantActivity(
                         if (restaurantViewModel.getRentalContractError() != -1)
                             restaurantViewModel.getRentalContractError()
                         else
-                            R.string.error_registerRestaurant_invalid_file
+                            R.string.error_registerRestaurant_invalid_file, maxSize
                     ),
                     formSent = formSent2,
                     deletable = true
@@ -339,7 +340,7 @@ fun RegisterRestaurantActivity(
                         if (restaurantViewModel.getAlcoholLicenseError() != -1)
                             restaurantViewModel.getAlcoholLicenseError()
                         else
-                            R.string.error_registerRestaurant_invalid_file
+                            R.string.error_registerRestaurant_invalid_file, maxSize
                     ),
                     formSent = formSent2,
                     deletable = true
@@ -505,7 +506,7 @@ fun RegisterRestaurantActivity(
                             if (restaurantViewModel.getIdCardError() != -1)
                                 restaurantViewModel.getIdCardError()
                             else
-                                R.string.error_registerRestaurant_invalid_file
+                                R.string.error_registerRestaurant_invalid_file, maxSize
                         ),
                         formSent = formSent3
                     )

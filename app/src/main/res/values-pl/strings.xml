@@ -53,7 +53,7 @@
     <string name="error_registerRestaurant_invalid_postal">Niepoprawny kod pocztowy</string>
     <string name="error_registerRestaurant_invalid_city">Niepoprawne miasto</string>
     <string name="error_registerRestaurant_invalid_restaurantType">Niepoprawny typ restauracji</string>
-    <string name="error_registerRestaurant_invalid_file">Niepoprawny plik</string>
+    <string name="error_registerRestaurant_invalid_file">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
