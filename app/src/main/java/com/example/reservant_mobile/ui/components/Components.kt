@@ -1575,6 +1575,8 @@ fun MenuPopup(
     onConfirm: () -> Unit,
     clear: () -> Unit,
     onFilePicked: (Uri?) -> Unit,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1640,8 +1642,10 @@ fun MenuPopup(
                     label = stringResource(id = R.string.label_menu_photo),
                     onFilePicked = onFilePicked,
                     context = LocalContext.current,
-                    isError = true,
-                    errorText = ""
+                    isError = fileErrors != -1 || fileTooLarge != -1,
+                    errorText = if (fileTooLarge != -1) stringResource(id = fileTooLarge, 1024)
+                    else if (fileErrors != -1) stringResource(id = fileErrors)
+                    else ""
                 )
 
             }
@@ -1686,6 +1690,8 @@ fun MenuCard(
     onClick: () -> Unit,
     isFetching: Boolean = false,
     isSaving: Boolean = false,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
 ) {
 
     when {
@@ -1722,7 +1728,9 @@ fun MenuCard(
                 menuType = menuType,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
-                isSaving = isSaving
+                isSaving = isSaving,
+                fileTooLarge = fileTooLarge,
+                fileErrors = fileErrors
             )
         }
     }
@@ -1852,6 +1860,8 @@ fun AddMenuButton(
     clearFields: () -> Unit,
     addMenu: () -> Unit,
     isSaving: Boolean = false,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
     showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     when {
@@ -1862,12 +1872,15 @@ fun AddMenuButton(
                 onConfirm = addMenu,
                 clear = clearFields,
                 onFilePicked = onFilePicked,
+                fileTooLarge = fileTooLarge,
+                fileErrors = fileErrors,
                 name = name,
                 altName = altName,
                 menuType = menuType,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
-                isSaving = isSaving
+                isSaving = isSaving,
+
             )
         }
     }

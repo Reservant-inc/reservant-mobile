@@ -8,10 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,7 +81,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                         name = "",
                                         menuType = "",
                                         dateFrom = "",
-                                        photoFileName = ""
+                                        photo = ""
                                     ),
                                     onEditClick = { },
                                     onDeleteClick = { },
@@ -140,8 +138,10 @@ fun MenuManagementActivity(restaurantId: Int) {
 
                                 },
                                 onFilePicked = { file ->
-                                    viewmodel.photo.value = file.toString()
+                                    viewmodel.photo.value = file?.toString() ?: ""
                                 },
+                                fileErrors = viewmodel.photoErrors(LocalContext.current),
+                                fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                                 isSaving = viewmodel.isSaving,
                                 showConfirmDeletePopup = showConfirmDeletePopup,
                                 showEditPopup = showEditPopup
@@ -183,8 +183,10 @@ fun MenuManagementActivity(restaurantId: Int) {
                             }
                         },
                         onFilePicked = { file ->
-                            viewmodel.photo.value = file.toString()
+                            viewmodel.photo.value = file?.toString() ?: ""
                         },
+                        fileErrors = viewmodel.photoErrors(LocalContext.current),
+                        fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                         isSaving = viewmodel.isSaving,
                         showAddDialog = showAddDialog
                     )
