@@ -116,8 +116,11 @@
     <string name="label_show_more_details">Show more details</string>
     <string name="label_menu_item_management">Menu item management</string>
     <string name="label_menu_item_photo">Menu Item Photo</string>
+    <string name="label_menu_photo">Zdjęcie pozycji z menu</string>
     <string name="label_edit_menu_item">Edit menu item</string>
     <string name="label_price">Price</string>
     <string name="label_alcohol">Alcohol Percentage</string>
     <string name="lable_logout_action">Log out</string>
+    <string name="error_file_not_given">File is required</string>
+    <string name="error_wrong_file_format">Wrong file format</string>
 </resources>

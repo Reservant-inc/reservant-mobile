@@ -12,5 +12,5 @@ data class RestaurantMenuDTO (
     val dateFrom: String,
     val dateUntil: String? = null,
     val menuItems: List<RestaurantMenuItemDTO>? = null,
-    val photo: String
+    val photoFileName: String
 )
