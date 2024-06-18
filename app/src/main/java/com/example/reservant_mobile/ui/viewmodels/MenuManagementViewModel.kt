@@ -1,17 +1,24 @@
 package com.example.reservant_mobile.ui.viewmodels
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.data.services.IRestaurantMenuService
 import com.example.reservant_mobile.data.services.RestaurantMenuService
+import com.example.reservant_mobile.data.utils.getFileFromUri
+import com.example.reservant_mobile.data.utils.getFileName
+import com.example.reservant_mobile.data.utils.getFileNameWithoutExtension
+import com.example.reservant_mobile.data.utils.isFileSizeInvalid
 import kotlinx.coroutines.launch
 
 class MenuManagementViewModel(
@@ -30,6 +37,7 @@ class MenuManagementViewModel(
     var menuType = FormField(RestaurantMenuDTO::menuType.name)
     var dateFrom = FormField(RestaurantMenuDTO::dateFrom.name)
     var dateUntil = FormField(RestaurantMenuDTO::dateUntil.name)
+    var photo = FormField(RestaurantMenuDTO::photoFileName.name)
 
     var fetchResult: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value = null))
     var result by mutableStateOf(Result(isError = false, value = null))
@@ -51,7 +59,7 @@ class MenuManagementViewModel(
     }
 
     suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
-        val photoString = menu.photo.substringAfter("uploads/")
+        val photoString = menu.photoFileName.substringAfter("uploads/")
         val result = fileService.getImage(photoString)
         if (!result.isError){
             return result.value!!
@@ -68,7 +76,7 @@ class MenuManagementViewModel(
             menuType = menuType.value,
             dateFrom = dateFrom.value,
             dateUntil = dateUntil.value.ifEmpty { null },
-            photo = "exampleImage"
+            photoFileName = photo.value
         )
     }
 
@@ -129,6 +137,21 @@ class MenuManagementViewModel(
         menuType.value = ""
         dateFrom.value = ""
         dateUntil.value = ""
+    }
+
+    fun photoErrors(context: Context): Int {
+        val value = photo.value
+
+        if (value.isBlank()) return R.string.error_file_not_given
+
+        if (!getFileName(context, value).endsWith(".jpg", ignoreCase = true)) return R.string.error_wrong_file_format
+
+        return -1
+    }
+
+    fun isPhotoTooLarge(context: Context): Int {
+        if (isFileSizeInvalid(context, photo.value)) return R.string.error_registerRestaurant_invalid_file
+        return -1
     }
 
     fun <T> getToastError(result: Result<T>): Int {

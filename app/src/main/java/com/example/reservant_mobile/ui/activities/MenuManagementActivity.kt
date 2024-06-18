@@ -35,6 +35,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
@@ -82,12 +83,13 @@ fun MenuManagementActivity(restaurantId: Int) {
                                         name = "",
                                         menuType = "",
                                         dateFrom = "",
-                                        photo = ""
+                                        photoFileName = ""
                                     ),
                                     onEditClick = { },
                                     onDeleteClick = { },
                                     onClick = { },
-                                    clearFields = { }
+                                    clearFields = { },
+                                    onFilePicked = { }
                                 )
                             }
                         }
@@ -137,6 +139,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     }
 
                                 },
+                                onFilePicked = { file ->
+                                    viewmodel.photo.value = file.toString()
+                                },
                                 isSaving = viewmodel.isSaving,
                                 showConfirmDeletePopup = showConfirmDeletePopup,
                                 showEditPopup = showEditPopup
@@ -149,12 +154,7 @@ fun MenuManagementActivity(restaurantId: Int) {
 
                         }
                         else -> item {
-                            //TODO: pagemissing
-                            Text(text = "There will be something here soon :)")
-                            if (viewmodel.fetchResult.isError){
-                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
-                                viewmodel.fetchResult.isError = false
-                            }
+                            MissingPage(errorStringId = viewmodel.getToastError(viewmodel.fetchResult))
                         }
                     }
 
@@ -181,6 +181,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 }
 
                             }
+                        },
+                        onFilePicked = { file ->
+                            viewmodel.photo.value = file.toString()
                         },
                         isSaving = viewmodel.isSaving,
                         showAddDialog = showAddDialog

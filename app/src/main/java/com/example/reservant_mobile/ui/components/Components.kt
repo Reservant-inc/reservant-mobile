@@ -1580,6 +1580,7 @@ fun MenuPopup(
     hide: () -> Unit,
     onConfirm: () -> Unit,
     clear: () -> Unit,
+    onFilePicked: (Uri?) -> Unit,
     name: FormField,
     altName: FormField,
     menuType: FormField,
@@ -1641,6 +1642,13 @@ fun MenuPopup(
                     },
                     onBirthdayChange = { dateUntil.value = it }
                 )
+                InputUserFile(
+                    label = stringResource(id = R.string.label_menu_photo),
+                    onFilePicked = onFilePicked,
+                    context = LocalContext.current,
+                    isError = true,
+                    errorText = ""
+                )
 
             }
         },
@@ -1677,6 +1685,7 @@ fun MenuCard(
     dateUntil: FormField,
     photo: ImageBitmap? = null,
     menu: RestaurantMenuDTO,
+    onFilePicked: (Uri?) -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     clearFields: () -> Unit,
@@ -1713,6 +1722,7 @@ fun MenuCard(
                 hide = {showEditPopup.value = false},
                 onConfirm = onEditClick,
                 clear = clearFields,
+                onFilePicked = onFilePicked,
                 name = name,
                 altName = altName,
                 menuType = menuType,
@@ -1844,6 +1854,7 @@ fun AddMenuButton(
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
+    onFilePicked: (Uri?) -> Unit,
     clearFields: () -> Unit,
     addMenu: () -> Unit,
     isSaving: Boolean = false,
@@ -1856,6 +1867,7 @@ fun AddMenuButton(
                 hide = { showAddDialog.value = false },
                 onConfirm = addMenu,
                 clear = clearFields,
+                onFilePicked = onFilePicked,
                 name = name,
                 altName = altName,
                 menuType = menuType,
