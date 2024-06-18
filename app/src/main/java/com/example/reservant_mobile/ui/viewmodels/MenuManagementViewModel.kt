@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.constants.Regex
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.fields.FormField
 import com.example.reservant_mobile.data.models.dtos.fields.Result
@@ -17,6 +18,7 @@ import com.example.reservant_mobile.data.services.RestaurantMenuService
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.isFileSizeInvalid
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 class MenuManagementViewModel(
     private val restaurantId: Int,
@@ -137,6 +139,14 @@ class MenuManagementViewModel(
         photo.value = ""
     }
 
+    fun isNameInvalid(): Boolean{
+        return isInvalidWithRegex(Regex.NAME_REG, name.value)
+    }
+
+    fun isAltNameInvalid(): Boolean{
+        return isInvalidWithRegex(Regex.NAME_REG, alternateName.value)
+    }
+
     fun photoErrors(context: Context): Int {
         if (photo.value.isBlank()) return R.string.error_file_not_given
 
@@ -149,6 +159,10 @@ class MenuManagementViewModel(
         if (photo.value.isBlank()) return -1
         if (isFileSizeInvalid(context, photo.value)) return R.string.error_registerRestaurant_invalid_file
         return -1
+    }
+
+    private fun isInvalidWithRegex(regex: String, str: String): Boolean{
+        return !Pattern.matches(regex, str)
     }
 
     fun <T> getToastError(result: Result<T>): Int {
