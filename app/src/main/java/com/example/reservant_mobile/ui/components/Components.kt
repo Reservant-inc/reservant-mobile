@@ -160,6 +160,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastCbrt
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
@@ -1578,7 +1579,9 @@ fun MenuPopup(
     fileTooLarge: Int = -1,
     fileErrors: Int = -1,
     name: FormField,
+    isNameInvalid: Boolean = false,
     altName: FormField,
+    isAltNameInvalid: Boolean = false,
     menuType: FormField,
     dateFrom: FormField,
     dateUntil: FormField,
@@ -1595,18 +1598,24 @@ fun MenuPopup(
                 InputUserInfo(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
-                    onValueChange = { name.value = it }
+                    onValueChange = { name.value = it },
+                    isError = isNameInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
                 InputUserInfo(
                     label = stringResource(id = R.string.label_alternate_name),
                     optional = true,
                     inputText = altName.value,
-                    onValueChange = { altName.value = it }
+                    onValueChange = { altName.value = it },
+                    isError = isAltNameInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
                 InputUserInfo(
                     label = stringResource(id = R.string.label_menu_type),
                     inputText = menuType.value,
-                    onValueChange = { menuType.value = it }
+                    onValueChange = { menuType.value = it },
+                    isError = menuType.value.isBlank(),
+                    errorText = stringResource(id = R.string.error_invalid_menu_type)
                 )
                 MyDatePickerDialog(
                     label = { Text(text = stringResource(id = R.string.label_date_from)) },
@@ -1692,6 +1701,8 @@ fun MenuCard(
     isSaving: Boolean = false,
     fileTooLarge: Int = -1,
     fileErrors: Int = -1,
+    isNameInvalid: Boolean = false,
+    isAltNameInvalid: Boolean = false
 ) {
 
     when {
@@ -1730,7 +1741,9 @@ fun MenuCard(
                 dateUntil = dateUntil,
                 isSaving = isSaving,
                 fileTooLarge = fileTooLarge,
-                fileErrors = fileErrors
+                fileErrors = fileErrors,
+                isNameInvalid = isNameInvalid,
+                isAltNameInvalid = isAltNameInvalid
             )
         }
     }
@@ -1862,6 +1875,8 @@ fun AddMenuButton(
     isSaving: Boolean = false,
     fileTooLarge: Int = -1,
     fileErrors: Int = -1,
+    isNameInvalid: Boolean = false,
+    isAltNameInvalid: Boolean = false,
     showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     when {
@@ -1880,7 +1895,8 @@ fun AddMenuButton(
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
                 isSaving = isSaving,
-
+                isNameInvalid = isNameInvalid,
+                isAltNameInvalid = isAltNameInvalid
             )
         }
     }

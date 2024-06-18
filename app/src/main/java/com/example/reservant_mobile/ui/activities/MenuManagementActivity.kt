@@ -87,7 +87,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     onDeleteClick = { },
                                     onClick = { },
                                     clearFields = { },
-                                    onFilePicked = { }
+                                    onFilePicked = { },
                                 )
                             }
                         }
@@ -144,7 +144,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                                 isSaving = viewmodel.isSaving,
                                 showConfirmDeletePopup = showConfirmDeletePopup,
-                                showEditPopup = showEditPopup
+                                showEditPopup = showEditPopup,
+                                isNameInvalid = viewmodel.isNameInvalid(),
+                                isAltNameInvalid = viewmodel.isAltNameInvalid()
                             )
 
                             if (viewmodel.result.isError){
@@ -188,7 +190,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                         fileErrors = viewmodel.photoErrors(LocalContext.current),
                         fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                         isSaving = viewmodel.isSaving,
-                        showAddDialog = showAddDialog
+                        showAddDialog = showAddDialog,
+                        isNameInvalid = viewmodel.isNameInvalid(),
+                        isAltNameInvalid = viewmodel.isAltNameInvalid()
                     )
 
                     if (viewmodel.result.isError){

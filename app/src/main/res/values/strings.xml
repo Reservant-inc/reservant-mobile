@@ -123,4 +123,6 @@
     <string name="lable_logout_action">Log out</string>
     <string name="error_file_not_given">File is required</string>
     <string name="error_wrong_file_format">Wrong file format</string>
+    <string name="error_invalid_menu_name">Invalid name</string>
+    <string name="error_invalid_menu_type">Invalid menu type</string>
 </resources>
