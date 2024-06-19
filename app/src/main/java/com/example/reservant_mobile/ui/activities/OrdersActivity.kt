@@ -1,21 +1,10 @@
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Grading
-import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.History
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,11 +17,9 @@ import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OrderItem
 
-
 @Composable
 fun OrdersActivity() {
     val ordersViewModel = viewModel<OrdersViewModel>()
-
     val orders by ordersViewModel.orders.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -41,33 +28,24 @@ fun OrdersActivity() {
             text = stringResource(id = R.string.label_orders),
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            ButtonComponent(
-                onClick = { /*TODO*/ },
-                label = "Aktualne",
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            ButtonComponent(
-                onClick = { /*TODO*/ },
-                label = "Zakończone",
-                modifier = Modifier.weight(1f)
-            )
-        }
         Spacer(modifier = Modifier.height(16.dp))
+
         TextField(
             value = "",
             onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = "Szukaj...") }
+            placeholder = { Text(text = stringResource(id = R.string.label_search)) },
+            leadingIcon = {
+                Icon(Icons.Filled.Search, contentDescription = null)
+            }
         )
+
         Spacer(modifier = Modifier.height(8.dp))
-        ButtonComponent(onClick = { /*TODO*/ }, label = "Filtry")
+
+        ButtonComponent(onClick = { /*TODO*/ }, label = stringResource(id = R.string.label_filters))
+
         Spacer(modifier = Modifier.height(16.dp))
+
         LazyColumn {
             items(orders) { order ->
                 OrderItem(order = order)
@@ -76,5 +54,3 @@ fun OrdersActivity() {
         }
     }
 }
-
-

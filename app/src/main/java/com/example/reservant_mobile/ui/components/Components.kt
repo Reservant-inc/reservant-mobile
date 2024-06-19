@@ -2625,9 +2625,11 @@ fun MissingPage(
 
 @Composable
 fun OrderItem(order: OrderDTO) {
-    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-        Text(text = "data: ${order.date}")
-        Text(text = "koszt całkowity: ${order.cost}")
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)) {
+        Text(text = stringResource(id = R.string.label_date)+": ${order.date}")
+        Text(text = stringResource(id = R.string.label_total_cost)+": ${order.cost}")
         Text(text = order.customer)
         Text(text = order.status, fontWeight = FontWeight.Bold)
     }

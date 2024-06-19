@@ -111,4 +111,8 @@
     <string name="label_show_more_details">Pokaż więcej szczegółów</string>
     <string name="lable_logout_action">Wyloguj się</string>
     <string name="label_orders">Zamówienia</string>
+    <string name="label_search">Szukaj...</string>
+    <string name="label_filters">Filtry</string>
+    <string name="label_date">Data</string>
+    <string name="label_total_cost">Koszt całkowity</string>
 </resources>
