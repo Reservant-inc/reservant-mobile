@@ -66,6 +66,7 @@ fun RegisterRestaurantActivity(
     var formSent by remember { mutableStateOf(false) }
     var formSent2 by remember { mutableStateOf(false) }
     var formSent3 by remember { mutableStateOf(false) }
+    var addGroup by remember { mutableStateOf(false) }
     var selectedGroup = restaurantViewModel.selectedGroup
     var groups = restaurantViewModel.groups
     val context = LocalContext.current
@@ -500,27 +501,52 @@ fun RegisterRestaurantActivity(
 
                     if (groups != null) {
                         val newGroups =
-                            groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
-                        OutLinedDropdownMenu(
-                            selectedOption = selectedGroup?.name
-                                ?: "",
-                            itemsList = newGroups.map { it.name },
-                            onOptionSelected = { name ->
-                                restaurantViewModel.viewModelScope.launch {
-                                    restaurantViewModel.selectedGroup =
-                                        newGroups.find { it.name == name }
-                                }
-                            },
-                            label = stringResource(R.string.label_add_to_group),
-                            isError = restaurantViewModel.isGroupInvalid(),
-                            errorText = stringResource(
-                                if (restaurantViewModel.getAlcoholLicenseError() != -1)
-                                    restaurantViewModel.getAlcoholLicenseError()
-                                else
-                                    R.string.error_registerRestaurant_invalid_group
-                            ),
-                            formSent = formSent3
-                        )
+                            groups + RestaurantGroupDTO(name = restaurantViewModel.name.value) + RestaurantGroupDTO(
+                                name = stringResource(
+                                    id = R.string.label_new_group
+                                )
+                            )
+
+                        if (selectedGroup?.name == stringResource(id = R.string.label_new_group)) {
+                            addGroup = true
+                        }
+
+                        if (!addGroup) {
+                            OutLinedDropdownMenu(
+                                selectedOption = selectedGroup?.name
+                                    ?: "",
+                                itemsList = newGroups.map { it.name },
+                                onOptionSelected = { name ->
+                                    restaurantViewModel.viewModelScope.launch {
+                                        restaurantViewModel.selectedGroup =
+                                            newGroups.find { it.name == name }
+                                    }
+                                },
+                                label = stringResource(R.string.label_add_to_group),
+                                isError = restaurantViewModel.isGroupInvalid(),
+                                errorText = stringResource(
+                                    if (restaurantViewModel.getGroupError() != -1)
+                                        restaurantViewModel.getGroupError()
+                                    else
+                                        R.string.error_registerRestaurant_invalid_group
+                                ),
+                                formSent = formSent3
+                            )
+                        } else {
+                            InputUserInfo(
+                                inputText = restaurantViewModel.newGroup.value,
+                                onValueChange = { restaurantViewModel.newGroup.value = it },
+                                label = stringResource(id = R.string.label_new_group),
+                                isError = restaurantViewModel.isGroupInvalid(),
+                                errorText = stringResource(
+                                    if (restaurantViewModel.getGroupError() != -1)
+                                        restaurantViewModel.getGroupError()
+                                    else
+                                        R.string.error_registerRestaurant_invalid_description
+                                ),
+                                formSent = formSent3
+                            )
+                        }
                     }
                 }
 

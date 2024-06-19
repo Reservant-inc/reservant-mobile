@@ -59,6 +59,7 @@ class RestaurantViewModel(
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
+    var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
 
     var restaurantId by mutableStateOf<Int?>(null)
 
@@ -82,6 +83,13 @@ class RestaurantViewModel(
             selectedTags = restaurant.value.tags
             selectedGroup = group
         }
+    }
+
+    suspend fun postNewGroup(): Boolean {
+        if(newGroup.value.isNotBlank()){
+            //TODO dodać nową grupę
+        }
+        return true
     }
 
     suspend fun registerRestaurant(context: Context): Boolean {
@@ -467,8 +475,8 @@ class RestaurantViewModel(
         return getFieldError(result2, idCard.name)
     }
 
-    fun getLogoError(): Int {
-        return getFieldError(result3, logo.name)
+    fun getGroupError(): Int {
+        return getFieldError(result3, newGroup.name)
     }
 
     fun getDescriptionError(): Int {
