@@ -273,6 +273,23 @@ fun RegisterRestaurantActivity(
                 Spacer(modifier = Modifier.height(30.dp))
 
                 InputUserFile(
+                    label = stringResource(id = R.string.label_restaurant_logo),
+                    defaultValue = restaurantViewModel.logo.value,
+                    onFilePicked = { file ->
+                        restaurantViewModel.logo.value = file.toString();
+                    },
+                    context = context,
+                    isError = restaurantViewModel.isLogoInvalid(context),
+                    errorText = stringResource(
+                        if (restaurantViewModel.getIdCardError() != -1)
+                            restaurantViewModel.getIdCardError()
+                        else
+                            R.string.error_registerRestaurant_invalid_file, maxSize
+                    ),
+                    formSent = formSent2
+                )
+
+                InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
                     defaultValue = restaurantViewModel.businessPermission.value,
                     onFilePicked = { file ->
@@ -345,33 +362,6 @@ fun RegisterRestaurantActivity(
                     formSent = formSent2,
                     deletable = true
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                if (groups != null) {
-                    val newGroups =
-                        groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
-                    OutLinedDropdownMenu(
-                        selectedOption = selectedGroup?.name
-                            ?: "",
-                        itemsList = newGroups.map { it.name },
-                        onOptionSelected = { name ->
-                            restaurantViewModel.viewModelScope.launch {
-                                restaurantViewModel.selectedGroup =
-                                    newGroups.find { it.name == name }
-                            }
-                        },
-                        label = stringResource(R.string.label_add_to_group),
-                        isError = restaurantViewModel.isGroupInvalid(),
-                        errorText = stringResource(
-                            if (restaurantViewModel.getAlcoholLicenseError() != -1)
-                                restaurantViewModel.getAlcoholLicenseError()
-                            else
-                                R.string.error_registerRestaurant_invalid_group
-                        ),
-                        formSent = formSent2
-                    )
-                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -494,22 +484,6 @@ fun RegisterRestaurantActivity(
                 }
 
                 Column {
-                    InputUserFile(
-                        label = stringResource(id = R.string.label_restaurant_logo),
-                        defaultValue = restaurantViewModel.logo.value,
-                        onFilePicked = { file ->
-                            restaurantViewModel.logo.value = file.toString();
-                        },
-                        context = context,
-                        isError = restaurantViewModel.isLogoInvalid(context),
-                        errorText = stringResource(
-                            if (restaurantViewModel.getIdCardError() != -1)
-                                restaurantViewModel.getIdCardError()
-                            else
-                                R.string.error_registerRestaurant_invalid_file, maxSize
-                        ),
-                        formSent = formSent3
-                    )
                     InputUserInfo(
                         inputText = restaurantViewModel.description.value,
                         onValueChange = { restaurantViewModel.description.value = it },
@@ -523,7 +497,34 @@ fun RegisterRestaurantActivity(
                         ),
                         formSent = formSent3
                     )
+
+                    if (groups != null) {
+                        val newGroups =
+                            groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
+                        OutLinedDropdownMenu(
+                            selectedOption = selectedGroup?.name
+                                ?: "",
+                            itemsList = newGroups.map { it.name },
+                            onOptionSelected = { name ->
+                                restaurantViewModel.viewModelScope.launch {
+                                    restaurantViewModel.selectedGroup =
+                                        newGroups.find { it.name == name }
+                                }
+                            },
+                            label = stringResource(R.string.label_add_to_group),
+                            isError = restaurantViewModel.isGroupInvalid(),
+                            errorText = stringResource(
+                                if (restaurantViewModel.getAlcoholLicenseError() != -1)
+                                    restaurantViewModel.getAlcoholLicenseError()
+                                else
+                                    R.string.error_registerRestaurant_invalid_group
+                            ),
+                            formSent = formSent3
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
 
 
                 ShowErrorToast(

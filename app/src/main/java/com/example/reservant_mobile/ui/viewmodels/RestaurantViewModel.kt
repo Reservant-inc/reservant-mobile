@@ -85,7 +85,6 @@ class RestaurantViewModel(
     }
 
     suspend fun registerRestaurant(context: Context): Boolean {
-        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
@@ -98,7 +97,6 @@ class RestaurantViewModel(
     }
 
     suspend fun editRestaurant(context: Context): Boolean {
-        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
@@ -121,6 +119,14 @@ class RestaurantViewModel(
 
     suspend fun validateSecondStep(context: Context): Boolean {
 
+        val restaurantLogo = if (
+            !logo.value.endsWith(".png", ignoreCase = true) &&
+            !logo.value.endsWith(".jpg", ignoreCase = true)
+        ) {
+            sendPhoto(logo.value, context)
+        } else {
+            null
+        }
 
         val permission = if (!businessPermission.value.endsWith(
                 ".pdf",
@@ -151,6 +157,13 @@ class RestaurantViewModel(
                 context,
                 DataType.PDF
             )
+
+        if (restaurantLogo != null) {
+            if (!restaurantLogo.isError)
+                logo.value = restaurantLogo.value?.fileName ?: ""
+            else
+                logo.value = "Bledny plik"
+        }
 
         if (permission != null) {
             if (!permission.isError)
@@ -200,28 +213,6 @@ class RestaurantViewModel(
             alcoholLicense.value = ""
         }
 
-        return true
-    }
-
-    suspend fun validateLogo(context: Context): Boolean {
-        val restaurantLogo = if (
-            !logo.value.endsWith(".png", ignoreCase = true) &&
-            !logo.value.endsWith(".jpg", ignoreCase = true)
-        ) {
-            sendPhoto(logo.value, context)
-        } else {
-            null
-        }
-
-        if (restaurantLogo != null) {
-            if (!restaurantLogo.isError)
-                logo.value = restaurantLogo.value?.fileName ?: ""
-            else
-                logo.value = "Bledny plik"
-        }
-        if (isLogoInvalid(context)) {
-            return false
-        }
         return true
     }
 
@@ -314,7 +305,7 @@ class RestaurantViewModel(
                 isIdCardInvalid(context) ||
                 isAlcoholLicenseInvalid(context) ||
                 isRentalContractInvalid(context) ||
-                isGroupInvalid()
+                isLogoInvalid(context)
 
     }
 
