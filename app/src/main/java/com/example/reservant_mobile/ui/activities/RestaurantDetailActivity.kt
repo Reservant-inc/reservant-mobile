@@ -105,7 +105,6 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                 }
             }
 
-
             restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null-> {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
@@ -269,7 +268,6 @@ fun MenuContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            //.verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = Modifier.height(64.dp))
 

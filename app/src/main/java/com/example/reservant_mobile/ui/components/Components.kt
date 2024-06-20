@@ -2693,34 +2693,29 @@ fun MenuItemCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.offset(y = (-4).dp)
                 )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Image(
-                painter = painterResource(imageResource),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxSize()
-            )
-            IconButton(
-                onClick = onAddClick,
-                modifier = Modifier
-                    .size(36.dp)
-                    .align(Alignment.CenterVertically)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.primary
+                IconButton(
+                    onClick = onAddClick,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Image(
+                    painter = painterResource(imageResource),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(end = 8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxSize()
                 )
             }
-
-
-            //Spacer(modifier = Modifier.height(8.dp))
-
 
         }
     }
