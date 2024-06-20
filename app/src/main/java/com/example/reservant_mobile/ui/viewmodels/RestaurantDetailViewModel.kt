@@ -16,7 +16,7 @@ import com.example.reservant_mobile.data.services.RestaurantService
 import kotlinx.coroutines.launch
 
 class RestaurantDetailViewModel(
-    private val restaurantId: Int,
+    private var restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val menuService: IRestaurantMenuService = RestaurantMenuService()
 ) : ViewModel() {
@@ -30,47 +30,51 @@ class RestaurantDetailViewModel(
     var isLoading: Boolean by mutableStateOf(false)
 
     init {
-        isLoading = true
         viewModelScope.launch {
-            loadRestaurant(restaurantId)
-            loadMenus(restaurantId)
-            menus?.get(0)?.menuId?.let { loadFullMenu(it) }
+            loadRestaurantAndMenus(restaurantId)
         }
     }
 
-    private suspend fun loadRestaurant(id: Int) {
+    private suspend fun loadRestaurantAndMenus(id: Int) {
         isLoading = true
-
-        resultRestaurant = restaurantService.getRestaurant(id)
-        if (!resultRestaurant.isError) {
-            restaurant = resultRestaurant.value
+        val restaurantLoaded = loadRestaurant(id)
+        if (restaurantLoaded) {
+            loadMenus(id)
+            menus?.firstOrNull()?.menuId?.let { loadFullMenu(it) }
         }
         isLoading = false
     }
 
-    private suspend fun loadMenus(id: Int) {
+    suspend fun loadRestaurant(id: Int): Boolean {
+        if (id != restaurantId) {
+            restaurantId = id
+        }
+        resultRestaurant = restaurantService.getRestaurant(restaurantId)
+        if (resultRestaurant.isError) {
+            return false
+        }
+        restaurant = resultRestaurant.value
+        return true
+    }
 
+    private suspend fun loadMenus(id: Int) {
         resultMenus = menuService.getMenus(id)
         if (!resultMenus.isError) {
             menus = resultMenus.value
         }
-
     }
 
     suspend fun loadFullMenu(menuId: Int) {
-
         val result = menuService.getMenu(menuId)
         if (!result.isError) {
-            currentMenu =  result.value
+            currentMenu = result.value
         }
-
     }
 
-    fun getToastError(): Int{
-        if(!resultRestaurant.isError) {
+    fun getToastError(): Int {
+        if (!resultRestaurant.isError) {
             return -1
         }
-        return resultRestaurant.errors!!.getOrDefault("TOAST", -1)
+        return resultRestaurant.errors?.getOrDefault("TOAST", -1) ?: -1
     }
-
 }
