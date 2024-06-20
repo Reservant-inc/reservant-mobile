@@ -104,6 +104,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 onDismissRequest = { showDeletePopup = false },
                 onConfirm = {
                     restaurantManageVM.viewModelScope.launch {
+                        if(navController.currentBackStackEntry?.destination?.route == RestaurantManagementRoutes.RestaurantPreview::class.qualifiedName)
+                            navController.navigate(RestaurantManagementRoutes.Restaurant)
                         restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
                         showDeletePopup = false
                     }
@@ -166,7 +168,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 CircularProgressIndicator()
                             }
                         } else {
-                            MissingPage(errorStringId = R.string.label_no_restaurants_found)
+                            MissingPage(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .align(alignment = Alignment.CenterHorizontally)
+                                    .padding(vertical = 40.dp),
+                                errorStringId = R.string.label_no_restaurants_found
+                            )
                         }
                     }
 
