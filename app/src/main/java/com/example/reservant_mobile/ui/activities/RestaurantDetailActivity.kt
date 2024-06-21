@@ -10,7 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -59,7 +61,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun RestaurantDetailActivity(restaurantId: Int) {
+fun RestaurantDetailActivity(navController: NavHostController, restaurantId: Int) {
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -86,19 +88,36 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                 }
             }
 
-            restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null-> {
+            restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null -> {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Box {
+                        restaurantDetailVM.restaurant?.let { restaurant ->
+                            Image(
+                                painter = painterResource(R.drawable.restaurant_photo),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            IconButton(
+                                onClick = { navController.popBackStack() },
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.TopStart)
+                                    .background(Color.White, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.label_back),
+                                    tint = Color.Black
+                                )
+                            }
+                        }
+                    }
 
                     restaurantDetailVM.restaurant?.let { restaurant ->
-                        Image(
-                            painter = painterResource(R.drawable.restaurant_photo),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentScale = ContentScale.Crop
-                        )
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -236,6 +255,7 @@ fun RestaurantDetailActivity(restaurantId: Int) {
         FullscreenGallery(onDismiss = { showGallery = false })
     }
 }
+
 
 
 @Composable

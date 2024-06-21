@@ -160,7 +160,7 @@ fun MapActivity(){
             )
         }
         composable<RestaurantRoutes.Details> {
-            RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
+            RestaurantDetailActivity(navController = navController, restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
         }
     }
 
