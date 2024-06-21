@@ -151,4 +151,5 @@
     <string name="error_registerRestaurant_invalid_file_photo">Invalid file -  expected filetype: png, jpg</string>
     <string name="error_file_size">Invalid file - max size %1$dKB</string>
     <string name="label_reviews">Reviews</string>
+    <string name="label_back">Back</string>
 </resources>

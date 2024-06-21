@@ -146,4 +146,5 @@
     <string name="error_registerRestaurant_invalid_file_photo">Niepoprawny plik -  oczekiwany typ pliku: png, jpg</string>
     <string name="error_file_size">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_reviews">Oceny</string>
+    <string name="label_back">Wróć</string>
 </resources>
