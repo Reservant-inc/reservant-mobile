@@ -15,11 +15,15 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -50,9 +54,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -86,6 +92,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -2681,52 +2688,156 @@ fun FloatingActionMenu(
         FloatingActionButton(onClick = { expanded = !expanded }) {
             Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
         }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    onDineInClick()
-                    expanded = false
-                },
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Filled.LocalDining, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Na miejscu")
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(340.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(16.dp)
+                    .align(Alignment.CenterEnd)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = { expanded = false }) {
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                        }
                     }
+                    FloatingTabSwitch(
+                        pages = listOf(
+                            "Na miejscu" to { DineInContent(onDineInClick) },
+                            "Dostawa" to { DeliveryContent(onDeliveryClick) },
+                            "Odbiór" to { TakeawayContent(onTakeawayClick) }
+                        ),
+                        paneScroll = false
+                    )
                 }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    onDeliveryClick()
-                    expanded = false
-                },
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Filled.DeliveryDining, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Dostawa")
-                    }
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    onTakeawayClick()
-                    expanded = false
-                },
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Filled.TakeoutDining, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Odbiór")
-                    }
-                }
-            )
+            }
         }
     }
 }
+
+@Composable
+fun DineInContent(onDineInClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = "Moja rezerwacja", style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Data rezerwacji", style = MaterialTheme.typography.bodyLarge)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .background(Color.Gray.copy(alpha = 0.3f))
+        ) {
+            Text(text = "Kalendarz z wyborem daty", modifier = Modifier.align(Alignment.Center))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Liczba miejsc", style = MaterialTheme.typography.bodyLarge)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(onClick = { /* TODO: Decrease seats */ }, shape = CircleShape) {
+                Text(text = "-")
+            }
+            Text(text = "2", style = MaterialTheme.typography.bodyLarge)
+            Button(onClick = { /* TODO: Increase seats */ }, shape = CircleShape) {
+                Text(text = "+")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Komentarz (opcjonalny)", style = MaterialTheme.typography.bodyLarge)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(Color.Gray.copy(alpha = 0.3f))
+        ) {
+            Text(text = "", modifier = Modifier.align(Alignment.Center))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Mój koszyk", style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
+                    Row {
+                        Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(onClick = { /* TODO: Decrease item count */ }, shape = CircleShape) {
+                            Text(text = "-")
+                        }
+                        Button(onClick = { /* TODO: Increase item count */ }, shape = CircleShape) {
+                            Text(text = "+")
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Kwota: 30zł", style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+    }
+}
+
+@Composable
+fun DeliveryContent(onDeliveryClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = "Dostawa", style = MaterialTheme.typography.headlineSmall)
+
+        Button(onClick = onDeliveryClick) {
+            Text("Zamów dostawę")
+        }
+    }
+}
+
+@Composable
+fun TakeawayContent(onTakeawayClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = "Odbiór", style = MaterialTheme.typography.headlineSmall)
+
+        Button(onClick = onTakeawayClick) {
+            Text("Zamów odbiór")
+        }
+    }
+}
+
 
 @Composable
 fun FloatingTabSwitch(

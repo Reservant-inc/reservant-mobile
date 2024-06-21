@@ -13,12 +13,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StarHalf
+import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -47,6 +51,7 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.ui.components.FloatingActionMenu
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
@@ -250,6 +255,11 @@ fun RestaurantDetailActivity(navController: NavHostController, restaurantId: Int
             }
         }
     }
+    FloatingActionMenu(
+        onDineInClick = {},
+        onDeliveryClick = {},
+        onTakeawayClick= {}
+    )
 
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
