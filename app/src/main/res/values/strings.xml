@@ -152,4 +152,6 @@
     <string name="error_file_size">Invalid file - max size %1$dKB</string>
     <string name="label_reviews">Reviews</string>
     <string name="label_back">Back</string>
+    <string name="label_reservation_date">Reservation date</string>
+    <string name="label_my_reservation">My Reservation</string>
 </resources>

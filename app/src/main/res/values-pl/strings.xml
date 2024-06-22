@@ -147,4 +147,6 @@
     <string name="error_file_size">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_reviews">Oceny</string>
     <string name="label_back">Wróć</string>
+    <string name="label_reservation_date">Data rezerwacji</string>
+    <string name="label_my_reservation">Moja Rezerwacja</string>
 </resources>
