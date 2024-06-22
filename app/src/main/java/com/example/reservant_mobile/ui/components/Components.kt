@@ -2956,29 +2956,24 @@ fun DineInContent(onDineInClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = { /* TODO: Decrease seats */ }) {
-                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
+            Button(onClick = { /* TODO: Decrease seats */ }, shape = CircleShape) {
+                Text(text = "-")
             }
             Text(text = "2", style = MaterialTheme.typography.bodyLarge)
-            IconButton(onClick = { /* TODO: Increase seats */ }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+            Button(onClick = { /* TODO: Increase seats */ }, shape = CircleShape) {
+                Text(text = "+")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "Komentarz (opcjonalny)",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        BasicTextField(
+        OutlinedTextField(
             value = "",
-            onValueChange = { /* TODO: Handle text change */ },
+            onValueChange = { /* TODO: Handle note change */ },
+            label = { Text(text = "Napisz notatkę do zamówienia...") },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                .padding(8.dp),
-            textStyle = TextStyle(color = Color.Black)
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(8.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -3107,11 +3102,17 @@ fun TakeawayContent(onTakeawayClick: () -> Unit) {
                         Row {
                             Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = { /* TODO: Decrease item count */ }, shape = CircleShape) {
-                                Text(text = "-")
+                            IconButton(
+                                onClick = { /* TODO: Decrease item count */ },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
                             }
-                            Button(onClick = { /* TODO: Increase item count */ }, shape = CircleShape) {
-                                Text(text = "+")
+                            IconButton(
+                                onClick = { /* TODO: Increase item count */ },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                             }
                         }
                     }
@@ -3151,7 +3152,8 @@ fun TakeawayContent(onTakeawayClick: () -> Unit) {
         ) {
             Text(
                 text = "Kwota całkowita:",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
             )
             Text(
                 text = "60zł",
