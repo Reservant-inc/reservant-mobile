@@ -2678,16 +2678,11 @@ fun FloatingActionMenu(
     onTakeawayClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Na miejscu") }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomEnd
+        modifier = Modifier.fillMaxSize()
     ) {
-        FloatingActionButton(onClick = { expanded = !expanded }) {
-            Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
-        }
 
         AnimatedVisibility(
             visible = expanded,
@@ -2696,32 +2691,77 @@ fun FloatingActionMenu(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .width(340.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
-                    .align(Alignment.CenterEnd)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.TopEnd
             ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(onClick = { expanded = false }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                Box(
+                    modifier = Modifier
+                        .height(680.dp)
+                        .width(360.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Column {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(
+                                onClick = { selectedOption = "Na miejscu" },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedOption == "Na miejscu") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                                    contentColor = if (selectedOption == "Na miejscu") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(text = "Na miejscu")
+                            }
+                            Button(
+                                onClick = { selectedOption = "Dostawa" },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedOption == "Dostawa") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                                    contentColor = if (selectedOption == "Dostawa") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(text = "Dostawa")
+                            }
+                            Button(
+                                onClick = { selectedOption = "Odbiór" },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedOption == "Odbiór") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                                    contentColor = if (selectedOption == "Odbiór") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(text = "Odbiór")
+                            }
+                        }
+
+                        when (selectedOption) {
+                            "Na miejscu" -> DineInContent(onDineInClick)
+                            "Dostawa" -> DeliveryContent(onDeliveryClick)
+                            "Odbiór" -> TakeawayContent(onTakeawayClick)
                         }
                     }
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            "Na miejscu" to { DineInContent(onDineInClick) },
-                            "Dostawa" to { DeliveryContent(onDeliveryClick) },
-                            "Odbiór" to { TakeawayContent(onTakeawayClick) }
-                        ),
-                        paneScroll = false
-                    )
                 }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            FloatingActionButton(onClick = { expanded = !expanded }) {
+                Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
             }
         }
     }
@@ -2734,21 +2774,30 @@ fun DineInContent(onDineInClick: () -> Unit) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Moja rezerwacja", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = stringResource(R.string.label_my_reservation),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Data rezerwacji", style = MaterialTheme.typography.bodyLarge)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .background(Color.Gray.copy(alpha = 0.3f))
-        ) {
-            Text(text = "Kalendarz z wyborem daty", modifier = Modifier.align(Alignment.Center))
-        }
+        Text(
+            text = stringResource(R.string.label_reservation_date),
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        MyDatePickerDialog(
+            label = { stringResource(R.string.label_reservation_date)},
+            onBirthdayChange = { selectedDate ->
+                // TODO: date change
+            }
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Liczba miejsc", style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = "Liczba miejsc",
+            style = MaterialTheme.typography.bodyLarge
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,

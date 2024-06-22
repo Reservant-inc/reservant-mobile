@@ -122,4 +122,6 @@
     <string name="lable_logout_action">Log out</string>
     <string name="label_reviews">Reviews</string>
     <string name="label_back">Back</string>
+    <string name="label_reservation_date">Reservation date</string>
+    <string name="label_my_reservation">My Reservation</string>
 </resources>
