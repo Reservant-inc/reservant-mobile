@@ -55,6 +55,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -74,6 +75,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -154,6 +156,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -2824,6 +2827,15 @@ fun FloatingActionMenu(
         modifier = Modifier.fillMaxSize()
     ) {
 
+        if (expanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(onClick = { expanded = false })
+            )
+        }
+
         AnimatedVisibility(
             visible = expanded,
             enter = slideInHorizontally(initialOffsetX = { it }),
@@ -2907,27 +2919,28 @@ fun FloatingActionMenu(
     }
 }
 
+
 @Composable
 fun DineInContent(onDineInClick: () -> Unit) {
+    var comment by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.label_my_reservation),
+            text = "Moja rezerwacja",
             style = MaterialTheme.typography.headlineSmall
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(R.string.label_reservation_date),
+            text = "Data rezerwacji",
             style = MaterialTheme.typography.bodyLarge
         )
-
         MyDatePickerDialog(
-            label = { stringResource(R.string.label_reservation_date)},
+            label = { Text("Data rezerwacji") },
             onBirthdayChange = { selectedDate ->
                 // TODO: date change
             }
@@ -2943,28 +2956,36 @@ fun DineInContent(onDineInClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(onClick = { /* TODO: Decrease seats */ }, shape = CircleShape) {
-                Text(text = "-")
+            IconButton(onClick = { /* TODO: Decrease seats */ }) {
+                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
             }
             Text(text = "2", style = MaterialTheme.typography.bodyLarge)
-            Button(onClick = { /* TODO: Increase seats */ }, shape = CircleShape) {
-                Text(text = "+")
+            IconButton(onClick = { /* TODO: Increase seats */ }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Komentarz (opcjonalny)", style = MaterialTheme.typography.bodyLarge)
-        Box(
+        Text(
+            text = "Komentarz (opcjonalny)",
+            style = MaterialTheme.typography.bodyLarge
+        )
+        BasicTextField(
+            value = "",
+            onValueChange = { /* TODO: Handle text change */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
-                .background(Color.Gray.copy(alpha = 0.3f))
-        ) {
-            Text(text = "", modifier = Modifier.align(Alignment.Center))
-        }
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .padding(8.dp),
+            textStyle = TextStyle(color = Color.Black)
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Mój koszyk", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = "Mój koszyk",
+            style = MaterialTheme.typography.headlineSmall
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
@@ -2982,17 +3003,59 @@ fun DineInContent(onDineInClick: () -> Unit) {
                     Row {
                         Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = { /* TODO: Decrease item count */ }, shape = CircleShape) {
-                            Text(text = "-")
+                        IconButton(
+                            onClick = { /* TODO: Decrease item count */ },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
                         }
-                        Button(onClick = { /* TODO: Increase item count */ }, shape = CircleShape) {
-                            Text(text = "+")
+                        IconButton(
+                            onClick = { /* TODO: Increase item count */ },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                         }
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "Kwota: 30zł", style = MaterialTheme.typography.bodyLarge)
             }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Wpisz kod promocyjny",
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+        )
+        OutlinedTextField(
+            value = "JSKS6X293",
+            onValueChange = { /* TODO: Change promo code */ },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Kwota całkowita:",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "60zł",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* TODO: Go to summary */ },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(50)
+        ) {
+            Text(text = "Przejdź do podsumowania")
         }
     }
 }
@@ -3019,10 +3082,91 @@ fun TakeawayContent(onTakeawayClick: () -> Unit) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Odbiór", style = MaterialTheme.typography.headlineSmall)
 
-        Button(onClick = onTakeawayClick) {
-            Text("Zamów odbiór")
+        Text(
+            text = "Mój koszyk",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        repeat(2) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .padding(16.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
+                        Row {
+                            Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(onClick = { /* TODO: Decrease item count */ }, shape = CircleShape) {
+                                Text(text = "-")
+                            }
+                            Button(onClick = { /* TODO: Increase item count */ }, shape = CircleShape) {
+                                Text(text = "+")
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Kwota: 30zł", style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* TODO: Handle note change */ },
+            label = { Text(text = "Napisz notatkę do zamówienia...") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(8.dp)
+        )
+
+        Text(
+            text = "Wpisz kod promocyjny",
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        OutlinedTextField(
+            value = "JSKS6X293",
+            onValueChange = { /* TODO: Change promo code */ },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Kwota całkowita:",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "60zł",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* TODO: Go to summary */ },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(50)
+        ) {
+            Text(text = "Przejdź do podsumowania")
         }
     }
 }
