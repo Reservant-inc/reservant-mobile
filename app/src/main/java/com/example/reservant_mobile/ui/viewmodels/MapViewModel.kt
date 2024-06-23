@@ -95,8 +95,6 @@ class MapViewModel(): ViewModel() {
         restaurantMarker.title = title
         restaurantMarker.setInfoWindow(null)
         restaurantMarker.setOnMarkerClickListener(onClick)
-        println("DUPA")
-
         OsmMap.view.overlays.add(0,restaurantMarker)
     }
 
