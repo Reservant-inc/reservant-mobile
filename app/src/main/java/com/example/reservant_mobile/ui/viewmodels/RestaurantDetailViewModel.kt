@@ -23,13 +23,12 @@ class RestaurantDetailViewModel(
 
     init {
         viewModelScope.launch {
-            restaurantId=0
             loadRestaurant(restaurantId)
         }
     }
 
     suspend fun loadRestaurant(id: Int): Boolean{
-        if (id != restaurantId){
+        if (id != restaurantId || restaurant == null){
             restaurantId = id
 
             isLoading = true

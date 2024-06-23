@@ -107,7 +107,7 @@
     <string name="label_delivery_cost">Delivery cost</string>
     <string name="label_menu_price">Price</string>
     <string name="label_events">Events</string>
-    <string name="error_text">\"Sorry! Something went wrong:(</string>
+    <string name="error_text">\"Sorry! Something went wrong</string>
     <string name="delete_restaurant_title">Delete a restaurant</string>
     <string name="delete_restaurant_message">Are you sure you want to delete</string>
     <string name="label_limited_time">Available until</string>
@@ -119,10 +119,14 @@
     <string name="label_edit_menu_item">Edit menu item</string>
     <string name="label_price">Price</string>
     <string name="label_alcohol">Alcohol Percentage</string>
-    <string name="lable_logout_action">Log out</string>
+    <string name="label_logout_action">Log out</string>
     <string name="label_orders">Orders</string>
     <string name="label_search">Search...</string>
     <string name="label_filters">Filters</string>
     <string name="label_date">Date</string>
     <string name="label_total_cost">Total cost</string>
+    <string name="label_no_restaurants_found">No restaurants found</string>
+    <string name="label_stats">Stats</string>
+    <string name="label_employees">Employees</string>
+    <string name="label_delete">Delete</string>
 </resources>
