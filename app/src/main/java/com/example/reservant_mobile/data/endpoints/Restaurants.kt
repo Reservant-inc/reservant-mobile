@@ -11,7 +11,7 @@ class Restaurants {
         @Resource("orders")
         class Orders(val parent: Id)
         @Resource("events")
-        class Events(val parent: Id)
+        class Events(val parent: Id, val page: Int? = null, val perPage: Int? = null)
         @Resource("reviews")
         class Reviews(val parent: Id)
     }

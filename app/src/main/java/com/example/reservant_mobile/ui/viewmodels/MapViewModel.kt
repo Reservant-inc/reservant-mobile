@@ -15,6 +15,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.EventDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.services.RestaurantService
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -76,10 +77,14 @@ class MapViewModel(): ViewModel() {
         isLoading = true
         val res = restaurantService.getRestaurantsInArea(lat1, lon1, lat2, lon2)
         isLoading = false
-        if(!res.isError){
-            return res.value!!
-        }
-        return null
+        return res.value
+    }
+
+    suspend fun getEvents() : List<EventDTO>? {
+        isLoading = true
+        val res = restaurantService.getRestaurantEvents(1)
+        isLoading = false
+        return res.value
     }
 
     fun addRestaurantMarker(position: GeoPoint, icon: Bitmap?, title: String, onClick: (Marker, MapView) -> Boolean) {
