@@ -8,22 +8,28 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
+import com.example.reservant_mobile.data.services.RestaurantService
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MapViewModel(): ViewModel() {
     private object OsmMap {
         lateinit var view:MapView
     }
 
+    private val restaurantService = RestaurantService()
+    var isLoading: Boolean by mutableStateOf(false)
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
 
@@ -41,9 +47,9 @@ class MapViewModel(): ViewModel() {
             }
             setTileSource(customTiles)
             setMultiTouchControls(true)
-            val rotationGestureOverlay = RotationGestureOverlay(this)
-            rotationGestureOverlay.isEnabled
-            overlays.add(rotationGestureOverlay)
+//            val rotationGestureOverlay = RotationGestureOverlay(this)
+//            rotationGestureOverlay.isEnabled
+//            overlays.add(rotationGestureOverlay)
 
             minZoomLevel = 4.0
             maxZoomLevel = 20.0
@@ -66,6 +72,16 @@ class MapViewModel(): ViewModel() {
         OsmMap.view.overlays.add(startMarker)
     }
 
+    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): List<RestaurantDTO>?{
+        isLoading = true
+        val res = restaurantService.getRestaurantsInArea(lat1, lon1, lat2, lon2)
+        isLoading = false
+        if(!res.isError){
+            return res.value!!
+        }
+        return null
+    }
+
     fun addRestaurantMarker(position: GeoPoint, icon: Bitmap?, title: String, onClick: (Marker, MapView) -> Boolean) {
         val restaurantMarker = CustomMarker(OsmMap.view)
         restaurantMarker.position = position
@@ -79,6 +95,8 @@ class MapViewModel(): ViewModel() {
         restaurantMarker.title = title
         restaurantMarker.setInfoWindow(null)
         restaurantMarker.setOnMarkerClickListener(onClick)
+        println("DUPA")
+
         OsmMap.view.overlays.add(0,restaurantMarker)
     }
 

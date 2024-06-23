@@ -6,6 +6,7 @@ import com.example.reservant_mobile.data.endpoints.Employments
 import com.example.reservant_mobile.data.endpoints.MyRestaurantGroups
 import com.example.reservant_mobile.data.endpoints.MyRestaurants
 import com.example.reservant_mobile.data.endpoints.RestaurantTags
+import com.example.reservant_mobile.data.endpoints.Restaurants
 import com.example.reservant_mobile.data.endpoints.User
 import com.example.reservant_mobile.data.endpoints.Users
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
@@ -37,6 +38,8 @@ interface IRestaurantService{
     suspend fun deleteEmployment(id: Any): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
     suspend fun getRestaurantsByTag(tag:String): Result<List<RestaurantDTO>?>
+    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): Result<List<RestaurantDTO>?>
+
     }
 
 class RestaurantService(private var api: APIService = APIService()): IRestaurantService {
@@ -359,6 +362,35 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
 
     override suspend fun getRestaurantsByTag(tag: String): Result<List<RestaurantDTO>?> {
         val res = api.get(RestaurantTags.Tag.Restaurants(parent = RestaurantTags.Tag(tag = tag)))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    override suspend fun getRestaurantsInArea(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Result<List<RestaurantDTO>?> {
+
+        val res = api.get(Restaurants.InArea(
+            lat1 = lat1,
+            lon1 = lon1,
+            lat2 = lat2,
+            lon2 = lon2
+        ))
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
