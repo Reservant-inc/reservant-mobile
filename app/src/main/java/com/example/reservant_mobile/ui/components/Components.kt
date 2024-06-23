@@ -173,6 +173,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
+import com.example.reservant_mobile.data.models.dtos.OrderDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
@@ -2923,5 +2924,17 @@ fun MissingPage(
             modifier = Modifier.padding(16.dp),
             text = stringResource(id = errorStringId)
         )
+    }
+}
+
+@Composable
+fun OrderItem(order: OrderDTO) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)) {
+        Text(text = stringResource(id = R.string.label_date)+": ${order.date}")
+        Text(text = stringResource(id = R.string.label_total_cost)+": ${order.cost}")
+        Text(text = order.customer)
+        Text(text = order.status, fontWeight = FontWeight.Bold)
     }
 }

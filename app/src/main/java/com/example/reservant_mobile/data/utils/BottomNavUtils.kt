@@ -3,6 +3,7 @@ package com.example.reservant_mobile.data.utils
 import android.provider.Settings.Global.getString
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Settings
@@ -26,9 +27,9 @@ sealed class BottomNavItem(
 
     data object Landing :
         BottomNavItem(
-            MainRoutes.Home,
-            Icons.Filled.Accessibility,
-            R.string.label_TODO
+            MainRoutes.Orders,
+            Icons.Filled.History,
+            R.string.label_orders
         )
 
     data object Management :

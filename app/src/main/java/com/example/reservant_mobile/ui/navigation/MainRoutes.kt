@@ -8,5 +8,8 @@ data object MainRoutes{
 
     @Serializable
     object Profile
+
+    @Serializable
+    object Orders
 }
 

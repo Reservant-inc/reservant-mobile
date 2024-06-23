@@ -1,5 +1,6 @@
 package com.example.reservant_mobile.ui.activities
 
+import OrdersActivity
 import RestaurantDetailActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -66,6 +67,9 @@ fun HomeActivity() {
                         bottomBarState.value = false
                     }
                     LandingActivity()
+                }
+                composable<MainRoutes.Orders>{
+                    OrdersActivity()
                 }
             }
         }
