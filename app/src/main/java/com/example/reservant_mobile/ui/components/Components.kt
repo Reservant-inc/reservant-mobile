@@ -1575,7 +1575,6 @@ fun Modifier.shimmer(): Modifier = composed {
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuPopup(
     title: @Composable (() -> Unit),
@@ -1599,7 +1598,7 @@ fun MenuPopup(
         mutableStateOf(listOf("Food", "Alcohol"))
     }
 
-    var expanded by remember {
+    var expanded = remember {
         mutableStateOf(false)
     }
 
@@ -1626,30 +1625,13 @@ fun MenuPopup(
                     isError = isAltNameInvalid,
                     errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded}) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .menuAnchor(),
-                        label = { Text(text = stringResource(id = R.string.label_menu_type)) },
-                        value = menuType.value,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        options.forEach {
-                            DropdownMenuItem(
-                                text = { Text(text = it) },
-                                onClick = {
-                                    menuType.value = it
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
+                ComboBox(
+                    label = stringResource(id = R.string.label_menu_type),
+                    value = menuType.value,
+                    onValueChange = { menuType.value = it},
+                    expanded = expanded,
+                    options = options
+                )
                 MyDatePickerDialog(
                     label = { Text(text = stringResource(id = R.string.label_date_from)) },
                     allowFutureDates = true,
@@ -1712,6 +1694,45 @@ fun MenuPopup(
         },
 
         )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ComboBox(
+    expanded: MutableState<Boolean>,
+    value: String,
+    onValueChange: (String) -> Unit,
+    options: List<String>,
+    label: String
+){
+
+    val onDismiss = { expanded.value = false }
+
+    ExposedDropdownMenuBox(expanded = expanded.value, onExpandedChange = { expanded.value = !expanded.value }) {
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .menuAnchor(),
+            label = { Text(text = label) },
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+            shape = RoundedCornerShape(8.dp)
+        )
+        ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
+            options.forEach {
+                DropdownMenuItem(
+                    text = { Text(text = it) },
+                    onClick = {
+                        onValueChange(it)
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
