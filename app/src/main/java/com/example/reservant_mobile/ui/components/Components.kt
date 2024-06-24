@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
+import android.icu.number.Precision
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -72,6 +73,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.AddLocationAlt
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
@@ -152,6 +154,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -997,31 +1000,37 @@ fun CountryCodePickerDialog(
 fun IconWithHeader(
     icon: ImageVector,
     text: String,
-    scale: Float = 1F
+    showBackButton: Boolean = false,
+    navController: NavController = rememberNavController()
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale)
     ) {
-        Row() {
-            Icon(
-                imageVector = icon,
-                contentDescription = icon.name,
-                modifier = Modifier
-                    .size(82.dp)
-                    .padding(top = 16.dp)
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .padding(4.dp, 16.dp, 8.dp, 4.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterVertically)
-            )
+        Box(Modifier.fillMaxWidth()) {
+            if (showBackButton) ReturnButton(navController = navController)
+            Row (modifier = Modifier
+                .padding(vertical = 4.dp)
+                .align(Alignment.Center)
+            ){
+                Icon(
+                    imageVector = icon,
+                    contentDescription = icon.name,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+            }
         }
+
+        HorizontalDivider(thickness = 2.dp)
     }
 }
 
@@ -2942,4 +2951,10 @@ fun OrderItem(order: OrderDTO) {
         Text(text = order.customer)
         Text(text = order.status, fontWeight = FontWeight.Bold)
     }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    IconWithHeader(icon = Icons.Rounded.AddLocationAlt, text = "Testowy nagłówek")
 }
