@@ -2457,6 +2457,7 @@ fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
     role: String,
     name: String,
+    altName: String,
     price: String,
     imageResource: Int,
     onInfoClick: () -> Unit,
@@ -2557,12 +2558,7 @@ fun MenuItemCard(
                     }
 
                 }
-                Text(
-                    text = price,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.offset(y = (-4).dp)
-                )
+
                 IconButton(
                     onClick = onAddClick,
                     modifier = Modifier
@@ -2681,7 +2677,6 @@ fun FloatingActionMenu(
     onTakeawayClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Na miejscu") }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -2713,55 +2708,29 @@ fun FloatingActionMenu(
                         .width(360.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp)
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Column {
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Button(
-                                onClick = { selectedOption = "Na miejscu" },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (selectedOption == "Na miejscu") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                                    contentColor = if (selectedOption == "Na miejscu") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                                ),
-                                shape = RoundedCornerShape(50)
-                            ) {
-                                Text(text = "Na miejscu")
-                            }
-                            Button(
-                                onClick = { selectedOption = "Dostawa" },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (selectedOption == "Dostawa") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                                    contentColor = if (selectedOption == "Dostawa") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                                ),
-                                shape = RoundedCornerShape(50)
-                            ) {
-                                Text(text = "Dostawa")
-                            }
-                            Button(
-                                onClick = { selectedOption = "Odbiór" },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (selectedOption == "Odbiór") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-                                    contentColor = if (selectedOption == "Odbiór") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                                ),
-                                shape = RoundedCornerShape(50)
-                            ) {
-                                Text(text = "Odbiór")
-                            }
-                        }
-
-                        when (selectedOption) {
-                            "Na miejscu" -> DineInContent(onDineInClick)
-                            "Dostawa" -> DeliveryContent(onDeliveryClick)
-                            "Odbiór" -> TakeawayContent(onTakeawayClick)
-                        }
-                    }
+                    FloatingTabSwitch(
+                        pages = listOf(
+                            "Na miejscu" to {
+                                DineInContent(
+                                    onDineInClick,
+                                    modifier = Modifier.padding(top = 88.dp)
+                                ) },
+                            "Dostawa" to { // TODO: not implemented on backend
+                                DeliveryContent(
+                                    onDeliveryClick,
+                                    modifier = Modifier.padding(top = 88.dp)
+                                ) },
+                            "Odbiór" to { // TODO: not implemented on backend
+                                TakeawayContent(
+                                    onTakeawayClick,
+                                    modifier = Modifier.padding(top = 88.dp)
+                                ) }
+                        ),
+                        paneScroll = false
+                    )
                 }
             }
         }
@@ -2781,24 +2750,21 @@ fun FloatingActionMenu(
 
 
 @Composable
-fun DineInContent(onDineInClick: () -> Unit) {
+fun DineInContent(
+    onDineInClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var comment by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = modifier.fillMaxSize()
     ) {
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Moja rezerwacja",
             style = MaterialTheme.typography.headlineSmall
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Data rezerwacji",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Spacer(modifier = Modifier.height(8.dp))
         MyDatePickerDialog(
             label = { Text("Data rezerwacji") },
             onBirthdayChange = { selectedDate ->
@@ -2916,11 +2882,12 @@ fun DineInContent(onDineInClick: () -> Unit) {
 }
 
 @Composable
-fun DeliveryContent(onDeliveryClick: () -> Unit) {
+fun DeliveryContent(
+    onDeliveryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = modifier.fillMaxSize()
     ) {
         Text(text = "Dostawa", style = MaterialTheme.typography.headlineSmall)
 
@@ -2931,11 +2898,12 @@ fun DeliveryContent(onDeliveryClick: () -> Unit) {
 }
 
 @Composable
-fun TakeawayContent(onTakeawayClick: () -> Unit) {
+fun TakeawayContent(
+    onTakeawayClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = modifier.fillMaxSize()
     ) {
 
         Text(
