@@ -68,6 +68,8 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import com.example.reservant_mobile.ui.components.DeliveryContent
+import com.example.reservant_mobile.ui.components.DineInContent
 import com.example.reservant_mobile.ui.components.FloatingActionMenu
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
@@ -78,6 +80,7 @@ import com.example.reservant_mobile.ui.components.MenuTypeButton
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagItem
+import com.example.reservant_mobile.ui.components.TakeawayContent
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -313,15 +316,18 @@ fun MenuContent(
         }
 
         menuItems?.forEach { menuItem ->
+
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
                 name = menuItem.name,
+                altName = menuItem.alternateName ?: "",
                 price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
                 imageResource = R.drawable.pizza,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
+
         }
 
     }
@@ -356,7 +362,7 @@ fun EventsContent(
 
 @Composable
 fun ReviewsContent(
-    reviews: List<ReviewDTO> = sampleReviews()
+    reviews: List<ReviewDTO> = sampleReviews(),
 ) {
     Column(
         modifier = Modifier
