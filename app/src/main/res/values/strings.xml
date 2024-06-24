@@ -116,7 +116,7 @@
     <string name="label_show_more_details">Show more details</string>
     <string name="label_menu_item_management">Menu item management</string>
     <string name="label_menu_item_photo">Menu Item Photo</string>
-    <string name="label_menu_photo">Zdjęcie pozycji z menu</string>
+    <string name="label_menu_photo">Menu photo</string>
     <string name="label_edit_menu_item">Edit menu item</string>
     <string name="label_price">Price</string>
     <string name="label_alcohol">Alcohol Percentage</string>
