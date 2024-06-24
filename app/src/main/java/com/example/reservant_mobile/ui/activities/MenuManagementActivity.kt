@@ -64,7 +64,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                     item {
                         IconWithHeader(
                             icon = Icons.AutoMirrored.Rounded.MenuBook,
-                            text = stringResource(id = R.string.label_menu_management).replace(" ", "\n")
+                            text = stringResource(id = R.string.label_menu_management),
                         )
                     }
 
