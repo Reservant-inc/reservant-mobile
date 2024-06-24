@@ -70,7 +70,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: ()
             )
 
             ButtonComponent(
-                label = stringResource(id = R.string.lable_logout_action),
+                label = stringResource(id = R.string.label_logout_action),
                 onClick = {
                     loginViewModel.viewModelScope.launch{
                         loginViewModel.logout()

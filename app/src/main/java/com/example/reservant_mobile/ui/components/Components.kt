@@ -1575,6 +1575,7 @@ fun Modifier.shimmer(): Modifier = composed {
         }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuPopup(
     title: @Composable (() -> Unit),
@@ -1593,6 +1594,15 @@ fun MenuPopup(
     dateUntil: FormField,
     isSaving: Boolean = false
 ) {
+
+    val options by remember {
+        mutableStateOf(listOf("Food", "Alcohol"))
+    }
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     AlertDialog(
         onDismissRequest = {
             hide()
@@ -1616,13 +1626,30 @@ fun MenuPopup(
                     isError = isAltNameInvalid,
                     errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_menu_type),
-                    inputText = menuType.value,
-                    onValueChange = { menuType.value = it },
-                    isError = menuType.value.isBlank(),
-                    errorText = stringResource(id = R.string.error_invalid_menu_type)
-                )
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded}) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .menuAnchor(),
+                        label = { Text(text = stringResource(id = R.string.label_menu_type)) },
+                        value = menuType.value,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        options.forEach {
+                            DropdownMenuItem(
+                                text = { Text(text = it) },
+                                onClick = {
+                                    menuType.value = it
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 MyDatePickerDialog(
                     label = { Text(text = stringResource(id = R.string.label_date_from)) },
                     allowFutureDates = true,
