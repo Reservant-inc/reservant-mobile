@@ -126,4 +126,5 @@
     <string name="label_delete">Usuń</string>
     <string name="lable_logout_action">Wyloguj się</string>
     <string name="label_restaurants">Restauracje</string>
+    <string name="label_restaurant_no_events">Restauracja nie ma wydarzeń</string>
 </resources>

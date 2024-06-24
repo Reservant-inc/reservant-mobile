@@ -131,4 +131,5 @@
     <string name="label_delete">Delete</string>
     <string name="lable_logout_action">Log out</string>
     <string name="label_restaurants">Restaurants</string>
+    <string name="label_restaurant_no_events">Restaurant has no events</string>
 </resources>
