@@ -138,10 +138,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -1006,10 +1008,17 @@ fun IconWithHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = 8.dp)
     ) {
         Box(Modifier.fillMaxWidth()) {
-            if (showBackButton) ReturnButton(navController = navController)
-            Row (modifier = Modifier
+            if (showBackButton){
+                ReturnButton(
+                    navController = navController,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
+            Row (
+                modifier = Modifier
                 .padding(vertical = 4.dp)
                 .align(Alignment.Center)
             ){
@@ -1052,10 +1061,12 @@ fun ReturnButton(
 ){
     Button(
         onClick = { navController.popBackStack() },
+        contentPadding = PaddingValues(2.dp),
         colors = ButtonColors(
             Color.Transparent, Color.Black,
             Color.Transparent, Color.Black
         ),
+        shape = RectangleShape,
         modifier = modifier
     ) {
         Icon(
