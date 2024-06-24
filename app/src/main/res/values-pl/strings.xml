@@ -124,4 +124,6 @@
     <string name="label_stats">Statystyki</string>
     <string name="label_employees">Pracownicy</string>
     <string name="label_delete">Usuń</string>
+    <string name="lable_logout_action">Wyloguj się</string>
+    <string name="label_restaurants">Restauracje</string>
 </resources>
