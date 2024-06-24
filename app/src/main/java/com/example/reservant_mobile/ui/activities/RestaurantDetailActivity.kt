@@ -316,18 +316,16 @@ fun MenuContent(
         }
 
         menuItems?.forEach { menuItem ->
-
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
                 name = menuItem.name,
                 altName = menuItem.alternateName ?: "",
                 price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
-                imageResource = R.drawable.pizza,
+                photo = R.drawable.pizza,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
-
         }
 
     }
