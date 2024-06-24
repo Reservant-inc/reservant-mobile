@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.data.models.dtos.EventDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.fields.Result
 import com.example.reservant_mobile.data.services.IRestaurantService
@@ -17,9 +18,12 @@ class RestaurantDetailViewModel(
 ) : ViewModel() {
 
     var result: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value=null))
+    var events: List<EventDTO>? by mutableStateOf(null)
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
+    var eventsLoading: Boolean by mutableStateOf(true)
+
 
     init {
         viewModelScope.launch {
@@ -39,6 +43,15 @@ class RestaurantDetailViewModel(
         }
         restaurant = result.value
         return true
+    }
+
+    suspend fun loadEvents(){
+        if(events != null)
+            return
+
+        eventsLoading = true
+        events = restaurantService.getRestaurantEvents(restaurantId).value
+        eventsLoading = false
     }
 
     public fun getToastError(): Int{
