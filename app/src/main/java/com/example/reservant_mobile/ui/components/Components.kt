@@ -1589,6 +1589,7 @@ fun MenuPopup(
     altName: FormField,
     isAltNameInvalid: Boolean = false,
     menuType: FormField,
+    isMenuTypeInvalid: Boolean = false,
     dateFrom: FormField,
     dateUntil: FormField,
     isSaving: Boolean = false
@@ -1630,7 +1631,9 @@ fun MenuPopup(
                     value = menuType.value,
                     onValueChange = { menuType.value = it},
                     expanded = expanded,
-                    options = options
+                    options = options,
+                    isError = isMenuTypeInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_type)
                 )
                 MyDatePickerDialog(
                     label = { Text(text = stringResource(id = R.string.label_date_from)) },
@@ -1704,23 +1707,31 @@ fun ComboBox(
     value: String,
     onValueChange: (String) -> Unit,
     options: List<String>,
-    label: String
+    label: String,
+    isError: Boolean,
+    errorText: String
 ){
 
     val onDismiss = { expanded.value = false }
 
     ExposedDropdownMenuBox(expanded = expanded.value, onExpandedChange = { expanded.value = !expanded.value }) {
-        OutlinedTextField(
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .menuAnchor(),
-            label = { Text(text = label) },
-            value = value,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
-            shape = RoundedCornerShape(8.dp)
-        )
+        Column {
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .menuAnchor(),
+                label = { Text(text = label) },
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                shape = RoundedCornerShape(8.dp),
+                isError = isError
+            )
+
+            if (isError) Text(text = errorText, color = MaterialTheme.colorScheme.error)
+        }
+
         ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
             options.forEach {
                 DropdownMenuItem(
@@ -1756,7 +1767,8 @@ fun MenuCard(
     fileTooLarge: Int = -1,
     fileErrors: Int = -1,
     isNameInvalid: Boolean = false,
-    isAltNameInvalid: Boolean = false
+    isAltNameInvalid: Boolean = false,
+    isMenuTypeInvalid: Boolean = false
 ) {
 
     when {
@@ -1797,7 +1809,8 @@ fun MenuCard(
                 fileTooLarge = fileTooLarge,
                 fileErrors = fileErrors,
                 isNameInvalid = isNameInvalid,
-                isAltNameInvalid = isAltNameInvalid
+                isAltNameInvalid = isAltNameInvalid,
+                isMenuTypeInvalid = isMenuTypeInvalid
             )
         }
     }
@@ -1931,6 +1944,7 @@ fun AddMenuButton(
     fileErrors: Int = -1,
     isNameInvalid: Boolean = false,
     isAltNameInvalid: Boolean = false,
+    isMenuTypeInvalid: Boolean = false,
     showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     when {
@@ -1950,7 +1964,8 @@ fun AddMenuButton(
                 dateUntil = dateUntil,
                 isSaving = isSaving,
                 isNameInvalid = isNameInvalid,
-                isAltNameInvalid = isAltNameInvalid
+                isAltNameInvalid = isAltNameInvalid,
+                isMenuTypeInvalid = isMenuTypeInvalid
             )
         }
     }
