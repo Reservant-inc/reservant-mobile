@@ -121,7 +121,7 @@ fun MapActivity(){
             }
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
-                "Restaurant" to {
+                stringResource(id = R.string.label_restaurants) to {
                     if(mapViewModel.isLoading){
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -150,15 +150,17 @@ fun MapActivity(){
                         }
                     }
                     else{
-                        MissingPage(
-                            errorStringId = R.string.error_not_found,
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(100.dp)
-                        )
+                                .height(500.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            MissingPage(errorStringId = R.string.error_not_found)
+                        }
                     }
                 },
-                "Events" to {
+                stringResource(id = R.string.label_events) to {
                     if(mapViewModel.isLoading){
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -201,7 +203,7 @@ fun MapActivity(){
 
             BottomSheetScaffold(
                 scaffoldState = rememberBottomSheetScaffoldState(),
-                sheetPeekHeight = 100.dp,
+                sheetPeekHeight = 90.dp,
                 sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 sheetContent = {
                     Box(
