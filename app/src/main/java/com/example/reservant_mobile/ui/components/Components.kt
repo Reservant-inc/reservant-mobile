@@ -1,8 +1,6 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.icu.number.Scale
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,7 +21,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -57,7 +54,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -71,16 +67,13 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
@@ -94,7 +87,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -130,7 +122,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -148,7 +139,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -159,7 +149,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -177,7 +166,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -196,7 +184,6 @@ import com.example.reservant_mobile.data.utils.getFlagEmojiFor
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
-import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -2459,7 +2446,7 @@ fun MenuItemCard(
     name: String,
     altName: String,
     price: String,
-    imageResource: Int,
+    photo: Int,
     onInfoClick: () -> Unit,
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
@@ -2572,7 +2559,7 @@ fun MenuItemCard(
                     )
                 }
                 Image(
-                    painter = painterResource(imageResource),
+                    painter = painterResource(photo),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
                     modifier = Modifier
