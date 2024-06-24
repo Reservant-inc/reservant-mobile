@@ -17,5 +17,6 @@ data class EventDTO (
     /***
      * Interested user contains only userId, firstname, lastname
      */
-    val interested: List<UserDTO>? = null
+    val interested: List<UserDTO>? = null,
+    val numberInterested: Int? = null
 )

@@ -10,6 +10,7 @@ import com.example.reservant_mobile.data.endpoints.Restaurants
 import com.example.reservant_mobile.data.endpoints.User
 import com.example.reservant_mobile.data.endpoints.Users
 import com.example.reservant_mobile.data.models.dtos.EventDTO
+import com.example.reservant_mobile.data.models.dtos.PageDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
@@ -421,7 +422,8 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
 
         if (res.value!!.status == HttpStatusCode.OK){
             return try {
-                Result(isError = false, value = res.value.body())
+                val p:PageDTO<EventDTO>? = res.value.body()
+                Result(isError = false, value = p?.items)
             }
             catch (e: Exception){
                 Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
