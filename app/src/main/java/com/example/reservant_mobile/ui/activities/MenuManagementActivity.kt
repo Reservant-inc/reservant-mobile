@@ -88,6 +88,7 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     onClick = { },
                                     clearFields = { },
                                     onFilePicked = { },
+                                    menuTypes = emptyList()
                                 )
                             }
                         }
@@ -147,7 +148,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 showEditPopup = showEditPopup,
                                 isNameInvalid = viewmodel.isNameInvalid(),
                                 isAltNameInvalid = viewmodel.isAltNameInvalid(),
-                                isMenuTypeInvalid = viewmodel.isMenuTypeInvalid()
+                                isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                                menuTypes = viewmodel.menuTypes
                             )
 
                             if (viewmodel.result.isError){
@@ -194,7 +196,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                         showAddDialog = showAddDialog,
                         isNameInvalid = viewmodel.isNameInvalid(),
                         isAltNameInvalid = viewmodel.isAltNameInvalid(),
-                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid()
+                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                        menuTypes = viewmodel.menuTypes
                     )
 
                     if (viewmodel.result.isError){

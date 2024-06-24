@@ -28,6 +28,8 @@ class MenuManagementViewModel(
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
 
+    val menuTypes = listOf("Food", "Alcohol")
+
     var isFetching by mutableStateOf(true)
     var isSaving by mutableStateOf(false)
 

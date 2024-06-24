@@ -1589,15 +1589,12 @@ fun MenuPopup(
     altName: FormField,
     isAltNameInvalid: Boolean = false,
     menuType: FormField,
+    menuTypes: List<String>,
     isMenuTypeInvalid: Boolean = false,
     dateFrom: FormField,
     dateUntil: FormField,
     isSaving: Boolean = false
 ) {
-
-    val options by remember {
-        mutableStateOf(listOf("Food", "Alcohol"))
-    }
 
     var expanded = remember {
         mutableStateOf(false)
@@ -1631,7 +1628,7 @@ fun MenuPopup(
                     value = menuType.value,
                     onValueChange = { menuType.value = it},
                     expanded = expanded,
-                    options = options,
+                    options = menuTypes,
                     isError = isMenuTypeInvalid,
                     errorText = stringResource(id = R.string.error_invalid_menu_type)
                 )
@@ -1753,6 +1750,7 @@ fun MenuCard(
     name: FormField,
     altName: FormField,
     menuType: FormField,
+    menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
     photo: ImageBitmap? = null,
@@ -1803,6 +1801,7 @@ fun MenuCard(
                 name = name,
                 altName = altName,
                 menuType = menuType,
+                menuTypes = menuTypes,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
                 isSaving = isSaving,
@@ -1934,6 +1933,7 @@ fun AddMenuButton(
     name: FormField,
     altName: FormField,
     menuType: FormField,
+    menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
     onFilePicked: (Uri?) -> Unit,
@@ -1960,6 +1960,7 @@ fun AddMenuButton(
                 name = name,
                 altName = altName,
                 menuType = menuType,
+                menuTypes = menuTypes,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
                 isSaving = isSaving,
