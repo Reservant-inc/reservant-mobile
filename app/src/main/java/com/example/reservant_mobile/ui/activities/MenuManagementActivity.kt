@@ -146,7 +146,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                                 showConfirmDeletePopup = showConfirmDeletePopup,
                                 showEditPopup = showEditPopup,
                                 isNameInvalid = viewmodel.isNameInvalid(),
-                                isAltNameInvalid = viewmodel.isAltNameInvalid()
+                                isAltNameInvalid = viewmodel.isAltNameInvalid(),
+                                isMenuTypeInvalid = viewmodel.isMenuTypeInvalid()
                             )
 
                             if (viewmodel.result.isError){
@@ -192,7 +193,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                         isSaving = viewmodel.isSaving,
                         showAddDialog = showAddDialog,
                         isNameInvalid = viewmodel.isNameInvalid(),
-                        isAltNameInvalid = viewmodel.isAltNameInvalid()
+                        isAltNameInvalid = viewmodel.isAltNameInvalid(),
+                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid()
                     )
 
                     if (viewmodel.result.isError){

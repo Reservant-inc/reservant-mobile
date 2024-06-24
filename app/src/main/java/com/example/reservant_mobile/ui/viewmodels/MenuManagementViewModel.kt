@@ -147,6 +147,10 @@ class MenuManagementViewModel(
         return isInvalidWithRegex(Regex.NAME_REG, alternateName.value)
     }
 
+    fun isMenuTypeInvalid(): Boolean {
+        return menuType.value.isBlank()
+    }
+
     fun photoErrors(context: Context): Int {
         if (photo.value.isBlank()) return R.string.error_file_not_given
 
@@ -168,4 +172,6 @@ class MenuManagementViewModel(
     fun <T> getToastError(result: Result<T>): Int {
         return FormField("TOAST").getError(result)
     }
+
+
 }
