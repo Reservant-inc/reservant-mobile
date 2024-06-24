@@ -52,9 +52,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.EventDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.OsmMapView
@@ -79,6 +81,8 @@ fun MapActivity(){
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
             var restaurants:List<RestaurantDTO>? by remember { mutableStateOf(null) }
+            var events:List<EventDTO>? by remember { mutableStateOf(null) }
+
 
             // Init map
             val context = LocalContext.current
@@ -97,11 +101,12 @@ fun MapActivity(){
                     17.8770032,
                     60.192059,
                     24.945831)
+                events = mapViewModel.getEvents()
 
 
                 if (restaurants != null) {
                     for(restaurant in restaurants!!){
-                        val img: Bitmap? = FileService().getImage("test-jd.png").value
+                        val img: Bitmap? = FileService().getImage(restaurant.logo!!).value
                         mapViewModel.addRestaurantMarker(
                             position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude),
                             icon = img,
@@ -115,11 +120,8 @@ fun MapActivity(){
                 }
             }
 
-            BottomSheetScaffold(
-                scaffoldState = rememberBottomSheetScaffoldState(),
-                sheetPeekHeight = 100.dp,
-                sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                sheetContent = {
+            val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
+                "Restaurant" to {
                     if(mapViewModel.isLoading){
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -132,33 +134,94 @@ fun MapActivity(){
                         LazyColumn(
                             Modifier
                                 .fillMaxWidth()
-                                .height(475.dp)
+                                .padding(top = 75.dp)
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                                items(restaurants!!) { item ->
-                                    RestaurantCard(
-                                        onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                        imageUrl = "",
-                                        name = item.name,
-                                        location = item.address,
-                                        city = item.city
-                                    )
-                                }
+                            items(restaurants!!) { item ->
+                                RestaurantCard(
+                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                    imageUrl = "",
+                                    name = item.name,
+                                    location = item.address,
+                                    city = item.city
+                                )
+                            }
                         }
                     }
                     else{
-                        MissingPage(errorStringId = R.string.error_not_found)
+                        MissingPage(
+                            errorStringId = R.string.error_not_found,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp)
+                        )
                     }
+                },
+                "Events" to {
+                    if(mapViewModel.isLoading){
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    else if(events!= null) {
+                        LazyColumn(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 75.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(events!!) { item ->
+                                RestaurantCard(
+                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                    imageUrl = "",
+                                    name = item.restaurantName!!,
+                                    location = item.description,
+                                    city = item.mustJoinUntil
+                                )
+                            }
+                        }
+                    }
+                    else{
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(500.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            MissingPage(errorStringId = R.string.error_not_found)
+                        }
+                    }
+                }
+            )
 
+            BottomSheetScaffold(
+                scaffoldState = rememberBottomSheetScaffoldState(),
+                sheetPeekHeight = 100.dp,
+                sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                sheetContent = {
+                    Box(
+                        modifier = Modifier
+                            .height(550.dp)
+                            .fillMaxWidth()
+                    ){
 
+                        FloatingTabSwitch(
+                            pages = pages,
+                            color = MaterialTheme.colorScheme.surface)
+                    }
                 },
                 content = { innerPadding -> OsmMapView(mv, startPoint,
                     Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
                 )
-                }
+                },
+                contentColor = MaterialTheme.colorScheme.surface
             )
         }
         composable<RestaurantRoutes.Details> {

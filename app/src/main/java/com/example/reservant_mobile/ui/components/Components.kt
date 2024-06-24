@@ -2705,7 +2705,8 @@ fun FloatingActionMenu(
 
 @Composable
 fun FloatingTabSwitch(
-    pages: List<Pair<String, @Composable () -> Unit>>
+    pages: List<Pair<String, @Composable () -> Unit>>,
+    color: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
     val pagerState = rememberPagerState(
         pageCount = { pages.size }
@@ -2729,7 +2730,7 @@ fun FloatingTabSwitch(
         }
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = color,
             modifier = Modifier
                 .padding(20.dp)
                 .clip(cornerShape),
