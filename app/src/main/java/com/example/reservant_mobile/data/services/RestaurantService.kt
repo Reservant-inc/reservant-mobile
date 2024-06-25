@@ -19,7 +19,7 @@ import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 
 interface IRestaurantService{
-    suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<Boolean>
+    suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
     suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean>
     suspend fun getRestaurants():Result<List<RestaurantDTO>?>
     suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>
@@ -47,15 +47,20 @@ interface IRestaurantService{
 
 class RestaurantService(private var api: APIService = APIService()): IRestaurantService {
 
-    override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<Boolean> {
+    override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?> {
         val res = api.post(MyRestaurants(), restaurant)
         if(res.isError)
-            return Result(isError = true, errors = res.errors, value = false)
+            return Result(isError = true, errors = res.errors, value = null)
 
         if (res.value!!.status == HttpStatusCode.OK)
-            return Result(isError = false, value = true)
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
 
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
 
     }
 
