@@ -1851,16 +1851,21 @@ fun MenuCard(
             if (photo != null){
                 Image(
                     bitmap = photo,
-                    contentDescription = "",
+                    contentDescription = "${menu.name}_photo",
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
                 Image(
-                    painterResource(id = R.drawable.pizza),
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxWidth()
+                    painterResource(id = R.drawable.unknown_image),
+                    contentDescription = "placeholder_photo",
+                    modifier = Modifier
+                        .size(140.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
                 )
             }
+
+
 
             Box(
                 modifier = Modifier.fillMaxWidth()
