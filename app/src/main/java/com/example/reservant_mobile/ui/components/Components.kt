@@ -3012,7 +3012,7 @@ fun MissingPage(
         )
         Text(
             modifier = Modifier.padding(16.dp),
-            text = stringResource(id = errorStringId)
+            text = if (errorStringId != -1) stringResource(id = errorStringId) else ""
         )
     }
 }
