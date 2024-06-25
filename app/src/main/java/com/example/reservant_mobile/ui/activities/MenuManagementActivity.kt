@@ -8,10 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +33,7 @@ import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.ui.components.AddMenuButton
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.MenuCard
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import com.example.reservant_mobile.ui.viewmodels.MenuManagementViewModel
@@ -87,7 +86,9 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     onEditClick = { },
                                     onDeleteClick = { },
                                     onClick = { },
-                                    clearFields = { }
+                                    clearFields = { },
+                                    onFilePicked = { },
+                                    menuTypes = emptyList()
                                 )
                             }
                         }
@@ -137,9 +138,18 @@ fun MenuManagementActivity(restaurantId: Int) {
                                     }
 
                                 },
+                                onFilePicked = { file ->
+                                    viewmodel.photo.value = file?.toString() ?: ""
+                                },
+                                fileErrors = viewmodel.photoErrors(LocalContext.current),
+                                fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                                 isSaving = viewmodel.isSaving,
                                 showConfirmDeletePopup = showConfirmDeletePopup,
-                                showEditPopup = showEditPopup
+                                showEditPopup = showEditPopup,
+                                isNameInvalid = viewmodel.isNameInvalid(),
+                                isAltNameInvalid = viewmodel.isAltNameInvalid(),
+                                isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                                menuTypes = viewmodel.menuTypes
                             )
 
                             if (viewmodel.result.isError){
@@ -149,12 +159,7 @@ fun MenuManagementActivity(restaurantId: Int) {
 
                         }
                         else -> item {
-                            //TODO: pagemissing
-                            Text(text = "There will be something here soon :)")
-                            if (viewmodel.fetchResult.isError){
-                                ShowErrorToast(context = LocalContext.current, id = viewmodel.getToastError(viewmodel.fetchResult))
-                                viewmodel.fetchResult.isError = false
-                            }
+                            MissingPage(errorStringId = viewmodel.getToastError(viewmodel.fetchResult))
                         }
                     }
 
@@ -182,8 +187,17 @@ fun MenuManagementActivity(restaurantId: Int) {
 
                             }
                         },
+                        onFilePicked = { file ->
+                            viewmodel.photo.value = file?.toString() ?: ""
+                        },
+                        fileErrors = viewmodel.photoErrors(LocalContext.current),
+                        fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                         isSaving = viewmodel.isSaving,
-                        showAddDialog = showAddDialog
+                        showAddDialog = showAddDialog,
+                        isNameInvalid = viewmodel.isNameInvalid(),
+                        isAltNameInvalid = viewmodel.isAltNameInvalid(),
+                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                        menuTypes = viewmodel.menuTypes
                     )
 
                     if (viewmodel.result.isError){

@@ -20,6 +20,8 @@ import com.example.reservant_mobile.data.services.IRestaurantService
 import com.example.reservant_mobile.data.services.RestaurantService
 import com.example.reservant_mobile.data.utils.getFileFromUri
 import com.example.reservant_mobile.data.utils.getFileName
+import com.example.reservant_mobile.data.utils.isFileNameInvalid
+import com.example.reservant_mobile.data.utils.isFileSizeInvalid
 import java.util.UUID
 
 class RestaurantViewModel(
@@ -417,45 +419,7 @@ class RestaurantViewModel(
                 )) || isFileSizeInvalid(context, value)
     }
 
-    fun isFileNameInvalid(uri: String?): Boolean {
-        if (uri.isNullOrEmpty()) return true
-        val fileName = uri.substringAfterLast('/')
-        return !fileName.contains(".") || fileName.substringAfterLast(".").isEmpty()
-    }
 
-    fun isUuid(name: String): Boolean {
-        return try {
-            UUID.fromString(name)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
-
-    fun getFileNameWithoutExtension(name: String): String {
-        val lastDotIndex = name.lastIndexOf('.')
-        return if (lastDotIndex != -1) {
-            name.substring(0, lastDotIndex)
-        } else {
-            name
-        }
-    }
-
-    fun isFileSizeInvalid(context: Context, uri: String?): Boolean {
-        if (uri == null) {
-            return false
-        }
-
-        val fileNameWithoutExtension = getFileNameWithoutExtension(uri)
-
-        if (isUuid(fileNameWithoutExtension)) {
-            return false
-        }
-
-        val byteArray = getFileFromUri(context, uri.toUri())
-
-        return (byteArray?.size ?: 0) > 1024000
-    }
 
 
     fun areTagsInvalid(): Boolean {
