@@ -41,6 +41,7 @@ import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.components.ComboBox
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
@@ -112,12 +113,12 @@ fun RegisterRestaurantActivity(
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_new_restaurant),
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_edit_restaurant),
                     )
                 }
 
@@ -513,14 +514,17 @@ fun RegisterRestaurantActivity(
                                     Box(
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        OutLinedDropdownMenu(
-                                            selectedOption = selectedGroup?.name ?: "",
-                                            itemsList = newGroups.map { it.name },
-                                            onOptionSelected = { name ->
+                                        val expandedState = remember { mutableStateOf(false) }
+
+                                        ComboBox(
+                                            expanded = expandedState,
+                                            value = selectedGroup?.name ?: "",
+                                            onValueChange = { name ->
                                                 restaurantViewModel.viewModelScope.launch {
                                                     restaurantViewModel.selectedGroup = newGroups.find { it.name == name }
                                                 }
                                             },
+                                            options = newGroups.map { it.name },
                                             label = stringResource(R.string.label_add_to_group),
                                             isError = restaurantViewModel.isGroupInvalid(),
                                             errorText = stringResource(
@@ -528,10 +532,9 @@ fun RegisterRestaurantActivity(
                                                     restaurantViewModel.getGroupError()
                                                 else
                                                     R.string.error_registerRestaurant_invalid_group
-                                            ),
-                                            formSent = formSent3,
-                                            modifier = Modifier.fillMaxWidth(0.9f)
+                                            )
                                         )
+
                                     }
 
                                     ButtonComponent(
