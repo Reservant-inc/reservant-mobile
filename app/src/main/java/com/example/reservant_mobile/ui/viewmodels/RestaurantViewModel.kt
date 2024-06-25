@@ -98,17 +98,19 @@ class RestaurantViewModel(
 
         restaurantId = response.value?.restaurantId
 
+        if (response.value == null){
+            return false
+        }
+
         if(newGroup.value.isNotBlank()){
-            if(restaurantId != null) {
                 val new = RestaurantGroupDTO(
                     name = newGroup.value,
                     restaurantIds = listOf(restaurantId!!)
                 )
                 result = restaurantService.addGroup(new)
-            }
         }
 
-        return response.value != null
+        return true
     }
 
     suspend fun editRestaurant(context: Context): Boolean {
@@ -118,17 +120,21 @@ class RestaurantViewModel(
 
         val restaurant = getRestaurantData()
 
+        val response = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
+
+        if (response.value == null){
+            return false
+        }
+
         if(newGroup.value.isNotBlank()){
-            if(restaurantId != null) {
                 val new = RestaurantGroupDTO(
                     name = newGroup.value,
                     restaurantIds = listOf(restaurantId!!)
                 )
                 result = restaurantService.addGroup(new)
-            }
         }
 
-        return !restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
+        return result.value
     }
 
     suspend fun validateFirstStep(): Boolean {
