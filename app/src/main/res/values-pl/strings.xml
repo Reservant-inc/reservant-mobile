@@ -133,4 +133,6 @@
     <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
     <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
     <string name="label_new_group">Dodaj nową grupę</string>
+    <string name="error_registerRestaurant_invalid_file_pdf">Niepoprawny plik - maksymalny rozmiar %1$dKB, typ pliku: pdf</string>
+    <string name="error_registerRestaurant_invalid_file_photo">Niepoprawny plik - maksymalny rozmiar %1$dKB, typ pliku: png, jpg</string>
 </resources>
