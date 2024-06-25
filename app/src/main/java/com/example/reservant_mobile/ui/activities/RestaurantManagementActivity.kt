@@ -121,7 +121,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
+                    .padding(vertical = 16.dp, horizontal = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -133,7 +133,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_management_manage),
-                        scale = 0.9F
+                        navController = navController,
+                        showBackButton = true
                     )
 
                     if (groups != null) {

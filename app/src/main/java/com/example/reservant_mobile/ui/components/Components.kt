@@ -1,6 +1,7 @@
 package com.example.reservant_mobile.ui.components
 
 import android.content.Context
+import android.icu.number.Precision
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -72,6 +73,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.AddLocationAlt
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -134,10 +136,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -150,10 +154,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastCbrt
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
@@ -994,31 +1000,44 @@ fun CountryCodePickerDialog(
 fun IconWithHeader(
     icon: ImageVector,
     text: String,
-    scale: Float = 1F
+    showBackButton: Boolean = false,
+    navController: NavController = rememberNavController()
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale)
+            .padding(bottom = 8.dp)
     ) {
-        Row() {
-            Icon(
-                imageVector = icon,
-                contentDescription = icon.name,
+        Box(Modifier.fillMaxWidth()) {
+            if (showBackButton){
+                ReturnButton(
+                    navController = navController,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
+            Row (
                 modifier = Modifier
-                    .size(82.dp)
-                    .padding(top = 16.dp)
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .padding(4.dp, 16.dp, 8.dp, 4.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterVertically)
-            )
+                .padding(vertical = 4.dp)
+                .align(Alignment.Center)
+            ){
+                Icon(
+                    imageVector = icon,
+                    contentDescription = icon.name,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+            }
         }
+
+        HorizontalDivider(thickness = 2.dp)
     }
 }
 
@@ -1040,10 +1059,12 @@ fun ReturnButton(
 ){
     Button(
         onClick = { navController.popBackStack() },
+        contentPadding = PaddingValues(2.dp),
         colors = ButtonColors(
             Color.Transparent, Color.Black,
             Color.Transparent, Color.Black
         ),
+        shape = RectangleShape,
         modifier = modifier
     ) {
         Icon(
@@ -1577,13 +1598,25 @@ fun MenuPopup(
     hide: () -> Unit,
     onConfirm: () -> Unit,
     clear: () -> Unit,
+    onFilePicked: (Uri?) -> Unit,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
     name: FormField,
+    isNameInvalid: Boolean = false,
     altName: FormField,
+    isAltNameInvalid: Boolean = false,
     menuType: FormField,
+    menuTypes: List<String>,
+    isMenuTypeInvalid: Boolean = false,
     dateFrom: FormField,
     dateUntil: FormField,
     isSaving: Boolean = false
 ) {
+
+    var expanded = remember {
+        mutableStateOf(false)
+    }
+
     AlertDialog(
         onDismissRequest = {
             hide()
@@ -1595,18 +1628,26 @@ fun MenuPopup(
                 InputUserInfo(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
-                    onValueChange = { name.value = it }
+                    onValueChange = { name.value = it },
+                    isError = isNameInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
                 InputUserInfo(
                     label = stringResource(id = R.string.label_alternate_name),
                     optional = true,
                     inputText = altName.value,
-                    onValueChange = { altName.value = it }
+                    onValueChange = { altName.value = it },
+                    isError = isAltNameInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
-                InputUserInfo(
+                ComboBox(
                     label = stringResource(id = R.string.label_menu_type),
-                    inputText = menuType.value,
-                    onValueChange = { menuType.value = it }
+                    value = menuType.value,
+                    onValueChange = { menuType.value = it},
+                    expanded = expanded,
+                    options = menuTypes,
+                    isError = isMenuTypeInvalid,
+                    errorText = stringResource(id = R.string.error_invalid_menu_type)
                 )
                 MyDatePickerDialog(
                     label = { Text(text = stringResource(id = R.string.label_date_from)) },
@@ -1638,6 +1679,15 @@ fun MenuPopup(
                     },
                     onBirthdayChange = { dateUntil.value = it }
                 )
+                InputUserFile(
+                    label = stringResource(id = R.string.label_menu_photo),
+                    onFilePicked = onFilePicked,
+                    context = LocalContext.current,
+                    isError = fileErrors != -1 || fileTooLarge != -1,
+                    errorText = if (fileTooLarge != -1) stringResource(id = fileTooLarge, 1024)
+                    else if (fileErrors != -1) stringResource(id = fileErrors)
+                    else ""
+                )
 
             }
         },
@@ -1663,6 +1713,53 @@ fun MenuPopup(
         )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ComboBox(
+    expanded: MutableState<Boolean>,
+    value: String,
+    onValueChange: (String) -> Unit,
+    options: List<String>,
+    label: String,
+    isError: Boolean,
+    errorText: String
+){
+
+    val onDismiss = { expanded.value = false }
+
+    ExposedDropdownMenuBox(expanded = expanded.value, onExpandedChange = { expanded.value = !expanded.value }) {
+        Column {
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .menuAnchor(),
+                label = { Text(text = label) },
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                shape = RoundedCornerShape(8.dp),
+                isError = isError
+            )
+
+            if (isError) Text(text = errorText, color = MaterialTheme.colorScheme.error)
+        }
+
+        ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
+            options.forEach {
+                DropdownMenuItem(
+                    text = { Text(text = it) },
+                    onClick = {
+                        onValueChange(it)
+                        onDismiss()
+                    }
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun MenuCard(
     showConfirmDeletePopup: MutableState<Boolean> = mutableStateOf(false),
@@ -1670,16 +1767,23 @@ fun MenuCard(
     name: FormField,
     altName: FormField,
     menuType: FormField,
+    menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
     photo: ImageBitmap? = null,
     menu: RestaurantMenuDTO,
+    onFilePicked: (Uri?) -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     clearFields: () -> Unit,
     onClick: () -> Unit,
     isFetching: Boolean = false,
     isSaving: Boolean = false,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
+    isNameInvalid: Boolean = false,
+    isAltNameInvalid: Boolean = false,
+    isMenuTypeInvalid: Boolean = false
 ) {
 
     when {
@@ -1710,12 +1814,19 @@ fun MenuCard(
                 hide = {showEditPopup.value = false},
                 onConfirm = onEditClick,
                 clear = clearFields,
+                onFilePicked = onFilePicked,
                 name = name,
                 altName = altName,
                 menuType = menuType,
+                menuTypes = menuTypes,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
-                isSaving = isSaving
+                isSaving = isSaving,
+                fileTooLarge = fileTooLarge,
+                fileErrors = fileErrors,
+                isNameInvalid = isNameInvalid,
+                isAltNameInvalid = isAltNameInvalid,
+                isMenuTypeInvalid = isMenuTypeInvalid
             )
         }
     }
@@ -1839,11 +1950,18 @@ fun AddMenuButton(
     name: FormField,
     altName: FormField,
     menuType: FormField,
+    menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
+    onFilePicked: (Uri?) -> Unit,
     clearFields: () -> Unit,
     addMenu: () -> Unit,
     isSaving: Boolean = false,
+    fileTooLarge: Int = -1,
+    fileErrors: Int = -1,
+    isNameInvalid: Boolean = false,
+    isAltNameInvalid: Boolean = false,
+    isMenuTypeInvalid: Boolean = false,
     showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     when {
@@ -1853,12 +1971,19 @@ fun AddMenuButton(
                 hide = { showAddDialog.value = false },
                 onConfirm = addMenu,
                 clear = clearFields,
+                onFilePicked = onFilePicked,
+                fileTooLarge = fileTooLarge,
+                fileErrors = fileErrors,
                 name = name,
                 altName = altName,
                 menuType = menuType,
+                menuTypes = menuTypes,
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
-                isSaving = isSaving
+                isSaving = isSaving,
+                isNameInvalid = isNameInvalid,
+                isAltNameInvalid = isAltNameInvalid,
+                isMenuTypeInvalid = isMenuTypeInvalid
             )
         }
     }
@@ -2897,4 +3022,10 @@ fun OrderItem(order: OrderDTO) {
         Text(text = order.customer)
         Text(text = order.status, fontWeight = FontWeight.Bold)
     }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    IconWithHeader(icon = Icons.Rounded.AddLocationAlt, text = "Testowy nagłówek")
 }

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import com.example.reservant_mobile.ui.components.AddEmployeeDialog
@@ -70,7 +71,6 @@ fun EmployeeManagementActivity(restaurantId: Int) {
             IconWithHeader(
                 icon = Icons.Rounded.People,
                 text = stringResource(R.string.label_management_manage_employees),
-                scale = 0.9F
             )
 
             LazyColumn(

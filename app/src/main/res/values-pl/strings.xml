@@ -111,6 +111,7 @@
     <string name="label_show_more_details">Pokaż więcej szczegółów</string>
     <string name="label_menu_item_management">Zarzadzanie pozycją menu</string>
     <string name="label_menu_item_photo">Zdjęcie pozycji w menu</string>
+    <string name="label_menu_photo">Zdjęcie menu</string>
     <string name="label_edit_menu_item">Edytuj pozycję w menu</string>
     <string name="label_price">Cena</string>
     <string name="label_alcohol">Zawartość alkoholu</string>
@@ -127,4 +128,8 @@
     <string name="lable_logout_action">Wyloguj się</string>
     <string name="label_restaurants">Restauracje</string>
     <string name="label_restaurant_no_events">Restauracja nie ma wydarzeń</string>
+    <string name="error_file_not_given">Plik jest wymagany</string>
+    <string name="error_wrong_file_format">Zły format pliku</string>
+    <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
+    <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
 </resources>
