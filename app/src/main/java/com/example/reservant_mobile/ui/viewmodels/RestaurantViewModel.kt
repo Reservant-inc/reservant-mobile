@@ -85,12 +85,6 @@ class RestaurantViewModel(
         }
     }
 
-    suspend fun postNewGroup(): Boolean {
-        if(newGroup.value.isNotBlank()){
-            //TODO dodać nową grupę
-        }
-        return true
-    }
 
     suspend fun registerRestaurant(context: Context): Boolean {
         if (isRestaurantRegistrationInvalid(context)) {
@@ -99,9 +93,22 @@ class RestaurantViewModel(
 
         val restaurant = getRestaurantData()
 
-        result = restaurantService.registerRestaurant(restaurant)
+        val response = restaurantService.registerRestaurant(restaurant)
+        result.isError = response.isError
 
-        return result.value
+        restaurantId = response.value?.restaurantId
+
+        if(newGroup.value.isNotBlank()){
+            if(restaurantId != null) {
+                val new = RestaurantGroupDTO(
+                    name = newGroup.value,
+                    restaurantIds = listOf(restaurantId!!)
+                )
+                result = restaurantService.addGroup(new)
+            }
+        }
+
+        return response.value != null
     }
 
     suspend fun editRestaurant(context: Context): Boolean {
@@ -110,6 +117,16 @@ class RestaurantViewModel(
         }
 
         val restaurant = getRestaurantData()
+
+        if(newGroup.value.isNotBlank()){
+            if(restaurantId != null) {
+                val new = RestaurantGroupDTO(
+                    name = newGroup.value,
+                    restaurantIds = listOf(restaurantId!!)
+                )
+                result = restaurantService.addGroup(new)
+            }
+        }
 
         return !restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
     }
@@ -359,7 +376,7 @@ class RestaurantViewModel(
     }
 
     fun isGroupInvalid(): Boolean {
-        return selectedGroup == null
+        return selectedGroup == null && newGroup.value.isBlank()
     }
 
     fun isBusinessPermissionInvalid(context: Context): Boolean {

@@ -3,6 +3,7 @@ package com.example.reservant_mobile.ui.activities
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -499,56 +500,68 @@ fun RegisterRestaurantActivity(
                         formSent = formSent3
                     )
 
-                    if (groups != null) {
-                        val newGroups =
-                            groups + RestaurantGroupDTO(name = restaurantViewModel.name.value) + RestaurantGroupDTO(
-                                name = stringResource(
-                                    id = R.string.label_new_group
-                                )
-                            )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (groups != null) {
+                                val newGroups = groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
 
-                        if (selectedGroup?.name == stringResource(id = R.string.label_new_group)) {
-                            addGroup = true
-                        }
-
-                        if (!addGroup) {
-                            OutLinedDropdownMenu(
-                                selectedOption = selectedGroup?.name
-                                    ?: "",
-                                itemsList = newGroups.map { it.name },
-                                onOptionSelected = { name ->
-                                    restaurantViewModel.viewModelScope.launch {
-                                        restaurantViewModel.selectedGroup =
-                                            newGroups.find { it.name == name }
+                                if (!addGroup) {
+                                    Box(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        OutLinedDropdownMenu(
+                                            selectedOption = selectedGroup?.name ?: "",
+                                            itemsList = newGroups.map { it.name },
+                                            onOptionSelected = { name ->
+                                                restaurantViewModel.viewModelScope.launch {
+                                                    restaurantViewModel.selectedGroup = newGroups.find { it.name == name }
+                                                }
+                                            },
+                                            label = stringResource(R.string.label_add_to_group),
+                                            isError = restaurantViewModel.isGroupInvalid(),
+                                            errorText = stringResource(
+                                                if (restaurantViewModel.getGroupError() != -1)
+                                                    restaurantViewModel.getGroupError()
+                                                else
+                                                    R.string.error_registerRestaurant_invalid_group
+                                            ),
+                                            formSent = formSent3,
+                                            modifier = Modifier.fillMaxWidth(0.9f)
+                                        )
                                     }
-                                },
-                                label = stringResource(R.string.label_add_to_group),
-                                isError = restaurantViewModel.isGroupInvalid(),
-                                errorText = stringResource(
-                                    if (restaurantViewModel.getGroupError() != -1)
-                                        restaurantViewModel.getGroupError()
-                                    else
-                                        R.string.error_registerRestaurant_invalid_group
-                                ),
-                                formSent = formSent3
-                            )
-                        } else {
-                            InputUserInfo(
-                                inputText = restaurantViewModel.newGroup.value,
-                                onValueChange = { restaurantViewModel.newGroup.value = it },
-                                label = stringResource(id = R.string.label_new_group),
-                                isError = restaurantViewModel.isGroupInvalid(),
-                                errorText = stringResource(
-                                    if (restaurantViewModel.getGroupError() != -1)
-                                        restaurantViewModel.getGroupError()
-                                    else
-                                        R.string.error_registerRestaurant_invalid_description
-                                ),
-                                formSent = formSent3
-                            )
+
+                                    ButtonComponent(
+                                        onClick = { addGroup = true },
+                                        label = "+",
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .align(Alignment.CenterVertically)
+                                            .fillMaxWidth(0.2f)
+                                    )
+                                } else {
+                                    InputUserInfo(
+                                        inputText = restaurantViewModel.newGroup.value,
+                                        onValueChange = { restaurantViewModel.newGroup.value = it },
+                                        label = stringResource(id = R.string.label_new_group),
+                                        isError = restaurantViewModel.isGroupInvalid(),
+                                        errorText = stringResource(
+                                            if (restaurantViewModel.getGroupError() != -1)
+                                                restaurantViewModel.getGroupError()
+                                            else
+                                                R.string.error_registerRestaurant_invalid_description
+                                        ),
+                                        formSent = formSent3,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
                         }
+
                     }
-                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
