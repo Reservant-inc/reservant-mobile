@@ -1017,8 +1017,8 @@ fun IconWithHeader(
             }
             Row (
                 modifier = Modifier
-                .padding(vertical = 4.dp)
-                .align(Alignment.Center)
+                    .padding(vertical = 4.dp)
+                    .align(Alignment.Center)
             ){
                 Icon(
                     imageVector = icon,
@@ -1727,8 +1727,17 @@ fun ComboBox(
 ){
 
     val onDismiss = { expanded.value = false }
+    var beginValidation by remember {
+        mutableStateOf(false)
+    }
 
-    ExposedDropdownMenuBox(expanded = expanded.value, onExpandedChange = { expanded.value = !expanded.value }) {
+    ExposedDropdownMenuBox(
+        expanded = expanded.value,
+        onExpandedChange = {
+            expanded.value = !expanded.value
+            beginValidation = true
+        }
+    ) {
         Column {
             OutlinedTextField(
                 modifier = Modifier
@@ -1740,10 +1749,10 @@ fun ComboBox(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
                 shape = RoundedCornerShape(8.dp),
-                isError = isError
+                isError = isError && beginValidation
             )
 
-            if (isError) Text(text = errorText, color = MaterialTheme.colorScheme.error)
+            if (isError && beginValidation) Text(text = errorText, color = MaterialTheme.colorScheme.error)
         }
 
         ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
