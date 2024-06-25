@@ -132,4 +132,12 @@
     <string name="error_wrong_file_format">Zły format pliku</string>
     <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
     <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
+    <string name="label_edit_profile">Edytuj profil</string>
+    <string name="label_wallet">Portfel</string>
+    <string name="label_my_orders">Moje zamówienia</string>
+    <string name="label_helpdesk">Pomoc techniczna</string>
+    <string name="label_faq">FAQ</string>
+    <string name="label_promo_codes">Kody promocyjne</string>
+    <string name="label_app_settings">Ustawienia aplikacji</string>
+    <string name="label_delete_account">Usuń konto</string>
 </resources>
