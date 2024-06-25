@@ -132,4 +132,5 @@
     <string name="error_wrong_file_format">Zły format pliku</string>
     <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
     <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
+    <string name="label_close">Zamknij</string>
 </resources>

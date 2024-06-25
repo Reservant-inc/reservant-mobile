@@ -5,22 +5,33 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.components.FilterDialog
 import com.example.reservant_mobile.ui.components.IconWithHeader
 import com.example.reservant_mobile.ui.components.OrderItem
 
 @Composable
 fun OrdersActivity() {
     val ordersViewModel = viewModel<OrdersViewModel>()
-    val orders by ordersViewModel.orders.collectAsState()
+    val orders by ordersViewModel.filteredOrders.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    var showFilterDialog by remember { mutableStateOf(false) }
+
+    if (showFilterDialog) {
+        FilterDialog(
+            onDismissRequest = { showFilterDialog = false },
+            onFilterSelected = { status ->
+                ordersViewModel.filterOrders(status)
+                showFilterDialog = false
+            }
+        )
+    }
 
     Column(modifier = Modifier.padding(16.dp)) {
         IconWithHeader(
@@ -31,8 +42,11 @@ fun OrdersActivity() {
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
-            value = "",
-            onValueChange = {},
+            value = searchQuery,
+            onValueChange = {
+                searchQuery = it
+                ordersViewModel.searchOrders(it)
+            },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(text = stringResource(id = R.string.label_search)) },
             leadingIcon = {
@@ -42,7 +56,10 @@ fun OrdersActivity() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        ButtonComponent(onClick = { /*TODO*/ }, label = stringResource(id = R.string.label_filters))
+        ButtonComponent(
+            onClick = { showFilterDialog = true },
+            label = stringResource(id = R.string.label_filters)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
