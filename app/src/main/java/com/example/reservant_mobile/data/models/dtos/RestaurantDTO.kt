@@ -22,6 +22,7 @@ data class RestaurantDTO (
     val logo:String? = null,
     val photos:List<String> = emptyList(),
     val isVerified:Boolean = false,
+    val distanceFrom: Double? = null,
     val description:String = "",
     val location: LocationDTO? = null,
     val reservationDeposit:Double? = null,

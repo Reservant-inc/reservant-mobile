@@ -38,9 +38,9 @@ class UserService(private var api: APIService = APIService()) : IUserService {
     
     private suspend fun wrapUser(u:UserDTO){
         u.userId?.let { User.userId = it }
-        User.login = u.login
-        User.firstName = u.login
-        User.lastName = u.login
+        User.login = u.login!!
+        User.firstName = u.firstName
+        User.lastName = u.lastName
         User.roles = u.roles!!
         localBearer.saveBearerToken(u.token!!)
     }

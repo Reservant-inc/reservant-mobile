@@ -2,6 +2,7 @@ package com.example.reservant_mobile.ui.activities
 
 import RestaurantDetailActivity
 import android.graphics.Bitmap
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,16 +15,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,30 +52,37 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.example.reservant_mobile.data.models.dtos.EventDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.services.FileService
 import com.example.reservant_mobile.ui.components.ButtonComponent
+import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.OsmMapView
 import com.example.reservant_mobile.ui.components.RatingBar
-import com.example.reservant_mobile.ui.components.RestaurantsBottomSheet
+import com.example.reservant_mobile.ui.components.RestaurantCard
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.MapViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import org.osmdroid.util.GeoPoint
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapActivity(){
 
     val navController = rememberNavController()
+
 
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
+            var restaurants:List<RestaurantDTO>? by remember { mutableStateOf(null) }
+            var events:List<EventDTO>? by remember { mutableStateOf(null) }
+
 
             // Init map
             val context = LocalContext.current
@@ -84,79 +96,134 @@ fun MapActivity(){
             }
 
             LaunchedEffect(key1 = true) {
-                val img: Bitmap? = FileService().getImage("test-jd.png").value
+                restaurants = mapViewModel.getRestaurantsInArea(
+                    -11.2135241,
+                    17.8770032,
+                    60.192059,
+                    24.945831)
+                events = mapViewModel.getEvents()
 
-                mapViewModel.addRestaurantMarker(
-                    GeoPoint(52.240055, 21.017532),
-                    img,
-                    "Restaurant 1" +
-                            ""
-                ) { _, _ ->
-                    showRestaurantId = 1
-                    showRestaurantBottomSheet = true
-                    true
-                }
 
-                mapViewModel.addRestaurantMarker(
-                    GeoPoint(52.240055, 21.027532),
-                    img,
-                    "Restaurant 2" +
-                            ""
-                ) { _, _ ->
-                    showRestaurantId = 2
-                    showRestaurantBottomSheet = true
-                    true
-                }
-
-                mapViewModel.addRestaurantMarker(
-                    GeoPoint(52.250055, 21.027532),
-                    img,
-                    "Restaurant 3" +
-                            ""
-                ) { _, _ ->
-                    showRestaurantId = 3
-                    showRestaurantBottomSheet = true
-                    true
-                }
-
-                mapViewModel.addRestaurantMarker(
-                    GeoPoint(52.210055, 21.007532),
-                    img,
-                    "Restaurant 4" +
-                            ""
-                ) { _, _ ->
-                    showRestaurantId = 4
-                    showRestaurantBottomSheet = true
-                    true
+                if (restaurants != null) {
+                    for(restaurant in restaurants!!){
+                        val img: Bitmap? = FileService().getImage(restaurant.logo!!).value
+                        mapViewModel.addRestaurantMarker(
+                            position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude),
+                            icon = img,
+                            title = restaurant.name
+                        ) { _, _ ->
+                            showRestaurantId = restaurant.restaurantId
+                            showRestaurantBottomSheet = true
+                            true
+                        }
+                    }
                 }
             }
 
-
-            val sheetContent = listOf(
-                RestaurantDTO(
-                    restaurantId = 1,
-                    name = "John Doe's Restaurant",
-                    address = "ul. Konstruktorska 15",
-                    city = "Piaseczno"
-                ),
-                RestaurantDTO(
-                    restaurantId = 2,
-                    name = "Maciek's Pizza",
-                    address = "ul. Bajeczna 15",
-                    city = "Warszawa"
-                ),
-                RestaurantDTO(
-                    restaurantId = 3,
-                    name = "Best Thai",
-                    address = "ul. Krótka 10",
-                    city = "Kraków"
-                )
+            val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
+                stringResource(id = R.string.label_restaurants) to {
+                    if(mapViewModel.isLoading){
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    else if(restaurants!= null) {
+                        LazyColumn(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 75.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(restaurants!!) { item ->
+                                RestaurantCard(
+                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                    imageUrl = "",
+                                    name = item.name,
+                                    location = item.address,
+                                    city = item.city
+                                )
+                            }
+                        }
+                    }
+                    else{
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(500.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            MissingPage(errorStringId = R.string.error_not_found)
+                        }
+                    }
+                },
+                stringResource(id = R.string.label_events) to {
+                    if(mapViewModel.isLoading){
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    else if(events!= null) {
+                        LazyColumn(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 75.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(events!!) { item ->
+                                RestaurantCard(
+                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                    imageUrl = "",
+                                    name = item.restaurantName!!,
+                                    location = item.description,
+                                    city = item.mustJoinUntil
+                                )
+                            }
+                        }
+                    }
+                    else{
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(500.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            MissingPage(errorStringId = R.string.error_not_found)
+                        }
+                    }
+                }
             )
 
-            RestaurantsBottomSheet(
-                body= { modifier -> OsmMapView(mv, startPoint, modifier) },
-                sheetContent = sheetContent,
-                navController = navController
+            BottomSheetScaffold(
+                scaffoldState = rememberBottomSheetScaffoldState(),
+                sheetPeekHeight = 90.dp,
+                sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                sheetContent = {
+                    Box(
+                        modifier = Modifier
+                            .height(550.dp)
+                            .fillMaxWidth()
+                    ){
+
+                        FloatingTabSwitch(
+                            pages = pages,
+                            color = MaterialTheme.colorScheme.surface)
+                    }
+                },
+                content = { innerPadding -> OsmMapView(mv, startPoint,
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                )
+                },
+                contentColor = MaterialTheme.colorScheme.surface
             )
         }
         composable<RestaurantRoutes.Details> {
@@ -187,11 +254,6 @@ fun RestaurantDetailPreview(
                     RestaurantDetailViewModel(restaurantId) as T
             }
         )
-
-        LaunchedEffect(key1 = Unit) {
-            if(!restaurantDetailVM.loadRestaurant(restaurantId))
-                restaurantDetailVM.restaurant = null
-        }
 
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -288,7 +350,7 @@ fun RestaurantDetailPreview(
                                     .wrapContentHeight(align = Alignment.CenterVertically),
                                 onClick = {
                                     onDismiss()
-                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  1))
+                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
                                 },
 
                                 label = stringResource(id = R.string.label_show_more_details)

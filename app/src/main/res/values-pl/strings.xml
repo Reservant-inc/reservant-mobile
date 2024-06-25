@@ -125,6 +125,9 @@
     <string name="label_stats">Statystyki</string>
     <string name="label_employees">Pracownicy</string>
     <string name="label_delete">Usuń</string>
+    <string name="lable_logout_action">Wyloguj się</string>
+    <string name="label_restaurants">Restauracje</string>
+    <string name="label_restaurant_no_events">Restauracja nie ma wydarzeń</string>
     <string name="error_file_not_given">Plik jest wymagany</string>
     <string name="error_wrong_file_format">Zły format pliku</string>
     <string name="error_invalid_menu_name">Niepoprawna nazwa</string>

@@ -97,4 +97,8 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
     implementation ("org.osmdroid:osmdroid-android:6.1.18")
 
+    val pagingVersion = "3.3.0"
+    implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
+    implementation("androidx.paging:paging-compose:$pagingVersion")
+
 }

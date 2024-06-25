@@ -1,17 +1,35 @@
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -53,7 +70,9 @@ fun RestaurantDetailActivity(restaurantId: Int) {
     var showGallery by remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize().padding(bottom = 4.dp)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = 4.dp)) {
 
         if (restaurantDetailVM.result.isError) {
             ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
@@ -180,7 +199,43 @@ fun RestaurantDetailActivity(restaurantId: Int) {
                         FloatingTabSwitch(
                             pages = listOf(
                                 stringResource(R.string.label_menu) to { MenuContent() },
-                                stringResource(R.string.label_events) to { EventsContent() }
+                                stringResource(R.string.label_events) to {
+                                    LaunchedEffect(key1 = true) {
+                                        restaurantDetailVM.loadEvents()
+                                    }
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    ) {
+                                        Spacer(modifier = Modifier.height(64.dp))
+                                        if(restaurantDetailVM.eventsLoading){
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(16.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                CircularProgressIndicator()
+                                            }
+                                        }
+                                        else if(restaurantDetailVM.events!!.isEmpty()){
+                                            MissingPage(errorStringId = R.string.label_restaurant_no_events)
+                                        }
+                                        else if(restaurantDetailVM.events!= null){
+                                            restaurantDetailVM.events!!.forEach { event ->
+                                                Text(event.restaurantName!!, style = MaterialTheme.typography.headlineSmall)
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Text(event.description)
+                                                Spacer(modifier = Modifier.height(16.dp))
+                                            }
+                                        }
+                                        else{
+                                            MissingPage(errorStringId = R.string.error_not_found)
+                                        }
+
+                                    }
+                                }
                             )
                         )
                     }
@@ -258,33 +313,6 @@ fun MenuContent(
 //                onInfoClick = { /* TODO: Handle info */ },
 //                onAddClick = { /* TODO: Handle add */ }
 //            )
-//        }
-    }
-}
-
-// TODO: EventDTO
-@Composable
-fun EventsContent(
-//    events: List<EventDTO>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(64.dp))
-        repeat(3){
-            Text("Event name", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Event details")
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-//        events.forEach { event ->
-//            Text(event.name, style = MaterialTheme.typography.headlineSmall)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(event.details)
-//            Spacer(modifier = Modifier.height(16.dp))
 //        }
     }
 }

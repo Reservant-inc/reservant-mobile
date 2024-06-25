@@ -76,7 +76,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.AddLocationAlt
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -113,7 +112,6 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -185,7 +183,6 @@ import com.example.reservant_mobile.data.utils.BottomNavItem
 import com.example.reservant_mobile.data.utils.Country
 import com.example.reservant_mobile.data.utils.getFileName
 import com.example.reservant_mobile.data.utils.getFlagEmojiFor
-import com.example.reservant_mobile.ui.navigation.RestaurantRoutes
 import com.example.reservant_mobile.ui.viewmodels.EmployeeViewModel
 import com.example.reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlinx.coroutines.delay
@@ -2833,7 +2830,8 @@ fun FloatingActionMenu(
 
 @Composable
 fun FloatingTabSwitch(
-    pages: List<Pair<String, @Composable () -> Unit>>
+    pages: List<Pair<String, @Composable () -> Unit>>,
+    color: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
     val pagerState = rememberPagerState(
         pageCount = { pages.size }
@@ -2857,7 +2855,7 @@ fun FloatingTabSwitch(
         }
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = color,
             modifier = Modifier
                 .padding(20.dp)
                 .clip(cornerShape),
@@ -2986,49 +2984,6 @@ fun OsmMapView(
             view.controller.setCenter(geoPoint)
         }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RestaurantsBottomSheet(
-    body: @Composable (modifier: Modifier) -> Unit,
-    sheetContent: List<RestaurantDTO>,
-    navController: NavController
-) {
-    val scaffoldState = rememberBottomSheetScaffoldState()
-
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 100.dp,
-        sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-        sheetContent = {
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth()
-                    .height(475.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(sheetContent) { item ->
-                    RestaurantCard(
-                        onClick = {navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))},
-                        imageUrl = "",
-                        name = item.name,
-                        location = item.address,
-                        city = item.city
-                    )
-                }
-
-            }
-        },
-        content = { innerPadding -> body.invoke(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        )
-        }
-    )
-
 }
 
 @Composable
