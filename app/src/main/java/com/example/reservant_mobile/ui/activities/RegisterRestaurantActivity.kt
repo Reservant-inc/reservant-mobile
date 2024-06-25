@@ -222,7 +222,7 @@ fun RegisterRestaurantActivity(
                 )
 
                 ButtonComponent(
-                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_next) else stringResource(
                         R.string.label_edit_restaurant
                     ),
                     isLoading = isLoading,
@@ -381,7 +381,7 @@ fun RegisterRestaurantActivity(
                 )
 
                 ButtonComponent(
-                    label = if (restaurantId == null && group == null) stringResource(R.string.label_register_restaurant) else stringResource(
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_next) else stringResource(
                         R.string.label_edit_restaurant
                     ),
                     isLoading = isLoading,
@@ -549,7 +549,7 @@ fun RegisterRestaurantActivity(
                         }
                     )
                 } else {
-                    ButtonComponent(label = stringResource(id = R.string.label_edit_restaurant),
+                    ButtonComponent(label = stringResource(id = R.string.label_save),
                         isLoading = isLoading,
                         onClick = {
                             restaurantViewModel.viewModelScope.launch {
