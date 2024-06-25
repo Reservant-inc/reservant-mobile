@@ -145,4 +145,5 @@
     <string name="label_promo_codes">Promo codes</string>
     <string name="label_app_settings">App settings</string>
     <string name="label_delete_account">Delete Account</string>
+    <string name="label_close">Close</string>
 </resources>

@@ -140,4 +140,5 @@
     <string name="label_promo_codes">Kody promocyjne</string>
     <string name="label_app_settings">Ustawienia aplikacji</string>
     <string name="label_delete_account">Usuń konto</string>
+    <string name="label_close">Zamknij</string>
 </resources>
