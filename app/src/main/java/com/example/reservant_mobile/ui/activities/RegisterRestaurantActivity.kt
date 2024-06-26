@@ -42,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.models.dtos.RestaurantDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import com.example.reservant_mobile.data.utils.isFileSizeInvalid
 import com.example.reservant_mobile.ui.components.ButtonComponent
 import com.example.reservant_mobile.ui.components.ComboBox
 import com.example.reservant_mobile.ui.components.IconWithHeader
@@ -280,24 +281,35 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(id = R.string.label_restaurant_logo),
-                    defaultValue = restaurantViewModel.logo.value,
+                    defaultValue =
+                    if (restaurantViewModel.logo.value == "null")
+                        ""
+                    else
+                        restaurantViewModel.logo.value,
                     onFilePicked = { file ->
                         restaurantViewModel.logo.value = file.toString();
                     },
                     context = context,
                     isError = restaurantViewModel.isLogoInvalid(context),
                     errorText = stringResource(
-                        if (restaurantViewModel.getIdCardError() != -1)
-                            restaurantViewModel.getIdCardError()
-                        else
-                            R.string.error_registerRestaurant_invalid_file_photo, maxSize
+                        if (restaurantViewModel.getLogoError() != -1) {
+                            restaurantViewModel.getLogoError()
+                        } else
+                            if (isFileSizeInvalid(context, restaurantViewModel.logo.value)) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_photo, maxSize
                     ),
                     formSent = formSent2
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_consent),
-                    defaultValue = restaurantViewModel.businessPermission.value,
+                    defaultValue =
+                    if (restaurantViewModel.businessPermission.value == "null")
+                        ""
+                    else
+                        restaurantViewModel.businessPermission.value,
                     onFilePicked = { file ->
                         restaurantViewModel.businessPermission.value = file.toString();
                     },
@@ -305,17 +317,28 @@ fun RegisterRestaurantActivity(
                     optional = false,
                     isError = restaurantViewModel.isBusinessPermissionInvalid(context),
                     errorText = stringResource(
-                        if (restaurantViewModel.getBusinessPermissionError() != -1)
+                        if (restaurantViewModel.getBusinessPermissionError() != -1) {
                             restaurantViewModel.getBusinessPermissionError()
-                        else
-                            R.string.error_registerRestaurant_invalid_file_pdf, maxSize
+                        } else
+                            if (isFileSizeInvalid(
+                                    context,
+                                    restaurantViewModel.businessPermission.value
+                                )
+                            ) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_pdf, maxSize
                     ),
                     formSent = formSent2
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_ownerId),
-                    defaultValue = restaurantViewModel.idCard.value,
+                    defaultValue =
+                    if (restaurantViewModel.idCard.value == "null")
+                        ""
+                    else
+                        restaurantViewModel.idCard.value,
                     onFilePicked = { file ->
                         restaurantViewModel.idCard.value = file.toString();
                     },
@@ -323,17 +346,24 @@ fun RegisterRestaurantActivity(
                     optional = false,
                     isError = restaurantViewModel.isIdCardInvalid(context),
                     errorText = stringResource(
-                        if (restaurantViewModel.getIdCardError() != -1)
+                        if (restaurantViewModel.getIdCardError() != -1) {
                             restaurantViewModel.getIdCardError()
-                        else
-                            R.string.error_registerRestaurant_invalid_file_pdf, maxSize
+                        } else
+                            if (isFileSizeInvalid(context, restaurantViewModel.idCard.value)) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_pdf, maxSize
                     ),
                     formSent = formSent2
                 )
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_lease),
-                    defaultValue = restaurantViewModel.rentalContract.value,
+                    defaultValue =
+                    if (restaurantViewModel.rentalContract.value == "null")
+                        ""
+                    else
+                        restaurantViewModel.rentalContract.value,
                     onFilePicked = { file ->
                         restaurantViewModel.rentalContract.value = file.toString();
                     },
@@ -341,10 +371,17 @@ fun RegisterRestaurantActivity(
                     optional = true,
                     isError = restaurantViewModel.isRentalContractInvalid(context),
                     errorText = stringResource(
-                        if (restaurantViewModel.getRentalContractError() != -1)
+                        if (restaurantViewModel.getRentalContractError() != -1) {
                             restaurantViewModel.getRentalContractError()
-                        else
-                            R.string.error_registerRestaurant_invalid_file_pdf, maxSize
+                        } else
+                            if (isFileSizeInvalid(
+                                    context,
+                                    restaurantViewModel.rentalContract.value
+                                )
+                            ) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_pdf, maxSize
                     ),
                     formSent = formSent2,
                     deletable = true
@@ -352,7 +389,11 @@ fun RegisterRestaurantActivity(
 
                 InputUserFile(
                     label = stringResource(R.string.label_restaurant_license),
-                    defaultValue = restaurantViewModel.alcoholLicense.value,
+                    defaultValue =
+                    if (restaurantViewModel.alcoholLicense.value == "null")
+                        ""
+                    else
+                        restaurantViewModel.alcoholLicense.value,
                     onFilePicked = { file ->
                         restaurantViewModel.alcoholLicense.value = file.toString();
                     },
@@ -360,10 +401,17 @@ fun RegisterRestaurantActivity(
                     optional = true,
                     isError = restaurantViewModel.isAlcoholLicenseInvalid(context),
                     errorText = stringResource(
-                        if (restaurantViewModel.getAlcoholLicenseError() != -1)
+                        if (restaurantViewModel.getAlcoholLicenseError() != -1) {
                             restaurantViewModel.getAlcoholLicenseError()
-                        else
-                            R.string.error_registerRestaurant_invalid_file_pdf, maxSize
+                        } else
+                            if (isFileSizeInvalid(
+                                    context,
+                                    restaurantViewModel.alcoholLicense.value
+                                )
+                            ) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_pdf, maxSize
                     ),
                     formSent = formSent2,
                     deletable = true
@@ -504,88 +552,90 @@ fun RegisterRestaurantActivity(
                         formSent = formSent3
                     )
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            if (groups != null) {
-                                val newGroups = groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        if (groups != null) {
+                            val newGroups =
+                                groups + RestaurantGroupDTO(name = restaurantViewModel.name.value)
 
-                                if (!addGroup) {
-                                    Box(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        val expandedState = remember { mutableStateOf(false) }
+                            if (!addGroup) {
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    val expandedState = remember { mutableStateOf(false) }
 
-                                        ComboBox(
-                                            expanded = expandedState,
-                                            value = selectedGroup?.name ?: "",
-                                            onValueChange = { name ->
-                                                restaurantViewModel.viewModelScope.launch {
-                                                    restaurantViewModel.selectedGroup = newGroups.find { it.name == name }
-                                                }
-                                            },
-                                            options = newGroups.map { it.name },
-                                            label = stringResource(R.string.label_add_to_group),
-                                            isError = restaurantViewModel.isGroupInvalid(),
-                                            errorText = stringResource(
-                                                if (restaurantViewModel.getGroupError() != -1)
-                                                    restaurantViewModel.getGroupError()
-                                                else
-                                                    R.string.error_registerRestaurant_invalid_group
-                                            )
+                                    ComboBox(
+                                        expanded = expandedState,
+                                        value = selectedGroup?.name ?: "",
+                                        onValueChange = { name ->
+                                            restaurantViewModel.viewModelScope.launch {
+                                                restaurantViewModel.selectedGroup =
+                                                    newGroups.find { it.name == name }
+                                            }
+                                        },
+                                        options = newGroups.map { it.name },
+                                        label = stringResource(R.string.label_add_to_group),
+                                        isError = restaurantViewModel.isGroupInvalid(),
+                                        errorText = stringResource(
+                                            if (restaurantViewModel.getGroupError() != -1)
+                                                restaurantViewModel.getGroupError()
+                                            else
+                                                R.string.error_registerRestaurant_invalid_group
                                         )
-
-                                    }
-
-                                    SecondaryButton(
-                                        onClick = { addGroup = true },
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = "Add Group",
-                                        modifier = Modifier
-                                            .padding(start = 8.dp)
-                                            .align(Alignment.CenterVertically)
-                                            .fillMaxWidth(0.2f)
                                     )
 
-                                } else {
-                                    Box(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        InputUserInfo(
-                                            inputText = restaurantViewModel.newGroup.value,
-                                            onValueChange = {
-                                                restaurantViewModel.newGroup.value = it
-                                            },
-                                            label = stringResource(id = R.string.label_new_group),
-                                            isError = restaurantViewModel.isGroupInvalid(),
-                                            errorText = stringResource(
-                                                if (restaurantViewModel.getGroupError() != -1)
-                                                    restaurantViewModel.getGroupError()
-                                                else
-                                                    R.string.error_registerRestaurant_invalid_description
-                                            ),
-                                            formSent = formSent3,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
+                                }
 
-                                    SecondaryButton(
-                                        onClick = { addGroup = false },
-                                        imageVector = Icons.Default.Remove,
-                                        contentDescription = "Remove Group",
-                                        modifier = Modifier
-                                            .padding(start = 8.dp)
-                                            .align(Alignment.CenterVertically)
-                                            .fillMaxWidth(0.2f)
+                                SecondaryButton(
+                                    onClick = { addGroup = true },
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add Group",
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                        .align(Alignment.CenterVertically)
+                                        .fillMaxWidth(0.2f)
+                                )
+
+                            } else {
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    InputUserInfo(
+                                        inputText = restaurantViewModel.newGroup.value,
+                                        onValueChange = {
+                                            restaurantViewModel.newGroup.value = it
+                                        },
+                                        label = stringResource(id = R.string.label_new_group),
+                                        isError = restaurantViewModel.isGroupInvalid(),
+                                        errorText = stringResource(
+                                            if (restaurantViewModel.getGroupError() != -1)
+                                                restaurantViewModel.getGroupError()
+                                            else
+                                                R.string.error_registerRestaurant_invalid_description
+                                        ),
+                                        formSent = formSent3,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
+
+                                SecondaryButton(
+                                    onClick = { addGroup = false },
+                                    imageVector = Icons.Default.Remove,
+                                    contentDescription = "Remove Group",
+                                    modifier = Modifier
+                                        .padding(start = 8.dp)
+                                        .align(Alignment.CenterVertically)
+                                        .fillMaxWidth(0.2f)
+                                )
                             }
                         }
-
                     }
+
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 

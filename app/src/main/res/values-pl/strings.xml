@@ -142,6 +142,7 @@
     <string name="label_delete_account">Usuń konto</string>
     <string name="label_close">Zamknij</string>
     <string name="label_new_group">Dodaj nową grupę</string>
-    <string name="error_registerRestaurant_invalid_file_pdf">Niepoprawny plik - maksymalny rozmiar %1$dKB, typ pliku: pdf</string>
-    <string name="error_registerRestaurant_invalid_file_photo">Niepoprawny plik - maksymalny rozmiar %1$dKB, typ pliku: png, jpg</string>
+    <string name="error_registerRestaurant_invalid_file_pdf">Niepoprawny plik -  oczekiwany typ pliku: pdf</string>
+    <string name="error_registerRestaurant_invalid_file_photo">Niepoprawny plik -  oczekiwany typ pliku: png, jpg</string>
+    <string name="error_file_size">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
 </resources>
