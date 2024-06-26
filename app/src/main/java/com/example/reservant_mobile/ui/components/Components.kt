@@ -111,6 +111,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -3072,6 +3073,35 @@ fun SettingItem(
         )
     }
     HorizontalDivider()
+}
+
+@Composable
+fun FilterDialog(
+    onDismissRequest: () -> Unit,
+    onFilterSelected: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = stringResource(id = R.string.label_filters)) },
+        text = {
+            Column {
+                FilterOption("Odebrano", onFilterSelected)
+                FilterOption("Anulowano", onFilterSelected)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(id = R.string.label_close))
+            }
+        }
+    )
+}
+
+@Composable
+fun FilterOption(status: String, onFilterSelected: (String) -> Unit) {
+    TextButton(onClick = { onFilterSelected(status) }) {
+        Text(text = status)
+    }
 }
 
 @Preview
