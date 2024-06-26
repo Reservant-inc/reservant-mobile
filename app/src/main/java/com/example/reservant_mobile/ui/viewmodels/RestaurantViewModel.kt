@@ -498,6 +498,10 @@ class RestaurantViewModel(
         return getFieldError(result2, idCard.name)
     }
 
+    fun getLogoError(): Int {
+        return getFieldError(result2, logo.name)
+    }
+
     fun getGroupError(): Int {
         return getFieldError(result3, newGroup.name)
     }

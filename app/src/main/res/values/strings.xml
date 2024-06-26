@@ -138,6 +138,7 @@
     <string name="error_invalid_menu_name">Invalid name</string>
     <string name="error_invalid_menu_type">Invalid menu type</string>
     <string name="label_new_group">Add new group</string>
-    <string name="error_registerRestaurant_invalid_file_pdf">Invalid file - max size %1$dKB, filetype: pdf</string>
-    <string name="error_registerRestaurant_invalid_file_photo">Invalid file - max size %1$dKB, filetype: png, jpg</string>
+    <string name="error_registerRestaurant_invalid_file_pdf">Invalid file - expected filetype: pdf</string>
+    <string name="error_registerRestaurant_invalid_file_photo">Invalid file -  expected filetype: png, jpg</string>
+    <string name="error_file_size">Invalid file - max size %1$dKB</string>
 </resources>
