@@ -16,6 +16,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -47,6 +49,7 @@ import com.example.reservant_mobile.ui.components.InputUserFile
 import com.example.reservant_mobile.ui.components.InputUserInfo
 import com.example.reservant_mobile.ui.components.OutLinedDropdownMenu
 import com.example.reservant_mobile.ui.components.ProgressBar
+import com.example.reservant_mobile.ui.components.SecondaryButton
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagList
 import com.example.reservant_mobile.ui.components.TagSelectionScreen
@@ -537,28 +540,46 @@ fun RegisterRestaurantActivity(
 
                                     }
 
-                                    ButtonComponent(
+                                    SecondaryButton(
                                         onClick = { addGroup = true },
-                                        label = "+",
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Add Group",
                                         modifier = Modifier
                                             .padding(start = 8.dp)
                                             .align(Alignment.CenterVertically)
                                             .fillMaxWidth(0.2f)
                                     )
+
                                 } else {
-                                    InputUserInfo(
-                                        inputText = restaurantViewModel.newGroup.value,
-                                        onValueChange = { restaurantViewModel.newGroup.value = it },
-                                        label = stringResource(id = R.string.label_new_group),
-                                        isError = restaurantViewModel.isGroupInvalid(),
-                                        errorText = stringResource(
-                                            if (restaurantViewModel.getGroupError() != -1)
-                                                restaurantViewModel.getGroupError()
-                                            else
-                                                R.string.error_registerRestaurant_invalid_description
-                                        ),
-                                        formSent = formSent3,
-                                        modifier = Modifier.fillMaxWidth()
+                                    Box(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        InputUserInfo(
+                                            inputText = restaurantViewModel.newGroup.value,
+                                            onValueChange = {
+                                                restaurantViewModel.newGroup.value = it
+                                            },
+                                            label = stringResource(id = R.string.label_new_group),
+                                            isError = restaurantViewModel.isGroupInvalid(),
+                                            errorText = stringResource(
+                                                if (restaurantViewModel.getGroupError() != -1)
+                                                    restaurantViewModel.getGroupError()
+                                                else
+                                                    R.string.error_registerRestaurant_invalid_description
+                                            ),
+                                            formSent = formSent3,
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+
+                                    SecondaryButton(
+                                        onClick = { addGroup = false },
+                                        imageVector = Icons.Default.Remove,
+                                        contentDescription = "Remove Group",
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .align(Alignment.CenterVertically)
+                                            .fillMaxWidth(0.2f)
                                     )
                                 }
                             }
