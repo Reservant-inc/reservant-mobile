@@ -137,4 +137,12 @@
     <string name="error_wrong_file_format">Wrong file format</string>
     <string name="error_invalid_menu_name">Invalid name</string>
     <string name="error_invalid_menu_type">Invalid menu type</string>
+    <string name="label_edit_profile">Edit profile</string>
+    <string name="label_wallet">Wallet</string>
+    <string name="label_my_orders">My orders</string>
+    <string name="label_helpdesk">Helpdesk</string>
+    <string name="label_faq">FAQ</string>
+    <string name="label_promo_codes">Promo codes</string>
+    <string name="label_app_settings">App settings</string>
+    <string name="label_delete_account">Delete Account</string>
 </resources>
