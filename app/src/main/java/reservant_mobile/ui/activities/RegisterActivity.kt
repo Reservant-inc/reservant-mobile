@@ -63,7 +63,7 @@ fun RegisterActivity(navController: NavHostController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            LogoWithReturn(navController)
+            LogoWithReturn { navController.popBackStack() }
 
             InputUserInfo(
                 inputText = registerViewModel.login.value,

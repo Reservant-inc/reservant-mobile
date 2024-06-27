@@ -34,7 +34,7 @@ import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 
 @Composable
-fun EmployeeManagementActivity(restaurantId: Int) {
+fun EmployeeManagementActivity(onReturnClick: () -> Unit,restaurantId: Int) {
     val employeeViewModel = viewModel<EmployeeViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -68,6 +68,8 @@ fun EmployeeManagementActivity(restaurantId: Int) {
             IconWithHeader(
                 icon = Icons.Rounded.People,
                 text = stringResource(R.string.label_management_manage_employees),
+                showBackButton = true,
+                onReturnClick = onReturnClick
             )
 
             LazyColumn(
@@ -98,10 +100,4 @@ fun EmployeeManagementActivity(restaurantId: Int) {
             MyFloatingActionButton(onClick = { showAddDialog = true })
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewEmployee() {
-    EmployeeManagementActivity(1)
 }

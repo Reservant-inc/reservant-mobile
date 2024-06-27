@@ -41,7 +41,10 @@ import reservant_mobile.ui.viewmodels.MenuManagementViewModel
 
 
 @Composable
-fun MenuManagementActivity(restaurantId: Int) {
+fun MenuManagementActivity(
+    onReturnClick: () -> Unit,
+    restaurantId: Int
+) {
     val viewmodel = viewModel<MenuManagementViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -64,6 +67,8 @@ fun MenuManagementActivity(restaurantId: Int) {
                         IconWithHeader(
                             icon = Icons.AutoMirrored.Rounded.MenuBook,
                             text = stringResource(id = R.string.label_menu_management),
+                            showBackButton = true,
+                            onReturnClick = onReturnClick
                         )
                     }
 
@@ -213,6 +218,7 @@ fun MenuManagementActivity(restaurantId: Int) {
 
         composable<RestaurantManagementRoutes.MenuItem> {
             MenuItemManagementActivity(
+                onReturnClick = { navController.popBackStack() },
                 menuId = it.toRoute<RestaurantManagementRoutes.MenuItem>().menuId,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.MenuItem>().restaurantId
             )

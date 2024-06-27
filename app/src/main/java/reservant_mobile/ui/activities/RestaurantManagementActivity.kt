@@ -132,9 +132,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 ) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_management_manage),
-                        navController = navController,
-                        showBackButton = true
+                        text = stringResource(R.string.label_management_manage)
                     )
 
                     if (groups != null) {
@@ -304,7 +302,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             )
 
                         ReturnButton(
-                            navController = navController,
+                            onReturnClick = { navController.popBackStack() },
                             modifier = Modifier.align(Alignment.TopStart)
                         )
                     }
@@ -447,12 +445,14 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         }
         composable<RestaurantManagementRoutes.Menu> {
             MenuManagementActivity(
+                onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Menu>().restaurantId
             )
         }
 
         composable<RestaurantManagementRoutes.Employee> {
             EmployeeManagementActivity(
+                onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Employee>().restaurantId
             )
         }

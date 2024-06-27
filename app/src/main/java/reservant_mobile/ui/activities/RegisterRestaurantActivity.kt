@@ -117,11 +117,15 @@ fun RegisterRestaurantActivity(
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_new_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navControllerHome.popBackStack() }
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_edit_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navControllerHome.popBackStack() }
                     )
                 }
 
@@ -265,12 +269,16 @@ fun RegisterRestaurantActivity(
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_new_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_edit_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
                     )
                 }
 
@@ -456,12 +464,16 @@ fun RegisterRestaurantActivity(
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_new_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_new_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_edit_restaurant).replace(" ", "\n"),
+                        text = stringResource(R.string.label_edit_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
                     )
                 }
 

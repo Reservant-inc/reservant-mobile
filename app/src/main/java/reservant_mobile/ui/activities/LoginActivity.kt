@@ -57,7 +57,7 @@ fun LoginActivity(navController: NavHostController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LogoWithReturn(navController)
+            LogoWithReturn { navController.popBackStack() }
 
             InputUserInfo(
                 inputText = loginViewModel.login.value,

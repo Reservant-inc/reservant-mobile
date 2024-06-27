@@ -1006,7 +1006,7 @@ fun IconWithHeader(
     icon: ImageVector,
     text: String,
     showBackButton: Boolean = false,
-    navController: NavController = rememberNavController()
+    onReturnClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -1016,7 +1016,7 @@ fun IconWithHeader(
         Box(Modifier.fillMaxWidth()) {
             if (showBackButton){
                 ReturnButton(
-                    navController = navController,
+                    onReturnClick = onReturnClick,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
@@ -1047,10 +1047,12 @@ fun IconWithHeader(
 }
 
 @Composable
-fun LogoWithReturn(navController: NavController = rememberNavController()) {
+fun LogoWithReturn(
+    onReturnClick: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxWidth()) {
         ReturnButton(
-            navController = navController,
+            onReturnClick = onReturnClick,
             modifier = Modifier.align(Alignment.CenterStart)
         )
         Logo(modifier = Modifier.align(Alignment.Center))
@@ -1059,11 +1061,11 @@ fun LogoWithReturn(navController: NavController = rememberNavController()) {
 
 @Composable
 fun ReturnButton(
-    navController: NavController,
+    onReturnClick: () -> Unit,
     modifier: Modifier = Modifier
 ){
     Button(
-        onClick = { navController.popBackStack() },
+        onClick = onReturnClick,
         contentPadding = PaddingValues(2.dp),
         colors = ButtonColors(
             Color.Transparent, Color.Black,
@@ -3513,10 +3515,4 @@ fun FilterOption(status: String, onFilterSelected: (String) -> Unit) {
     TextButton(onClick = { onFilterSelected(status) }) {
         Text(text = status)
     }
-}
-
-@Preview
-@Composable
-fun Preview(){
-    IconWithHeader(icon = Icons.Rounded.AddLocationAlt, text = "Testowy nagłówek")
 }
