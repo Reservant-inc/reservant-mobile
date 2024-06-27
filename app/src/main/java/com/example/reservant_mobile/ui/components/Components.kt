@@ -2950,9 +2950,9 @@ fun DineInContent(
 
         Text(
             text = "Mój koszyk",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -2967,8 +2967,11 @@ fun DineInContent(
                 ) {
                     Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
                     Row {
-                        Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "ilość: 1",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
                         IconButton(
                             onClick = { /* TODO: Decrease item count */ },
                             modifier = Modifier.size(40.dp)
@@ -2983,25 +2986,29 @@ fun DineInContent(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "Kwota: 30zł", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = "Kwota: 30zł",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Wpisz kod promocyjny",
-            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
         )
         OutlinedTextField(
             value = "JSKS6X293",
             onValueChange = { /* TODO: Change promo code */ },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -3014,11 +3021,12 @@ fun DineInContent(
                 fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = { /* TODO: Go to summary */ },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             shape = RoundedCornerShape(50)
         ) {
             Text(text = "Przejdź do podsumowania")
