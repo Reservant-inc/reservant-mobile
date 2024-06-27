@@ -3083,52 +3083,59 @@ fun TakeawayContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 16.dp, end = 8.dp, start = 8.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         Text(
             text = "Mój koszyk",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        repeat(2) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(16.dp)
-                    .padding(vertical = 8.dp)
-            ) {
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                        Row {
-                            Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            IconButton(
-                                onClick = { /* TODO: Decrease item count */ },
-                                modifier = Modifier.size(40.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            repeat(2) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
-                            }
-                            IconButton(
-                                onClick = { /* TODO: Increase item count */ },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                                Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
+                                IconButton(
+                                    onClick = { /* TODO: Decrease item count */ },
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
+                                }
+                                IconButton(
+                                    onClick = { /* TODO: Increase item count */ },
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                                }
                             }
                         }
+                        Text(
+                            text = "Kwota: 30zł",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Kwota: 30zł", style = MaterialTheme.typography.bodyLarge)
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
 
         OutlinedTextField(
@@ -3136,47 +3143,48 @@ fun TakeawayContent(
             onValueChange = { /* TODO: Handle note change */ },
             label = { Text(text = "Napisz notatkę do zamówienia...") },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         )
 
-        Text(
-            text = "Wpisz kod promocyjny",
-            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
         OutlinedTextField(
             value = "JSKS6X293",
             onValueChange = { /* TODO: Change promo code */ },
+            label = {
+                Text(
+                    text = "Wpisz kod promocyjny",
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            modifier = Modifier.padding(top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "Kwota całkowita:",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "60zł",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Kwota całkowita:",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "60zł",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* TODO: Go to summary */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(50)
-        ) {
-            Text(text = "Przejdź do podsumowania")
+            Button(
+                onClick = { /* TODO: Go to summary */ },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text(text = "Przejdź do podsumowania")
+            }
         }
     }
 }
