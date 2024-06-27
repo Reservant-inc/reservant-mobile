@@ -2994,14 +2994,15 @@ fun DineInContent(
             }
         }
 
-        Text(
-            text = "Wpisz kod promocyjny",
-            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-        )
         OutlinedTextField(
             value = "JSKS6X293",
             onValueChange = { /* TODO: Change promo code */ },
+            label = {
+                Text(
+                    text = "Wpisz kod promocyjny",
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
