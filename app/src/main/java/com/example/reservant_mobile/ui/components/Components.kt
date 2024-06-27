@@ -2892,6 +2892,7 @@ fun DineInContent(
     modifier: Modifier = Modifier
 ) {
     var comment by remember { mutableStateOf("") }
+    var seats by remember { mutableIntStateOf(1) }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -2919,13 +2920,23 @@ fun DineInContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(onClick = { /* TODO: Decrease seats */ }, shape = CircleShape) {
-                Text(text = "-")
-            }
-            Text(text = "2", style = MaterialTheme.typography.bodyLarge)
-            Button(onClick = { /* TODO: Increase seats */ }, shape = CircleShape) {
-                Text(text = "+")
-            }
+            LabelButton(
+                onClick = { if (seats > 1) seats-- },
+                color = MaterialTheme.colorScheme.primary,
+                enabled = seats > 1,
+                label = "-"
+            )
+            Text(
+                text = seats.toString(),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+            LabelButton(
+                onClick = { if (seats < 10) seats++ },
+                color = MaterialTheme.colorScheme.primary,
+                enabled = seats < 10,
+                label = "+"
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -3015,6 +3026,33 @@ fun DineInContent(
         ) {
             Text(text = "Przejdź do podsumowania")
         }
+    }
+}
+
+@Composable
+fun LabelButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    color: Color = MaterialTheme.colorScheme.primary,
+    label: String
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(48.dp)
+            .background(color, CircleShape)
+            .clickable(
+                enabled = enabled,
+                onClick = onClick
+            )
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
