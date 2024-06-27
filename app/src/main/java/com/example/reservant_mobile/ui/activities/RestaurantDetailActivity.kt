@@ -273,7 +273,6 @@ fun RestaurantDetailActivity(navController: NavHostController, restaurantId: Int
 }
 
 
-
 @Composable
 fun MenuContent(
     menus: List<RestaurantMenuDTO>,
