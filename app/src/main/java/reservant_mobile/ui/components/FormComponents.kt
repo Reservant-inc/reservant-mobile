@@ -34,13 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
+import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.getFileName
+import reservant_mobile.data.utils.getFlagEmojiFor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
@@ -339,4 +342,27 @@ fun MyDatePickerDialog(
     }
 
 
+}
+
+@Composable
+fun CountryPickerView(
+    selectedCountry: Country,
+    onSelection: (Country) -> Unit,
+    countries: List<Country>
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    Text(
+        modifier = Modifier
+            .clickable {
+                showDialog = true
+            }
+            .padding(start = 20.dp, end = 5.dp)
+            .testTag("CountryPicker"),
+        text = "${getFlagEmojiFor(selectedCountry.nameCode)} +${selectedCountry.code}"
+    )
+
+    if (showDialog)
+        CountryCodePickerDialog(countries, onSelection) {
+            showDialog = false
+        }
 }

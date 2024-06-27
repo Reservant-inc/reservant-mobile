@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,7 +68,6 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingBag
@@ -111,7 +109,6 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -141,7 +138,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -169,7 +165,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -355,92 +350,6 @@ fun TagsDetailView(tags: List<String>) {
         label = stringResource(R.string.label_restaurant_tags),
         value = tagsString
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownMenuBox(
-    modifier: Modifier = Modifier,
-    label: String,
-    itemsList: List<String>,
-    shape: RoundedCornerShape = roundedShape,
-    onItemSelected: (String) -> Unit,
-    enabled: Boolean = true,
-    isError: Boolean = false
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
-
-    Box(
-        modifier = modifier.padding(vertical = 8.dp)
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                if (enabled) {
-                    expanded = it
-                }
-            }
-        ) {
-            TextField(
-                label = { Text(text = label) },
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(),
-                shape = shape,
-                enabled = enabled,
-                isError = isError
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    if (enabled) {
-                        expanded = false
-                    }
-                }
-            ) {
-                itemsList.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                            if (enabled) {
-                                selectedText = item
-                                expanded = false
-                                onItemSelected(item)
-                            }
-                        },
-                        enabled = enabled
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CountryPickerView(
-    selectedCountry: Country,
-    onSelection: (Country) -> Unit,
-    countries: List<Country>
-) {
-    var showDialog by remember { mutableStateOf(false) }
-    Text(
-        modifier = Modifier
-            .clickable {
-                showDialog = true
-            }
-            .padding(start = 20.dp, end = 5.dp)
-            .testTag("CountryPicker"),
-        text = "${getFlagEmojiFor(selectedCountry.nameCode)} +${selectedCountry.code}"
-    )
-
-    if (showDialog)
-        CountryCodePickerDialog(countries, onSelection) {
-            showDialog = false
-        }
 }
 
 @Composable
