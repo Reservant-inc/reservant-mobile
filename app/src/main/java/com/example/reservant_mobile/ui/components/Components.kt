@@ -2885,7 +2885,7 @@ fun FloatingActionMenu(
     }
 }
 
-
+// TODO: resources
 @Composable
 fun DineInContent(
     onDineInClick: () -> Unit,
@@ -2895,21 +2895,21 @@ fun DineInContent(
     var seats by remember { mutableIntStateOf(1) }
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Moja rezerwacja",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
         MyDatePickerDialog(
             label = { Text("Data rezerwacji") },
             onBirthdayChange = { selectedDate ->
                 // TODO: date change
             }
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Liczba miejsc",
@@ -2938,18 +2938,15 @@ fun DineInContent(
                 label = "+"
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
-
         OutlinedTextField(
             value = "",
             onValueChange = { /* TODO: Handle note change */ },
             label = { Text(text = "Napisz notatkę do zamówienia...") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 24.dp),
             shape = RoundedCornerShape(8.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Mój koszyk",
