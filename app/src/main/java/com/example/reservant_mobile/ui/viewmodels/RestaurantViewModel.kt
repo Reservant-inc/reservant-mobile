@@ -59,6 +59,7 @@ class RestaurantViewModel(
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
+    var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
 
     var restaurantId by mutableStateOf<Int?>(null)
 
@@ -84,28 +85,56 @@ class RestaurantViewModel(
         }
     }
 
+
     suspend fun registerRestaurant(context: Context): Boolean {
-        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
 
         val restaurant = getRestaurantData()
 
-        result = restaurantService.registerRestaurant(restaurant)
+        val response = restaurantService.registerRestaurant(restaurant)
+        result.isError = response.isError
 
-        return result.value
+        restaurantId = response.value?.restaurantId
+
+        if (response.value == null){
+            return false
+        }
+
+        if(newGroup.value.isNotBlank()){
+                val new = RestaurantGroupDTO(
+                    name = newGroup.value,
+                    restaurantIds = listOf(restaurantId!!)
+                )
+                result = restaurantService.addGroup(new)
+        }
+
+        return true
     }
 
     suspend fun editRestaurant(context: Context): Boolean {
-        validateLogo(context)
         if (isRestaurantRegistrationInvalid(context)) {
             return false
         }
 
         val restaurant = getRestaurantData()
 
-        return !restaurantService.editRestaurant(restaurant.restaurantId, restaurant).isError
+        val response = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
+
+        if (response.value == null){
+            return false
+        }
+
+        if(newGroup.value.isNotBlank()){
+                val new = RestaurantGroupDTO(
+                    name = newGroup.value,
+                    restaurantIds = listOf(restaurantId!!)
+                )
+                result = restaurantService.addGroup(new)
+        }
+
+        return result.value
     }
 
     suspend fun validateFirstStep(): Boolean {
@@ -121,6 +150,14 @@ class RestaurantViewModel(
 
     suspend fun validateSecondStep(context: Context): Boolean {
 
+        val restaurantLogo = if (
+            !logo.value.endsWith(".png", ignoreCase = true) &&
+            !logo.value.endsWith(".jpg", ignoreCase = true)
+        ) {
+            sendPhoto(logo.value, context)
+        } else {
+            null
+        }
 
         val permission = if (!businessPermission.value.endsWith(
                 ".pdf",
@@ -151,6 +188,13 @@ class RestaurantViewModel(
                 context,
                 DataType.PDF
             )
+
+        if (restaurantLogo != null) {
+            if (!restaurantLogo.isError)
+                logo.value = restaurantLogo.value?.fileName ?: ""
+            else
+                logo.value = "Bledny plik"
+        }
 
         if (permission != null) {
             if (!permission.isError)
@@ -200,28 +244,6 @@ class RestaurantViewModel(
             alcoholLicense.value = ""
         }
 
-        return true
-    }
-
-    suspend fun validateLogo(context: Context): Boolean {
-        val restaurantLogo = if (
-            !logo.value.endsWith(".png", ignoreCase = true) &&
-            !logo.value.endsWith(".jpg", ignoreCase = true)
-        ) {
-            sendPhoto(logo.value, context)
-        } else {
-            null
-        }
-
-        if (restaurantLogo != null) {
-            if (!restaurantLogo.isError)
-                logo.value = restaurantLogo.value?.fileName ?: ""
-            else
-                logo.value = "Bledny plik"
-        }
-        if (isLogoInvalid(context)) {
-            return false
-        }
         return true
     }
 
@@ -314,7 +336,7 @@ class RestaurantViewModel(
                 isIdCardInvalid(context) ||
                 isAlcoholLicenseInvalid(context) ||
                 isRentalContractInvalid(context) ||
-                isGroupInvalid()
+                isLogoInvalid(context)
 
     }
 
@@ -360,7 +382,7 @@ class RestaurantViewModel(
     }
 
     fun isGroupInvalid(): Boolean {
-        return selectedGroup == null
+        return selectedGroup == null && newGroup.value.isBlank()
     }
 
     fun isBusinessPermissionInvalid(context: Context): Boolean {
@@ -477,7 +499,11 @@ class RestaurantViewModel(
     }
 
     fun getLogoError(): Int {
-        return getFieldError(result3, logo.name)
+        return getFieldError(result2, logo.name)
+    }
+
+    fun getGroupError(): Int {
+        return getFieldError(result3, newGroup.name)
     }
 
     fun getDescriptionError(): Int {

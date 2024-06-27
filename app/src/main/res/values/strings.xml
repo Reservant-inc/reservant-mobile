@@ -146,4 +146,8 @@
     <string name="label_app_settings">App settings</string>
     <string name="label_delete_account">Delete Account</string>
     <string name="label_close">Close</string>
+    <string name="label_new_group">Add new group</string>
+    <string name="error_registerRestaurant_invalid_file_pdf">Invalid file - expected filetype: pdf</string>
+    <string name="error_registerRestaurant_invalid_file_photo">Invalid file -  expected filetype: png, jpg</string>
+    <string name="error_file_size">Invalid file - max size %1$dKB</string>
 </resources>
