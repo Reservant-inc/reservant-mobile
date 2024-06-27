@@ -85,8 +85,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -107,7 +105,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
@@ -115,7 +112,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -184,11 +180,8 @@ import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.getFlagEmojiFor
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 import kotlin.math.floor
 
 val roundedShape = RoundedCornerShape(12.dp)
@@ -329,39 +322,6 @@ fun ButtonComponent(
 
 
 @Composable
-fun TagsSelection(
-    tags: List<String>,
-    selectedTags: List<String>,
-    onTagSelected: (String, Boolean) -> Unit,
-) {
-    Column {
-        tags.forEach { tag ->
-            val isChecked = selectedTags.contains(tag)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp)
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { isSelected ->
-                        onTagSelected(tag, isSelected)
-                    }
-                )
-                Text(
-                    text = tag,
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .clickable { onTagSelected(tag, !isChecked) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-
 fun Logo(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(id = R.drawable.ic_logo),
@@ -370,109 +330,6 @@ fun Logo(modifier: Modifier = Modifier) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialog(
-    onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
-    allowFutureDates: Boolean,
-    startDate: String
-) {
-    fun convertMillisToDate(millis: Long): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return formatter.format(Date(millis))
-    }
-
-    fun convertDateToMillis(date: String): Long {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return formatter.parse(date)?.time ?: 0L
-    }
-
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateToMillis(startDate),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return if (allowFutureDates) {
-                    true
-                } else {
-                    utcTimeMillis <= System.currentTimeMillis()
-                }
-            }
-        }
-    )
-
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-
-    DatePickerDialog(
-        onDismissRequest = { onDismiss() },
-        confirmButton = {
-            Button(onClick = {
-                onDateSelected(selectedDate)
-                onDismiss()
-            }) {
-                Text(text = "OK")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text(text = "Cancel")
-            }
-        }
-    ) {
-        DatePicker(
-            state = datePickerState
-        )
-    }
-}
-
-
-@Composable
-fun MyDatePickerDialog(
-    onBirthdayChange: (String) -> Unit,
-    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
-    startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
-    allowFutureDates: Boolean = false,
-    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
-) {
-    var date by remember { mutableStateOf(startStringValue) }
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = date,
-        onValueChange = { },
-        label = label,
-        readOnly = true,
-        shape = roundedShape,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        interactionSource = remember { MutableInteractionSource() }
-            .also { interactionSource ->
-                LaunchedEffect(interactionSource) {
-                    interactionSource.interactions.collect {
-                        if (it is PressInteraction.Release) {
-                            showDatePicker = true
-                        }
-                    }
-                }
-            }
-    )
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDateSelected = {
-                date = it
-                onBirthdayChange(it)
-            },
-            onDismiss = { showDatePicker = false },
-            allowFutureDates = allowFutureDates,
-            startDate = startDate
-        )
-
-    }
-}
 
 @Composable
 fun RestaurantInfoView(
@@ -1467,7 +1324,7 @@ fun MenuPopup(
                     startDate = dateFrom.value.ifEmpty {
                         LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                     },
-                    onBirthdayChange = { dateFrom.value = it }
+                    onDateChange = { dateFrom.value = it }
                 )
                 MyDatePickerDialog(
                     label = {
@@ -1488,7 +1345,7 @@ fun MenuPopup(
                     startDate = dateUntil.value.ifEmpty {
                         LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                     },
-                    onBirthdayChange = { dateUntil.value = it }
+                    onDateChange = { dateUntil.value = it }
                 )
                 FormFileInput(
                     label = stringResource(id = R.string.label_menu_photo),
@@ -2716,7 +2573,7 @@ fun DineInContent(
         )
         MyDatePickerDialog(
             label = { Text("Data rezerwacji") },
-            onBirthdayChange = { selectedDate ->
+            onDateChange = { selectedDate ->
                 // TODO: date change
             },
             startDate = LocalDate.now().toString(),

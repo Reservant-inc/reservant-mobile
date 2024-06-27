@@ -16,10 +16,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,6 +41,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.utils.getFileName
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun FormInput(
@@ -221,4 +230,113 @@ fun FormFileInput(
             color = Color.Red
         )
     }
+}
+
+
+
+@Composable
+fun MyDatePickerDialog(
+    onDateChange: (String) -> Unit,
+    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
+    startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
+    allowFutureDates: Boolean = false,
+    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
+) {
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DatePickerDialog(
+        onDateSelected: (String) -> Unit,
+        onDismiss: () -> Unit,
+        allowFutureDates: Boolean,
+        startDate: String
+    ) {
+        fun convertMillisToDate(millis: Long): String {
+            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            return formatter.format(Date(millis))
+        }
+
+        fun convertDateToMillis(date: String): Long {
+            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            return formatter.parse(date)?.time ?: 0L
+        }
+
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = convertDateToMillis(startDate),
+            selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return if (allowFutureDates) {
+                        true
+                    } else {
+                        utcTimeMillis <= System.currentTimeMillis()
+                    }
+                }
+            }
+        )
+
+        val selectedDate = datePickerState.selectedDateMillis?.let {
+            convertMillisToDate(it)
+        } ?: ""
+
+        androidx.compose.material3.DatePickerDialog(
+            onDismissRequest = { onDismiss() },
+            confirmButton = {
+                Button(onClick = {
+                    onDateSelected(selectedDate)
+                    onDismiss()
+                }) {
+                    Text(text = "OK")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { onDismiss() }) {
+                    Text(text = "Cancel")
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState
+            )
+        }
+    }
+
+
+    var date by remember { mutableStateOf(startStringValue) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = date,
+        onValueChange = { },
+        label = label,
+        readOnly = true,
+        shape = roundedShape,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        interactionSource = remember { MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is PressInteraction.Release) {
+                            showDatePicker = true
+                        }
+                    }
+                }
+            }
+    )
+    
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDateSelected = {
+                date = it
+                onDateChange(it)
+            },
+            onDismiss = { showDatePicker = false },
+            allowFutureDates = allowFutureDates,
+            startDate = startDate
+        )
+
+    }
+
+
 }
