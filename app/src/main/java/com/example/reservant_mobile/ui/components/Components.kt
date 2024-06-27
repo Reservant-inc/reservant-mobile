@@ -2762,7 +2762,9 @@ fun DineInContent(
             label = { Text("Data rezerwacji") },
             onBirthdayChange = { selectedDate ->
                 // TODO: date change
-            }
+            },
+            startDate = LocalDate.now().toString(),
+            allowFutureDates = true
         )
 
         Text(
