@@ -61,6 +61,7 @@ import com.example.reservant_mobile.ui.components.MenuItemCard
 import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.MenuTypeButton
 import com.example.reservant_mobile.ui.components.RatingBar
+import com.example.reservant_mobile.ui.components.SearchBarWithFilter
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagItem
 import com.example.reservant_mobile.ui.components.TakeawayContent
@@ -357,59 +358,6 @@ fun ReviewsContent(
         reviews.forEach { review ->
             ReviewCard(review)
             Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-}
-
-// TODO: verify colors
-@Composable
-fun SearchBarWithFilter() {
-    var text by remember { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            BasicTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 36.dp),
-                singleLine = true,
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
-            )
-            if (text.isEmpty()) {
-                Text(
-                    text = "Szukaj...",
-                    color = Color.Gray,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
-        IconButton(
-            onClick = { /* TODO: Handle filter action */ },
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = "Filter",
-                tint = MaterialTheme.colorScheme.secondary
-            )
         }
     }
 }
