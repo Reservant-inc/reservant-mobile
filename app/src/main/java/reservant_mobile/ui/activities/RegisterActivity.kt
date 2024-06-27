@@ -39,7 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.CountryPickerView
-import reservant_mobile.ui.components.InputUserInfo
+import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.LogoWithReturn
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.ShowErrorToast
@@ -65,7 +65,7 @@ fun RegisterActivity(navController: NavHostController) {
         ) {
             LogoWithReturn { navController.popBackStack() }
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.login.value,
                 onValueChange = {
                     registerViewModel.login.value = it
@@ -88,7 +88,7 @@ fun RegisterActivity(navController: NavHostController) {
                 formSent = formSent
             )
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.firstName.value,
                 onValueChange = { registerViewModel.firstName.value = it },
                 label = stringResource(R.string.label_name),
@@ -102,7 +102,7 @@ fun RegisterActivity(navController: NavHostController) {
                 formSent = formSent
             )
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.lastName.value,
                 onValueChange = { registerViewModel.lastName.value = it },
                 label = stringResource(R.string.label_lastname),
@@ -118,7 +118,7 @@ fun RegisterActivity(navController: NavHostController) {
 
             MyDatePickerDialog(onBirthdayChange = { birthday -> registerViewModel.birthday.value = birthday })
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.email.value,
                 onValueChange = { registerViewModel.email.value = it },
                 label = stringResource(R.string.label_email),
@@ -133,7 +133,7 @@ fun RegisterActivity(navController: NavHostController) {
                 formSent = formSent
             )
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.phoneNum.value,
                 onValueChange = { registerViewModel.phoneNum.value = it },
                 label = stringResource(R.string.label_phone),
@@ -161,7 +161,7 @@ fun RegisterActivity(navController: NavHostController) {
             )
 
 
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.password.value,
                 onValueChange = { registerViewModel.password.value = it },
                 label = stringResource(R.string.label_password),
@@ -192,7 +192,7 @@ fun RegisterActivity(navController: NavHostController) {
                 ),
                 formSent = formSent
             )
-            InputUserInfo(
+            FormInput(
                 inputText = registerViewModel.confirmPassword.value,
                 onValueChange = { registerViewModel.confirmPassword.value = it },
                 label = stringResource(R.string.label_register_repeat_password),

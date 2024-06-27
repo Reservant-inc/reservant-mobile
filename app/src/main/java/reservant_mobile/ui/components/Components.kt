@@ -3,8 +3,6 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -65,7 +63,6 @@ import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
@@ -79,7 +76,6 @@ import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.AddLocationAlt
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -157,10 +153,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -172,9 +165,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -190,7 +181,6 @@ import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.data.utils.Country
-import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.getFlagEmojiFor
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
@@ -202,192 +192,6 @@ import java.util.Locale
 import kotlin.math.floor
 
 val roundedShape = RoundedCornerShape(12.dp)
-
-@Composable
-fun InputUserInfo(
-    modifier: Modifier = Modifier,
-    inputText: String,
-    onValueChange: (String) -> Unit,
-    label: String = "",
-    placeholder: String = "",
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    optional: Boolean = false,
-    maxLines: Int = 1,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-) {
-
-    var beginValidation: Boolean by remember {
-        mutableStateOf(false)
-    }
-
-    if (inputText.isNotEmpty())
-        beginValidation = true
-
-    if (inputText.isEmpty() && optional)
-        beginValidation = false
-
-    Column {
-        OutlinedTextField(
-            modifier =
-            if (optional) {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            } else {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .onFocusChanged {
-                        if (it.hasFocus) beginValidation = true
-                    }
-            },
-            value = inputText,
-            onValueChange = onValueChange,
-            label = {
-                Row {
-                    Text(text = label)
-                    if (optional)
-                        Text(
-                            text = stringResource(id = R.string.label_optional),
-                            color = MaterialTheme.colorScheme.outline,
-                            fontStyle = FontStyle.Italic
-                        )
-
-                }
-            },
-            placeholder = { Text(text = placeholder) },
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions.copy(
-                imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
-                    ImeAction.Next
-                else keyboardOptions.imeAction
-            ),
-            shape = shape,
-            isError = isError && (beginValidation || formSent),
-            maxLines = maxLines,
-            leadingIcon = leadingIcon,
-
-            )
-        if (isError && (beginValidation || formSent)) {
-            Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
-    }
-
-}
-
-@Composable
-fun InputUserFile(
-    label: String = "",
-    defaultValue: String = "",
-    onFilePicked: (Uri?) -> Unit,
-    modifier: Modifier = Modifier,
-    context: Context,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    optional: Boolean = false,
-    deletable: Boolean = false
-) {
-    var fileName by remember { mutableStateOf<String?>(null) }
-    val pickFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        fileName = uri?.let { getFileName(context, it.toString()) }
-        onFilePicked(uri)
-    }
-    var beginValidation: Boolean by remember { mutableStateOf(false) }
-
-    if (fileName != null) {
-        beginValidation = true
-    }
-    if (fileName == null && optional) {
-        beginValidation = false
-    }
-
-    if (fileName == null && defaultValue.isNotBlank()){
-        fileName = defaultValue
-    }
-
-    OutlinedTextField(
-        modifier =
-        if (optional) {
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        } else {
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .onFocusChanged {
-                    if (it.hasFocus) {
-                        beginValidation = true
-                    }
-                }
-        },
-        value = fileName ?: "",
-        onValueChange = { },
-        label = {
-            Row {
-                Text(text = label)
-                if (optional) {
-                    Text(
-                        text = stringResource(R.string.label_optional),
-                        color = Color.Gray,
-                        fontStyle = FontStyle.Italic
-                    )
-                }
-            }
-        },
-        readOnly = true,
-        visualTransformation = VisualTransformation.None,
-        keyboardOptions = KeyboardOptions.Default,
-        interactionSource = remember { MutableInteractionSource() }
-            .also { interactionSource ->
-                LaunchedEffect(interactionSource) {
-                    interactionSource.interactions.collect {
-                        if (it is PressInteraction.Release) {
-                            pickFileLauncher.launch("*/*")
-                        }
-                    }
-                }
-            },
-        trailingIcon = {
-            if (deletable && fileName != null) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete file",
-                    modifier = Modifier.clickable {
-                        fileName = null
-                        onFilePicked(null)
-                    }
-                )
-            } else if (fileName == null) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Attach file"
-                )
-            }
-        },
-        shape = shape,
-        isError = isError && (beginValidation || formSent),
-    )
-
-    if (isError && (beginValidation || formSent)) {
-        Text(
-            text = errorText,
-            color = Color.Red
-        )
-    }
-}
 
 
 @Composable
@@ -1318,7 +1122,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
         title = { Text(stringResource(id = R.string.label_employee_add)) },
         text = {
             Column {
-                InputUserInfo(
+                FormInput(
                     inputText = vm.login.value,
                     onValueChange = { vm.login.value = it },
                     label = stringResource(id = R.string.label_login),
@@ -1332,7 +1136,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.firstName.value,
                     onValueChange = { vm.firstName.value = it },
                     label = stringResource(id = R.string.label_name),
@@ -1346,7 +1150,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.lastName.value,
                     onValueChange = { vm.lastName.value = it },
                     label = stringResource(id = R.string.label_lastname),
@@ -1360,7 +1164,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.phoneNum.value,
                     onValueChange = { vm.phoneNum.value = it },
                     label = stringResource(id = R.string.label_phone),
@@ -1374,7 +1178,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.password.value,
                     onValueChange = { vm.password.value = it },
                     label = stringResource(id = R.string.label_password),
@@ -1454,7 +1258,7 @@ fun EditEmployeeDialog(
         title = { Text(stringResource(id = R.string.label_employee_edit)) },
         text = {
             Column {
-                InputUserInfo(
+                FormInput(
                     inputText = vm.login.value,
                     onValueChange = { vm.login.value = it },
                     label = stringResource(id = R.string.label_login),
@@ -1468,7 +1272,7 @@ fun EditEmployeeDialog(
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.firstName.value,
                     onValueChange = { vm.firstName.value = it },
                     label = stringResource(id = R.string.label_name),
@@ -1482,7 +1286,7 @@ fun EditEmployeeDialog(
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.lastName.value,
                     onValueChange = { vm.lastName.value = it },
                     label = stringResource(id = R.string.label_lastname),
@@ -1496,7 +1300,7 @@ fun EditEmployeeDialog(
                     ),
                     formSent = formSent
                 )
-                InputUserInfo(
+                FormInput(
                     inputText = vm.phoneNum.value,
                     onValueChange = { vm.phoneNum.value = it },
                     label = stringResource(id = R.string.label_phone),
@@ -1632,14 +1436,14 @@ fun MenuPopup(
         title = title,
         text = {
             Column {
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
                     onValueChange = { name.value = it },
                     isError = isNameInvalid,
                     errorText = stringResource(id = R.string.error_invalid_menu_name)
                 )
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_alternate_name),
                     optional = true,
                     inputText = altName.value,
@@ -1686,7 +1490,7 @@ fun MenuPopup(
                     },
                     onBirthdayChange = { dateUntil.value = it }
                 )
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(id = R.string.label_menu_photo),
                     onFilePicked = onFilePicked,
                     context = LocalContext.current,
@@ -1729,8 +1533,8 @@ fun ComboBox(
     onValueChange: (String) -> Unit,
     options: List<String>,
     label: String,
-    isError: Boolean,
-    errorText: String
+    isError: Boolean = false,
+    errorText: String = ""
 ){
 
     val onDismiss = { expanded.value = false }
@@ -1762,7 +1566,11 @@ fun ComboBox(
             if (isError && beginValidation) Text(text = errorText, color = MaterialTheme.colorScheme.error)
         }
 
-        ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
+        ExposedDropdownMenu(
+            modifier = Modifier.exposedDropdownSize(matchTextFieldWidth = false),
+            expanded = expanded.value,
+            onDismissRequest = onDismiss
+        ) {
             options.forEach {
                 DropdownMenuItem(
                     text = { Text(text = it) },
@@ -2165,31 +1973,31 @@ fun MenuItemPopup(
         title = title,
         text = {
             Column {
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
                     onValueChange = { name.value = it }
                 )
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_alternate_name),
                     optional = true,
                     inputText = altName.value,
                     onValueChange = { altName.value = it }
                 )
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_price),
                     inputText = price.value,
                     onValueChange = { price.value = it },
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
-                InputUserInfo(
+                FormInput(
                     label = stringResource(id = R.string.label_alcohol),
                     inputText = alcoholPercentage.value,
                     onValueChange = { alcoholPercentage.value = it },
                     optional = true,
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(id = R.string.label_menu_item_photo),
                     onFilePicked = { file -> photo.value = file.toString() },
                     context = context

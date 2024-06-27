@@ -46,8 +46,8 @@ import reservant_mobile.data.utils.isFileSizeInvalid
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.components.InputUserFile
-import reservant_mobile.ui.components.InputUserInfo
+import reservant_mobile.ui.components.FormFileInput
+import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.OutLinedDropdownMenu
 import reservant_mobile.ui.components.ProgressBar
 import reservant_mobile.ui.components.SecondaryButton
@@ -131,7 +131,7 @@ fun RegisterRestaurantActivity(
 
                 ProgressBar(currentStep = 1)
 
-                InputUserInfo(
+                FormInput(
                     inputText = restaurantViewModel.name.value,
                     onValueChange = { restaurantViewModel.name.value = it },
                     label = stringResource(id = R.string.label_restaurant_name),
@@ -146,7 +146,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent
                 )
 
-                InputUserInfo(
+                FormInput(
                     inputText = restaurantViewModel.nip.value,
                     onValueChange = { restaurantViewModel.nip.value = it },
                     label = stringResource(id = R.string.label_restaurant_nip),
@@ -177,7 +177,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent
                 )
 
-                InputUserInfo(
+                FormInput(
                     inputText = restaurantViewModel.address.value,
                     onValueChange = { restaurantViewModel.address.value = it },
                     label = stringResource(id = R.string.label_restaurant_address),
@@ -192,7 +192,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent
                 )
 
-                InputUserInfo(
+                FormInput(
                     inputText = restaurantViewModel.postalCode.value,
                     onValueChange = { restaurantViewModel.postalCode.value = it },
                     label = stringResource(id = R.string.label_restaurant_postal),
@@ -208,7 +208,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent
                 )
 
-                InputUserInfo(
+                FormInput(
                     inputText = restaurantViewModel.city.value,
                     onValueChange = { restaurantViewModel.city.value = it },
                     label = stringResource(id = R.string.label_restaurant_city),
@@ -286,7 +286,7 @@ fun RegisterRestaurantActivity(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(id = R.string.label_restaurant_logo),
                     defaultValue =
                     if (restaurantViewModel.logo.value == "null")
@@ -310,7 +310,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent2
                 )
 
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(R.string.label_restaurant_consent),
                     defaultValue =
                     if (restaurantViewModel.businessPermission.value == "null")
@@ -339,7 +339,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent2
                 )
 
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(R.string.label_restaurant_ownerId),
                     defaultValue =
                     if (restaurantViewModel.idCard.value == "null")
@@ -364,7 +364,7 @@ fun RegisterRestaurantActivity(
                     formSent = formSent2
                 )
 
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(R.string.label_restaurant_lease),
                     defaultValue =
                     if (restaurantViewModel.rentalContract.value == "null")
@@ -394,7 +394,7 @@ fun RegisterRestaurantActivity(
                     deletable = true
                 )
 
-                InputUserFile(
+                FormFileInput(
                     label = stringResource(R.string.label_restaurant_license),
                     defaultValue =
                     if (restaurantViewModel.alcoholLicense.value == "null")
@@ -549,7 +549,7 @@ fun RegisterRestaurantActivity(
                 }
 
                 Column {
-                    InputUserInfo(
+                    FormInput(
                         inputText = restaurantViewModel.description.value,
                         onValueChange = { restaurantViewModel.description.value = it },
                         label = stringResource(id = R.string.label_restaurant_description),
@@ -615,7 +615,7 @@ fun RegisterRestaurantActivity(
                                 Box(
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    InputUserInfo(
+                                    FormInput(
                                         inputText = restaurantViewModel.newGroup.value,
                                         onValueChange = {
                                             restaurantViewModel.newGroup.value = it

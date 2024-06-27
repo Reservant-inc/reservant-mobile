@@ -34,7 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
-import reservant_mobile.ui.components.InputUserInfo
+import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.LogoWithReturn
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.AuthRoutes
@@ -59,7 +59,7 @@ fun LoginActivity(navController: NavHostController) {
         ) {
             LogoWithReturn { navController.popBackStack() }
 
-            InputUserInfo(
+            FormInput(
                 inputText = loginViewModel.login.value,
                 onValueChange = {
                     loginViewModel.login.value = it
@@ -71,7 +71,7 @@ fun LoginActivity(navController: NavHostController) {
                 formSent = formSent
             )
 
-            InputUserInfo(
+            FormInput(
                 inputText = loginViewModel.password.value,
                 onValueChange = {
                     loginViewModel.password.value = it
