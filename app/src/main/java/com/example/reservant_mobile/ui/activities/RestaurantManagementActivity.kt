@@ -267,7 +267,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 ) {
                     MyFloatingActionButton(
                         onClick = {
-                            navController.navigate(RegisterRestaurantRoutes.Inputs)
+                            navControllerHome.navigate(RegisterRestaurantRoutes.Register)
                         }
                     )
                 }
@@ -448,12 +448,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantManagementRoutes.Menu> {
             MenuManagementActivity(
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Menu>().restaurantId
-            )
-        }
-
-        composable<RegisterRestaurantRoutes.Inputs> {
-            RegisterRestaurantActivity(
-                navController
             )
         }
 
