@@ -330,138 +330,6 @@ fun Logo(modifier: Modifier = Modifier) {
     )
 }
 
-
-@Composable
-fun RestaurantInfoView(
-    restaurant: RestaurantDTO,
-    onEditClick: () -> Unit,
-    onManageEmployeeClick: () -> Unit,
-    onManageMenuClick: () -> Unit,
-    onManageSubscriptionClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    var showMenu by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_logo),
-                        contentDescription = "Restaurant Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "${restaurant.name} - ${restaurant.restaurantType}",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_nip),
-                    value = restaurant.nip
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_address),
-                    value = "${restaurant.address}, ${restaurant.postalIndex}"
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_city),
-                    value = restaurant.city
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_delivery),
-                    value =
-                    if (restaurant.provideDelivery)
-                        stringResource(R.string.label_restaurant_delivery_available)
-                    else
-                        stringResource(R.string.label_restaurant_delivery_not_available)
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_description),
-                    value = restaurant.description
-                )
-                if (restaurant.tags.isNotEmpty()) {
-                    TagsDetailView(tags = restaurant.tags)
-                }
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_tables),
-                    value = "${restaurant.tables.size}"
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.TopEnd)
-                    .offset(x = 16.dp)
-                    .offset(y = (-12).dp)
-            ) {
-                IconButton(
-                    onClick = { showMenu = !showMenu },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
-                }
-
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            onEditClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_edit_local_data)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageEmployeeClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_employees)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageMenuClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_menu)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageSubscriptionClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_subscription)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onDeleteClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_delete_restaurant)) }
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
 fun DetailItem(label: String, value: String) {
     Column(
@@ -482,13 +350,11 @@ fun DetailItem(label: String, value: String) {
 
 @Composable
 fun TagsDetailView(tags: List<String>) {
-    if (tags.isNotEmpty()) {
-        val tagsString = tags.joinToString(separator = ", ")
-        DetailItem(
-            label = stringResource(R.string.label_restaurant_tags),
-            value = tagsString
-        )
-    }
+    val tagsString = tags.joinToString(separator = ", ")
+    DetailItem(
+        label = stringResource(R.string.label_restaurant_tags),
+        value = tagsString
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
