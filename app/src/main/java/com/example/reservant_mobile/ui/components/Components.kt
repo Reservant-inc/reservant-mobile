@@ -2808,24 +2808,26 @@ fun DineInContent(
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, shape = RoundedCornerShape(8.dp))
-                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                .padding(16.dp)
-        ) {
-            Column {
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .padding(start = 16.dp, end = 16.dp)
+                    .padding(vertical = 8.dp)
+                ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                    Row {
-                        Text(
-                            text = "ilość: 1",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
                         IconButton(
                             onClick = { /* TODO: Decrease item count */ },
                             modifier = Modifier.size(40.dp)
@@ -2842,8 +2844,7 @@ fun DineInContent(
                 }
                 Text(
                     text = "Kwota: 30zł",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 8.dp)
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
@@ -2857,7 +2858,10 @@ fun DineInContent(
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
                 )
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+
         )
 
         Row(
