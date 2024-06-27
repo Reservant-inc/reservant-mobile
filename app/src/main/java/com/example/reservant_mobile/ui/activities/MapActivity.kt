@@ -227,7 +227,7 @@ fun MapActivity(){
             )
         }
         composable<RestaurantRoutes.Details> {
-            RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
+            RestaurantDetailActivity(navController = navController, restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
         }
     }
 
@@ -257,7 +257,7 @@ fun RestaurantDetailPreview(
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            if (restaurantDetailVM.result.isError) {
+            if (restaurantDetailVM.resultRestaurant.isError) {
                 ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
             }
 
