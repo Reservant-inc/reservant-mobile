@@ -17,22 +17,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DeliveryDining
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.LocalDining
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.StarHalf
-import androidx.compose.material.icons.filled.TakeoutDining
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,7 +34,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,38 +46,34 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import com.example.reservant_mobile.data.constants.Roles
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import com.example.reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import com.example.reservant_mobile.ui.components.DeliveryContent
-import com.example.reservant_mobile.ui.components.DineInContent
 import com.example.reservant_mobile.ui.components.FloatingActionMenu
 import com.example.reservant_mobile.ui.components.FloatingTabSwitch
 import com.example.reservant_mobile.ui.components.FullscreenGallery
 import com.example.reservant_mobile.ui.components.ImageCard
 import com.example.reservant_mobile.ui.components.MenuItemCard
-import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.MenuTypeButton
+import com.example.reservant_mobile.ui.components.MissingPage
 import com.example.reservant_mobile.ui.components.RatingBar
 import com.example.reservant_mobile.ui.components.SearchBarWithFilter
 import com.example.reservant_mobile.ui.components.ShowErrorToast
 import com.example.reservant_mobile.ui.components.TagItem
-import com.example.reservant_mobile.ui.components.TakeawayContent
 import com.example.reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun RestaurantDetailActivity(navController: NavHostController, restaurantId: Int) {
+fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
