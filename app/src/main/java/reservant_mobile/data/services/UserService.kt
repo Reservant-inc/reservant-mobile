@@ -1,13 +1,13 @@
 package reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import io.ktor.client.call.body
-import io.ktor.http.HttpStatusCode
 
 
 interface IUserService{

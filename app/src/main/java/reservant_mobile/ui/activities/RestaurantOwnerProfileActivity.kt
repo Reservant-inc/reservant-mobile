@@ -1,13 +1,22 @@
 package reservant_mobile.ui.activities
 
-import reservant_mobile.ui.components.SettingItem
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Help
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material3.*
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,10 +25,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.SettingItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: () -> Unit) {

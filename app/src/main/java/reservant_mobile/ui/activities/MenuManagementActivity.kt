@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.ui.components.AddMenuButton
 import reservant_mobile.ui.components.IconWithHeader
@@ -37,7 +38,6 @@ import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.viewmodels.MenuManagementViewModel
-import kotlinx.coroutines.launch
 
 
 @Composable

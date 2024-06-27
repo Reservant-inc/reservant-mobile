@@ -1,11 +1,11 @@
 package reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.Events
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import io.ktor.client.call.body
-import io.ktor.http.HttpStatusCode
 
 interface IEventService{
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>

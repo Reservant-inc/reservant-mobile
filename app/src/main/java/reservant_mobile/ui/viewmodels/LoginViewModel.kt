@@ -3,10 +3,10 @@ package reservant_mobile.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.fields.FormField
-import reservant_mobile.data.services.IUserService
-import reservant_mobile.data.services.UserService
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.LocalBearerService
+import reservant_mobile.data.services.UserService
 
 class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
 

@@ -1,12 +1,12 @@
 package reservant_mobile.services
 
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Before
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.LocalBearerService
 import reservant_mobile.data.services.UserService
-import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Before
 
 abstract class ServiceTest {
     private lateinit var existingToken: String

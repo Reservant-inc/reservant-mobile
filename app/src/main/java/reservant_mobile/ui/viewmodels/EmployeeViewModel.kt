@@ -5,15 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantService
-import reservant_mobile.data.services.RestaurantService
-import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.services.IUserService
+import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
-import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class EmployeeViewModel(

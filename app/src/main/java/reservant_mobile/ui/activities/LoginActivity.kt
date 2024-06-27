@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.InputUserInfo
 import reservant_mobile.ui.components.LogoWithReturn
@@ -39,7 +40,6 @@ import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginActivity(navController: NavHostController) {

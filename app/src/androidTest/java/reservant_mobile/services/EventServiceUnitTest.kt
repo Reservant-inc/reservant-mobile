@@ -1,13 +1,13 @@
 package reservant_mobile.services
 
-import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.services.EventService
-import reservant_mobile.data.services.IEventService
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.EventService
+import reservant_mobile.data.services.IEventService
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

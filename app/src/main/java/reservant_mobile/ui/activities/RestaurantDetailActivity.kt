@@ -54,6 +54,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -69,7 +70,6 @@ import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
-import kotlinx.coroutines.launch
 
 
 @Composable

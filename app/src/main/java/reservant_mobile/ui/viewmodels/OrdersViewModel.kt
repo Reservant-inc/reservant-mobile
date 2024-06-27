@@ -1,10 +1,10 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import reservant_mobile.data.models.dtos.OrderDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.OrderDTO
 
 class OrdersViewModel : ViewModel() {
 

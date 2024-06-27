@@ -4,13 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.getCountriesList
-import reservant_mobile.data.constants.Regex
 import java.util.regex.Pattern
 
 

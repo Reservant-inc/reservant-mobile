@@ -1,15 +1,15 @@
 package reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import io.ktor.client.call.body
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.MenuItems
 import reservant_mobile.data.endpoints.Menus
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import io.ktor.client.call.body
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
 
 
 interface IRestaurantMenuService{

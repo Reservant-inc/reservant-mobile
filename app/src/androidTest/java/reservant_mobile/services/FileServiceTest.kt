@@ -1,11 +1,11 @@
 package reservant_mobile.services
 
-import reservant_mobile.data.services.FileService
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.services.FileService
 
 class FileServiceTest: ServiceTest() {
     private val service: FileService = FileService()

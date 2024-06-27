@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.FormField
@@ -17,7 +18,6 @@ import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.RestaurantMenuService
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileSizeInvalid
-import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 class MenuManagementViewModel(

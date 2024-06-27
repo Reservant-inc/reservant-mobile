@@ -1,10 +1,11 @@
 package reservant_mobile.viewmodels
 
-import reservant_mobile.ApplicationService
-import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import reservant_mobile.ApplicationService
+import reservant_mobile.ui.viewmodels.RestaurantViewModel
+
 class RestaurantViewModelUnitTest {
 
     @Test

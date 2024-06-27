@@ -1,7 +1,6 @@
 package reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
-import reservant_mobile.data.models.dtos.fields.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
@@ -28,6 +27,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import reservant_mobile.data.models.dtos.fields.Result
 
 
 class APIService{

@@ -1,6 +1,8 @@
 package reservant_mobile.data.services
 
 import com.example.reservant_mobile.R
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.Employments
 import reservant_mobile.data.endpoints.MyRestaurantGroups
@@ -15,8 +17,6 @@ import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import io.ktor.client.call.body
-import io.ktor.http.HttpStatusCode
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>

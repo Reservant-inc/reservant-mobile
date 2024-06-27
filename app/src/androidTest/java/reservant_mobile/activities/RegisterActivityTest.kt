@@ -13,10 +13,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
-import reservant_mobile.ui.activities.RegisterActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import reservant_mobile.ui.activities.RegisterActivity
 
 class RegisterActivityTest {
 

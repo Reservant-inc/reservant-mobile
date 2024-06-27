@@ -176,6 +176,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
@@ -190,10 +194,6 @@ import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.getFlagEmojiFor
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

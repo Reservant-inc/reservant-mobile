@@ -20,8 +20,8 @@ import reservant_mobile.ui.components.BottomNavigation
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
-import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")

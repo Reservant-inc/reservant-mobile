@@ -34,6 +34,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.CountryPickerView
 import reservant_mobile.ui.components.InputUserInfo
@@ -42,9 +45,6 @@ import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.RegisterViewModel
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterActivity(navController: NavHostController) {

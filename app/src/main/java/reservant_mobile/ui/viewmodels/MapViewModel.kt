@@ -15,14 +15,14 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
 import com.example.reservant_mobile.R
-import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
-import reservant_mobile.data.services.RestaurantService
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.services.RestaurantService
 
 class MapViewModel(): ViewModel() {
     private object OsmMap {

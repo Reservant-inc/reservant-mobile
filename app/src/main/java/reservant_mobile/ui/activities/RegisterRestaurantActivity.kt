@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.utils.isFileSizeInvalid
 import reservant_mobile.ui.components.ButtonComponent
@@ -56,7 +57,6 @@ import reservant_mobile.ui.components.TagSelectionScreen
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
-import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable

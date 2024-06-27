@@ -63,6 +63,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.ui.components.CountDownPopup
 import reservant_mobile.ui.components.DetailItem
@@ -76,7 +77,6 @@ import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
-import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable

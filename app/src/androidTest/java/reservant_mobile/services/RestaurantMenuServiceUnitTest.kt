@@ -1,14 +1,14 @@
 package reservant_mobile.services
 
-import reservant_mobile.data.models.dtos.RestaurantMenuDTO
-import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.data.services.IRestaurantMenuService
-import reservant_mobile.data.services.RestaurantMenuService
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.data.services.IRestaurantMenuService
+import reservant_mobile.data.services.RestaurantMenuService
 
 class RestaurantMenuServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantMenuService = RestaurantMenuService()

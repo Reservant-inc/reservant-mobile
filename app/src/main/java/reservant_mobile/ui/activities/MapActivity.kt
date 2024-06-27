@@ -52,6 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import org.osmdroid.util.GeoPoint
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.services.FileService
@@ -66,7 +67,6 @@ import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
-import org.osmdroid.util.GeoPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

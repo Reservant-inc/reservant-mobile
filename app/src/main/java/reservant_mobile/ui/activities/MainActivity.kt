@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.LoginViewModel
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     

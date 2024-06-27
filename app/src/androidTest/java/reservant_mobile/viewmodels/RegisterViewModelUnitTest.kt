@@ -1,10 +1,9 @@
 package reservant_mobile.viewmodels
 
-import reservant_mobile.ui.viewmodels.RegisterViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-
 import org.junit.Test
+import reservant_mobile.ui.viewmodels.RegisterViewModel
 
 class RegisterViewModelUnitTest {
 

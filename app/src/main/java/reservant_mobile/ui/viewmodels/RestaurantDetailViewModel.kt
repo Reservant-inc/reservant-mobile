@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -12,7 +13,6 @@ import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantMenuService
 import reservant_mobile.data.services.RestaurantService
-import kotlinx.coroutines.launch
 
 class RestaurantDetailViewModel(
     private var restaurantId: Int,
