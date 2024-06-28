@@ -24,9 +24,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -870,7 +867,7 @@ fun TagItem(
     )
 }
 
-
+//TODO: Jeden z MENUITEMCARD to wywalenia
 @Composable
 fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
@@ -1007,8 +1004,8 @@ fun MenuItemCard(
 }
 
 @Composable
-fun FullscreenGallery(onDismiss: () -> Unit) {
-    val imageList = listOf(
+fun FullscreenGallery(
+    imageList: List<Int> = listOf(
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
@@ -1028,7 +1025,9 @@ fun FullscreenGallery(onDismiss: () -> Unit) {
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo
-    )
+    ),
+    onDismiss: () -> Unit
+) {
 
     Dialog(onDismissRequest = onDismiss) {
         Box(
