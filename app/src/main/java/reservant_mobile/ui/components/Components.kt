@@ -1107,7 +1107,7 @@ fun SearchBarWithFilter() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -1116,27 +1116,30 @@ fun SearchBarWithFilter() {
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
         ) {
-            BasicTextField(
+            OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 36.dp),
+                    .padding(end = 16.dp),
                 singleLine = true,
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
-            )
-            if (text.isEmpty()) {
-                Text(
-                    text = "Szukaj...",
-                    color = Color.Gray,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterEnd)
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = "Szukaj...",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "search icon",
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                    )
+                }
             )
         }
         IconButton(
