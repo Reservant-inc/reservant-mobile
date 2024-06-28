@@ -93,7 +93,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -125,18 +124,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -1167,6 +1160,45 @@ fun FloatingTabSwitch(
     color: Color = MaterialTheme.colorScheme.surfaceVariant,
     paneScroll: Boolean = true
 ) {
+
+    @Composable
+    fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
+        val transition = updateTransition(pagerState.currentPage, label = "")
+        val indicatorStart by transition.animateDp(
+            transitionSpec = {
+                if (initialState < targetState) {
+                    spring(dampingRatio = 1f, stiffness = 400f)
+                } else {
+                    spring(dampingRatio = 1f, stiffness = 1000f)
+                }
+            }, label = ""
+        ) {
+            tabPositions[it].left
+        }
+
+        val indicatorEnd by transition.animateDp(
+            transitionSpec = {
+                if (initialState < targetState) {
+                    spring(dampingRatio = 1f, stiffness = 1000f)
+                } else {
+                    spring(dampingRatio = 1f, stiffness = 400f)
+                }
+            }, label = ""
+        ) {
+            tabPositions[it].right
+        }
+
+        Box(
+            Modifier
+                .offset(x = indicatorStart)
+                .wrapContentSize(align = Alignment.BottomStart)
+                .width(indicatorEnd - indicatorStart)
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+                .zIndex(5f)
+        )
+    }
+
     val pagerState = rememberPagerState(
         pageCount = { pages.size }
     )
@@ -1220,44 +1252,6 @@ fun FloatingTabSwitch(
 }
 
 @Composable
-private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
-    val transition = updateTransition(pagerState.currentPage, label = "")
-    val indicatorStart by transition.animateDp(
-        transitionSpec = {
-            if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 400f)
-            } else {
-                spring(dampingRatio = 1f, stiffness = 1000f)
-            }
-        }, label = ""
-    ) {
-        tabPositions[it].left
-    }
-
-    val indicatorEnd by transition.animateDp(
-        transitionSpec = {
-            if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 1000f)
-            } else {
-                spring(dampingRatio = 1f, stiffness = 400f)
-            }
-        }, label = ""
-    ) {
-        tabPositions[it].right
-    }
-
-    Box(
-        Modifier
-            .offset(x = indicatorStart)
-            .wrapContentSize(align = Alignment.BottomStart)
-            .width(indicatorEnd - indicatorStart)
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
-            .zIndex(5f)
-    )
-}
-
-@Composable
 fun ImageCard(
     image: Painter
 ){
@@ -1273,51 +1267,6 @@ fun ImageCard(
             contentScale = ContentScale.Crop
         )
     }
-}
-
-@Composable
-fun rememberMapViewWithLifecycle(mapView: MapView): MapView {
-    // Makes MapView follow the lifecycle of this composable
-    val lifecycleObserver = rememberMapLifecycleObserver(mapView)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-        }
-    }
-    return mapView
-}
-
-@Composable
-fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
-    remember(mapView) {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                else -> {}
-            }
-        }
-    }
-
-@Composable
-fun OsmMapView(
-    mapView: MapView,
-    startPoint: GeoPoint,
-    modifier: Modifier = Modifier.fillMaxSize()
-) {
-
-    val geoPoint by remember { mutableStateOf(startPoint) }
-    val mapViewState = rememberMapViewWithLifecycle(mapView)
-
-    AndroidView(
-        modifier = modifier,
-        factory = { mapViewState },
-        update = { view ->
-            view.controller.setCenter(geoPoint)
-        }
-    )
 }
 
 @Composable
