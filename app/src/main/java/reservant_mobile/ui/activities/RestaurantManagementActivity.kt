@@ -65,6 +65,7 @@ import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
 import reservant_mobile.ui.components.IconWithHeader
@@ -137,11 +138,14 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
                     if (groups != null) {
                         if (groups.size > 1) {
-                            OutLinedDropdownMenu(
+                            ComboBox(
+                                expanded = remember {
+                                    mutableStateOf(false)
+                                },
                                 label = stringResource(R.string.label_group),
-                                selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
-                                itemsList = groups.map { it.name },
-                                onOptionSelected = { name ->
+                                value = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
+                                options = groups.map { it.name },
+                                onValueChange = { name ->
                                     selectedGroup = groups.find { it.name == name }
                                     restaurantManageVM.viewModelScope.launch {
                                         selectedGroup = selectedGroup?.let { group ->
@@ -151,7 +155,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         }
                                     }
                                 },
-                                modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                                modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp)
                             )
                         } else if (groups.size == 1) {
                             restaurantManageVM.viewModelScope.launch {

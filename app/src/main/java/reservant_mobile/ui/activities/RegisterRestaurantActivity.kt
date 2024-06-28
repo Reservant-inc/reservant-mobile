@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberBasicTooltipState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -162,19 +163,22 @@ fun RegisterRestaurantActivity(
                     formSent = formSent
                 )
 
-                OutLinedDropdownMenu(
-                    selectedOption = restaurantViewModel.restaurantType.value,
+                ComboBox(
+                    modifier = Modifier.fillMaxWidth(),
+                    expanded = remember {
+                        mutableStateOf(false)
+                    },
+                    value = restaurantViewModel.restaurantType.value,
+                    onValueChange = { restaurantViewModel.restaurantType.value = it } ,
                     label = stringResource(R.string.label_restaurant_type),
-                    itemsList = options,
-                    onOptionSelected = { restaurantViewModel.restaurantType.value = it },
+                    options = options,
                     isError = restaurantViewModel.isRestaurantTypeInvalid(),
                     errorText = stringResource(
                         if (restaurantViewModel.getRestaurantTypeError() != -1)
                             restaurantViewModel.getRestaurantTypeError()
                         else
                             R.string.error_registerRestaurant_invalid_restaurantType
-                    ),
-                    formSent = formSent
+                    )
                 )
 
                 FormInput(

@@ -239,6 +239,7 @@ fun OutLinedDropdownMenu(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComboBox(
+    modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
     value: String,
     onValueChange: (String) -> Unit,
@@ -262,7 +263,7 @@ fun ComboBox(
     ) {
         Column {
             OutlinedTextField(
-                modifier = Modifier
+                modifier = modifier
                     .padding(vertical = 8.dp)
                     .menuAnchor(),
                 label = { Text(text = label) },
