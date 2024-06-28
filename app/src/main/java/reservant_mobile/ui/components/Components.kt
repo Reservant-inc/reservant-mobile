@@ -499,49 +499,6 @@ fun BottomNavigation(
 
 
 @Composable
-fun Heading() {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text("Drawer title", modifier = Modifier.padding(16.dp))
-                HorizontalDivider()
-                NavigationDrawerItem(
-                    label = { Text("Drawer Item") },
-                    selected = false,
-                    onClick = { /* Akcja po kliknięciu */ }
-                )
-                // Dodaj więcej elementów, jeśli są potrzebne
-            }
-        },
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.TopStart
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .padding(4.dp) // wielkość kolorowego tła
-            ) {
-                IconButton(onClick = {
-                    scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    }
-                }) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
     vm.clearFields()
     var formSent by remember { mutableStateOf(false) }
