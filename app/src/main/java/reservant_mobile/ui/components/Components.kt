@@ -66,7 +66,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingBag
@@ -82,7 +81,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -95,11 +93,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
@@ -108,7 +103,6 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -154,7 +148,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
@@ -163,13 +156,11 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
-import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -495,267 +486,6 @@ fun BottomNavigation(
             }
         }
     )
-}
-
-
-@Composable
-fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
-    vm.clearFields()
-    var formSent by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.label_employee_add)) },
-        text = {
-            Column {
-                FormInput(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.firstName.value,
-                    onValueChange = { vm.firstName.value = it },
-                    label = stringResource(id = R.string.label_name),
-                    optional = false,
-                    isError = vm.isFirstNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getFirstNameError() != -1)
-                            vm.getFirstNameError()
-                        else
-                            R.string.error_register_invalid_name
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.lastName.value,
-                    onValueChange = { vm.lastName.value = it },
-                    label = stringResource(id = R.string.label_lastname),
-                    optional = false,
-                    isError = vm.isLastNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLastNameError() != -1)
-                            vm.getLastNameError()
-                        else
-                            R.string.error_register_invalid_lastname
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.phoneNum.value,
-                    onValueChange = { vm.phoneNum.value = it },
-                    label = stringResource(id = R.string.label_phone),
-                    optional = false,
-                    isError = vm.isPhoneInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPhoneError() != -1)
-                            vm.getPhoneError()
-                        else
-                            R.string.error_register_invalid_phone
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.password.value,
-                    onValueChange = { vm.password.value = it },
-                    label = stringResource(id = R.string.label_password),
-                    optional = false,
-                    isError = vm.isPasswordInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPasswordError() != -1)
-                            vm.getPasswordError()
-                        else
-                            R.string.error_register_invalid_password
-                    ),
-                    formSent = formSent
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_hall))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
-                }
-            }
-        },
-        confirmButton = {
-            ShowErrorToast(context = LocalContext.current, id = vm.getToastError())
-            ButtonComponent(
-                onClick = {
-                    vm.viewModelScope.launch {
-                        isLoading = true
-                        formSent = true
-
-                        if (vm.register()) {
-                            onDismiss()
-                        }
-
-                        isLoading = false
-                    }
-                },
-                label = stringResource(R.string.label_signup)
-            )
-        },
-        dismissButton = {
-            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
-        }
-    )
-}
-
-@Composable
-fun EditEmployeeDialog(
-    employee: RestaurantEmployeeDTO,
-    onDismiss: () -> Unit,
-    vm: EmployeeViewModel
-) {
-    vm.login.value = employee.login.substringAfter('+')
-    vm.firstName.value = employee.firstName
-    vm.lastName.value = employee.lastName
-    vm.phoneNum.value = employee.phoneNumber
-    vm.isHallEmployee = employee.isHallEmployee
-    vm.isBackdoorEmployee = employee.isBackdoorEmployee
-
-    var formSent by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.label_employee_edit)) },
-        text = {
-            Column {
-                FormInput(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.firstName.value,
-                    onValueChange = { vm.firstName.value = it },
-                    label = stringResource(id = R.string.label_name),
-                    optional = false,
-                    isError = vm.isFirstNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getFirstNameError() != -1)
-                            vm.getFirstNameError()
-                        else
-                            R.string.error_register_invalid_name
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.lastName.value,
-                    onValueChange = { vm.lastName.value = it },
-                    label = stringResource(id = R.string.label_lastname),
-                    optional = false,
-                    isError = vm.isLastNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLastNameError() != -1)
-                            vm.getLastNameError()
-                        else
-                            R.string.error_register_invalid_lastname
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.phoneNum.value,
-                    onValueChange = { vm.phoneNum.value = it },
-                    label = stringResource(id = R.string.label_phone),
-                    optional = false,
-                    isError = vm.isPhoneInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPhoneError() != -1)
-                            vm.getPhoneError()
-                        else
-                            R.string.error_register_invalid_phone
-                    ),
-                    formSent = formSent
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_hall))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
-                }
-            }
-        },
-        confirmButton = {
-            ButtonComponent(
-                onClick = {
-                    vm.viewModelScope.launch {
-                        isLoading = true
-                        formSent = true
-
-                        if (vm.editEmployee(employee)) {
-                            onDismiss()
-                        }
-
-                        isLoading = false
-                    }
-                },
-                label = stringResource(R.string.label_save)
-            )
-        },
-        dismissButton = {
-            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
-        }
-    )
-}
-
-@Composable
-fun Content() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Zgłodniałeś?")
-    }
 }
 
 

@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,12 +25,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import reservant_mobile.ui.viewmodels.EmployeeViewModel
 
 @Composable
 fun EmployeeCard(
@@ -140,4 +146,251 @@ fun EmployeeCard(
         }
 
     }
+}
+
+@Composable
+fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
+    vm.clearFields()
+    var formSent by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.label_employee_add)) },
+        text = {
+            Column {
+                FormInput(
+                    inputText = vm.login.value,
+                    onValueChange = { vm.login.value = it },
+                    label = stringResource(id = R.string.label_login),
+                    optional = false,
+                    isError = vm.isLoginInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLoginError() != -1)
+                            vm.getLoginError()
+                        else
+                            R.string.error_login_invalid
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.firstName.value,
+                    onValueChange = { vm.firstName.value = it },
+                    label = stringResource(id = R.string.label_name),
+                    optional = false,
+                    isError = vm.isFirstNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getFirstNameError() != -1)
+                            vm.getFirstNameError()
+                        else
+                            R.string.error_register_invalid_name
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.lastName.value,
+                    onValueChange = { vm.lastName.value = it },
+                    label = stringResource(id = R.string.label_lastname),
+                    optional = false,
+                    isError = vm.isLastNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLastNameError() != -1)
+                            vm.getLastNameError()
+                        else
+                            R.string.error_register_invalid_lastname
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.phoneNum.value,
+                    onValueChange = { vm.phoneNum.value = it },
+                    label = stringResource(id = R.string.label_phone),
+                    optional = false,
+                    isError = vm.isPhoneInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPhoneError() != -1)
+                            vm.getPhoneError()
+                        else
+                            R.string.error_register_invalid_phone
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.password.value,
+                    onValueChange = { vm.password.value = it },
+                    label = stringResource(id = R.string.label_password),
+                    optional = false,
+                    isError = vm.isPasswordInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPasswordError() != -1)
+                            vm.getPasswordError()
+                        else
+                            R.string.error_register_invalid_password
+                    ),
+                    formSent = formSent
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isHallEmployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isHallEmployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isBackdoorEmployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isBackdoorEmployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_backdoor))
+                }
+            }
+        },
+        confirmButton = {
+            ShowErrorToast(context = LocalContext.current, id = vm.getToastError())
+            ButtonComponent(
+                onClick = {
+                    vm.viewModelScope.launch {
+                        isLoading = true
+                        formSent = true
+
+                        if (vm.register()) {
+                            onDismiss()
+                        }
+
+                        isLoading = false
+                    }
+                },
+                label = stringResource(R.string.label_signup)
+            )
+        },
+        dismissButton = {
+            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
+        }
+    )
+}
+
+@Composable
+fun EditEmployeeDialog(
+    employee: RestaurantEmployeeDTO,
+    onDismiss: () -> Unit,
+    vm: EmployeeViewModel
+) {
+    vm.login.value = employee.login.substringAfter('+')
+    vm.firstName.value = employee.firstName
+    vm.lastName.value = employee.lastName
+    vm.phoneNum.value = employee.phoneNumber
+    vm.isHallEmployee = employee.isHallEmployee
+    vm.isBackdoorEmployee = employee.isBackdoorEmployee
+
+    var formSent by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.label_employee_edit)) },
+        text = {
+            Column {
+                FormInput(
+                    inputText = vm.login.value,
+                    onValueChange = { vm.login.value = it },
+                    label = stringResource(id = R.string.label_login),
+                    optional = false,
+                    isError = vm.isLoginInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLoginError() != -1)
+                            vm.getLoginError()
+                        else
+                            R.string.error_login_invalid
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.firstName.value,
+                    onValueChange = { vm.firstName.value = it },
+                    label = stringResource(id = R.string.label_name),
+                    optional = false,
+                    isError = vm.isFirstNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getFirstNameError() != -1)
+                            vm.getFirstNameError()
+                        else
+                            R.string.error_register_invalid_name
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.lastName.value,
+                    onValueChange = { vm.lastName.value = it },
+                    label = stringResource(id = R.string.label_lastname),
+                    optional = false,
+                    isError = vm.isLastNameInvalid(),
+                    errorText = stringResource(
+                        if (vm.getLastNameError() != -1)
+                            vm.getLastNameError()
+                        else
+                            R.string.error_register_invalid_lastname
+                    ),
+                    formSent = formSent
+                )
+                FormInput(
+                    inputText = vm.phoneNum.value,
+                    onValueChange = { vm.phoneNum.value = it },
+                    label = stringResource(id = R.string.label_phone),
+                    optional = false,
+                    isError = vm.isPhoneInvalid(),
+                    errorText = stringResource(
+                        if (vm.getPhoneError() != -1)
+                            vm.getPhoneError()
+                        else
+                            R.string.error_register_invalid_phone
+                    ),
+                    formSent = formSent
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isHallEmployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isHallEmployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = vm.isBackdoorEmployee,
+                        onCheckedChange = { isChecked ->
+                            vm.isBackdoorEmployee = isChecked
+                        }
+                    )
+                    Text(stringResource(id = R.string.label_employee_backdoor))
+                }
+            }
+        },
+        confirmButton = {
+            ButtonComponent(
+                onClick = {
+                    vm.viewModelScope.launch {
+                        isLoading = true
+                        formSent = true
+
+                        if (vm.editEmployee(employee)) {
+                            onDismiss()
+                        }
+
+                        isLoading = false
+                    }
+                },
+                label = stringResource(R.string.label_save)
+            )
+        },
+        dismissButton = {
+            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
+        }
+    )
 }
