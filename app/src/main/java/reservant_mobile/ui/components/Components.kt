@@ -740,8 +740,7 @@ fun ProgressBar(currentStep: Int) {
             .height(8.dp)
 
     ) {
-        Row()
-        {
+        Row {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -783,40 +782,6 @@ fun RatingBar(rating: Float) {
                 contentDescription = "Empty Star"
             )
         }
-    }
-}
-
-@Composable
-fun MenuTypeButton(
-    modifier: Modifier = Modifier,
-    menuType: String,
-    onMenuClick: () -> Unit
-) {
-    Button(
-        onClick = { onMenuClick() },
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(4.dp)
-    ) {
-        Text(menuType)
-    }
-}
-
-@Composable
-fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(2.dp)
-    ) {
-        Text(category)
     }
 }
 
