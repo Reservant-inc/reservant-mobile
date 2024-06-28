@@ -646,7 +646,7 @@ fun DeletePopup(
 }
 
 @Composable
-fun CountDownPopup(
+fun DeleteCountdownPopup(
     countDownTimer: Int = 5,
     icon: ImageVector,
     title: String,
