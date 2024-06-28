@@ -72,7 +72,6 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
-import reservant_mobile.ui.components.OutLinedDropdownMenu
 import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes

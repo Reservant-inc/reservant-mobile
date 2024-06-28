@@ -15,8 +15,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,14 +42,11 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -70,7 +65,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -106,7 +100,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -118,7 +111,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -136,105 +128,6 @@ import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
-
-val roundedShape = RoundedCornerShape(12.dp)
-
-//TODO: co z tym komponentem a comboboxem
-@Composable
-fun OutLinedDropdownMenu(
-    selectedOption: String,
-    itemsList: List<String>,
-    onOptionSelected: (String) -> Unit,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    modifier: Modifier = Modifier,
-    isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    label: String = "",
-    optional: Boolean = false
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-    var beginValidation: Boolean by remember {
-        mutableStateOf(false)
-    }
-
-    if (selectedOption.isNotEmpty())
-        beginValidation = true
-    if (selectedOption.isEmpty() && optional)
-        beginValidation = false
-
-    Column {
-        OutlinedTextField(
-            modifier =
-            if (optional) {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            } else {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .onFocusChanged {
-                        if (it.hasFocus) beginValidation = true
-                    }
-            },
-            value = selectedOption,
-            onValueChange = { },
-            readOnly = true,
-            label = {
-                Row {
-                    Text(text = label)
-                    if (optional)
-                        Text(
-                            text = stringResource(id = R.string.label_optional),
-                            color = Color.Gray,
-                            fontStyle = FontStyle.Italic
-                        )
-                }
-            },
-            interactionSource = interactionSource,
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Hide" else "Show"
-                )
-            },
-            shape = shape,
-            isError = isError && (beginValidation || formSent),
-        )
-        if (isError && (beginValidation || formSent)) {
-            Text(
-                text = errorText,
-                color = Color.Red
-            )
-        }
-
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                if (interaction is PressInteraction.Release) {
-                    expanded = true
-                }
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsList.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

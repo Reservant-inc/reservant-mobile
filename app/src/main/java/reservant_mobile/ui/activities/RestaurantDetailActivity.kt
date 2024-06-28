@@ -58,7 +58,6 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.ui.components.ReservationFloatingMenu
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
@@ -66,6 +65,7 @@ import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
+import reservant_mobile.ui.components.ReservationFloatingMenu
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem

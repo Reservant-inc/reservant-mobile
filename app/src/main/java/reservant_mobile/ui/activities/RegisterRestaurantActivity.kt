@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberBasicTooltipState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,10 +45,9 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.utils.isFileSizeInvalid
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
-import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
-import reservant_mobile.ui.components.OutLinedDropdownMenu
+import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ProgressBar
 import reservant_mobile.ui.components.SecondaryButton
 import reservant_mobile.ui.components.ShowErrorToast

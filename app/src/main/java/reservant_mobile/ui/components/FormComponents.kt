@@ -316,7 +316,7 @@ fun MyDatePickerDialog(
         onValueChange = { },
         label = label,
         readOnly = true,
-        shape = roundedShape,
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
