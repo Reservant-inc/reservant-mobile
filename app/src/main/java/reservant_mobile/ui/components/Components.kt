@@ -131,7 +131,6 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
@@ -1296,19 +1295,7 @@ fun MissingPage(
 }
 
 @Composable
-fun OrderItem(order: OrderDTO) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-        Text(text = stringResource(id = R.string.label_date)+": ${order.date}")
-        Text(text = stringResource(id = R.string.label_total_cost)+": ${order.cost}")
-        Text(text = order.customer)
-        Text(text = order.status, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun SettingItem(
+fun UnderlinedItem(
     icon: ImageVector,
     text: String,
     onClick: () -> Unit
@@ -1346,6 +1333,8 @@ fun SettingItem(
     HorizontalDivider()
 }
 
+
+//TODO: remove and use search with filter
 @Composable
 fun FilterDialog(
     onDismissRequest: () -> Unit,
