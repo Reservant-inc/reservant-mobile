@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -171,8 +170,6 @@ import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
-import reservant_mobile.data.utils.Country
-import reservant_mobile.data.utils.getFlagEmojiFor
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import java.time.LocalDate
@@ -181,7 +178,7 @@ import kotlin.math.floor
 
 val roundedShape = RoundedCornerShape(12.dp)
 
-
+//TODO: co z tym komponentem a comboboxem
 @Composable
 fun OutLinedDropdownMenu(
     selectedOption: String,
@@ -345,96 +342,10 @@ fun DetailItem(label: String, value: String) {
 
 @Composable
 fun TagsDetailView(tags: List<String>) {
-    val tagsString = tags.joinToString(separator = ", ")
     DetailItem(
         label = stringResource(R.string.label_restaurant_tags),
-        value = tagsString
+        value = tags.joinToString(separator = ", ")
     )
-}
-
-@Composable
-fun RestaurantCard(
-    onClick: () -> Unit,
-    imageUrl: String,
-    name: String,
-    location: String,
-    city: String
-) {
-    Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row (
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxWidth()
-        ){
-            Image(
-                painter = painterResource(R.drawable.ic_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            )
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "$location, $city",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CountryCodePickerDialog(
-    countries: List<Country>,
-    onSelection: (Country) -> Unit,
-    dismiss: () -> Unit,
-) {
-    Dialog(onDismissRequest = dismiss) {
-        Box {
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp, vertical = 40.dp)
-                    .background(shape = RoundedCornerShape(20.dp), color = Color.White)
-            ) {
-                for (country in countries) {
-                    item {
-                        Text(
-                            modifier = Modifier
-                                .clickable {
-                                    onSelection(country)
-                                    dismiss()
-                                }
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            text = "${getFlagEmojiFor(country.nameCode)} ${country.fullName}"
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable

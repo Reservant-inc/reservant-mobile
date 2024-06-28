@@ -4,13 +4,16 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.reservant_mobile.R
 import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.getFileName
@@ -365,4 +369,37 @@ fun CountryPickerView(
         CountryCodePickerDialog(countries, onSelection) {
             showDialog = false
         }
+}
+
+@Composable
+fun CountryCodePickerDialog(
+    countries: List<Country>,
+    onSelection: (Country) -> Unit,
+    dismiss: () -> Unit,
+) {
+    Dialog(onDismissRequest = dismiss) {
+        Box {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp, vertical = 40.dp)
+                    .background(shape = RoundedCornerShape(20.dp), color = Color.White)
+            ) {
+                for (country in countries) {
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .clickable {
+                                    onSelection(country)
+                                    dismiss()
+                                }
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            text = "${getFlagEmojiFor(country.nameCode)} ${country.fullName}"
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
