@@ -190,7 +190,7 @@ fun MenuCard(
 
     when {
         showConfirmDeletePopup.value -> {
-            CountDownPopup(
+            DeleteCountdownPopup(
                 icon = Icons.Filled.DeleteForever,
                 title = stringResource(id = R.string.confirm_delete_title),
                 text = stringResource(id = R.string.confirm_delete_text),

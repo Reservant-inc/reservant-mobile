@@ -65,7 +65,7 @@ import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import reservant_mobile.ui.components.CountDownPopup
+import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
@@ -95,7 +95,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         if(restaurant!= null){
             val confirmText = stringResource(R.string.delete_restaurant_message) +
                     "\n" + restaurant.name + " ?";
-            CountDownPopup(
+            DeleteCountdownPopup(
                 icon = Icons.Default.Delete,
                 title = stringResource(R.string.delete_restaurant_title),
                 text = confirmText,
