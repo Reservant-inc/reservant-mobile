@@ -141,7 +141,6 @@ fun MapActivity(){
                             items(restaurants!!) { item ->
                                 RestaurantCard(
                                     onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                    imageUrl = "",
                                     name = item.name,
                                     location = item.address,
                                     city = item.city
@@ -180,7 +179,6 @@ fun MapActivity(){
                             items(events!!) { item ->
                                 RestaurantCard(
                                     onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                    imageUrl = "",
                                     name = item.restaurantName!!,
                                     location = item.description,
                                     city = item.mustJoinUntil

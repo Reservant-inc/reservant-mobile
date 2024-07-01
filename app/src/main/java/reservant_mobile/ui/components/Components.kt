@@ -1,10 +1,7 @@
 package reservant_mobile.ui.components
 
 import android.content.Context
-import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -13,26 +10,18 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,44 +31,31 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.AddLocationAlt
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -89,10 +65,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -104,25 +76,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -134,357 +98,97 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
-import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
-import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
-import reservant_mobile.data.utils.Country
-import reservant_mobile.data.utils.getFileName
-import reservant_mobile.data.utils.getFlagEmojiFor
-import reservant_mobile.ui.viewmodels.EmployeeViewModel
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 import kotlin.math.floor
 
-val roundedShape = RoundedCornerShape(12.dp)
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputUserInfo(
+fun ComboBox(
     modifier: Modifier = Modifier,
-    inputText: String,
+    expanded: MutableState<Boolean>,
+    value: String,
     onValueChange: (String) -> Unit,
-    label: String = "",
-    placeholder: String = "",
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    options: List<String>,
+    label: String,
     isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    optional: Boolean = false,
-    maxLines: Int = 1,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-) {
+    errorText: String = ""
+){
 
-    var beginValidation: Boolean by remember {
+    val onDismiss = { expanded.value = false }
+    var beginValidation by remember {
         mutableStateOf(false)
     }
 
-    if (inputText.isNotEmpty())
-        beginValidation = true
-
-    if (inputText.isEmpty() && optional)
-        beginValidation = false
-
-    Column {
-        OutlinedTextField(
-            modifier =
-            if (optional) {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            } else {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .onFocusChanged {
-                        if (it.hasFocus) beginValidation = true
-                    }
-            },
-            value = inputText,
-            onValueChange = onValueChange,
-            label = {
-                Row {
-                    Text(text = label)
-                    if (optional)
-                        Text(
-                            text = stringResource(id = R.string.label_optional),
-                            color = MaterialTheme.colorScheme.outline,
-                            fontStyle = FontStyle.Italic
-                        )
-
-                }
-            },
-            placeholder = { Text(text = placeholder) },
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions.copy(
-                imeAction = if (keyboardOptions.imeAction == ImeAction.Default)
-                    ImeAction.Next
-                else keyboardOptions.imeAction
-            ),
-            shape = shape,
-            isError = isError && (beginValidation || formSent),
-            maxLines = maxLines,
-            leadingIcon = leadingIcon,
-
-            )
-        if (isError && (beginValidation || formSent)) {
-            Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error
-            )
+    ExposedDropdownMenuBox(
+        expanded = expanded.value,
+        onExpandedChange = {
+            expanded.value = !expanded.value
+            beginValidation = true
         }
-    }
-
-}
-
-@Composable
-fun InputUserFile(
-    label: String = "",
-    defaultValue: String = "",
-    onFilePicked: (Uri?) -> Unit,
-    modifier: Modifier = Modifier,
-    context: Context,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    optional: Boolean = false,
-    deletable: Boolean = false
-) {
-    var fileName by remember { mutableStateOf<String?>(null) }
-    val pickFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        fileName = uri?.let { getFileName(context, it.toString()) }
-        onFilePicked(uri)
-    }
-    var beginValidation: Boolean by remember { mutableStateOf(false) }
-
-    if (fileName != null) {
-        beginValidation = true
-    }
-    if (fileName == null && optional) {
-        beginValidation = false
-    }
-
-    if (fileName == null && defaultValue.isNotBlank()){
-        fileName = defaultValue
-    }
-
-    OutlinedTextField(
-        modifier =
-        if (optional) {
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        } else {
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .onFocusChanged {
-                    if (it.hasFocus) {
-                        beginValidation = true
-                    }
-                }
-        },
-        value = fileName ?: "",
-        onValueChange = { },
-        label = {
-            Row {
-                Text(text = label)
-                if (optional) {
-                    Text(
-                        text = stringResource(R.string.label_optional),
-                        color = Color.Gray,
-                        fontStyle = FontStyle.Italic
-                    )
-                }
-            }
-        },
-        readOnly = true,
-        visualTransformation = VisualTransformation.None,
-        keyboardOptions = KeyboardOptions.Default,
-        interactionSource = remember { MutableInteractionSource() }
-            .also { interactionSource ->
-                LaunchedEffect(interactionSource) {
-                    interactionSource.interactions.collect {
-                        if (it is PressInteraction.Release) {
-                            pickFileLauncher.launch("*/*")
-                        }
-                    }
-                }
-            },
-        trailingIcon = {
-            if (deletable && fileName != null) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete file",
-                    modifier = Modifier.clickable {
-                        fileName = null
-                        onFilePicked(null)
-                    }
-                )
-            } else if (fileName == null) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Attach file"
-                )
-            }
-        },
-        shape = shape,
-        isError = isError && (beginValidation || formSent),
-    )
-
-    if (isError && (beginValidation || formSent)) {
-        Text(
-            text = errorText,
-            color = Color.Red
-        )
-    }
-}
-
-
-@Composable
-fun OutLinedDropdownMenu(
-    selectedOption: String,
-    itemsList: List<String>,
-    onOptionSelected: (String) -> Unit,
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    modifier: Modifier = Modifier,
-    isError: Boolean = false,
-    errorText: String = "",
-    formSent: Boolean = false,
-    label: String = "",
-    optional: Boolean = false
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-    var beginValidation: Boolean by remember {
-        mutableStateOf(false)
-    }
-
-    if (selectedOption.isNotEmpty())
-        beginValidation = true
-    if (selectedOption.isEmpty() && optional)
-        beginValidation = false
-
-    Column {
-        OutlinedTextField(
-            modifier =
-            if (optional) {
-                modifier
-                    .fillMaxWidth()
+    ) {
+        Column {
+            OutlinedTextField(
+                modifier = modifier
                     .padding(vertical = 8.dp)
-            } else {
-                modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .onFocusChanged {
-                        if (it.hasFocus) beginValidation = true
-                    }
-            },
-            value = selectedOption,
-            onValueChange = { },
-            readOnly = true,
-            label = {
-                Row {
-                    Text(text = label)
-                    if (optional)
-                        Text(
-                            text = stringResource(id = R.string.label_optional),
-                            color = Color.Gray,
-                            fontStyle = FontStyle.Italic
-                        )
-                }
-            },
-            interactionSource = interactionSource,
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = if (expanded) "Hide" else "Show"
-                )
-            },
-            shape = shape,
-            isError = isError && (beginValidation || formSent),
-        )
-        if (isError && (beginValidation || formSent)) {
-            Text(
-                text = errorText,
-                color = Color.Red
+                    .menuAnchor(),
+                label = { Text(text = label) },
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                shape = RoundedCornerShape(8.dp),
+                isError = isError && beginValidation
             )
+
+            if (isError && beginValidation) Text(text = errorText, color = MaterialTheme.colorScheme.error)
         }
 
-        LaunchedEffect(interactionSource) {
-            interactionSource.interactions.collect { interaction ->
-                if (interaction is PressInteraction.Release) {
-                    expanded = true
-                }
-            }
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
+        ExposedDropdownMenu(
+            modifier = Modifier.exposedDropdownSize(matchTextFieldWidth = false),
+            expanded = expanded.value,
+            onDismissRequest = onDismiss
         ) {
-            itemsList.forEach { option ->
+            options.forEach {
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(text = it) },
                     onClick = {
-                        onOptionSelected(option)
-                        expanded = false
+                        onValueChange(it)
+                        onDismiss()
                     }
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun ButtonComponent(
@@ -525,280 +229,12 @@ fun ButtonComponent(
 
 
 @Composable
-fun TagsSelection(
-    tags: List<String>,
-    selectedTags: List<String>,
-    onTagSelected: (String, Boolean) -> Unit,
-) {
-    Column {
-        tags.forEach { tag ->
-            val isChecked = selectedTags.contains(tag)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp)
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { isSelected ->
-                        onTagSelected(tag, isSelected)
-                    }
-                )
-                Text(
-                    text = tag,
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .clickable { onTagSelected(tag, !isChecked) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-
 fun Logo(modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = "Logo",
         modifier = modifier.size(120.dp)
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialog(
-    onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit,
-    allowFutureDates: Boolean,
-    startDate: String
-) {
-    fun convertMillisToDate(millis: Long): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return formatter.format(Date(millis))
-    }
-
-    fun convertDateToMillis(date: String): Long {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return formatter.parse(date)?.time ?: 0L
-    }
-
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = convertDateToMillis(startDate),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                return if (allowFutureDates) {
-                    true
-                } else {
-                    utcTimeMillis <= System.currentTimeMillis()
-                }
-            }
-        }
-    )
-
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-
-    DatePickerDialog(
-        onDismissRequest = { onDismiss() },
-        confirmButton = {
-            Button(onClick = {
-                onDateSelected(selectedDate)
-                onDismiss()
-            }) {
-                Text(text = "OK")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text(text = "Cancel")
-            }
-        }
-    ) {
-        DatePicker(
-            state = datePickerState
-        )
-    }
-}
-
-
-@Composable
-fun MyDatePickerDialog(
-    onBirthdayChange: (String) -> Unit,
-    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
-    startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
-    allowFutureDates: Boolean = false,
-    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
-) {
-    var date by remember { mutableStateOf(startStringValue) }
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    OutlinedTextField(
-        value = date,
-        onValueChange = { },
-        label = label,
-        readOnly = true,
-        shape = roundedShape,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        interactionSource = remember { MutableInteractionSource() }
-            .also { interactionSource ->
-                LaunchedEffect(interactionSource) {
-                    interactionSource.interactions.collect {
-                        if (it is PressInteraction.Release) {
-                            showDatePicker = true
-                        }
-                    }
-                }
-            }
-    )
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDateSelected = {
-                date = it
-                onBirthdayChange(it)
-            },
-            onDismiss = { showDatePicker = false },
-            allowFutureDates = allowFutureDates,
-            startDate = startDate
-        )
-
-    }
-}
-
-@Composable
-fun RestaurantInfoView(
-    restaurant: RestaurantDTO,
-    onEditClick: () -> Unit,
-    onManageEmployeeClick: () -> Unit,
-    onManageMenuClick: () -> Unit,
-    onManageSubscriptionClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    var showMenu by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_logo),
-                        contentDescription = "Restaurant Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "${restaurant.name} - ${restaurant.restaurantType}",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_nip),
-                    value = restaurant.nip
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_address),
-                    value = "${restaurant.address}, ${restaurant.postalIndex}"
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_city),
-                    value = restaurant.city
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_delivery),
-                    value =
-                    if (restaurant.provideDelivery)
-                        stringResource(R.string.label_restaurant_delivery_available)
-                    else
-                        stringResource(R.string.label_restaurant_delivery_not_available)
-                )
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_description),
-                    value = restaurant.description
-                )
-                if (restaurant.tags.isNotEmpty()) {
-                    TagsDetailView(tags = restaurant.tags)
-                }
-                DetailItem(
-                    label = stringResource(R.string.label_restaurant_tables),
-                    value = "${restaurant.tables.size}"
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.TopEnd)
-                    .offset(x = 16.dp)
-                    .offset(y = (-12).dp)
-            ) {
-                IconButton(
-                    onClick = { showMenu = !showMenu },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = "More Options")
-                }
-
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            onEditClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_edit_local_data)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageEmployeeClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_employees)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageMenuClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_menu)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onManageSubscriptionClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_manage_subscription)) }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onDeleteClick()
-                            showMenu = false
-                        },
-                        text = { Text(stringResource(R.string.label_management_delete_restaurant)) }
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -821,184 +257,10 @@ fun DetailItem(label: String, value: String) {
 
 @Composable
 fun TagsDetailView(tags: List<String>) {
-    if (tags.isNotEmpty()) {
-        val tagsString = tags.joinToString(separator = ", ")
-        DetailItem(
-            label = stringResource(R.string.label_restaurant_tags),
-            value = tagsString
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownMenuBox(
-    modifier: Modifier = Modifier,
-    label: String,
-    itemsList: List<String>,
-    shape: RoundedCornerShape = roundedShape,
-    onItemSelected: (String) -> Unit,
-    enabled: Boolean = true,
-    isError: Boolean = false
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
-
-    Box(
-        modifier = modifier.padding(vertical = 8.dp)
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                if (enabled) {
-                    expanded = it
-                }
-            }
-        ) {
-            TextField(
-                label = { Text(text = label) },
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(),
-                shape = shape,
-                enabled = enabled,
-                isError = isError
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    if (enabled) {
-                        expanded = false
-                    }
-                }
-            ) {
-                itemsList.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                            if (enabled) {
-                                selectedText = item
-                                expanded = false
-                                onItemSelected(item)
-                            }
-                        },
-                        enabled = enabled
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CountryPickerView(
-    selectedCountry: Country,
-    onSelection: (Country) -> Unit,
-    countries: List<Country>
-) {
-    var showDialog by remember { mutableStateOf(false) }
-    Text(
-        modifier = Modifier
-            .clickable {
-                showDialog = true
-            }
-            .padding(start = 20.dp, end = 5.dp)
-            .testTag("CountryPicker"),
-        text = "${getFlagEmojiFor(selectedCountry.nameCode)} +${selectedCountry.code}"
+    DetailItem(
+        label = stringResource(R.string.label_restaurant_tags),
+        value = tags.joinToString(separator = ", ")
     )
-
-    if (showDialog)
-        CountryCodePickerDialog(countries, onSelection) {
-            showDialog = false
-        }
-}
-
-@Composable
-fun RestaurantCard(
-    onClick: () -> Unit,
-    imageUrl: String,
-    name: String,
-    location: String,
-    city: String
-) {
-    Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row (
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .fillMaxWidth()
-        ){
-            Image(
-                painter = painterResource(R.drawable.ic_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            )
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "$location, $city",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CountryCodePickerDialog(
-    countries: List<Country>,
-    onSelection: (Country) -> Unit,
-    dismiss: () -> Unit,
-) {
-    Dialog(onDismissRequest = dismiss) {
-        Box {
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp, vertical = 40.dp)
-                    .background(shape = RoundedCornerShape(20.dp), color = Color.White)
-            ) {
-                for (country in countries) {
-                    item {
-                        Text(
-                            modifier = Modifier
-                                .clickable {
-                                    onSelection(country)
-                                    dismiss()
-                                }
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            text = "${getFlagEmojiFor(country.nameCode)} ${country.fullName}"
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -1092,118 +354,6 @@ fun ShowErrorToast(context: Context, id: Int) {
     }
 }
 
-@Composable
-fun EmployeeCard(
-    employee: RestaurantEmployeeDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    var showConfirmDeletePopup by remember { mutableStateOf(false) }
-
-    when {
-        showConfirmDeletePopup -> {
-            CountDownPopup(
-                icon = Icons.Filled.DeleteForever,
-                title = stringResource(id = R.string.confirm_delete_title),
-                text = stringResource(id = R.string.confirm_delete_text),
-                onConfirm = {
-                    onDeleteClick()
-                    showConfirmDeletePopup = false
-                },
-                onDismissRequest = { showConfirmDeletePopup = false },
-                confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.label_cancel)
-            )
-        }
-    }
-
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        val localDensity = LocalDensity.current
-        var tabWidth by remember { mutableStateOf(0.dp) }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopStart
-            ) {
-
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "${employee.firstName} ${employee.lastName}",
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
-                    )
-
-                    Text(
-                        text = "${stringResource(id = R.string.label_login_display)} ${employee.login}",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-
-                    Text(
-                        text = "${stringResource(id = R.string.label_phone_display)} ${employee.phoneNumber}",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-                        modifier = Modifier
-                            .onGloballyPositioned { coordinates ->
-                                tabWidth = with(localDensity) { coordinates.size.width.toDp() }
-                            }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .width(tabWidth),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-
-
-                    if (employee.isHallEmployee) {
-                        Text(
-                            text = stringResource(id = R.string.label_employee_hall),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    if (employee.isBackdoorEmployee) {
-                        Text(
-                            text = stringResource(id = R.string.label_employee_backdoor),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-            Row {
-                val buttonModifier = Modifier
-                    .size(50.dp)
-                    .padding(6.dp)
-
-                SecondaryButton(
-                    modifier = buttonModifier,
-                    onClick = onEditClick,
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "EditEmployee"
-                )
-
-                SecondaryButton(
-                    modifier = buttonModifier,
-                    onClick = {showConfirmDeletePopup = true},
-                    imageVector = Icons.Filled.DeleteForever,
-                    contentDescription = "DeleteEmployee"
-                )
-            }
-        }
-
-    }
-}
-
 
 @Composable
 fun BottomNavigation(
@@ -1264,310 +414,6 @@ fun BottomNavigation(
 }
 
 
-@Composable
-fun Heading() {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text("Drawer title", modifier = Modifier.padding(16.dp))
-                HorizontalDivider()
-                NavigationDrawerItem(
-                    label = { Text("Drawer Item") },
-                    selected = false,
-                    onClick = { /* Akcja po kliknięciu */ }
-                )
-                // Dodaj więcej elementów, jeśli są potrzebne
-            }
-        },
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.TopStart
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .padding(4.dp) // wielkość kolorowego tła
-            ) {
-                IconButton(onClick = {
-                    scope.launch {
-                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                    }
-                }) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
-    vm.clearFields()
-    var formSent by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.label_employee_add)) },
-        text = {
-            Column {
-                InputUserInfo(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.firstName.value,
-                    onValueChange = { vm.firstName.value = it },
-                    label = stringResource(id = R.string.label_name),
-                    optional = false,
-                    isError = vm.isFirstNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getFirstNameError() != -1)
-                            vm.getFirstNameError()
-                        else
-                            R.string.error_register_invalid_name
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.lastName.value,
-                    onValueChange = { vm.lastName.value = it },
-                    label = stringResource(id = R.string.label_lastname),
-                    optional = false,
-                    isError = vm.isLastNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLastNameError() != -1)
-                            vm.getLastNameError()
-                        else
-                            R.string.error_register_invalid_lastname
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.phoneNum.value,
-                    onValueChange = { vm.phoneNum.value = it },
-                    label = stringResource(id = R.string.label_phone),
-                    optional = false,
-                    isError = vm.isPhoneInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPhoneError() != -1)
-                            vm.getPhoneError()
-                        else
-                            R.string.error_register_invalid_phone
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.password.value,
-                    onValueChange = { vm.password.value = it },
-                    label = stringResource(id = R.string.label_password),
-                    optional = false,
-                    isError = vm.isPasswordInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPasswordError() != -1)
-                            vm.getPasswordError()
-                        else
-                            R.string.error_register_invalid_password
-                    ),
-                    formSent = formSent
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_hall))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
-                }
-            }
-        },
-        confirmButton = {
-            ShowErrorToast(context = LocalContext.current, id = vm.getToastError())
-            ButtonComponent(
-                onClick = {
-                    vm.viewModelScope.launch {
-                        isLoading = true
-                        formSent = true
-
-                        if (vm.register()) {
-                            onDismiss()
-                        }
-
-                        isLoading = false
-                    }
-                },
-                label = stringResource(R.string.label_signup)
-            )
-        },
-        dismissButton = {
-            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
-        }
-    )
-}
-
-@Composable
-fun EditEmployeeDialog(
-    employee: RestaurantEmployeeDTO,
-    onDismiss: () -> Unit,
-    vm: EmployeeViewModel
-) {
-    vm.login.value = employee.login.substringAfter('+')
-    vm.firstName.value = employee.firstName
-    vm.lastName.value = employee.lastName
-    vm.phoneNum.value = employee.phoneNumber
-    vm.isHallEmployee = employee.isHallEmployee
-    vm.isBackdoorEmployee = employee.isBackdoorEmployee
-
-    var formSent by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.label_employee_edit)) },
-        text = {
-            Column {
-                InputUserInfo(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.firstName.value,
-                    onValueChange = { vm.firstName.value = it },
-                    label = stringResource(id = R.string.label_name),
-                    optional = false,
-                    isError = vm.isFirstNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getFirstNameError() != -1)
-                            vm.getFirstNameError()
-                        else
-                            R.string.error_register_invalid_name
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.lastName.value,
-                    onValueChange = { vm.lastName.value = it },
-                    label = stringResource(id = R.string.label_lastname),
-                    optional = false,
-                    isError = vm.isLastNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLastNameError() != -1)
-                            vm.getLastNameError()
-                        else
-                            R.string.error_register_invalid_lastname
-                    ),
-                    formSent = formSent
-                )
-                InputUserInfo(
-                    inputText = vm.phoneNum.value,
-                    onValueChange = { vm.phoneNum.value = it },
-                    label = stringResource(id = R.string.label_phone),
-                    optional = false,
-                    isError = vm.isPhoneInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPhoneError() != -1)
-                            vm.getPhoneError()
-                        else
-                            R.string.error_register_invalid_phone
-                    ),
-                    formSent = formSent
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_hall))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
-                }
-            }
-        },
-        confirmButton = {
-            ButtonComponent(
-                onClick = {
-                    vm.viewModelScope.launch {
-                        isLoading = true
-                        formSent = true
-
-                        if (vm.editEmployee(employee)) {
-                            onDismiss()
-                        }
-
-                        isLoading = false
-                    }
-                },
-                label = stringResource(R.string.label_save)
-            )
-        },
-        dismissButton = {
-            ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
-        }
-    )
-}
-
-@Composable
-fun Content() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Zgłodniałeś?")
-    }
-}
-
-
 fun Modifier.shimmer(): Modifier = composed {
     var size by remember {
         mutableStateOf(IntSize.Zero)
@@ -1597,662 +443,6 @@ fun Modifier.shimmer(): Modifier = composed {
         .onGloballyPositioned {
             size = it.size
         }
-}
-
-@Composable
-fun MenuPopup(
-    title: @Composable (() -> Unit),
-    hide: () -> Unit,
-    onConfirm: () -> Unit,
-    clear: () -> Unit,
-    onFilePicked: (Uri?) -> Unit,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
-    name: FormField,
-    isNameInvalid: Boolean = false,
-    altName: FormField,
-    isAltNameInvalid: Boolean = false,
-    menuType: FormField,
-    menuTypes: List<String>,
-    isMenuTypeInvalid: Boolean = false,
-    dateFrom: FormField,
-    dateUntil: FormField,
-    isSaving: Boolean = false
-) {
-
-    var expanded = remember {
-        mutableStateOf(false)
-    }
-
-    AlertDialog(
-        onDismissRequest = {
-            hide()
-            clear()
-        },
-        title = title,
-        text = {
-            Column {
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_restaurant_name),
-                    inputText = name.value,
-                    onValueChange = { name.value = it },
-                    isError = isNameInvalid,
-                    errorText = stringResource(id = R.string.error_invalid_menu_name)
-                )
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_alternate_name),
-                    optional = true,
-                    inputText = altName.value,
-                    onValueChange = { altName.value = it },
-                    isError = isAltNameInvalid,
-                    errorText = stringResource(id = R.string.error_invalid_menu_name)
-                )
-                ComboBox(
-                    label = stringResource(id = R.string.label_menu_type),
-                    value = menuType.value,
-                    onValueChange = { menuType.value = it},
-                    expanded = expanded,
-                    options = menuTypes,
-                    isError = isMenuTypeInvalid,
-                    errorText = stringResource(id = R.string.error_invalid_menu_type)
-                )
-                MyDatePickerDialog(
-                    label = { Text(text = stringResource(id = R.string.label_date_from)) },
-                    allowFutureDates = true,
-                    startStringValue = dateFrom.value,
-                    startDate = dateFrom.value.ifEmpty {
-                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                    },
-                    onBirthdayChange = { dateFrom.value = it }
-                )
-                MyDatePickerDialog(
-                    label = {
-                        Text(text = buildAnnotatedString {
-                            append(stringResource(id = R.string.label_date_to))
-                            pushStyle(
-                                SpanStyle(
-                                    Color.Gray,
-                                    fontWeight = FontWeight.Light,
-                                    fontStyle = FontStyle.Italic
-                                )
-                            )
-                            append(stringResource(id = R.string.label_optional))
-                        })
-                    },
-                    allowFutureDates = true,
-                    startStringValue = dateUntil.value,
-                    startDate = dateUntil.value.ifEmpty {
-                        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-                    },
-                    onBirthdayChange = { dateUntil.value = it }
-                )
-                InputUserFile(
-                    label = stringResource(id = R.string.label_menu_photo),
-                    onFilePicked = onFilePicked,
-                    context = LocalContext.current,
-                    isError = fileErrors != -1 || fileTooLarge != -1,
-                    errorText = if (fileTooLarge != -1) stringResource(id = fileTooLarge, 1024)
-                    else if (fileErrors != -1) stringResource(id = fileErrors)
-                    else ""
-                )
-
-            }
-        },
-        dismissButton = {
-            ButtonComponent(
-                onClick = {
-                    hide()
-                    clear()
-                },
-                label = stringResource(id = R.string.label_cancel)
-            )
-        },
-        confirmButton = {
-            ButtonComponent(
-                onClick = {
-                    onConfirm()
-                },
-                label = stringResource(id = R.string.label_save),
-                isLoading = isSaving
-            )
-        },
-
-        )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ComboBox(
-    expanded: MutableState<Boolean>,
-    value: String,
-    onValueChange: (String) -> Unit,
-    options: List<String>,
-    label: String,
-    isError: Boolean,
-    errorText: String
-){
-
-    val onDismiss = { expanded.value = false }
-    var beginValidation by remember {
-        mutableStateOf(false)
-    }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded.value,
-        onExpandedChange = {
-            expanded.value = !expanded.value
-            beginValidation = true
-        }
-    ) {
-        Column {
-            OutlinedTextField(
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .menuAnchor(),
-                label = { Text(text = label) },
-                value = value,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
-                shape = RoundedCornerShape(8.dp),
-                isError = isError && beginValidation
-            )
-
-            if (isError && beginValidation) Text(text = errorText, color = MaterialTheme.colorScheme.error)
-        }
-
-        ExposedDropdownMenu(expanded = expanded.value, onDismissRequest = onDismiss) {
-            options.forEach {
-                DropdownMenuItem(
-                    text = { Text(text = it) },
-                    onClick = {
-                        onValueChange(it)
-                        onDismiss()
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MenuCard(
-    showConfirmDeletePopup: MutableState<Boolean> = mutableStateOf(false),
-    showEditPopup: MutableState<Boolean> = mutableStateOf(false),
-    name: FormField,
-    altName: FormField,
-    menuType: FormField,
-    menuTypes: List<String>,
-    dateFrom: FormField,
-    dateUntil: FormField,
-    photo: ImageBitmap? = null,
-    menu: RestaurantMenuDTO,
-    onFilePicked: (Uri?) -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    clearFields: () -> Unit,
-    onClick: () -> Unit,
-    isFetching: Boolean = false,
-    isSaving: Boolean = false,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
-    isNameInvalid: Boolean = false,
-    isAltNameInvalid: Boolean = false,
-    isMenuTypeInvalid: Boolean = false
-) {
-
-    when {
-        showConfirmDeletePopup.value -> {
-            CountDownPopup(
-                icon = Icons.Filled.DeleteForever,
-                title = stringResource(id = R.string.confirm_delete_title),
-                text = stringResource(id = R.string.confirm_delete_text),
-                onConfirm = {
-                    onDeleteClick()
-                },
-                onDismissRequest = {showConfirmDeletePopup.value = false},
-                confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.label_cancel),
-                isSaving = isSaving
-            )
-        }
-
-        showEditPopup.value -> {
-            name.value = menu.name
-            altName.value = menu.alternateName ?: ""
-            menuType.value = menu.menuType
-            dateFrom.value = menu.dateFrom
-            dateUntil.value = menu.dateUntil ?: ""
-
-            MenuPopup(
-                title = { Text(text = stringResource(id = R.string.label_edit_menu)) },
-                hide = {showEditPopup.value = false},
-                onConfirm = onEditClick,
-                clear = clearFields,
-                onFilePicked = onFilePicked,
-                name = name,
-                altName = altName,
-                menuType = menuType,
-                menuTypes = menuTypes,
-                dateFrom = dateFrom,
-                dateUntil = dateUntil,
-                isSaving = isSaving,
-                fileTooLarge = fileTooLarge,
-                fileErrors = fileErrors,
-                isNameInvalid = isNameInvalid,
-                isAltNameInvalid = isAltNameInvalid,
-                isMenuTypeInvalid = isMenuTypeInvalid
-            )
-        }
-    }
-    
-
-    val loadingModifier = when {
-        isFetching -> Modifier
-            .shimmer()
-            .alpha(0F)
-        else -> Modifier
-    }
-
-    Card(
-        elevation = CardDefaults.cardElevation(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick = onClick)
-            .then(loadingModifier)
-    ) {
-        Column {
-            if (photo != null){
-                Image(
-                    bitmap = photo,
-                    contentDescription = "${menu.name}_photo",
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                Image(
-                    painterResource(id = R.drawable.unknown_image),
-                    contentDescription = "placeholder_photo",
-                    modifier = Modifier
-                        .size(140.dp)
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-
-
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                ) {
-
-                    val namePadding = when {
-                        menu.alternateName == null -> 8.dp
-                        else -> 2.dp
-                    }
-
-                    Text(
-                        text = menu.name,
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                        modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp, bottom = namePadding, top = 8.dp)
-                    )
-
-                    menu.alternateName?.let {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Light,
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                        )
-                    }
-
-                    menu.dateUntil?.let {
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(id = R.string.label_limited_time))
-                                append(": ")
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                                append(it)
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    val buttonModifier = Modifier
-                        .align(Alignment.Bottom)
-                        .size(50.dp)
-                        .padding(6.dp)
-
-                    SecondaryButton(
-                        modifier = buttonModifier,
-                        onClick = { showEditPopup.value = true },
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "EditMenuItem"
-                    )
-
-                    SecondaryButton(
-                        modifier = buttonModifier,
-                        onClick = { showConfirmDeletePopup.value = true },
-                        imageVector = Icons.Filled.DeleteForever,
-                        contentDescription = "delete"
-                    )
-                }
-
-                /*Text(
-                    text = menu.menuType,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(8.dp)
-                )*/
-
-            }
-        }
-    }
-}
-
-@Composable
-fun AddMenuButton(
-    name: FormField,
-    altName: FormField,
-    menuType: FormField,
-    menuTypes: List<String>,
-    dateFrom: FormField,
-    dateUntil: FormField,
-    onFilePicked: (Uri?) -> Unit,
-    clearFields: () -> Unit,
-    addMenu: () -> Unit,
-    isSaving: Boolean = false,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
-    isNameInvalid: Boolean = false,
-    isAltNameInvalid: Boolean = false,
-    isMenuTypeInvalid: Boolean = false,
-    showAddDialog: MutableState<Boolean> = mutableStateOf(false)
-) {
-    when {
-        showAddDialog.value -> {
-            MenuPopup(
-                title = { Text(text = stringResource(id = R.string.label_add_menu)) },
-                hide = { showAddDialog.value = false },
-                onConfirm = addMenu,
-                clear = clearFields,
-                onFilePicked = onFilePicked,
-                fileTooLarge = fileTooLarge,
-                fileErrors = fileErrors,
-                name = name,
-                altName = altName,
-                menuType = menuType,
-                menuTypes = menuTypes,
-                dateFrom = dateFrom,
-                dateUntil = dateUntil,
-                isSaving = isSaving,
-                isNameInvalid = isNameInvalid,
-                isAltNameInvalid = isAltNameInvalid,
-                isMenuTypeInvalid = isMenuTypeInvalid
-            )
-        }
-    }
-
-    MyFloatingActionButton(
-        onClick = { showAddDialog.value = true }
-    )
-}
-
-
-@Composable
-fun MenuItemCard(
-    name: FormField,
-    altName: FormField,
-    price: FormField,
-    alcoholPercentage: FormField,
-    photo: FormField,
-    menuItem: RestaurantMenuItemDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    clearFields: () -> Unit,
-    context: Context
-) {
-
-    var showConfirmDeletePopup by remember { mutableStateOf(false) }
-    var showEditPopup by remember { mutableStateOf(false) }
-
-
-    when {
-        showConfirmDeletePopup -> {
-            CountDownPopup(
-                icon = Icons.Filled.DeleteForever,
-                title = stringResource(id = R.string.confirm_delete_title),
-                text = stringResource(id = R.string.confirm_delete_text),
-                onConfirm = {
-                    onDeleteClick()
-                    showConfirmDeletePopup = false
-                },
-                onDismissRequest = { showConfirmDeletePopup = false },
-                confirmText = stringResource(id = R.string.label_yes_capital),
-                dismissText = stringResource(id = R.string.label_cancel)
-            )
-        }
-
-        showEditPopup -> {
-
-            name.value = menuItem.name
-            altName.value = menuItem.alternateName ?: ""
-            price.value = menuItem.price.toString()
-            alcoholPercentage.value = menuItem.alcoholPercentage.toString()
-            photo.value = menuItem.photoFileName ?: ""
-
-            MenuItemPopup(
-                title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
-                hide = { showEditPopup = false },
-                onConfirm = onEditClick,
-                clear = clearFields,
-                name = name,
-                altName = altName,
-                price = price,
-                alcoholPercentage = alcoholPercentage,
-                photo = photo,
-                context = context
-            )
-        }
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Row {
-            Column {
-                Text(
-                    text = menuItem.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize(0.5f)
-                )
-
-                if (menuItem.alternateName != null) {
-                    Text(
-                        text = menuItem.alternateName,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-                    )
-                }
-
-                Text(
-                    text = "Price: ${menuItem.price} zł",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-                )
-
-                if (menuItem.alcoholPercentage != null) {
-                    Text(
-                        text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    SecondaryButton(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(50.dp),
-                        onClick = { showEditPopup = true },
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "EditMenuItem"
-                    )
-
-                    SecondaryButton(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(50.dp),
-                        onClick = { showConfirmDeletePopup = true },
-                        imageVector = Icons.Filled.DeleteForever,
-                        contentDescription = "DeleteMenuItem"
-                    )
-                }
-            }
-
-            //TODO podmienić na zdj z backendu
-            Image(
-                painterResource(id = R.drawable.pizza),
-                contentDescription = "",
-                modifier = Modifier.fillMaxHeight()
-            )
-
-        }
-    }
-}
-
-@Composable
-fun MenuItemPopup(
-    title: @Composable (() -> Unit),
-    hide: () -> Unit,
-    onConfirm: () -> Unit,
-    clear: () -> Unit,
-    name: FormField,
-    altName: FormField,
-    price: FormField,
-    alcoholPercentage: FormField,
-    photo: FormField,
-    context: Context
-) {
-    AlertDialog(
-        onDismissRequest = {
-            hide()
-            clear()
-        },
-        title = title,
-        text = {
-            Column {
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_restaurant_name),
-                    inputText = name.value,
-                    onValueChange = { name.value = it }
-                )
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_alternate_name),
-                    optional = true,
-                    inputText = altName.value,
-                    onValueChange = { altName.value = it }
-                )
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_price),
-                    inputText = price.value,
-                    onValueChange = { price.value = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
-                InputUserInfo(
-                    label = stringResource(id = R.string.label_alcohol),
-                    inputText = alcoholPercentage.value,
-                    onValueChange = { alcoholPercentage.value = it },
-                    optional = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
-                InputUserFile(
-                    label = stringResource(id = R.string.label_menu_item_photo),
-                    onFilePicked = { file -> photo.value = file.toString() },
-                    context = context
-                )
-
-            }
-        },
-        dismissButton = {
-            ButtonComponent(
-                onClick = {
-                    hide()
-                    clear()
-                },
-                label = stringResource(id = R.string.label_cancel)
-            )
-        },
-        confirmButton = {
-            ButtonComponent(
-                onClick = {
-                    hide()
-                    onConfirm()
-                    clear()
-                },
-                label = stringResource(id = R.string.label_save)
-            )
-        },
-
-        )
-}
-
-@Composable
-fun AddMenuItemButton(
-    name: FormField,
-    altName: FormField,
-    price: FormField,
-    alcoholPercentage: FormField,
-    photo: FormField,
-    clearFields: () -> Unit,
-    addMenu: () -> Unit,
-    context: Context
-) {
-    var showAddDialog by remember { mutableStateOf(false) }
-
-    when {
-        showAddDialog -> {
-            MenuItemPopup(
-                title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
-                hide = { showAddDialog = false },
-                onConfirm = addMenu,
-                clear = clearFields,
-                name = name,
-                altName = altName,
-                price = price,
-                alcoholPercentage = alcoholPercentage,
-                photo = photo,
-                context = context
-            )
-        }
-    }
-
-    MyFloatingActionButton(
-        onClick = { showAddDialog = true }
-    )
 }
 
 
@@ -2333,7 +523,7 @@ fun DeletePopup(
 }
 
 @Composable
-fun CountDownPopup(
+fun DeleteCountdownPopup(
     countDownTimer: Int = 5,
     icon: ImageVector,
     title: String,
@@ -2427,8 +617,7 @@ fun ProgressBar(currentStep: Int) {
             .height(8.dp)
 
     ) {
-        Row()
-        {
+        Row {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -2470,40 +659,6 @@ fun RatingBar(rating: Float) {
                 contentDescription = "Empty Star"
             )
         }
-    }
-}
-
-@Composable
-fun MenuTypeButton(
-    modifier: Modifier = Modifier,
-    menuType: String,
-    onMenuClick: () -> Unit
-) {
-    Button(
-        onClick = { onMenuClick() },
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(4.dp)
-    ) {
-        Text(menuType)
-    }
-}
-
-@Composable
-fun MenuCategoryButton(modifier: Modifier = Modifier, category: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        ),
-        modifier = modifier.padding(2.dp)
-    ) {
-        Text(category)
     }
 }
 
@@ -2555,13 +710,13 @@ fun TagSelectionScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
-    FlowRow(
-        modifier = Modifier.padding(vertical = 8.dp)
+    LazyRow(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
     ) {
-        tags.forEach { tag ->
+        items(tags){ tag ->
             TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
@@ -2590,7 +745,7 @@ fun TagItem(
     )
 }
 
-
+//TODO: Jeden z MENUITEMCARD to wywalenia
 @Composable
 fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
@@ -2727,8 +882,8 @@ fun MenuItemCard(
 }
 
 @Composable
-fun FullscreenGallery(onDismiss: () -> Unit) {
-    val imageList = listOf(
+fun FullscreenGallery(
+    imageList: List<Int> = listOf(
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
@@ -2748,7 +903,9 @@ fun FullscreenGallery(onDismiss: () -> Unit) {
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo,
         R.drawable.restaurant_photo
-    )
+    ),
+    onDismiss: () -> Unit
+) {
 
     Dialog(onDismissRequest = onDismiss) {
         Box(
@@ -2810,246 +967,12 @@ fun FullscreenGallery(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun FloatingActionMenu(
-    onDineInClick: () -> Unit,
-    onDeliveryClick: () -> Unit,
-    onTakeawayClick: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-
-        if (expanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(onClick = { expanded = false })
-            )
-        }
-
-        AnimatedVisibility(
-            visible = expanded,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .height(680.dp)
-                        .width(360.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            "Na miejscu" to {
-                                DineInContent(
-                                    onDineInClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                ) },
-                            "Dostawa" to { // TODO: not implemented on backend
-                                DeliveryContent(
-                                    onDeliveryClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                ) },
-                            "Odbiór" to { // TODO: not implemented on backend
-                                TakeawayContent(
-                                    onTakeawayClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                ) }
-                        ),
-                        paneScroll = false
-                    )
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingActionButton(onClick = { expanded = !expanded }) {
-                Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
-            }
-        }
-    }
-}
-
-// TODO: resources
-@Composable
-fun DineInContent(
-    onDineInClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var comment by remember { mutableStateOf("") }
-    var seats by remember { mutableIntStateOf(1) }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = "Moja rezerwacja",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
-        )
-        MyDatePickerDialog(
-            label = { Text("Data rezerwacji") },
-            onBirthdayChange = { selectedDate ->
-                // TODO: date change
-            },
-            startDate = LocalDate.now().toString(),
-            allowFutureDates = true
-        )
-
-        Text(
-            text = "Liczba miejsc",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            LabelButton(
-                onClick = { if (seats > 1) seats-- },
-                color = MaterialTheme.colorScheme.primary,
-                enabled = seats > 1,
-                label = "-"
-            )
-            Text(
-                text = seats.toString(),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            LabelButton(
-                onClick = { if (seats < 10) seats++ },
-                color = MaterialTheme.colorScheme.primary,
-                enabled = seats < 10,
-                label = "+"
-            )
-        }
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO: Handle note change */ },
-            label = { Text(text = "Napisz notatkę do zamówienia...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        Text(
-            text = "Mój koszyk",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(start = 16.dp, end = 16.dp)
-                    .padding(vertical = 8.dp)
-                ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                        IconButton(
-                            onClick = { /* TODO: Decrease item count */ },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
-                        }
-                        IconButton(
-                            onClick = { /* TODO: Increase item count */ },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                        }
-                    }
-                }
-                Text(
-                    text = "Kwota: 30zł",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-
-        OutlinedTextField(
-            value = "JSKS6X293",
-            onValueChange = { /* TODO: Change promo code */ },
-            label = {
-                Text(
-                    text = "Wpisz kod promocyjny",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Kwota całkowita:",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "60zł",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Button(
-            onClick = { /* TODO: Go to summary */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            shape = RoundedCornerShape(50)
-        ) {
-            Text(text = "Przejdź do podsumowania")
-        }
-    }
-}
-
-@Composable
-fun LabelButton(
+fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     color: Color = MaterialTheme.colorScheme.primary,
-    label: String
+    icon: String
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -3062,7 +985,7 @@ fun LabelButton(
             )
     ) {
         Text(
-            text = label,
+            text = icon,
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
@@ -3070,135 +993,7 @@ fun LabelButton(
     }
 }
 
-@Composable
-fun DeliveryContent(
-    onDeliveryClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Text(text = "Dostawa", style = MaterialTheme.typography.headlineSmall)
-
-        Button(onClick = onDeliveryClick) {
-            Text("Zamów dostawę")
-        }
-    }
-}
-
-@Composable
-fun TakeawayContent(
-    onTakeawayClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 16.dp, end = 8.dp, start = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "Mój koszyk",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(2) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                                IconButton(
-                                    onClick = { /* TODO: Decrease item count */ },
-                                    modifier = Modifier.size(40.dp)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
-                                }
-                                IconButton(
-                                    onClick = { /* TODO: Increase item count */ },
-                                    modifier = Modifier.size(40.dp)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                                }
-                            }
-                        }
-                        Text(
-                            text = "Kwota: 30zł",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-                }
-            }
-        }
-
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO: Handle note change */ },
-            label = { Text(text = "Napisz notatkę do zamówienia...") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        OutlinedTextField(
-            value = "JSKS6X293",
-            onValueChange = { /* TODO: Change promo code */ },
-            label = {
-                Text(
-                    text = "Wpisz kod promocyjny",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Column(
-            modifier = Modifier.padding(top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Kwota całkowita:",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "60zł",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Button(
-                onClick = { /* TODO: Go to summary */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(50)
-            ) {
-                Text(text = "Przejdź do podsumowania")
-            }
-        }
-    }
-}
-
-// TODO: verify colors
+// TODO: verify colors and add vars
 @Composable
 fun SearchBarWithFilter() {
     var text by remember { mutableStateOf("") }
@@ -3206,7 +1001,7 @@ fun SearchBarWithFilter() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -3215,27 +1010,30 @@ fun SearchBarWithFilter() {
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
         ) {
-            BasicTextField(
+            OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 36.dp),
+                    .padding(end = 16.dp),
                 singleLine = true,
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
-            )
-            if (text.isEmpty()) {
-                Text(
-                    text = "Szukaj...",
-                    color = Color.Gray,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterEnd)
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = "Szukaj...",
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "search icon",
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                    )
+                }
             )
         }
         IconButton(
@@ -3258,6 +1056,45 @@ fun FloatingTabSwitch(
     color: Color = MaterialTheme.colorScheme.surfaceVariant,
     paneScroll: Boolean = true
 ) {
+
+    @Composable
+    fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
+        val transition = updateTransition(pagerState.currentPage, label = "")
+        val indicatorStart by transition.animateDp(
+            transitionSpec = {
+                if (initialState < targetState) {
+                    spring(dampingRatio = 1f, stiffness = 400f)
+                } else {
+                    spring(dampingRatio = 1f, stiffness = 1000f)
+                }
+            }, label = ""
+        ) {
+            tabPositions[it].left
+        }
+
+        val indicatorEnd by transition.animateDp(
+            transitionSpec = {
+                if (initialState < targetState) {
+                    spring(dampingRatio = 1f, stiffness = 1000f)
+                } else {
+                    spring(dampingRatio = 1f, stiffness = 400f)
+                }
+            }, label = ""
+        ) {
+            tabPositions[it].right
+        }
+
+        Box(
+            Modifier
+                .offset(x = indicatorStart)
+                .wrapContentSize(align = Alignment.BottomStart)
+                .width(indicatorEnd - indicatorStart)
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+                .zIndex(5f)
+        )
+    }
+
     val pagerState = rememberPagerState(
         pageCount = { pages.size }
     )
@@ -3311,44 +1148,6 @@ fun FloatingTabSwitch(
 }
 
 @Composable
-private fun CustomIndicator(tabPositions: List<TabPosition>, pagerState: PagerState) {
-    val transition = updateTransition(pagerState.currentPage, label = "")
-    val indicatorStart by transition.animateDp(
-        transitionSpec = {
-            if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 400f)
-            } else {
-                spring(dampingRatio = 1f, stiffness = 1000f)
-            }
-        }, label = ""
-    ) {
-        tabPositions[it].left
-    }
-
-    val indicatorEnd by transition.animateDp(
-        transitionSpec = {
-            if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 1000f)
-            } else {
-                spring(dampingRatio = 1f, stiffness = 400f)
-            }
-        }, label = ""
-    ) {
-        tabPositions[it].right
-    }
-
-    Box(
-        Modifier
-            .offset(x = indicatorStart)
-            .wrapContentSize(align = Alignment.BottomStart)
-            .width(indicatorEnd - indicatorStart)
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
-            .zIndex(5f)
-    )
-}
-
-@Composable
 fun ImageCard(
     image: Painter
 ){
@@ -3364,51 +1163,6 @@ fun ImageCard(
             contentScale = ContentScale.Crop
         )
     }
-}
-
-@Composable
-fun rememberMapViewWithLifecycle(mapView: MapView): MapView {
-    // Makes MapView follow the lifecycle of this composable
-    val lifecycleObserver = rememberMapLifecycleObserver(mapView)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-        }
-    }
-    return mapView
-}
-
-@Composable
-fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
-    remember(mapView) {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                else -> {}
-            }
-        }
-    }
-
-@Composable
-fun OsmMapView(
-    mapView: MapView,
-    startPoint: GeoPoint,
-    modifier: Modifier = Modifier.fillMaxSize()
-) {
-
-    val geoPoint by remember { mutableStateOf(startPoint) }
-    val mapViewState = rememberMapViewWithLifecycle(mapView)
-
-    AndroidView(
-        modifier = modifier,
-        factory = { mapViewState },
-        update = { view ->
-            view.controller.setCenter(geoPoint)
-        }
-    )
 }
 
 @Composable
@@ -3438,19 +1192,7 @@ fun MissingPage(
 }
 
 @Composable
-fun OrderItem(order: OrderDTO) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-        Text(text = stringResource(id = R.string.label_date)+": ${order.date}")
-        Text(text = stringResource(id = R.string.label_total_cost)+": ${order.cost}")
-        Text(text = order.customer)
-        Text(text = order.status, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun SettingItem(
+fun UnderlinedItem(
     icon: ImageVector,
     text: String,
     onClick: () -> Unit
@@ -3488,6 +1230,8 @@ fun SettingItem(
     HorizontalDivider()
 }
 
+
+//TODO: remove and use search with filter
 @Composable
 fun FilterDialog(
     onDismissRequest: () -> Unit,

@@ -65,13 +65,13 @@ import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
-import reservant_mobile.ui.components.CountDownPopup
+import reservant_mobile.ui.components.ComboBox
+import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
-import reservant_mobile.ui.components.OutLinedDropdownMenu
 import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
@@ -95,7 +95,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         if(restaurant!= null){
             val confirmText = stringResource(R.string.delete_restaurant_message) +
                     "\n" + restaurant.name + " ?";
-            CountDownPopup(
+            DeleteCountdownPopup(
                 icon = Icons.Default.Delete,
                 title = stringResource(R.string.delete_restaurant_title),
                 text = confirmText,
@@ -137,11 +137,14 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
                     if (groups != null) {
                         if (groups.size > 1) {
-                            OutLinedDropdownMenu(
+                            ComboBox(
+                                expanded = remember {
+                                    mutableStateOf(false)
+                                },
                                 label = stringResource(R.string.label_group),
-                                selectedOption = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
-                                itemsList = groups.map { it.name },
-                                onOptionSelected = { name ->
+                                value = selectedGroup?.name ?: stringResource(R.string.label_management_choose_group),
+                                options = groups.map { it.name },
+                                onValueChange = { name ->
                                     selectedGroup = groups.find { it.name == name }
                                     restaurantManageVM.viewModelScope.launch {
                                         selectedGroup = selectedGroup?.let { group ->
@@ -151,7 +154,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         }
                                     }
                                 },
-                                modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                                modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp)
                             )
                         } else if (groups.size == 1) {
                             restaurantManageVM.viewModelScope.launch {

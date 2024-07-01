@@ -27,7 +27,7 @@ import androidx.navigation.NavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.components.SettingItem
+import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
@@ -50,55 +50,55 @@ fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: ()
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.Person,
                 text = stringResource(id = R.string.label_edit_profile),
                 onClick = { /* Navigate to Edit Profile */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.AccountBalanceWallet,
                 text = stringResource(id = R.string.label_wallet),
                 onClick = { /* Navigate to Wallet */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.ShoppingCart,
                 text = stringResource(id = R.string.label_my_orders),
                 onClick = { /* Navigate to My Orders */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.AutoMirrored.Filled.Help,
                 text = stringResource(id = R.string.label_helpdesk),
                 onClick = { /* Navigate to Helpdesk */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.Info,
                 text = stringResource(id = R.string.label_faq),
                 onClick = { /* Navigate to FAQ */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.CardGiftcard,
                 text = stringResource(id = R.string.label_promo_codes),
                 onClick = { /* Navigate to Promo Codes */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.Settings,
                 text = stringResource(id = R.string.label_app_settings),
                 onClick = { /* Navigate to App Settings */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.Delete,
                 text = stringResource(id = R.string.label_delete_account),
                 onClick = { /* Navigate to Delete Account */ }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.AutoMirrored.Filled.ExitToApp,
                 text = stringResource(id = R.string.label_logout_action),
                 onClick = {
@@ -111,7 +111,7 @@ fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: ()
                 }
             )
 
-            SettingItem(
+            UnderlinedItem(
                 icon = Icons.Filled.Brightness4,
                 text = "Temporary theme changer",
                 onClick = { themeChange() }
