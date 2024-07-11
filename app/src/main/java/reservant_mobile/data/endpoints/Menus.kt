@@ -9,4 +9,6 @@ class Menus {
         @Resource("items")
         class Items(val parent: Id)
     }
+    @Resource("menu-types")
+    class MenuTypes(val parent: Menus = Menus())
 }
