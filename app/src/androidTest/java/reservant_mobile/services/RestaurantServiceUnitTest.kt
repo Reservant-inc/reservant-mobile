@@ -8,6 +8,7 @@ import org.junit.Test
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 
@@ -17,6 +18,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     private lateinit var restaurant: RestaurantDTO
     private lateinit var restaurantGroup: RestaurantGroupDTO
     private lateinit var restaurantEmployee: RestaurantEmployeeDTO
+    private lateinit var review: ReviewDTO
 
     @Before
     fun setupData() = runBlocking {
@@ -33,7 +35,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
             description = "Test desc",
             businessPermission = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.pdf",
             idCard = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.pdf",
-            logo = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.png    "
+            logo = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.png    ",
         )
 
         restaurantGroup = RestaurantGroupDTO(
@@ -49,17 +51,28 @@ class RestaurantServiceUnitTest: ServiceTest() {
             phoneNumber = "+48123456789",
             password = "P@ssw0rd",
         )
-    }
 
+        review = ReviewDTO(
+            contents = "Test review",
+            stars = 5
+        )
+    }
 
     @Test
     fun get_restaurant_return_not_null()= runTest{
-        assertThat(ser.getRestaurant(1).value).isNotNull()
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.getRestaurant(id).value).isNotNull()
+    }
+
+    @Test
+    fun get_user_restaurant_return_not_null()= runTest{
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.getUserRestaurant(id).value).isNotNull()
     }
 
     @Test
     fun register_and_delete_restaurant()= runTest{
-        assertThat(ser.registerRestaurant(restaurant).value).isTrue()
+        assertThat(ser.registerRestaurant(restaurant).value).isNotNull()
         val id = ser.getRestaurants().value!!.last().restaurantId
         assertThat(ser.deleteRestaurant(id).value).isTrue()
     }
@@ -148,5 +161,29 @@ class RestaurantServiceUnitTest: ServiceTest() {
     fun get_restaurants_by_tag_return_not_null() = runTest {
         val tag = ser.getRestaurantTags().value!!.first()
         assertThat(ser.getRestaurantsByTag(tag).value).isNotNull()
+    }
+
+    @Test
+    fun get_restaurant_orders_return_not_null()= runTest{
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.getRestaurantOrders(id).value).isNotNull()
+    }
+
+    @Test
+    fun get_restaurant_events_return_not_null()= runTest{
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.getRestaurantEvents(id).value).isNotNull()
+    }
+
+    @Test
+    fun get_restaurant_reviews_return_not_null()= runTest{
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.getRestaurantReviews(id).value).isNotNull()
+    }
+
+    @Test
+    fun add_review_return_not_null()= runTest{
+        val id = ser.getRestaurants().value!!.first().restaurantId
+        assertThat(ser.addRestaurantReview(id, review).value).isNotNull()
     }
 }

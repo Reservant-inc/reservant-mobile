@@ -25,6 +25,7 @@ interface IRestaurantService{
     suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean>
     suspend fun getRestaurants(): Result<List<RestaurantDTO>?>
     suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>
+    suspend fun getUserRestaurant(id:Any): Result<RestaurantDTO?>
     suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<RestaurantDTO?>
     suspend fun deleteRestaurant(id: Any): Result<Boolean>
     suspend fun getGroups(): Result<List<RestaurantGroupDTO>?>
@@ -95,7 +96,26 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         }
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
+
     override suspend fun getRestaurant(id: Any): Result<RestaurantDTO?> {
+        val res = api.get(Restaurants.Id(restaurantId = id.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    override suspend fun getUserRestaurant(id: Any): Result<RestaurantDTO?> {
         val res = api.get(MyRestaurants.Id(id = id.toString()))
 
         if(res.isError)
