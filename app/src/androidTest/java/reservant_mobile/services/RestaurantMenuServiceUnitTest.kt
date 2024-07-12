@@ -75,9 +75,9 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun create_and_delete_menu_item()= runTest{
-        val i = ser.createMenuItems(listOf(menuItem)).value
+        val i = ser.createMenuItem(menuItem).value
         assertThat(i).isNotNull()
-        assertThat(ser.deleteMenuItem(i!!.first().menuItemId!!).value).isTrue()
+        assertThat(ser.deleteMenuItem(i!!.menuItemId!!).value).isTrue()
     }
 
     @Test
