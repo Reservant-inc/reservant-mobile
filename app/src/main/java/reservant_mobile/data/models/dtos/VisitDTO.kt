@@ -10,6 +10,7 @@ data class VisitDTO(
      */
     val date: String? = null,
     val numberOfGuests: Int? = null,
+    val numberOfPeople: Int? = null,
     val paymentTime: String? = null,
     val deposit: Double? = null,
     /***
