@@ -10,7 +10,7 @@ import reservant_mobile.data.models.dtos.fields.Result
 interface IOrdersService{
     suspend fun getOrder(orderId: Any): Result<OrderDTO?>
     suspend fun cancelOrder(orderId: Any): Result<Boolean>
-    suspend fun createOrder(orderId: Any): Result<OrderDTO?>
+    suspend fun createOrder(order: OrderDTO): Result<OrderDTO?>
     suspend fun changeOrderStatus(orderId: Any, order: OrderDTO): Result<OrderDTO?>
 }
 
@@ -43,8 +43,8 @@ class OrdersService(private var api: APIService = APIService()): IOrdersService 
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), false)
     }
 
-    override suspend fun createOrder(orderId: Any): Result<OrderDTO?> {
-        val res = api.post(Orders.OrderId(orderId=orderId.toString()), "")
+    override suspend fun createOrder(order: OrderDTO): Result<OrderDTO?> {
+        val res = api.post(Orders(), order)
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
