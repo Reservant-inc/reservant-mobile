@@ -6,6 +6,7 @@ import com.example.reservant_mobile.R
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -48,14 +49,12 @@ class FileService(private var api: APIService = APIService()) {
     }
 
     suspend fun getFile(fileName: String): Result<ByteArray?> {
-        val res = api.get(Uploads.FileName(fileName=fileName))
+        val client = api.getHttpClient()
+        val res = client.get(fileName)
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-
-        if (res.value!!.status == HttpStatusCode.OK){
+        if (res.status == HttpStatusCode.OK){
             return try {
-                Result(isError = false, value = res.value.body())
+                Result(isError = false, value = res.body())
             }
             catch (e: Exception){
                 Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)

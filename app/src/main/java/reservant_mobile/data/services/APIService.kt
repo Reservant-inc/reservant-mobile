@@ -137,7 +137,7 @@ class APIService{
         return client
     }
 
-    suspend fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
+    fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
         res?:
             return Result(isError = true, errors =  mapOf(pair= Pair("TOAST", R.string.error_connection_server)), value = null)
 

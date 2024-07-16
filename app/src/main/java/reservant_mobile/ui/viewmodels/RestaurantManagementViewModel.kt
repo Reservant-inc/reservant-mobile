@@ -48,8 +48,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
         if(restaurant.logo == null)
             return null
         isLoading = true
-        val photoString = restaurant.logo.substringAfter("uploads/")
-        val result = fileService.getImage(photoString)
+        val result = fileService.getImage(restaurant.logo)
         isLoading = false
         if (!result.isError){
             return result.value!!
