@@ -19,9 +19,9 @@ fun OrderItem(order: OrderDTO) {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text(text = stringResource(id = R.string.label_date) + ": ${order.date}")
+//        Text(text = stringResource(id = R.string.label_date) + ": ${order.date}")
         Text(text = stringResource(id = R.string.label_total_cost) + ": ${order.cost}")
-        Text(text = order.customer)
-        Text(text = order.status, fontWeight = FontWeight.Bold)
+//        Text(text = order.customer)
+        Text(text = order.status!!, fontWeight = FontWeight.Bold)
     }
 }

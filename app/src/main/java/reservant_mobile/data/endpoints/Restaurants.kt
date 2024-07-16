@@ -9,10 +9,10 @@ class Restaurants {
     @Resource("{restaurantId}")
     class Id(val parent: Restaurants = Restaurants(), val restaurantId: String){
         @Resource("orders")
-        class Orders(val parent: Id)
+        class Orders(val parent: Id, val returnFinished:Boolean? = null, val page: Int? = null, val perPage: Int? = null, val orderBy: String? = null)
         @Resource("events")
         class Events(val parent: Id, val page: Int? = null, val perPage: Int? = null)
         @Resource("reviews")
-        class Reviews(val parent: Id)
+        class Reviews(val parent: Id, val orderBy: String? = null, val page: Int? = null, val perPage: Int? = null)
     }
 }

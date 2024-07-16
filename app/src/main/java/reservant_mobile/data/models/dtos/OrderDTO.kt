@@ -3,8 +3,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OrderDTO(
-    val date: String,
-    val cost: String,
-    val customer: String,
-    val status: String
-)
+    val orderId: Int? = null,
+    val visitId: Int? = null,
+    val cost: String? = null,
+//    val date: String? = null,
+    val status: String? = null,
+    val note: String? = null,
+    val items: List<OrderItemDTO>? = null,
+    val employeeId: String? = null
+){
+    @Serializable
+    data class OrderItemDTO(
+        val menuItemId: Int,
+        val amount: Int,
+        val cost: Double? = null,
+        val status: String? = null
+    )
+}

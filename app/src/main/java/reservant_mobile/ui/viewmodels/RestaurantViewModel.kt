@@ -62,7 +62,7 @@ class RestaurantViewModel(
 
     suspend fun assignData(id: Int, group: RestaurantGroupDTO) {
         restaurantId = id
-        val restaurant = restaurantService.getRestaurant(restaurantId!!)
+        val restaurant = restaurantService.getUserRestaurant(restaurantId!!)
         if (restaurant.value != null) {
             name.value = restaurant.value.name
             restaurantType.value = restaurant.value.restaurantType

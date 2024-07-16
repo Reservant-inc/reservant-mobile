@@ -12,10 +12,12 @@ import reservant_mobile.data.endpoints.Restaurants
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
 interface IRestaurantService{
@@ -23,6 +25,7 @@ interface IRestaurantService{
     suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean>
     suspend fun getRestaurants(): Result<List<RestaurantDTO>?>
     suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>
+    suspend fun getUserRestaurant(id:Any): Result<RestaurantDTO?>
     suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<RestaurantDTO?>
     suspend fun deleteRestaurant(id: Any): Result<Boolean>
     suspend fun getGroups(): Result<List<RestaurantGroupDTO>?>
@@ -41,8 +44,10 @@ interface IRestaurantService{
     suspend fun getRestaurantTags(): Result<List<String>?>
     suspend fun getRestaurantsByTag(tag:String): Result<List<RestaurantDTO>?>
     suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): Result<List<RestaurantDTO>?>
+    suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, page: Int? = null, perPage: Int? = null, orderBy: String? = null): Result<List<OrderDTO>?>
     suspend fun getRestaurantEvents(restaurantId: Any, page: Int? = null, perPage: Int? = null): Result<List<EventDTO>?>
-
+    suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?>
+    suspend fun getRestaurantReviews(restaurantId: Any, orderBy: String? = null, page: Int? = null, perPage: Int? = null): Result<List<ReviewDTO>?>
     }
 
 class RestaurantService(private var api: APIService = APIService()): IRestaurantService {
@@ -91,7 +96,26 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         }
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
+
     override suspend fun getRestaurant(id: Any): Result<RestaurantDTO?> {
+        val res = api.get(Restaurants.Id(restaurantId = id.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    override suspend fun getUserRestaurant(id: Any): Result<RestaurantDTO?> {
         val res = api.get(MyRestaurants.Id(id = id.toString()))
 
         if(res.isError)
@@ -419,6 +443,39 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
+    override suspend fun getRestaurantOrders(
+        restaurantId: Any,
+        returnFinished: Boolean?,
+        page: Int?,
+        perPage: Int?,
+        orderBy: String?
+    ): Result<List<OrderDTO>?> {
+
+        val res = api.get(
+            Restaurants.Id.Orders(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                returnFinished = returnFinished,
+                page = page,
+                perPage = perPage,
+                orderBy = orderBy
+            ))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                val p: PageDTO<OrderDTO>? = res.value.body()
+                Result(isError = false, value = p?.items)
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
     override suspend fun getRestaurantEvents(restaurantId: Any, page: Int?, perPage: Int?): Result<List<EventDTO>?> {
         val res = api.get(
             Restaurants.Id.Events(
@@ -433,6 +490,57 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         if (res.value!!.status == HttpStatusCode.OK){
             return try {
                 val p: PageDTO<EventDTO>? = res.value.body()
+                Result(isError = false, value = p?.items)
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    override suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?> {
+        val res = api.post(Restaurants.Id.Reviews(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString())),
+            review
+        )
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
+    override suspend fun getRestaurantReviews(
+        restaurantId: Any,
+        orderBy: String?,
+        page: Int?,
+        perPage: Int?
+    ): Result<List<ReviewDTO>?> {
+        val res = api.get(
+            Restaurants.Id.Reviews(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                orderBy = orderBy,
+                page = page,
+                perPage = perPage
+            ))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                val p: PageDTO<ReviewDTO>? = res.value.body()
                 Result(isError = false, value = p?.items)
             }
             catch (e: Exception){

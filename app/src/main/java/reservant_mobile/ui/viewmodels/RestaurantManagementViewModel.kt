@@ -58,7 +58,7 @@ class RestaurantManagementViewModel(private val restaurantService: IRestaurantSe
 
 
     suspend fun getSingleRestaurant(id: Int): RestaurantDTO? {
-        return restaurantService.getRestaurant(id).value
+        return restaurantService.getUserRestaurant(id).value
     }
 
     suspend fun deleteRestaurant(id: Int) {
