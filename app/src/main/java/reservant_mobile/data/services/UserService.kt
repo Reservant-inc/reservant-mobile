@@ -4,6 +4,7 @@ import com.example.reservant_mobile.R
 import io.ktor.client.call.body
 import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.Auth
+import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.UserDTO
@@ -16,6 +17,7 @@ interface IUserService{
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun logoutUser()
     suspend fun refreshToken(): Boolean
+    suspend fun getUser(): Result<UserDTO?>
 
 }
 
@@ -112,4 +114,22 @@ class UserService(private var api: APIService = APIService()) : IUserService {
          }
          else false
     }
+
+    override suspend fun getUser(): Result<UserDTO?> {
+        val res = api.get(User())
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
 }
