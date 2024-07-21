@@ -1,7 +1,6 @@
 package reservant_mobile.ui.activities
 
 import RestaurantDetailActivity
-import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,11 +50,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import org.osmdroid.util.GeoPoint
-import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
-import reservant_mobile.data.services.FileService
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.ImageCard
@@ -79,9 +76,9 @@ fun MapActivity(){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
-            var showRestaurantId by remember { mutableIntStateOf(0) }
-            var restaurants:List<RestaurantDTO>? by remember { mutableStateOf(null) }
-            var events:List<EventDTO>? by remember { mutableStateOf(null) }
+            val showRestaurantId by remember { mutableIntStateOf(0) }
+            val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
+            val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
 
 
             // Init map
@@ -96,27 +93,27 @@ fun MapActivity(){
             }
 
             LaunchedEffect(key1 = true) {
-                restaurants = mapViewModel.getRestaurantsInArea(
+                mapViewModel.getRestaurantsInArea(
                     -11.2135241,
                     17.8770032,
                     60.192059,
                     24.945831)
-                events = mapViewModel.getEvents()
+                mapViewModel.getEvents()
 
 
                 if (restaurants != null) {
-                    for(restaurant in restaurants!!){
-                        val img: Bitmap? = FileService().getImage(restaurant.logo!!).value
-                        mapViewModel.addRestaurantMarker(
-                            position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude),
-                            icon = img,
-                            title = restaurant.name
-                        ) { _, _ ->
-                            showRestaurantId = restaurant.restaurantId
-                            showRestaurantBottomSheet = true
-                            true
-                        }
-                    }
+//                    for(restaurant in restaurants){
+//                        val img: Bitmap? = FileService().getImage(restaurant.logo!!).value
+//                        mapViewModel.addRestaurantMarker(
+//                            position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude),
+//                            icon = img,
+//                            title = restaurant.name
+//                        ) { _, _ ->
+//                            showRestaurantId = restaurant.restaurantId
+//                            showRestaurantBottomSheet = true
+//                            true
+//                        }
+//                    }
                 }
             }
 
@@ -130,7 +127,7 @@ fun MapActivity(){
                             CircularProgressIndicator()
                         }
                     }
-                    else if(restaurants!= null) {
+                    else {
                         LazyColumn(
                             Modifier
                                 .fillMaxWidth()
@@ -138,24 +135,16 @@ fun MapActivity(){
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            items(restaurants!!) { item ->
-                                RestaurantCard(
-                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                    name = item.name,
-                                    location = item.address,
-                                    city = item.city
-                                )
+                            items(restaurants.itemCount) { index ->
+                                val item = restaurants[index]
+                                if(item != null)
+                                    RestaurantCard(
+                                        onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                        name = item.name,
+                                        location = item.address,
+                                        city = item.city
+                                    )
                             }
-                        }
-                    }
-                    else{
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(500.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            MissingPage(errorStringId = R.string.error_not_found)
                         }
                     }
                 },
@@ -176,13 +165,15 @@ fun MapActivity(){
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            items(events!!) { item ->
-                                RestaurantCard(
-                                    onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                    name = item.restaurantName!!,
-                                    location = item.description,
-                                    city = item.mustJoinUntil
-                                )
+                            items(events.itemCount) { index ->
+                                val item = events[index]
+                                if(item != null)
+                                    RestaurantCard(
+                                        onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                        name = item.restaurantName!!,
+                                        location = item.description,
+                                        city = item.mustJoinUntil
+                                    )
                             }
                         }
                     }
