@@ -19,6 +19,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.ui.components.AddMenuItemButton
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MenuItemCard
@@ -53,7 +54,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     altName = viewmodel.alternateName,
                     price = viewmodel.price,
                     alcoholPercentage = viewmodel.alcoholPercentage,
-                    photo = viewmodel.photo,
+                    //photo = viewmodel.photo, // TODO: fetchowanie zdjec menu
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
@@ -66,6 +67,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                         }
                     },
                     clearFields = viewmodel::clearFields,
+                    role = Roles.RESTAURANT_OWNER,
                     context = context
                 )
             }

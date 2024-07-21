@@ -5,55 +5,68 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.reservant_mobile.R
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.graphics.ImageBitmap
 
 @Composable
 fun MenuItemCard(
-    name: FormField,
-    altName: FormField,
-    price: FormField,
-    alcoholPercentage: FormField,
-    photo: FormField,
     menuItem: RestaurantMenuItemDTO,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    clearFields: () -> Unit,
-    context: Context
+    role: String,
+    photo: ImageBitmap? = null,
+    onInfoClick: () -> Unit = {},
+    onAddClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
+    name: FormField? = null,
+    altName: FormField? = null,
+    price: FormField? = null,
+    alcoholPercentage: FormField? = null,
+    photoField: FormField? = null,
+    clearFields: () -> Unit = {},
+    context: Context? = null
 ) {
-
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
 
-
     when {
-        showConfirmDeletePopup -> {
+        showConfirmDeletePopup && role == Roles.RESTAURANT_OWNER -> {
             DeleteCountdownPopup(
                 icon = Icons.Filled.DeleteForever,
                 title = stringResource(id = R.string.confirm_delete_title),
@@ -68,25 +81,24 @@ fun MenuItemCard(
             )
         }
 
-        showEditPopup -> {
-
-            name.value = menuItem.name
-            altName.value = menuItem.alternateName ?: ""
-            price.value = menuItem.price.toString()
-            alcoholPercentage.value = menuItem.alcoholPercentage.toString()
-            photo.value = menuItem.photoFileName ?: ""
+        showEditPopup && role == Roles.RESTAURANT_OWNER -> {
+            name?.value = menuItem.name
+            altName?.value = menuItem.alternateName ?: ""
+            price?.value = menuItem.price.toString()
+            alcoholPercentage?.value = menuItem.alcoholPercentage?.toString() ?: ""
+            photoField?.value = menuItem.photoFileName ?: ""
 
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
                 hide = { showEditPopup = false },
                 onConfirm = onEditClick,
                 clear = clearFields,
-                name = name,
-                altName = altName,
-                price = price,
-                alcoholPercentage = alcoholPercentage,
-                photo = photo,
-                context = context
+                name = name!!,
+                altName = altName!!,
+                price = price!!,
+                alcoholPercentage = alcoholPercentage!!,
+                photo = photoField!!,
+                context = context!!
             )
         }
     }
@@ -95,70 +107,108 @@ fun MenuItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Row {
-            Column {
-                Text(
-                    text = menuItem.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxSize(0.5f)
-                )
-
-                if (menuItem.alternateName != null) {
-                    Text(
-                        text = menuItem.alternateName,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-                    )
-                }
-
-                Text(
-                    text = "Price: ${menuItem.price} zł",
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
-                )
-
-                if (menuItem.alcoholPercentage != null) {
-                    Text(
-                        text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    SecondaryButton(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(50.dp),
-                        onClick = { showEditPopup = true },
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "EditMenuItem"
+                    Text(
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
+                    if (menuItem.alternateName != null) {
+                        Text(
+                            text = menuItem.alternateName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (menuItem.alcoholPercentage != null) {
+                        Text(
+                            text = "Alcohol Percentage: ${menuItem.alcoholPercentage}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
 
-                    SecondaryButton(
+                    Row(
                         modifier = Modifier
-                            .padding(8.dp)
-                            .size(50.dp),
-                        onClick = { showConfirmDeletePopup = true },
-                        imageVector = Icons.Filled.DeleteForever,
-                        contentDescription = "DeleteMenuItem"
-                    )
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        when (role) {
+                            Roles.CUSTOMER -> {
+                                IconButton(
+                                    onClick = onInfoClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Info,
+                                        contentDescription = "Info",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = onAddClick,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.AddShoppingCart,
+                                        contentDescription = "Add to Cart",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            Roles.RESTAURANT_OWNER -> {
+                                SecondaryButton(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .size(50.dp),
+                                    onClick = { showEditPopup = true },
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "EditMenuItem"
+                                )
+                                SecondaryButton(
+                                    modifier = Modifier
+                                        .size(50.dp),
+                                    onClick = { showConfirmDeletePopup = true },
+                                    imageVector = Icons.Filled.DeleteForever,
+                                    contentDescription = "DeleteMenuItem"
+                                )
+                            }
+                        }
+                    }
                 }
+
+                Image(
+                    painter = painterResource(R.drawable.pizza),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(start = 8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxSize()
+                )
             }
-
-            //TODO podmienić na zdj z backendu
-            Image(
-                painterResource(id = R.drawable.pizza),
-                contentDescription = "",
-                modifier = Modifier.fillMaxHeight()
-            )
-
         }
     }
 }
