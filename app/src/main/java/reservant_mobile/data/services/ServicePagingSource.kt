@@ -24,9 +24,8 @@ class ServicePagingSource<T:Any>(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
         return try {
-            val currentPage = params.key ?: 1
-            val pageSize = params.loadSize
-            val res = fetchResult(currentPage, pageSize)
+            val currentPage = params.key ?: 0
+            val res = fetchResult(currentPage, _pageSize)
 
 
             if(res.isError || res.value!!.status != HttpStatusCode.OK){
@@ -39,8 +38,8 @@ class ServicePagingSource<T:Any>(
 
             LoadResult.Page(
                 data = page.items,
-                prevKey = if (currentPage == 1) null else currentPage - 1,
-                nextKey = if (currentPage < page.totalPages) currentPage + 1 else null
+                prevKey = if (currentPage == 0) null else currentPage - 1,
+                nextKey = if (currentPage < page.totalPages-1) currentPage + 1 else null
             )
         } catch (exception: Exception) {
             LoadResult.Error(exception)
