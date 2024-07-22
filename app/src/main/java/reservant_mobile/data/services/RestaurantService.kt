@@ -1,8 +1,13 @@
 package reservant_mobile.data.services
 
+import androidx.paging.PagingData
 import com.example.reservant_mobile.R
 import io.ktor.client.call.body
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.serializer
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.Employments
 import reservant_mobile.data.endpoints.MyRestaurantGroups
@@ -43,13 +48,14 @@ interface IRestaurantService{
     suspend fun deleteEmployment(id: Any): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
     suspend fun getRestaurantsByTag(tag:String): Result<List<RestaurantDTO>?>
-    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): Result<List<RestaurantDTO>?>
-    suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, page: Int? = null, perPage: Int? = null, orderBy: String? = null): Result<List<OrderDTO>?>
-    suspend fun getRestaurantEvents(restaurantId: Any, page: Int? = null, perPage: Int? = null): Result<List<EventDTO>?>
+    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): Result<Flow<PagingData<RestaurantDTO>>?>
+    suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, orderBy: String? = null): Result<Flow<PagingData<OrderDTO>>?>
+    suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?>
-    suspend fun getRestaurantReviews(restaurantId: Any, orderBy: String? = null, page: Int? = null, perPage: Int? = null): Result<List<ReviewDTO>?>
+    suspend fun getRestaurantReviews(restaurantId: Any, orderBy: String? = null): Result<Flow<PagingData<ReviewDTO>>?>
     }
 
+@OptIn(InternalSerializationApi::class)
 class RestaurantService(private var api: APIService = APIService()): IRestaurantService {
 
     override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?> {
@@ -413,91 +419,83 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
+    @OptIn(InternalSerializationApi::class)
     override suspend fun getRestaurantsInArea(
         lat1: Double,
         lon1: Double,
         lat2: Double,
         lon2: Double
-    ): Result<List<RestaurantDTO>?> {
+    ): Result<Flow<PagingData<RestaurantDTO>>?> {
 
-        val res = api.get(
-            Restaurants.InArea(
-            lat1 = lat1,
-            lon1 = lon1,
-            lat2 = lat2,
-            lon2 = lon2
-        ))
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Restaurants(
+                lat1 = lat1,
+                lon1 = lon1,
+                lat2 = lat2,
+                lon2 = lon2,
+                page = page,
+                perPage = perPage
+            ))}
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(RestaurantDTO::class.serializer()))
 
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
+        return try {
+            Result(isError = false, value = sps.getFlow())
         }
-
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        catch (e: Exception){
+            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        }
     }
 
     override suspend fun getRestaurantOrders(
         restaurantId: Any,
         returnFinished: Boolean?,
-        page: Int?,
-        perPage: Int?,
         orderBy: String?
-    ): Result<List<OrderDTO>?> {
+    ): Result<Flow<PagingData<OrderDTO>>?> {
 
-        val res = api.get(
-            Restaurants.Id.Orders(
-                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                returnFinished = returnFinished,
-                page = page,
-                perPage = perPage,
-                orderBy = orderBy
-            ))
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                val p: PageDTO<OrderDTO>? = res.value.body()
-                Result(isError = false, value = p?.items)
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
+        val call: suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
+            api.get(
+                Restaurants.Id.Orders(
+                    parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                    returnFinished = returnFinished,
+                    page = page,
+                    perPage = perPage,
+                    orderBy = orderBy
+                )
+            )
         }
 
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        val sps =
+            ServicePagingSource(call, serializer = PageDTO.serializer(OrderDTO::class.serializer()))
+
+        return try {
+            Result(isError = false, value = sps.getFlow())
+        } catch (e: Exception) {
+            Result(
+                isError = true,
+                errors = mapOf(pair = Pair("TOAST", R.string.error_unknown)),
+                value = null
+            )
+        }
     }
 
-    override suspend fun getRestaurantEvents(restaurantId: Any, page: Int?, perPage: Int?): Result<List<EventDTO>?> {
-        val res = api.get(
+    override suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Events(
-            parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-            page = page,
-            perPage = perPage
-        ))
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                page = page,
+                perPage = perPage
+            ))}
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO::class.serializer()))
 
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                val p: PageDTO<EventDTO>? = res.value.body()
-                Result(isError = false, value = p?.items)
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
+        return try {
+            Result(isError = false, value = sps.getFlow())
         }
-
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        catch (e: Exception){
+            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        }
     }
 
     override suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?> {
@@ -521,33 +519,22 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
-    override suspend fun getRestaurantReviews(
-        restaurantId: Any,
-        orderBy: String?,
-        page: Int?,
-        perPage: Int?
-    ): Result<List<ReviewDTO>?> {
-        val res = api.get(
+    override suspend fun getRestaurantReviews(restaurantId: Any, orderBy: String?): Result<Flow<PagingData<ReviewDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Reviews(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 orderBy = orderBy,
                 page = page,
                 perPage = perPage
-            ))
+            ))}
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReviewDTO::class.serializer()))
 
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                val p: PageDTO<ReviewDTO>? = res.value.body()
-                Result(isError = false, value = p?.items)
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
+        return try {
+            Result(isError = false, value = sps.getFlow())
         }
-
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        catch (e: Exception){
+            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        }
     }
 }

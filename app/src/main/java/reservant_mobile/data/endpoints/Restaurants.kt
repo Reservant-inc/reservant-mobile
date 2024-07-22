@@ -3,9 +3,18 @@ package reservant_mobile.data.endpoints
 import io.ktor.resources.Resource
 
 @Resource("/restaurants")
-class Restaurants {
-    @Resource("in-area")
-    class InArea(val parent: Restaurants = Restaurants(), val lat1: Double, val lon1: Double, val lat2: Double, val lon2: Double)
+class Restaurants(
+    val origLat: Double? = null,
+    val origLon: Double? = null,
+    val name: String? = null,
+    val tags: List<String>? = null,
+    val lat1: Double? = null,
+    val lon1: Double? = null,
+    val lat2: Double? = null,
+    val lon2: Double? = null,
+    val page: Int? = null,
+    val perPage: Int? = null
+) {
     @Resource("{restaurantId}")
     class Id(val parent: Restaurants = Restaurants(), val restaurantId: String){
         @Resource("orders")

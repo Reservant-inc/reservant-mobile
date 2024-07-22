@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -8,13 +9,21 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
@@ -30,7 +39,12 @@ class MapViewModel(): ViewModel() {
     }
 
     private val restaurantService = RestaurantService()
+    private val _restaurantsState = MutableStateFlow<PagingData<RestaurantDTO>>(PagingData.empty())
+    private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
+    val restaurants: StateFlow<PagingData<RestaurantDTO>> = _restaurantsState.asStateFlow()
+    val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
+
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
 
@@ -64,6 +78,7 @@ class MapViewModel(): ViewModel() {
         return OsmMap.view
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun addUserMarker(startPoint: GeoPoint){
         val startMarker = Marker(OsmMap.view)
         startMarker.position = startPoint
@@ -73,18 +88,44 @@ class MapViewModel(): ViewModel() {
         OsmMap.view.overlays.add(startMarker)
     }
 
-    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): List<RestaurantDTO>?{
-        isLoading = true
-        val res = restaurantService.getRestaurantsInArea(lat1, lon1, lat2, lon2)
-        isLoading = false
-        return res.value
+    fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double){
+        viewModelScope.launch {
+            try {
+                isLoading = true
+                val res = restaurantService.getRestaurantsInArea(lat1, lon1, lat2, lon2)
+                if(res.isError || res.value == null)
+                    throw Exception()
+
+                res.value.collectLatest { pagingData ->
+                    _restaurantsState.value = pagingData
+                    isLoading = false
+                }
+
+            } catch (e: Exception) {
+                Log.d("[RESTAURANT]:", e.toString())
+
+            }
+        }
     }
 
-    suspend fun getEvents() : List<EventDTO>? {
-        isLoading = true
-        val res = restaurantService.getRestaurantEvents(1)
-        isLoading = false
-        return res.value
+    suspend fun getEvents() {
+        viewModelScope.launch {
+            try {
+                isLoading = true
+                val res = restaurantService.getRestaurantEvents(1)
+                if(res.isError || res.value == null)
+                    throw Exception()
+
+                res.value.collectLatest { pagingData ->
+                    _eventsState.value = pagingData
+                    isLoading = false
+                }
+
+            } catch (e: Exception) {
+                Log.d("[EVENT]:", e.toString())
+
+            }
+        }
     }
 
     fun addRestaurantMarker(position: GeoPoint, icon: Bitmap?, title: String, onClick: (Marker, MapView) -> Boolean) {
