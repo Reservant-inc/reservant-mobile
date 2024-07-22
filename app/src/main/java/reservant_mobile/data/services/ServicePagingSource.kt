@@ -20,6 +20,7 @@ class ServicePagingSource<T:Any>(
 ) : PagingSource<Int, T>() {
 
     private val _pageSize = 3
+    private var _hasError = false
     private lateinit var _errorRes:Result<HttpResponse?>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
@@ -35,13 +36,14 @@ class ServicePagingSource<T:Any>(
 
             val jsonElement = Json.parseToJsonElement(res.value.bodyAsText())
             val page: PageDTO<T> = Json.decodeFromJsonElement(serializer, jsonElement)
-
+            _hasError = false
             LoadResult.Page(
                 data = page.items,
                 prevKey = if (currentPage == 0) null else currentPage - 1,
                 nextKey = if (currentPage < page.totalPages-1) currentPage + 1 else null
             )
         } catch (exception: Exception) {
+            _hasError = true
             LoadResult.Error(exception)
         }
     }
@@ -58,12 +60,17 @@ class ServicePagingSource<T:Any>(
         return null
     }
 
-    fun getFlow(): Flow<PagingData<T>> =
-        Pager(
-            PagingConfig(
-                pageSize = _pageSize,
-                prefetchDistance = 10,
-                enablePlaceholders = false)) {
-            this
-        }.flow
+    fun getFlow(): Flow<PagingData<T>>?{
+        return if(_hasError)
+            null
+        else
+            Pager(
+                PagingConfig(
+                    pageSize = _pageSize,
+                    prefetchDistance = 10,
+                    enablePlaceholders = false)) {
+                this
+            }.flow
+
+        }
 }
