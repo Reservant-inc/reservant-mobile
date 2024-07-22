@@ -19,7 +19,7 @@ class ServicePagingSource<T:Any>(
     private val serializer: KSerializer<PageDTO<T>>
 ) : PagingSource<Int, T>() {
 
-    private val _pageSize = 2
+    private val _pageSize = 3
     private lateinit var _errorRes:Result<HttpResponse?>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
