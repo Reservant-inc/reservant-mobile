@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantMenuService
@@ -17,7 +19,8 @@ import reservant_mobile.data.services.RestaurantService
 class RestaurantDetailViewModel(
     private var restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
-    private val menuService: IRestaurantMenuService = RestaurantMenuService()
+    private val menuService: IRestaurantMenuService = RestaurantMenuService(),
+    private val fileService: FileService = FileService()
 ) : ViewModel() {
 
     var resultRestaurant: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value=null))
@@ -56,6 +59,14 @@ class RestaurantDetailViewModel(
         }
         restaurant = resultRestaurant.value
         return true
+    }
+
+    suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
+        val result = fileService.getImage(menu.photo)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
     }
 
     private suspend fun loadMenus(id: Int) {

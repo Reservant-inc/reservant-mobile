@@ -305,10 +305,7 @@ fun MenuContent(
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
-                name = menuItem.name,
-                altName = menuItem.alternateName ?: "",
-                price = stringResource(R.string.label_menu_price) + ": ${menuItem.price}zl",
-                photo = R.drawable.pizza,
+                // photo = photoBitmap, // TODO: wczytywanie zdjec
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
