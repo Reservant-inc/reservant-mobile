@@ -16,17 +16,18 @@ import reservant_mobile.data.models.dtos.fields.Result
 
 class ServicePagingSource<T:Any>(
     private val fetchResult: suspend (page: Int, perPage: Int) -> Result<HttpResponse?>,
-    private val serializer: KSerializer<PageDTO<T>>
+    private val serializer: KSerializer<PageDTO<T>>,
+    private val pageSize:Int = 5
 ) : PagingSource<Int, T>() {
 
-    private val _pageSize = 3
+
     private var _hasError = false
     private lateinit var _errorRes:Result<HttpResponse?>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
         return try {
             val currentPage = params.key ?: 0
-            val res = fetchResult(currentPage, _pageSize)
+            val res = fetchResult(currentPage, pageSize)
 
 
             if(res.isError || res.value!!.status != HttpStatusCode.OK){
@@ -66,7 +67,7 @@ class ServicePagingSource<T:Any>(
         else
             Pager(
                 PagingConfig(
-                    pageSize = _pageSize,
+                    pageSize = pageSize,
                     prefetchDistance = 10,
                     enablePlaceholders = false)) {
                 this
