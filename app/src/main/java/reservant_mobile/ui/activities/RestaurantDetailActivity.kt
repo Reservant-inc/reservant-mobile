@@ -351,7 +351,8 @@ fun ReviewsContent(
             .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        SearchBarWithFilter()
+        //TODO wypełnić zgodnie z możliwymi opcjami filtrowania przykład w OrdersActivity
+        //SearchBarWithFilter()
         Spacer(modifier = Modifier.height(16.dp))
 
         reviews.forEach { review ->

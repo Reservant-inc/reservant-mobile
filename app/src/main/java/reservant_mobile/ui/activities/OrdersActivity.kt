@@ -27,23 +27,19 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FilterDialog
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.OrderItem
+import reservant_mobile.ui.components.SearchBarWithFilter
 
 @Composable
 fun OrdersActivity() {
     val ordersViewModel = viewModel<OrdersViewModel>()
     val orders by ordersViewModel.filteredOrders.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    var showFilterDialog by remember { mutableStateOf(false) }
+    var selectedFilter by remember { mutableStateOf<String?>(null) }
 
-    if (showFilterDialog) {
-        FilterDialog(
-            onDismissRequest = { showFilterDialog = false },
-            onFilterSelected = { status ->
-                ordersViewModel.filterOrders(status)
-                showFilterDialog = false
-            }
-        )
-    }
+    val filterOptions = listOf(
+        "Odebrano",
+        "Anulowano"
+    )
 
     Column(modifier = Modifier.padding(16.dp)) {
         IconWithHeader(
@@ -53,24 +49,18 @@ fun OrdersActivity() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = searchQuery,
-            onValueChange = {
+        SearchBarWithFilter(
+            searchQuery = searchQuery,
+            onSearchQueryChange = {
                 searchQuery = it
                 ordersViewModel.searchOrders(it)
             },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = stringResource(id = R.string.label_search)) },
-            leadingIcon = {
-                Icon(Icons.Filled.Search, contentDescription = null)
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        ButtonComponent(
-            onClick = { showFilterDialog = true },
-            label = stringResource(id = R.string.label_filters)
+            onFilterSelected = { status ->
+                selectedFilter = status ?: ""
+                ordersViewModel.filterOrders(selectedFilter)
+            },
+            currentFilter = selectedFilter,
+            filterOptions = filterOptions
         )
 
         Spacer(modifier = Modifier.height(16.dp))
