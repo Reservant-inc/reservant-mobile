@@ -18,6 +18,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.RestaurantService
 
 class MapViewModel(): ViewModel() {
@@ -41,6 +43,7 @@ class MapViewModel(): ViewModel() {
     private val restaurantService = RestaurantService()
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantDTO>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
+    private var _addedRestaurants = ArrayList<Int>()
     val restaurants: StateFlow<PagingData<RestaurantDTO>> = _restaurantsState.asStateFlow()
     val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
@@ -96,7 +99,7 @@ class MapViewModel(): ViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.collectLatest { pagingData ->
+                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
                     _restaurantsState.value = pagingData
                     isLoading = false
                 }
@@ -108,7 +111,7 @@ class MapViewModel(): ViewModel() {
         }
     }
 
-    suspend fun getEvents() {
+    fun getEvents() {
         viewModelScope.launch {
             try {
                 isLoading = true
@@ -116,7 +119,7 @@ class MapViewModel(): ViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.collectLatest { pagingData ->
+                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
                     _eventsState.value = pagingData
                     isLoading = false
                 }
@@ -128,20 +131,35 @@ class MapViewModel(): ViewModel() {
         }
     }
 
-    fun addRestaurantMarker(position: GeoPoint, icon: Bitmap?, title: String, onClick: (Marker, MapView) -> Boolean) {
-        val restaurantMarker = CustomMarker(OsmMap.view)
-        restaurantMarker.position = position
-        restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+    fun addRestaurantMarker(restaurant:RestaurantDTO, onClick: (Marker, MapView) -> Boolean) {
+        if(_addedRestaurants.contains(restaurant.restaurantId))
+            return
 
-        restaurantMarker.icon = if(icon!= null)
-            getMarkerDrawable(icon)
-        else
-            OsmMap.view.context.getDrawable(R.drawable.restaurant_template_icon)
+        _addedRestaurants.add(restaurant.restaurantId)
+        viewModelScope.launch {
+            try {
+                val position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude)
+                val restaurantMarker = CustomMarker(OsmMap.view)
+                restaurantMarker.position = position
+                restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
-        restaurantMarker.title = title
-        restaurantMarker.setInfoWindow(null)
-        restaurantMarker.setOnMarkerClickListener(onClick)
-        OsmMap.view.overlays.add(0,restaurantMarker)
+                val icon: Bitmap? = FileService().getImage(restaurant.logo!!).value
+
+                restaurantMarker.icon = if(icon!= null)
+                    getMarkerDrawable(icon)
+                else
+                    OsmMap.view.context.getDrawable(R.drawable.restaurant_template_icon)
+
+                restaurantMarker.title = restaurant.name
+                restaurantMarker.setInfoWindow(null)
+                restaurantMarker.setOnMarkerClickListener(onClick)
+                OsmMap.view.overlays.add(0,restaurantMarker)
+                println("TEST MARKER:${restaurant.name}")
+            }
+            catch (e: Exception){
+                Log.d("[MAP MARKER]:", e.toString())
+            }
+        }
     }
 
     private fun getMarkerDrawable(icon: Bitmap): Drawable{

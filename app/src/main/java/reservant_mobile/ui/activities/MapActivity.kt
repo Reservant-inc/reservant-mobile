@@ -76,7 +76,7 @@ fun MapActivity(){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
-            val showRestaurantId by remember { mutableIntStateOf(0) }
+            var showRestaurantId by remember { mutableIntStateOf(0) }
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
             val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
 
@@ -97,25 +97,10 @@ fun MapActivity(){
                     -11.2135241,
                     17.8770032,
                     60.192059,
-                    24.945831)
-                mapViewModel.getEvents()
-
-
-                if (restaurants != null) {
-//                    for(restaurant in restaurants){
-//                        val img: Bitmap? = FileService().getImage(restaurant.logo!!).value
-//                        mapViewModel.addRestaurantMarker(
-//                            position = GeoPoint(restaurant.location!!.latitude, restaurant.location.longitude),
-//                            icon = img,
-//                            title = restaurant.name
-//                        ) { _, _ ->
-//                            showRestaurantId = restaurant.restaurantId
-//                            showRestaurantBottomSheet = true
-//                            true
-//                        }
-//                    }
-                }
+                    24.945831
+                )
             }
+
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {
@@ -137,13 +122,21 @@ fun MapActivity(){
                         ) {
                             items(restaurants.itemCount) { index ->
                                 val item = restaurants[index]
-                                if(item != null)
+                                if(item != null){
                                     RestaurantCard(
                                         onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
                                         name = item.name,
                                         location = item.address,
                                         city = item.city
                                     )
+                                        mapViewModel.addRestaurantMarker(item) { _, _ ->
+                                            showRestaurantId = item.restaurantId
+                                            showRestaurantBottomSheet = true
+                                            true
+                                        }
+
+                                }
+
                             }
                         }
                     }
@@ -157,35 +150,32 @@ fun MapActivity(){
                             CircularProgressIndicator()
                         }
                     }
-                    else if(events!= null) {
-                        LazyColumn(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 75.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            items(events.itemCount) { index ->
-                                val item = events[index]
-                                if(item != null)
-                                    RestaurantCard(
-                                        onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                        name = item.restaurantName!!,
-                                        location = item.description,
-                                        city = item.mustJoinUntil
-                                    )
+                    else {
+                        if (events.itemCount < 1){
+                            LaunchedEffect(key1 = true) {
+                                println("TEST")
+                                mapViewModel.getEvents()
                             }
                         }
-                    }
-                    else{
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(500.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            MissingPage(errorStringId = R.string.error_not_found)
-                        }
+                        else
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 75.dp)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                items(events.itemCount) { index ->
+                                    val item = events[index]
+                                    if(item != null)
+                                        RestaurantCard(
+                                            onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
+                                            name = item.restaurantName!!,
+                                            location = item.description,
+                                            city = item.mustJoinUntil
+                                        )
+                                }
+                            }
                     }
                 }
             )
@@ -231,7 +221,6 @@ fun RestaurantDetailPreview(
     onDismiss: () -> Unit
 ){
     val modalBottomSheetState = rememberModalBottomSheetState()
-
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
@@ -243,6 +232,10 @@ fun RestaurantDetailPreview(
                     RestaurantDetailViewModel(restaurantId) as T
             }
         )
+
+        LaunchedEffect(key1 = true) {
+            restaurantDetailVM.loadRestaurant(restaurantId)
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
 
