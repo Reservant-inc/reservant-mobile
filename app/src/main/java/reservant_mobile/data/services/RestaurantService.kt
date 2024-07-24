@@ -419,7 +419,6 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
-    @OptIn(InternalSerializationApi::class)
     override suspend fun getRestaurantsInArea(
         lat1: Double,
         lon1: Double,
@@ -429,22 +428,21 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
 
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants(
-                lat1 = lat1,
-                lon1 = lon1,
-                lat2 = lat2,
-                lon2 = lon2,
+//                lat1 = lat1,
+//                lon1 = lon1,
+//                lat2 = lat2,
+//                lon2 = lon2,
                 page = page,
                 perPage = perPage
             ))}
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(RestaurantDTO::class.serializer()))
+        val flow = sps.getFlow()
 
-        return try {
+        return if(flow != null)
             Result(isError = false, value = sps.getFlow())
-        }
-        catch (e: Exception){
+        else
             Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-        }
     }
 
     override suspend fun getRestaurantOrders(
@@ -466,18 +464,13 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
             )
         }
 
-        val sps =
-            ServicePagingSource(call, serializer = PageDTO.serializer(OrderDTO::class.serializer()))
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(OrderDTO::class.serializer()))
+        val flow = sps.getFlow()
 
-        return try {
+        return if(flow != null)
             Result(isError = false, value = sps.getFlow())
-        } catch (e: Exception) {
-            Result(
-                isError = true,
-                errors = mapOf(pair = Pair("TOAST", R.string.error_unknown)),
-                value = null
-            )
-        }
+        else
+            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
     }
 
     override suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?> {
@@ -489,13 +482,12 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
             ))}
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO::class.serializer()))
+        val flow = sps.getFlow()
 
-        return try {
+        return if(flow != null)
             Result(isError = false, value = sps.getFlow())
-        }
-        catch (e: Exception){
+        else
             Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-        }
     }
 
     override suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?> {
@@ -529,12 +521,11 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
             ))}
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReviewDTO::class.serializer()))
+        val flow = sps.getFlow()
 
-        return try {
+        return if(flow != null)
             Result(isError = false, value = sps.getFlow())
-        }
-        catch (e: Exception){
+        else
             Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-        }
     }
 }

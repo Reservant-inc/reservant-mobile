@@ -50,10 +50,14 @@ class RestaurantDetailViewModel(
     }
 
     suspend fun loadRestaurant(id: Int): Boolean {
+        isLoading = true
+
         if (id != restaurantId) {
             restaurantId = id
         }
-        resultRestaurant = restaurantService.getRestaurant(restaurantId)
+        resultRestaurant = restaurantService.getRestaurant(id)
+        isLoading = false
+
         if (resultRestaurant.isError) {
             return false
         }
