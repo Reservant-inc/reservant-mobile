@@ -1,7 +1,6 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,16 +39,16 @@ fun ProfileActivity(navController: NavHostController) {
                 ProfileViewModel() as T
         }
     )
-
+    // TODO: resources
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { },
+                title = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(text = "Mój profil", fontWeight = FontWeight.Bold) } },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.label_back)
                         )
                     }
                 },
@@ -144,7 +144,7 @@ fun ChatsTab() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_logo), // Update this to chat user's profile picture
+                    painter = painterResource(R.drawable.ic_logo),
                     contentDescription = "Chat User Picture",
                     modifier = Modifier
                         .size(50.dp)
