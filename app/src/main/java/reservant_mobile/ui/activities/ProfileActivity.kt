@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -46,22 +47,21 @@ fun ProfileActivity(navController: NavHostController) {
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Tutaj dodaj logikę otwierającą ekran edycji profilu */ }) {
+                    IconButton(onClick = {
+                        // Edit profile
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
                             contentDescription = "Edit Profile"
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
+                }
             )
         }
     ) { paddingValues ->
@@ -78,7 +78,7 @@ fun ProfileActivity(navController: NavHostController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_logo), //TODO: update to use user photo
+                        painter = painterResource(R.drawable.jd),
                         contentDescription = "Profile Picture",
                         modifier = Modifier
                             .size(100.dp)
@@ -98,18 +98,17 @@ fun ProfileActivity(navController: NavHostController) {
                     onValueChange = { },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(start = 16.dp, end = 16.dp),
                     placeholder = { Text("Szukaj...") },
                     trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     singleLine = true
                 )
 
                 FloatingTabSwitch(pages = listOf(
+                    "Visits" to { VisitsTab() },
+                    "Orders" to { OrdersTab() },
                     "Chats" to { ChatsTab() },
                     "Friends" to { FriendsTab() },
-                    "Events" to { EventsTab(
-                        //profileViewModel.getEvents()
-                    ) }
                 ))
             }
         }
@@ -117,42 +116,53 @@ fun ProfileActivity(navController: NavHostController) {
 }
 
 @Composable
+fun VisitsTab() {
+
+}
+
+@Composable
+fun OrdersTab() {
+
+}
+
+@Composable
 fun ChatsTab() {
-    Text("Chats content goes here")
+    val chats = listOf(
+        Chat("John Doe", "Whats up?"),
+        Chat("John Doe", "Whats up?"),
+        Chat("John Doe", "Whats up?"),
+        Chat("John Doe", "Whats up?"),
+        Chat("John Doe", "Whats up?")
+    )
+
+    LazyColumn(modifier = Modifier.padding(top = 72.dp)) {
+        items(chats) { chat ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_logo), // Update this to chat user's profile picture
+                    contentDescription = "Chat User Picture",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Text(text = chat.userName, fontWeight = FontWeight.Bold)
+                    Text(text = chat.message, color = Color.Gray)
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun FriendsTab() {
-    Text("Friends content goes here")
+
 }
 
-@Composable
-fun EventsTab(
-    //events: List<Event>
-) {
-    LazyColumn {
-//        items(events) { event ->
-//            Card(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 16.dp, vertical = 8.dp),
-//                elevation = 4.dp
-//            ) {
-//                Row(
-//                    modifier = Modifier.padding(16.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Image(
-//                        painter = painterResource(id = event.imageResource),
-//                        contentDescription = "Event Image",
-//                        modifier = Modifier.size(50.dp)
-//                    )
-//                    Column(modifier = Modifier.padding(start = 16.dp)) {
-//                        Text(text = event.name, fontWeight = FontWeight.Bold)
-//                        Text(text = event.date, color = Color.Gray)
-//                        Text(text = event.location, color = Color.Gray)
-//                    }
-//                }
-//
-    }
-}
+data class Chat(val userName: String, val message: String)
