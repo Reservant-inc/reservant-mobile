@@ -75,7 +75,7 @@ import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
 @Composable
-fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
+fun RestaurantDetailActivity(navController: NavController, restaurantId: Int = 1) {
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -274,7 +274,7 @@ fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
-            onClick = { navController.navigate(RestaurantRoutes.Order) }
+            onClick = { navController.navigate(RestaurantRoutes.Reservation) }
         ) {
             Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
         }
