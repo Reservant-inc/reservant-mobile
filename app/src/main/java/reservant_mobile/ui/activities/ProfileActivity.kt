@@ -6,8 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -54,7 +54,7 @@ fun ProfileActivity(navController: NavHostController) {
                 },
                 actions = {
                     IconButton(onClick = {
-                        // Edit profile
+                        // TODO: Edit profile
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
@@ -90,7 +90,17 @@ fun ProfileActivity(navController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp
                     )
-                    Text(text = "5,00 Ocena", color = Color.Gray)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Icon(imageVector = Icons.Filled.Cake, contentDescription = "Birthday", tint = Color.Gray)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "01-01-2000", color = Color.Gray)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = "5,00 Ocena", color = Color.Gray)
+                    }
                 }
 
                 OutlinedTextField(
@@ -117,12 +127,12 @@ fun ProfileActivity(navController: NavHostController) {
 
 @Composable
 fun VisitsTab() {
-
+    // Content for the Visits tab
 }
 
 @Composable
 fun OrdersTab() {
-
+    // Content for the Orders tab
 }
 
 @Composable
@@ -162,7 +172,37 @@ fun ChatsTab() {
 
 @Composable
 fun FriendsTab() {
+    val friends = listOf(
+        Friend("John Doe"),
+        Friend("John Doe"),
+        Friend("John Doe"),
+        Friend("John Doe"),
+        Friend("John Doe"),
+        Friend("John Doe")
+    )
 
+    LazyColumn(modifier = Modifier.padding(16.dp)) {
+        items(friends) { friend ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.jd),
+                    contentDescription = "Friend Profile Picture",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = friend.name, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
 }
 
 data class Chat(val userName: String, val message: String)
+data class Friend(val name: String)
