@@ -182,7 +182,7 @@ fun FriendsTab() {
         Friend("John Doe")
     )
 
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
+    LazyColumn(modifier = Modifier.padding(top = 72.dp)) {
         items(friends) { friend ->
             Row(
                 modifier = Modifier
