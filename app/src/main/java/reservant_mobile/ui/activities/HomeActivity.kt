@@ -62,7 +62,7 @@ fun HomeActivity() {
                     RestaurantDetailActivity(navController = innerNavController, 1)
                 }
                 composable<RestaurantRoutes.Order>{
-                    RestaurantOrderActivity(navController = innerNavController)
+                    RestaurantReservationActivity(navController = innerNavController)
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
