@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
@@ -59,6 +61,13 @@ class RestaurantViewModel(
     var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
 
     var restaurantId by mutableStateOf<Int?>(null)
+
+    init {
+        viewModelScope.launch {
+            getGroups()
+            getTags()
+        }
+    }
 
     suspend fun assignData(id: Int, group: RestaurantGroupDTO) {
         restaurantId = id
