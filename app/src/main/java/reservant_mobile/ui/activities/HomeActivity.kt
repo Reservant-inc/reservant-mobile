@@ -1,7 +1,6 @@
 package reservant_mobile.ui.activities
 
 import OrdersActivity
-import RestaurantDetailActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -62,6 +61,9 @@ fun HomeActivity() {
                 }
                 composable<RestaurantRoutes.Details>{
                     RestaurantDetailActivity(navController = innerNavController, 1) //TODO: hardcoded id?
+                }
+                composable<RestaurantRoutes.Order>{
+                    RestaurantOrderActivity(navController = innerNavController)
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
