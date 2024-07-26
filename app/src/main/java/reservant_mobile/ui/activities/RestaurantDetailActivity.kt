@@ -1,4 +1,4 @@
-
+package reservant_mobile.ui.activities
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,12 +22,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -65,10 +67,10 @@ import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
-import reservant_mobile.ui.components.ReservationFloatingMenu
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
@@ -264,11 +266,27 @@ fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
             }
         }
     }
-    ReservationFloatingMenu(
-        onDineInClick = {},
-        onDeliveryClick = {},
-        onTakeawayClick= {}
-    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        FloatingActionButton(
+            onClick = { navController.navigate(RestaurantRoutes.Order) }
+        ) {
+            Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
+        }
+    }
+
+
+
+//    ReservationFloatingMenu(
+//        onDineInClick = {},
+//        onDeliveryClick = {},
+//        onTakeawayClick= {}
+//    )
 
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
