@@ -13,6 +13,6 @@ data object RestaurantRoutes {
     )
 
     @Serializable
-    object Order
+    object Reservation
 
 }
