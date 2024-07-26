@@ -22,6 +22,7 @@ import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,14 +80,9 @@ fun RegisterRestaurantActivity(
     var showTagDialog by remember { mutableStateOf(false) }
 
     if (restaurantId != null && group != null) {
-        restaurantViewModel.viewModelScope.launch {
+        LaunchedEffect(key1 = Unit) {
             restaurantViewModel.assignData(restaurantId, group)
         }
-    }
-
-    restaurantViewModel.viewModelScope.launch {
-        restaurantViewModel.getGroups()
-        restaurantViewModel.getTags()
     }
 
     NavHost(

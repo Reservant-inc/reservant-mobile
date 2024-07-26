@@ -46,16 +46,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -123,7 +119,6 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel

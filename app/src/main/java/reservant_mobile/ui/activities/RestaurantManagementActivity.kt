@@ -154,10 +154,12 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         }
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 4.dp, end = 4.dp)
                             )
                         } else if (groups.size == 1) {
-                            restaurantManageVM.viewModelScope.launch {
+                            LaunchedEffect(key1 = Unit) {
                                 selectedGroup = groups.first().restaurantGroupId?.let { it1 ->
                                     restaurantManageVM.getGroup(it1)
                                 }
