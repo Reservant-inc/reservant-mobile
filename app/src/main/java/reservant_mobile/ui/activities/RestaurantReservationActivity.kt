@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.DeliveryContent
 import reservant_mobile.ui.components.DineInContent
@@ -107,4 +109,10 @@ fun RestaurantReservationActivity(navController: NavHostController) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    RestaurantReservationActivity(navController = rememberNavController())
 }
