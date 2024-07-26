@@ -16,6 +16,9 @@ data object RestaurantRoutes {
     object Ticket
 
     @Serializable
+    object Reservation
+
+    @Serializable
     object TicketHistory
 
     @Serializable
