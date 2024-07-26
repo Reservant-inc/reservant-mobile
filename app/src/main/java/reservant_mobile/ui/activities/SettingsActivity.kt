@@ -33,7 +33,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: () -> Unit) {
+fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
     val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {

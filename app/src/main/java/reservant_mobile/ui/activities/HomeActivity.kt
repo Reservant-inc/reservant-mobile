@@ -57,7 +57,7 @@ fun HomeActivity() {
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
                 composable<MainRoutes.Profile>{
-                    RestaurantOwnerProfileActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                    SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Details>{
                     RestaurantDetailActivity(navController = innerNavController, 1) //TODO: hardcoded id?
