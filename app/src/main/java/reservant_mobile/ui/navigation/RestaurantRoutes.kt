@@ -17,4 +17,7 @@ data object RestaurantRoutes {
 
     @Serializable
     object TicketHistory
+
+    @Serializable
+    object Order
 }
