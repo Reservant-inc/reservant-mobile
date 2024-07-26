@@ -280,14 +280,6 @@ fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
         }
     }
 
-
-
-//    ReservationFloatingMenu(
-//        onDineInClick = {},
-//        onDeliveryClick = {},
-//        onTakeawayClick= {}
-//    )
-
     if (showGallery) {
         FullscreenGallery(onDismiss = { showGallery = false })
     }
