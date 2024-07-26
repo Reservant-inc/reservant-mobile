@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import RestaurantDetailActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
