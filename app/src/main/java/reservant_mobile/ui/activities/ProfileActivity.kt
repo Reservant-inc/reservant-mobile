@@ -33,12 +33,8 @@ import reservant_mobile.ui.viewmodels.ProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileActivity(navController: NavHostController) {
-    val profileViewModel = viewModel<ProfileViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                ProfileViewModel() as T
-        }
-    )
+    val profileViewModel = viewModel<ProfileViewModel>()
+
     // TODO: resources
     Scaffold(
         topBar = {
