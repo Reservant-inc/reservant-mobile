@@ -27,15 +27,17 @@ interface IRestaurantMenuService{
 }
 
 class RestaurantMenuService(private var api: APIService = APIService()): IRestaurantMenuService {
-    private suspend inline fun <reified T> resultWrapper(res: Result<HttpResponse?>): Result<T?> {
+    private suspend inline fun <reified T> resultWrapper(res: Result<HttpResponse?>, expectedCode:HttpStatusCode = HttpStatusCode.OK): Result<T?> {
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
 
-        if (res.value!!.status == HttpStatusCode.OK){
+        if (res.value!!.status == expectedCode){
             return try {
-                Result(isError = false, value = res.value.body())
+                val r:T = res.value.body()
+                Result(isError = false, value = r)
             }
             catch (e: Exception){
+                println("SERVICE ERROR: $e")
                 Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
             }
         }
@@ -84,7 +86,7 @@ class RestaurantMenuService(private var api: APIService = APIService()): IRestau
 
     override suspend fun createMenuItem(menuItems: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?> {
         val res = api.post( MenuItems(), menuItems)
-        return resultWrapper(res)
+        return resultWrapper(res, HttpStatusCode.Created)
     }
 
 
