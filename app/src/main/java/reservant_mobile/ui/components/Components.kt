@@ -61,6 +61,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -854,60 +855,102 @@ fun IconButton(
 
 // TODO: verify colors and add vars
 @Composable
-fun SearchBarWithFilter() {
-    var text by remember { mutableStateOf("") }
+fun SearchBarWithFilter(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onFilterSelected: (String?) -> Unit,
+    currentFilter: String?,
+    filterOptions: List<String>
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val labelAll = stringResource(id = R.string.label_all)
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterStart
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 16.dp),
-                singleLine = true,
-                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                placeholder = {
-                    Text(
-                        text = "Szukaj...",
-                        color = Color.Gray,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                trailingIcon = {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    singleLine = true,
+                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.label_search),
+                            color = Color.Gray,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                        )
+                    }
+                )
+            }
+            Box {
+                IconButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "search icon",
-                        modifier = Modifier
-                            .padding(end = 4.dp)
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = stringResource(id = R.string.label_filters),
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
-            )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = labelAll) },
+                        onClick = {
+                            onFilterSelected("")
+                            expanded = false
+                        }
+                    )
+                    filterOptions.forEach { filter ->
+                        DropdownMenuItem(
+                            text = { Text(text = filter) },
+                            onClick = {
+                                onFilterSelected(if (filter == labelAll) "" else filter)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
         }
-        IconButton(
-            onClick = { /* TODO: Handle filter action */ },
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = "Filter",
-                tint = MaterialTheme.colorScheme.secondary
-            )
+
+        currentFilter?.let {
+            if (it.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.label_current_filter, it),
+                    style = TextStyle(color = Color.Gray, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
-
 
 @Composable
 fun FloatingTabSwitch(
@@ -1087,30 +1130,6 @@ fun UnderlinedItem(
         )
     }
     HorizontalDivider()
-}
-
-
-//TODO: remove and use search with filter
-@Composable
-fun FilterDialog(
-    onDismissRequest: () -> Unit,
-    onFilterSelected: (String) -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(id = R.string.label_filters)) },
-        text = {
-            Column {
-                FilterOption("Odebrano", onFilterSelected)
-                FilterOption("Anulowano", onFilterSelected)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(id = R.string.label_close))
-            }
-        }
-    )
 }
 
 @Composable

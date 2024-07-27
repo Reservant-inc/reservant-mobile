@@ -1,17 +1,12 @@
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,27 +18,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
-import reservant_mobile.ui.components.ButtonComponent
-import reservant_mobile.ui.components.FilterDialog
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.OrderItem
+import reservant_mobile.ui.components.SearchBarWithFilter
 
 @Composable
 fun OrdersActivity() {
     val ordersViewModel = viewModel<OrdersViewModel>()
     val orders by ordersViewModel.filteredOrders.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    var showFilterDialog by remember { mutableStateOf(false) }
+    var selectedFilter by remember { mutableStateOf<String?>(null) }
 
-    if (showFilterDialog) {
-        FilterDialog(
-            onDismissRequest = { showFilterDialog = false },
-            onFilterSelected = { status ->
-                ordersViewModel.filterOrders(status)
-                showFilterDialog = false
-            }
-        )
-    }
+    val filterOptions = listOf(
+        "Odebrano",
+        "Anulowano"
+    )
 
     Column(modifier = Modifier.padding(16.dp)) {
         IconWithHeader(
@@ -53,24 +42,18 @@ fun OrdersActivity() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = searchQuery,
-            onValueChange = {
+        SearchBarWithFilter(
+            searchQuery = searchQuery,
+            onSearchQueryChange = {
                 searchQuery = it
                 ordersViewModel.searchOrders(it)
             },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = stringResource(id = R.string.label_search)) },
-            leadingIcon = {
-                Icon(Icons.Filled.Search, contentDescription = null)
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        ButtonComponent(
-            onClick = { showFilterDialog = true },
-            label = stringResource(id = R.string.label_filters)
+            onFilterSelected = { status ->
+                selectedFilter = status ?: ""
+                ordersViewModel.filterOrders(selectedFilter)
+            },
+            currentFilter = selectedFilter,
+            filterOptions = filterOptions
         )
 
         Spacer(modifier = Modifier.height(16.dp))
