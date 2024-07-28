@@ -59,9 +59,6 @@ fun HomeActivity() {
                 composable<MainRoutes.Profile>{
                     SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
-                composable<RestaurantRoutes.Details>{
-                    RestaurantDetailActivity(navController = innerNavController, restaurantId = 1)
-                }
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
                 }
