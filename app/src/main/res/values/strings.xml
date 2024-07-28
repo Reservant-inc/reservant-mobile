@@ -173,4 +173,5 @@
     <string name="errorCode_NotFound">Not found</string>
     <string name="label_ticket">New ticket</string>
     <string name="label_ticket_history">Ticket History</string>
+    <string name="label_detail_reviews">reviews</string>
 </resources>
