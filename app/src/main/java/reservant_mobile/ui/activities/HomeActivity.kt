@@ -58,12 +58,6 @@ fun HomeActivity() {
                 composable<MainRoutes.Profile>{
                     RestaurantOwnerProfileActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
-                composable<RestaurantRoutes.Details>{
-                    RestaurantDetailActivity(navController = innerNavController)
-                }
-                composable<RestaurantRoutes.Reservation>{
-                    RestaurantReservationActivity(navController = innerNavController)
-                }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
                         bottomBarState.value = false
