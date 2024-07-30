@@ -96,6 +96,7 @@ dependencies {
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("androidx.core:core-splashscreen:1.0.1")
     implementation ("org.osmdroid:osmdroid-android:6.1.18")
+    implementation ("com.github.MKergall:osmbonuspack:6.9.0")
 
     val pagingVersion = "3.3.0"
     implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
