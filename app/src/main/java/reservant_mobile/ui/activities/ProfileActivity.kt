@@ -67,74 +67,92 @@ fun ProfileActivity(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if(profileViewModel.user != null){
-                profileViewModel.user?.let { user ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+
+            when {
+                profileViewModel.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.jd),
-                            contentDescription = stringResource(R.string.label_profile_picture),
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Text(
-                            text = "${user.firstName} ${user.lastName}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(top = 8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Cake,
-                                contentDescription = stringResource(R.string.label_birthday),
-                                tint = Color.Gray
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            profileViewModel.user!!.birthDate?.let {
-                                Text(text = it, color = Color.Gray)
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
-                                color = Color.Gray
-                            )
-                        }
+                        CircularProgressIndicator()
                     }
-
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp),
-                        placeholder = {
-                            Text(
-                                stringResource(R.string.label_search)+"..."
-                            ) 
-                                      },
-                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                        singleLine = true
-                    )
-
-                    FloatingTabSwitch(pages = listOf(
-                        "Visits" to { VisitsTab() },
-                        "Orders" to { OrdersTab() },
-                        "Chats" to { ChatsTab() },
-                        "Friends" to { FriendsTab() },
-                    ))
                 }
-            }else{
-                MissingPage(errorStringId = R.string.error_not_found)
+
+                profileViewModel.user != null -> {
+                    profileViewModel.user.let { user ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.jd),
+                                contentDescription = stringResource(R.string.label_profile_picture),
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                            if (user != null) {
+                                Text(
+                                    text = "${user.firstName} ${user.lastName}",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Cake,
+                                    contentDescription = stringResource(R.string.label_birthday),
+                                    tint = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                profileViewModel.user!!.birthDate?.let {
+                                    Text(text = it, color = Color.Gray)
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+
+                        OutlinedTextField(
+                            value = "",
+                            onValueChange = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp),
+                            placeholder = {
+                                Text(
+                                    stringResource(R.string.label_search)+"..."
+                                )
+                            },
+                            trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                            singleLine = true
+                        )
+
+                        FloatingTabSwitch(pages = listOf(
+                            "Visits" to { VisitsTab() },
+                            "Orders" to { OrdersTab() },
+                            "Chats" to { ChatsTab() },
+                            "Friends" to { FriendsTab() },
+                        ))
+                    }
+                }
+
+                else -> {
+                    MissingPage(errorStringId = R.string.error_not_found)
+                }
+
             }
+
         }
     }
 }

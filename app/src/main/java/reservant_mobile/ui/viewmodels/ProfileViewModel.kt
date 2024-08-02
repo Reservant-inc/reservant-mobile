@@ -16,7 +16,7 @@ class ProfileViewModel(
 ) : ViewModel() {
 
     var user: LoggedUserDTO? by mutableStateOf(null)
-
+    var isLoading: Boolean by mutableStateOf(false)
     init {
         viewModelScope.launch {
             loadUser()
@@ -24,11 +24,13 @@ class ProfileViewModel(
     }
 
     private suspend fun loadUser(): Boolean {
+        isLoading = true
         val resultUser =  userService.getUser()
         if(resultUser.isError){
             return false
         }
         user = resultUser.value
+        isLoading = false
         return true
     }
 
