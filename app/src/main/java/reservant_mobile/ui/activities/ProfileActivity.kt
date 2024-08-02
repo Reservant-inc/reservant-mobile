@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.FloatingTabSwitch
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,56 +67,60 @@ fun ProfileActivity(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            profileViewModel.user?.let { user ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.jd),
-                        contentDescription = "Profile Picture",
+            if(profileViewModel.user != null){
+                profileViewModel.user?.let { user ->
+                    Column(
                         modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Text(
-                        text = "${user.firstName} ${user.lastName}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(top = 8.dp)
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(imageVector = Icons.Filled.Cake, contentDescription = "Birthday", tint = Color.Gray)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "01-01-2000", color = Color.Gray)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = "5,00 Ocena", color = Color.Gray)
+                        Image(
+                            painter = painterResource(R.drawable.jd),
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = "${user.firstName} ${user.lastName}",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Icon(imageVector = Icons.Filled.Cake, contentDescription = "Birthday", tint = Color.Gray)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "01-01-2000", color = Color.Gray)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(text = "5,00 Ocena", color = Color.Gray)
+                        }
                     }
+
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp),
+                        placeholder = { Text("Szukaj...") },
+                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                        singleLine = true
+                    )
+
+                    FloatingTabSwitch(pages = listOf(
+                        "Visits" to { VisitsTab() },
+                        "Orders" to { OrdersTab() },
+                        "Chats" to { ChatsTab() },
+                        "Friends" to { FriendsTab() },
+                    ))
                 }
-
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp),
-                    placeholder = { Text("Szukaj...") },
-                    trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    singleLine = true
-                )
-
-                FloatingTabSwitch(pages = listOf(
-                    "Visits" to { VisitsTab() },
-                    "Orders" to { OrdersTab() },
-                    "Chats" to { ChatsTab() },
-                    "Friends" to { FriendsTab() },
-                ))
+            }else{
+                MissingPage(errorStringId = R.string.error_not_found)
             }
         }
     }
