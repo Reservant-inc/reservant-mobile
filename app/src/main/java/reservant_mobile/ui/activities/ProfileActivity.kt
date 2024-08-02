@@ -36,7 +36,6 @@ import reservant_mobile.ui.viewmodels.ProfileViewModel
 fun ProfileActivity(navController: NavHostController) {
     val profileViewModel = viewModel<ProfileViewModel>()
 
-    // TODO: resources
     Scaffold(
         topBar = {
             TopAppBar(
@@ -174,6 +173,7 @@ fun ChatsTab() {
         Chat("John Doe", "Whats up?"),
         Chat("John Doe", "Whats up?"),
         Chat("John Doe", "Whats up?"),
+        Chat("John Doe", "Whats up?"),
         Chat("John Doe", "Whats up?")
     )
 
@@ -235,6 +235,6 @@ fun FriendsTab() {
         }
     }
 }
-
+// tmp data classes
 data class Chat(val userName: String, val message: String)
 data class Friend(val name: String)
