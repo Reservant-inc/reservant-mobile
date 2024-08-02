@@ -155,4 +155,6 @@
     <string name="label_reservation_date">Reservation date</string>
     <string name="label_my_reservation">My Reservation</string>
     <string name="label_my_profile">My profile</string>
+    <string name="label_all">All</string>
+    <string name="label_current_filter">Current filter: %1$s</string>
 </resources>

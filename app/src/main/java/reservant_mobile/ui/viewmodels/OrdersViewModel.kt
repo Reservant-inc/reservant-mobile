@@ -37,7 +37,11 @@ class OrdersViewModel : ViewModel() {
         }
     }
 
-    fun filterOrders(status: String) {
-        _filteredOrders.value = allOrders.filter { it.status == status }
+    fun filterOrders(status: String?) {
+        _filteredOrders.value = if (status.isNullOrBlank()) {
+            allOrders
+        } else {
+            allOrders.filter { it.status == status }
+        }
     }
 }
