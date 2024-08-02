@@ -55,7 +55,7 @@ fun ProfileActivity(navController: NavHostController) {
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "Edit Profile"
+                            contentDescription = stringResource(R.string.label_edit_profile)
                         )
                     }
                 }
@@ -77,7 +77,7 @@ fun ProfileActivity(navController: NavHostController) {
                     ) {
                         Image(
                             painter = painterResource(R.drawable.jd),
-                            contentDescription = "Profile Picture",
+                            contentDescription = stringResource(R.string.label_profile_picture),
                             modifier = Modifier
                                 .size(100.dp)
                                 .clip(CircleShape),
@@ -93,11 +93,20 @@ fun ProfileActivity(navController: NavHostController) {
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
-                            Icon(imageVector = Icons.Filled.Cake, contentDescription = "Birthday", tint = Color.Gray)
+                            Icon(
+                                imageVector = Icons.Filled.Cake,
+                                contentDescription = stringResource(R.string.label_birthday),
+                                tint = Color.Gray
+                            )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "01-01-2000", color = Color.Gray)
+                            profileViewModel.user!!.birthDate?.let {
+                                Text(text = it, color = Color.Gray)
+                            }
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text(text = "5,00 Ocena", color = Color.Gray)
+                            Text(
+                                text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
+                                color = Color.Gray
+                            )
                         }
                     }
 
@@ -107,7 +116,11 @@ fun ProfileActivity(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp),
-                        placeholder = { Text("Szukaj...") },
+                        placeholder = {
+                            Text(
+                                stringResource(R.string.label_search)+"..."
+                            ) 
+                                      },
                         trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                         singleLine = true
                     )
