@@ -57,10 +57,10 @@ fun HomeActivity() {
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
                 composable<MainRoutes.Profile>{
-                    RestaurantOwnerProfileActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                    SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Details>{
-                    RestaurantDetailActivity(navController = innerNavController, 1)
+                    RestaurantDetailActivity(navController = innerNavController, 1) //TODO: hardcoded id?
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
@@ -70,6 +70,9 @@ fun HomeActivity() {
                 }
                 composable<MainRoutes.Orders>{
                     OrdersActivity()
+                }
+                composable<MainRoutes.UserProfile>{
+                    ProfileActivity(navController = innerNavController)
                 }
             }
         }
