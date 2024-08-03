@@ -46,9 +46,15 @@ class EventServiceUnitTest: ServiceTest() {
 
     @Test
     fun add_and_delete_event()= runTest{
-        val m = ser.addEvent(event).value
-        Truth.assertThat(m).isNotNull()
-//        Truth.assertThat(ser.deleteEvent(m!!.eventId!!).value).isTrue()
+        val e = ser.addEvent(event).value
+        Truth.assertThat(e).isNotNull()
+        Truth.assertThat(ser.deleteEvent(e!!.eventId!!).value).isTrue()
+    }
+
+    @Test
+    fun update_event_return_not_null()= runTest{
+        val e = ser.updateEvent(1,event).value
+        Truth.assertThat(e).isNotNull()
     }
 
     @Test
