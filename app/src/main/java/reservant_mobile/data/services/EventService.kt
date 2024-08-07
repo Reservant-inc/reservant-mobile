@@ -12,7 +12,7 @@ interface IEventService{
     suspend fun markEventAsInterested(eventId: Any): Result<Boolean>
     suspend fun markEventAsNotInterested(eventId: Any): Result<Boolean>
 }
-class EventService(private var api: APIService = APIService()): ServiceUtil(), IEventService{
+class EventService(): ServiceUtil(), IEventService{
     override suspend fun addEvent(event: EventDTO): Result<EventDTO?> {
         val res = api.post(Events(), event)
         return complexResultWrapper(res)

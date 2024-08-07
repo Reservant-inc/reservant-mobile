@@ -17,7 +17,8 @@ import reservant_mobile.data.models.dtos.fields.Result
 class ServicePagingSource<T:Any>(
     private val fetchResult: suspend (page: Int, perPage: Int) -> Result<HttpResponse?>,
     private val serializer: KSerializer<PageDTO<T>>,
-    private val pageSize:Int = 5
+    private val pageSize:Int = 5,
+    private val expectedCode: HttpStatusCode = HttpStatusCode.OK
 ) : PagingSource<Int, T>() {
 
 
@@ -30,7 +31,7 @@ class ServicePagingSource<T:Any>(
             val res = fetchResult(currentPage, pageSize)
 
 
-            if(res.isError || res.value!!.status != HttpStatusCode.OK){
+            if(res.isError || res.value!!.status != expectedCode){
                 _errorRes = res
                 throw Exception()
             }

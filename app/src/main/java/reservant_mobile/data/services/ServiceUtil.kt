@@ -1,13 +1,15 @@
 package reservant_mobile.data.services
 
+import androidx.paging.PagingData
 import com.example.reservant_mobile.R
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.Flow
 import reservant_mobile.data.models.dtos.ErrorResponseDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
-abstract class ServiceUtil {
+abstract class ServiceUtil(protected var api: APIService = APIService()) {
 
     protected suspend inline fun <reified T> complexResultWrapper(res: Result<HttpResponse?>, expectedCode: HttpStatusCode = HttpStatusCode.OK): Result<T?> {
         if(res.isError)
@@ -37,7 +39,20 @@ abstract class ServiceUtil {
         return Result(true, errorCodesWrapper(res.value), false)
     }
 
-    suspend fun errorCodesWrapper(res: HttpResponse): Map<String, Int> {
+    protected suspend inline fun <reified T : Any>  pagingResultWrapper(sps : ServicePagingSource<T>): Result<Flow<PagingData<T>>?> {
+        val flow = sps.getFlow()
+        return if(flow != null)
+            Result(isError = false, value = flow)
+        else{
+            val r = sps.getErrorResult()
+            if(r != null){
+                Result(isError = true, errors = r.value?.let { errorCodesWrapper(it) },value = null)
+            }
+            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        }
+    }
+
+        suspend fun errorCodesWrapper(res: HttpResponse): Map<String, Int> {
         return try {
             val errorResponse:ErrorResponseDTO = res.body()
             val map = HashMap<String, Int>()
