@@ -76,7 +76,7 @@ fun TicketHistoryActivity() {
                 Tab(
                     selected = index == 0,
                     onClick = { /* TODO: Handle tab click */ },
-                    text = { Text(title) }
+                    text = { Text(title, fontSize = 12.sp) }
                 )
             }
         }
@@ -98,14 +98,6 @@ fun TicketHistoryActivity() {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
-        }
-        FloatingActionButton(
-            onClick = { /* TODO: Handle add action */ },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(16.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
     }
 }
