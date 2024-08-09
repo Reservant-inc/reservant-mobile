@@ -5,6 +5,6 @@ import io.ktor.resources.Resource
 @Resource("/users")
 class Users {
 
-    @Resource("{id}")
-    class Id(val parent: Users = Users(), val id: String)
+    @Resource("{employeeId}")
+    class Id(val parent: Users = Users(), val employeeId: String)
 }
