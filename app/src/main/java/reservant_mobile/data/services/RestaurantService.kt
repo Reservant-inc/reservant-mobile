@@ -336,7 +336,7 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
     }
 
     override suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?> {
-        val res = api.get(Users.Id(id=id.toString()))
+        val res = api.get(Users.Id(employeeId = id.toString()))
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
@@ -354,7 +354,7 @@ class RestaurantService(private var api: APIService = APIService()): IRestaurant
     }
 
     override suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?> {
-        val res = api.put(Users.Id(id = id.toString()), emp)
+        val res = api.put(Users.Id(employeeId = id.toString()), emp)
 
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = null)
