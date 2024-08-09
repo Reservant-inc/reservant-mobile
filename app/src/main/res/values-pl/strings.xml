@@ -159,4 +159,5 @@
     <string name="errorCode_AccessDenied">Nie masz uprawnień do wykonania tej czynności</string>
     <string name="errorCode_Duplicate">Istnieje już taki obiekt</string>
     <string name="errorCode_NotFound">Nie znaleziono</string>
+    <string name="label_chats">Czaty</string>
 </resources>
