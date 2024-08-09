@@ -57,7 +57,7 @@ abstract class ServiceUtil(protected var api: APIService = APIService()) {
             val errorResponse:ErrorResponseDTO = res.body()
             val map = HashMap<String, Int>()
             for(e in errorResponse.errorCodes){
-                val stringId = getStringIdByPropName(e.value.first())
+                val stringId = getStringIdByPropName(e.value?.first() ?: "")
                 if(stringId != -1){
                     map[e.key] = stringId
                 }
