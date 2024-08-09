@@ -1,8 +1,10 @@
 package reservant_mobile.activities
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasProgressBarRangeInfo
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -39,15 +41,24 @@ class RegisterActivityTest {
             RegisterActivity(navController = rememberNavController())
         }
 
-        this.loginField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_login))
-        this.nameField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_name))
-        this.lastNameField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_lastname))
-        this.dateField = hasClickAction() and hasText(rule.activity.getString(R.string.label_register_birthday_select))
-        this.emailField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_email))
-        this.passwordField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_password))
-        this.repeatPasswordField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_register_repeat_password))
-        this.phoneField = hasSetTextAction() and hasText(rule.activity.getString(R.string.label_register_repeat_password))
-        this.signUpButton = hasClickAction() and hasTestTag("Button") and hasText(rule.activity.getString(R.string.label_signup))
+        this.loginField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_login))
+        this.nameField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_name))
+        this.lastNameField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_lastname))
+        this.dateField =
+            hasClickAction() and hasText(rule.activity.getString(R.string.label_register_birthday_select))
+        this.emailField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_email))
+        this.passwordField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_password))
+        this.repeatPasswordField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_register_repeat_password))
+        this.phoneField =
+            hasSetTextAction() and hasText(rule.activity.getString(R.string.label_register_repeat_password))
+        this.signUpButton =
+            hasClickAction() and hasText(rule.activity.getString(R.string.label_signup))
     }
 
     @Test
@@ -63,26 +74,32 @@ class RegisterActivityTest {
         rule.onNodeWithText(rule.activity.getString(R.string.error_login_invalid)).assertExists()
     }
 
-// Waiting for proper implementation
-/*    @Test
+    // Waiting for proper implementation
+    @Test
     fun enterTakenLogin_showError() {
-        rule.onNode(loginField).performTextInput("john@doe.pl")
+        rule.onNode(loginField).performTextInput("JD")
         rule.onNode(nameField).performClick()
+        rule.onNode(loginField).performClick()
 
-        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
-    }*/
+        rule.mainClock.advanceTimeBy(1000)
+
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_username_taken))
+            .assertExists()
+    }
 
     @Test
     fun enterInvalidName_showError() {
 //        test empty input
         rule.onNode(nameField).performTextInput("")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_name)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_name))
+            .assertExists()
 
 //        test invalid input
         rule.onNode(nameField).performTextInput("!@#$%^&*()_-+=")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_name)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_name))
+            .assertExists()
     }
 
     @Test
@@ -90,12 +107,14 @@ class RegisterActivityTest {
 //        test empty input
         rule.onNode(lastNameField).performTextInput("")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_lastname)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_lastname))
+            .assertExists()
 
 //        test invalid input
         rule.onNode(lastNameField).performTextInput("!@#$%^&*()_-+=")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_lastname)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_lastname))
+            .assertExists()
     }
 
     @Test
@@ -109,46 +128,54 @@ class RegisterActivityTest {
 //        test empty input
         rule.onNode(emailField).performTextInput("")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_email)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_email))
+            .assertExists()
 
 //        test invalid input
         rule.onNode(emailField).performTextInput("!@#$%^&*()_-+=")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_email)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_email))
+            .assertExists()
     }
 
-// Waiting for proper implementation
-/*    @Test
+    // Waiting for proper implementation
+    @Test
     fun enterInvalidPhone_showError() {
         rule.onNode(phoneField).performTextInput("!@#$%^&*()_-+=")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone))
+            .assertExists()
 
         rule.onNode(phoneField).performTextInput("123")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone))
+            .assertExists()
 
-        rule.onNode(phoneField).performTextInput("1231231231231231")
+        rule.onNode(phoneField).performTextInput("12312312312312311231231")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone)).assertExists()
-    }*/
-@Test
-fun ensureCountryPickerDialogShowUp() {
-    rule.onNode(hasTestTag("CountryPicker")).performClick()
-    rule.onNode(isDialog()).assertExists()
-}
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_phone))
+            .assertExists()
+    }
+
+    @Test
+    fun ensureCountryPickerDialogShowUp() {
+        rule.onNode(hasTestTag("CountryPicker")).performClick()
+        rule.onNode(isDialog()).assertExists()
+    }
 
     @Test
     fun enterInvalidPassword_showError() {
 //        test empty input
         rule.onNode(passwordField).performTextInput("")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_password)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_password))
+            .assertExists()
 
 //        test invalid input
         rule.onNode(passwordField).performTextInput("invalid")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_password)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_password))
+            .assertExists()
     }
 
     @Test
@@ -158,18 +185,22 @@ fun ensureCountryPickerDialogShowUp() {
 //        test empty input
         rule.onNode(repeatPasswordField).performTextInput("")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_password_match)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_password_match))
+            .assertExists()
 
 //        test invalid input
         rule.onNode(repeatPasswordField).performTextInput("invalid")
         rule.onNode(loginField).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_password_match)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.error_register_password_match))
+            .assertExists()
     }
 
     @Test
     fun enterEmptyForm_showError() {
         rule.onNode(signUpButton).performClick()
-        rule.onNodeWithText(rule.activity.getString(R.string.error_register_invalid_request)).assertExists()
+        rule.waitUntil(timeoutMillis = 5000) {
+            rule.onAllNodes(signUpButton).fetchSemanticsNodes().size == 1
+        }
     }
 
 }
