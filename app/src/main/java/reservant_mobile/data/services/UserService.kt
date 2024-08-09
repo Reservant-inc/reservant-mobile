@@ -22,6 +22,7 @@ interface IUserService{
 class UserService(private var api: APIService = APIService()) : IUserService {
     private val localBearer = LocalBearerService()
     object User {
+    object UserObject {
         lateinit var userId: String
         lateinit var login: String
         lateinit var firstName: String
@@ -42,6 +43,11 @@ class UserService(private var api: APIService = APIService()) : IUserService {
         User.firstName = u.firstName
         User.lastName = u.lastName
         User.roles = u.roles!!
+        u.userId?.let { UserObject.userId = it }
+        UserObject.login = u.login!!
+        UserObject.firstName = u.firstName
+        UserObject.lastName = u.lastName
+        UserObject.roles = u.roles!!
         localBearer.saveBearerToken(u.token!!)
     }
 

@@ -360,7 +360,7 @@ fun BottomNavigation(
     val items = listOfNotNull(
         BottomNavItem.Home,
         BottomNavItem.Landing,
-        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.User.roles },
+        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
         BottomNavItem.Profile
     )
 
