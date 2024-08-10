@@ -4,6 +4,7 @@ import io.ktor.http.HttpStatusCode
 import reservant_mobile.data.endpoints.MenuItems
 import reservant_mobile.data.endpoints.Menus
 import reservant_mobile.data.endpoints.MyRestaurants
+import reservant_mobile.data.endpoints.Restaurants
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -12,12 +13,14 @@ import reservant_mobile.data.models.dtos.fields.Result
 interface IRestaurantMenuService{
     suspend fun addMenu(menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>
     suspend fun getMenus(restaurantId:Any): Result<List<RestaurantMenuDTO>?>
+    suspend fun getOwnerMenus(restaurantId:Any): Result<List<RestaurantMenuDTO>?>
     suspend fun getMenu(id: Any): Result<RestaurantMenuDTO?>
     suspend fun editMenu(id: Any, menu: RestaurantMenuDTO): Result<RestaurantMenuDTO?>
     suspend fun deleteMenu(id: Any): Result<Boolean>
     suspend fun addItemsToMenu(menuId: Any, itemsIds:List<Int>): Result<RestaurantMenuDTO?>
     suspend fun createMenuItem(menuItems: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?>
     suspend fun getMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
+    suspend fun getOwnerMenuItems(restaurantId:Any): Result<List<RestaurantMenuItemDTO>?>
     suspend fun getMenuItem(id:Any): Result<RestaurantMenuItemDTO?>
     suspend fun editMenuItem(menuItemId: Any, item: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?>
     suspend fun deleteMenuItem(id: Any): Result<Boolean>
@@ -31,6 +34,11 @@ class RestaurantMenuService():ServiceUtil(), IRestaurantMenuService {
     }
 
     override suspend fun getMenus(restaurantId: Any): Result<List<RestaurantMenuDTO>?> {
+        val res = api.get(Restaurants.Id.Menus(Restaurants.Id(restaurantId =restaurantId.toString())))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getOwnerMenus(restaurantId: Any): Result<List<RestaurantMenuDTO>?> {
         val res = api.get(MyRestaurants.Id.Menus(MyRestaurants.Id(id=restaurantId.toString())))
         return complexResultWrapper(res)
     }
@@ -58,11 +66,16 @@ class RestaurantMenuService():ServiceUtil(), IRestaurantMenuService {
 
     override suspend fun createMenuItem(menuItems: RestaurantMenuItemDTO): Result<RestaurantMenuItemDTO?> {
         val res = api.post( MenuItems(), menuItems)
-        return complexResultWrapper(res, HttpStatusCode.Created)
+        return complexResultWrapper(res)
     }
 
     override suspend fun getMenuItems(restaurantId: Any): Result<List<RestaurantMenuItemDTO>?> {
         val res = api.get(MyRestaurants.Id.MenuItems(MyRestaurants.Id(id=restaurantId.toString())))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getOwnerMenuItems(restaurantId: Any): Result<List<RestaurantMenuItemDTO>?> {
+        val res = api.get(Restaurants.Id.MenuItems(Restaurants.Id(restaurantId=restaurantId.toString())))
         return complexResultWrapper(res)
     }
 
