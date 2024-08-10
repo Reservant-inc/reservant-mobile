@@ -20,6 +20,7 @@ class UserDTO (
     val birthDate: String? = null,
     val roles: List<String>? = null,
     val employments: List<RestaurantEmployeeDTO>? = null,
+    val employerId: String? = null,
     val token: String? = null,
     val photo: String? = null
 )

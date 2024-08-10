@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MoneyDTO(
-    val transactionId: Int?,
+    val transactionId: Int? = null,
     val title: String,
     val amount: Double,
     /***
      * Time in 'yyyy-MM-dd'T'HH:mm:ss.yyyy'Z'' format
      */
-    val time: String?
+    val time: String? = null
 )
