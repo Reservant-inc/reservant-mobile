@@ -145,7 +145,10 @@ class APIService{
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
         if (res.status == HttpStatusCode.NotFound)
-            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_not_found)) ,value = null)
+
+        if (res.status == HttpStatusCode.InternalServerError)
+            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
 
         return Result(isError = false, value = res)
 
