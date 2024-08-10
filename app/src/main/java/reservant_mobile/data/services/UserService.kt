@@ -197,7 +197,7 @@ class UserService(): ServiceUtil(), IUserService {
 
     override suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean> {
         val res = api.post(Wallet.AddMoney(), money)
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     override suspend fun getWalletBalance(): Result<Double?> {

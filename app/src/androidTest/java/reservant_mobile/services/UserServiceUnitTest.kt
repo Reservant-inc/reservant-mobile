@@ -109,7 +109,9 @@ class UserServiceUnitTest: ServiceTest(){
 
     @Test
     fun get_wallet_balance_return_not_null()= runTest{
-        assertThat(userService.getWalletBalance().value).isNotNull()
+        val res = userService.getWalletBalance().value
+        assertThat(res).isNotNull()
+        assertThat(res).isGreaterThan(0)
     }
 
     @Test
