@@ -50,8 +50,8 @@ class OrdersServiceUnitTest: ServiceTest(){
     }
 
 //    todo: need to wait for proper emp implementation
-//    @Test
-//    fun set_order_status_return_not_null()= runTest{
-//        assertThat(ser.changeOrderStatus(orderId, order).value).isNotNull()
-//    }
+    @Test
+    fun set_order_status_return_not_null()= runTest{
+        assertThat(ser.changeOrderStatus(orderId, order).value).isNotNull()
+    }
 }
