@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.services.IRestaurantMenuService
@@ -34,7 +35,11 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
             price = 100.0,
             name = "Burger",
             alcoholPercentage = 99.9,
-            photo = "test-jd.png"
+            photo = "test-jd.png",
+            ingredients = listOf(IngredientDTO(
+                ingredientId = 1,
+                amountUsed = 10.0
+            ))
         )
     }
 
@@ -43,6 +48,11 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
         val m = ser.addMenu(menu).value
         assertThat(m).isNotNull()
         assertThat(ser.deleteMenu(m!!.menuId!!).value).isTrue()
+    }
+
+    @Test
+    fun get_owner_menus_return_not_null()= runTest{
+        assertThat(ser.getOwnerMenus(1).value).isNotNull()
     }
 
     @Test
@@ -65,6 +75,11 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
     @Test
     fun get_menu_items_return_not_null()= runTest{
         assertThat(ser.getMenuItems(1).value).isNotNull()
+    }
+
+    @Test
+    fun get_owner_menu_items_return_not_null()= runTest{
+        assertThat(ser.getOwnerMenuItems(1).value).isNotNull()
     }
 
     @Test
