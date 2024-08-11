@@ -45,7 +45,7 @@ class VisitServiceUnitTest: ServiceTest() {
     }
 
     @Test
-    fun get_order_return_not_null()= runTest{
+    fun create_visit_return_not_null()= runTest{
         assertThat(ser.createVisit(visit).value).isNotNull()
     }
 }
