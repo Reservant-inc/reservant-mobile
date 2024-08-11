@@ -9,7 +9,6 @@ class Threads {
         @Resource("messages")
         class Messages(
             val parent: ThreadId,
-            val returnBefore: String? = null,
             val page: Int? = null,
             val perPage: Int? = null
         )
