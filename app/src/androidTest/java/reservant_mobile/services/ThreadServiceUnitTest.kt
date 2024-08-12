@@ -1,5 +1,6 @@
 package reservant_mobile.services
 
+import androidx.paging.testing.asSnapshot
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -51,8 +52,12 @@ class ThreadServiceUnitTest:ServiceTest() {
     }
 
     @Test
-    fun get_message_return_pagination()= runTest{
-        assertThat(ser.getMessages(1).value).isNotNull()
+    fun get_messages_return_pagination()= runTest{
+        val items = ser.getMessages(1).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
