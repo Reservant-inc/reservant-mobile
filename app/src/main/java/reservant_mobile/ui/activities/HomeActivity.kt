@@ -74,7 +74,7 @@ fun HomeActivity() {
                 }
 
                 composable<UserRoutes.ChatList>{
-                    ChatListActivity()
+                    ChatListActivity(navController = innerNavController)
                 }
             }
         }
