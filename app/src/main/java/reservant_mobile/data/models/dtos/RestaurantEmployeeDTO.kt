@@ -21,6 +21,6 @@ data class RestaurantEmployeeDTO(
     val isBackdoorEmployee:Boolean = false,
     val dateFrom: String = "",
     val dateUntil: String? = null,
-    val employmentId: String? = null,
-    val employeeId: String = ""
+    val employmentId: Int? = null,
+    val employeeId: String = userId
 )
