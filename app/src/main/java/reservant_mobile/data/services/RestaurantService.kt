@@ -78,17 +78,17 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     }
 
     override suspend fun getUserRestaurant(id: Any): Result<RestaurantDTO?> {
-        val res = api.get(MyRestaurants.Id(id = id.toString()))
+        val res = api.get(MyRestaurants.Id(restaurantId = id.toString()))
         return complexResultWrapper(res)
     }
 
     override suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<RestaurantDTO?> {
-        val res = api.put(MyRestaurants.Id(id = id.toString()), restaurant)
+        val res = api.put(MyRestaurants.Id(restaurantId = id.toString()), restaurant)
         return complexResultWrapper(res)
     }
 
     override suspend fun deleteRestaurant(id: Any): Result<Boolean> {
-        val res = api.delete(MyRestaurants.Id(id = id.toString()))
+        val res = api.delete(MyRestaurants.Id(restaurantId = id.toString()))
         return booleanResultWrapper(res)
     }
 
@@ -122,7 +122,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val newGroup: HashMap<String, String> = hashMapOf("groupId" to groupId.toString())
         val res = api.post(
             MyRestaurants.Id.MoveToGroup(
-            parent  = MyRestaurants.Id(id = restaurantId.toString())
+            parent  = MyRestaurants.Id(restaurantId = restaurantId.toString())
         ), newGroup)
         return complexResultWrapper(res)
     }
@@ -135,7 +135,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean> {
         val res = api.post(
             MyRestaurants.Id.Employees(
-            parent = MyRestaurants.Id(id = id.toString())
+            parent = MyRestaurants.Id(restaurantId = id.toString())
         ), listOf(emp))
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
@@ -143,7 +143,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(
             MyRestaurants.Id.Employees(
-            parent = MyRestaurants.Id(id = restaurantId.toString())
+            parent = MyRestaurants.Id(restaurantId = restaurantId.toString())
         ))
         return complexResultWrapper(res)
     }

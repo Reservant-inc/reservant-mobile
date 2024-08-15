@@ -4,8 +4,8 @@ import io.ktor.resources.Resource
 
 @Resource("/my-restaurants")
 class MyRestaurants {
-    @Resource("{id}")
-    class Id(val parent: MyRestaurants = MyRestaurants(), val id: String){
+    @Resource("{restaurantId}")
+    class Id(val parent: MyRestaurants = MyRestaurants(), val restaurantId: String){
         @Resource("move-to-group")
         class MoveToGroup(val parent: Id)
 
