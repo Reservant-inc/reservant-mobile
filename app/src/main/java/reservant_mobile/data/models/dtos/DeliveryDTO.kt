@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeliveryDTO (
-    val delieryId: Int? = null,
+    val deliveryId: Int? = null,
     val orderTime: String? = null,
     val deliveredTime: String? = null,
     val userId: String? = null,
