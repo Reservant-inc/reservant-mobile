@@ -1,7 +1,6 @@
 package reservant_mobile.data.services
 
 import androidx.paging.PagingData
-import com.example.reservant_mobile.R
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -9,26 +8,37 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.Employments
+import reservant_mobile.data.endpoints.Ingredients
 import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
+import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
     suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean>
-    suspend fun getRestaurants(): Result<List<RestaurantDTO>?>
-    suspend fun getRestaurant(id:Any): Result<RestaurantDTO?>
+    suspend fun getRestaurants(origLat: Double? = null,
+                               origLon: Double? = null,
+                               name: String? = null,
+                               tags: List<String>? = null,
+                               lat1: Double? = null,
+                               lon1: Double? = null,
+                               lat2: Double? = null,
+                               lon2: Double? = null,):Result<Flow<PagingData<RestaurantDTO>>?>
+    suspend fun getRestaurant(id:Any):  Result<RestaurantDTO?>
     suspend fun getUserRestaurant(id:Any): Result<RestaurantDTO?>
     suspend fun editRestaurant(id: Any, restaurant: RestaurantDTO): Result<RestaurantDTO?>
     suspend fun deleteRestaurant(id: Any): Result<Boolean>
@@ -46,13 +56,43 @@ interface IRestaurantService{
     suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
-    suspend fun getRestaurantsByTag(tag:String): Result<List<RestaurantDTO>?>
-    suspend fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double): Result<Flow<PagingData<RestaurantDTO>>?>
+    /***
+     * Available order values : DateAsc, DateDesc, CostAsc, CostDesc
+     */
     suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, orderBy: String? = null): Result<Flow<PagingData<OrderDTO>>?>
     suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?>
+
+    /***
+     * Available order values : DateAsc, DateDesc, StarsAsc, StarsDesc
+     */
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: String? = null): Result<Flow<PagingData<ReviewDTO>>?>
-    }
+
+    /***
+     * Available visitSorting values : DateAsc, DateDesc
+     */
+    suspend fun getVisits(restaurantId: Any,
+                          dateStart: String? = null,
+                          dateEnd: String? = null,
+                          orderBy: String? = null): Result<Flow<PagingData<VisitDTO>>?>
+
+    /***
+     * Available order values : NameAsc, NameDesc, AmountAsc, AmountDesc
+     */
+    suspend fun getIngredients(restaurantId: Any, orderBy: String? = null): Result<Flow<PagingData<IngredientDTO>>?>
+
+    /***
+     * Available order values : OrderTimeAsc, OrderTimeDesc, DeliveredTimeAsc, DeliveredTimeDesc
+     */
+    suspend fun getDeliveries(restaurantId: Any,
+                              returnDelivered: Boolean? = null,
+                              userId: String? = null,
+                              userName: String? = null,
+                              orderBy: String? = null): Result<Flow<PagingData<DeliveryDTO>>?>
+
+    suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
+
+}
 
 @OptIn(InternalSerializationApi::class)
 class RestaurantService(): ServiceUtil(), IRestaurantService {
@@ -64,18 +104,45 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun validateFirstStep(restaurant: RestaurantDTO): Result<Boolean> {
         val res = api.post(MyRestaurants.ValidateFirstStep(), restaurant)
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
-    override suspend fun getRestaurants(): Result<List<RestaurantDTO>?> {
-        val res = api.get(MyRestaurants())
-        return complexResultWrapper(res)
+    override suspend fun getRestaurants(
+        origLat: Double?,
+        origLon: Double?,
+        name: String?,
+        tags: List<String>?,
+        lat1: Double?,
+        lon1: Double?,
+        lat2: Double?,
+        lon2: Double?
+    ): Result<Flow<PagingData<RestaurantDTO>>?> {
+        val call: suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
+            api.get(
+                Restaurants(
+                    origLat = origLat,
+                    origLon = origLon,
+                    name = name,
+                    tags = tags,
+                    lat1 = lat1,
+                    lon1 = lon1,
+                    lat2 = lat2,
+                    lon2 = lon2,
+                    page = page,
+                    perPage = perPage,
+                )
+            )
+        }
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(RestaurantDTO::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 
     override suspend fun getRestaurant(id: Any): Result<RestaurantDTO?> {
         val res = api.get(Restaurants.Id(restaurantId = id.toString()))
         return complexResultWrapper(res)
     }
+
 
     override suspend fun getUserRestaurant(id: Any): Result<RestaurantDTO?> {
         val res = api.get(MyRestaurants.Id(restaurantId = id.toString()))
@@ -89,7 +156,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun deleteRestaurant(id: Any): Result<Boolean> {
         val res = api.delete(MyRestaurants.Id(restaurantId = id.toString()))
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     override suspend fun getGroups(): Result<List<RestaurantGroupDTO>?> {
@@ -104,7 +171,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun addGroup(group: RestaurantGroupDTO): Result<Boolean> {
         val res = api.post(MyRestaurantGroups(), group)
-        return booleanResultWrapper(res, HttpStatusCode.Created)
+        return booleanResultWrapper(res)
     }
 
     override suspend fun editGroup(id: Any, newName: String): Result<RestaurantGroupDTO?> {
@@ -115,7 +182,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun deleteGroup(id: Any): Result<Boolean> {
         val res = api.delete(MyRestaurantGroups.Id(id = id.toString()))
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     override suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<RestaurantDTO?> {
@@ -173,44 +240,11 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return complexResultWrapper(res)
     }
 
-    override suspend fun getRestaurantsByTag(tag: String): Result<List<RestaurantDTO>?> {
-        val res = api.get(RestaurantTags.Tag.Restaurants(parent = RestaurantTags.Tag(tag = tag)))
-        return complexResultWrapper(res)
-    }
-
-    override suspend fun getRestaurantsInArea(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double
-    ): Result<Flow<PagingData<RestaurantDTO>>?> {
-
-        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Restaurants(
-//                lat1 = lat1,
-//                lon1 = lon1,
-//                lat2 = lat2,
-//                lon2 = lon2,
-                page = page,
-                perPage = perPage
-            ))}
-
-        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(RestaurantDTO::class.serializer()))
-        val flow = sps.getFlow()
-
-        return if(flow != null)
-            Result(isError = false, value = sps.getFlow())
-        else
-            Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-    }
-
     override suspend fun getRestaurantOrders(
         restaurantId: Any,
         returnFinished: Boolean?,
         orderBy: String?
     ): Result<Flow<PagingData<OrderDTO>>?> {
-
-
         val call: suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
             api.get(
                 Restaurants.Id.Orders(
@@ -258,5 +292,68 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReviewDTO::class.serializer()))
         return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getVisits(
+        restaurantId: Any,
+        dateStart: String?,
+        dateEnd: String?,
+        orderBy: String?
+    ): Result<Flow<PagingData<VisitDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Restaurants.Id.Visits(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                dateStart = dateStart,
+                dateEnd = dateEnd,
+                visitSorting = orderBy,
+                page = page,
+                perPage = perPage
+            ))}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(VisitDTO::class.serializer()))
+        return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getIngredients(
+        restaurantId: Any,
+        orderBy: String?
+    ): Result<Flow<PagingData<IngredientDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Restaurants.Id.Ingredients(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                orderBy = orderBy,
+                page = page,
+                perPage = perPage
+            ))}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(IngredientDTO::class.serializer()))
+        return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getDeliveries(
+        restaurantId: Any,
+        returnDelivered: Boolean?,
+        userId: String?,
+        userName: String?,
+        orderBy: String?
+    ): Result<Flow<PagingData<DeliveryDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Restaurants.Id.Deliveries(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                returnDelivered = returnDelivered,
+                userId = userId,
+                userName = userName,
+                orderBy = orderBy,
+                page = page,
+                perPage = perPage
+            ))}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(DeliveryDTO::class.serializer()))
+        return pagingResultWrapper(sps)
+    }
+
+    override suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?> {
+        val res = api.post(Ingredients(), ingredient)
+        return complexResultWrapper(res)
     }
 }
