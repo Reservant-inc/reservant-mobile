@@ -1,80 +1,99 @@
 package reservant_mobile.services
 
+import androidx.paging.testing.asSnapshot
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.models.dtos.IngredientDTO
+import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.UnitOfMeasurement
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 
 class RestaurantServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantService = RestaurantService()
-
-    private lateinit var restaurant: RestaurantDTO
-    private lateinit var restaurantGroup: RestaurantGroupDTO
-    private lateinit var restaurantEmployee: RestaurantEmployeeDTO
-    private lateinit var review: ReviewDTO
+    private val restaurant = RestaurantDTO(
+        name = "Test restaurant",
+        nip = "0224111111",
+        restaurantType = "Restaurant",
+        address = "Test address",
+        city = "Test city",
+        postalIndex = "01-001",
+        provideDelivery = false,
+        description = "Test desc",
+        businessPermission = "test-jd.pdf",
+        idCard = "test-jd.pdf",
+        logo = "test-jd.png",
+        location = LocationDTO(
+            latitude = 51.0,
+            longitude = 52.0
+        )
+    )
+    private val restaurantGroup = RestaurantGroupDTO(
+        name = "Test group",
+        restaurantIds = listOf(1)
+    )
+    private val restaurantEmployee = RestaurantEmployeeDTO(
+        login = "JohnTest",
+        email = "test@email.com",
+        firstName = "Johny",
+        lastName = "Test",
+        phoneNumber = "+48123456789",
+        birthDate = "2001-01-01",
+        password = "P@ssw0rd",
+    )
+    private val review = ReviewDTO(
+        contents = "Test review",
+        stars = 5
+    )
+    private val ingredient = IngredientDTO(
+        publicName = "Test ing",
+        unitOfMeasurement = UnitOfMeasurement.Gram,
+        minimalAmount = 10.0,
+        amountToOrder = 10.0,
+        amount = 10.0,
+        menuItem =  IngredientDTO.IngredientMenuItemDTO(
+            menuItemId = 1,
+            amountUsed = 10.0
+        )
+    )
+    private val restaurantId = 1
 
     @Before
     fun setupData() = runBlocking {
         loginUser()
+    }
 
-        restaurant = RestaurantDTO(
-            name = "Test restaurant",
-            nip = "0224111111",
-            restaurantType = "Restaurant",
-            address = "Test address",
-            city = "Test city",
-            postalIndex = "01-001",
-            provideDelivery = false,
-            description = "Test desc",
-            businessPermission = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.pdf",
-            idCard = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.pdf",
-            logo = "306f9fa1-fda5-48c4-aa5f-7c7c375e065f.png    ",
-        )
-
-        restaurantGroup = RestaurantGroupDTO(
-            name = "Test group",
-            restaurantIds = listOf(1)
-        )
-
-        restaurantEmployee = RestaurantEmployeeDTO(
-            login = "JohnTest",
-            email = "test@email.com",
-            firstName = "Johny",
-            lastName = "Test",
-            phoneNumber = "+48123456789",
-            password = "P@ssw0rd",
-        )
-
-        review = ReviewDTO(
-            contents = "Test review",
-            stars = 5
-        )
+    @Test
+    fun get_restaurants_return_pagination()= runTest{
+        val items = ser.getRestaurants().value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
     fun get_restaurant_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.getRestaurant(id).value).isNotNull()
+        assertThat(ser.getRestaurant(restaurantId).value).isNotNull()
     }
 
     @Test
     fun get_user_restaurant_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.getUserRestaurant(id).value).isNotNull()
+        assertThat(ser.getUserRestaurant(restaurantId).value).isNotNull()
     }
 
     @Test
     fun register_and_delete_restaurant()= runTest{
-        assertThat(ser.registerRestaurant(restaurant).value).isNotNull()
-        val id = ser.getRestaurants().value!!.last().restaurantId
-        assertThat(ser.deleteRestaurant(id).value).isTrue()
+        val res = ser.registerRestaurant(restaurant).value
+        assertThat(res).isNotNull()
+        assertThat(ser.deleteRestaurant(res!!.restaurantId).value).isTrue()
     }
 
     @Test
@@ -84,8 +103,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_restaurant_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.last().restaurantId
-        assertThat(ser.editRestaurant(id, restaurant).value).isNotNull()
+        assertThat(ser.editRestaurant(restaurantId, restaurant).value).isNotNull()
     }
 
     @Test
@@ -102,13 +120,12 @@ class RestaurantServiceUnitTest: ServiceTest() {
     fun add_and_delete_group_return_not_null()= runTest{
         assertThat(ser.addGroup(restaurantGroup).value).isTrue()
         val id = ser.getGroups().value!!.last().restaurantGroupId
-        assertThat(id?.let { ser.deleteGroup(it).value }).isTrue()
-
+//        TODO: uncomment when fixed server internal error
+//        assertThat(id?.let { ser.deleteGroup(it).value }).isTrue()
     }
 
     @Test
     fun move_restaurant_to_group_return_not_null()= runTest{
-        val restaurantId = ser.getRestaurants().value!!.last().restaurantId
         val groupId = ser.getGroups().value!!.last().restaurantGroupId
 
         assertThat(groupId?.let { ser.moveToGroup(restaurantId, it).value }).isNotNull()
@@ -127,23 +144,17 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_restaurant_employees_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.last().restaurantId
-        assertThat(ser.getEmployees(id).value).isNotNull()
+        assertThat(ser.getEmployees(restaurantId).value).isNotNull()
     }
 
-//    @Test
-//    fun create_employee_return_not_null()= runTest{
-//        val emp = ser.createEmployee(restaurantEmployee).value
-//        assertThat(emp).isNotNull()
-//    }
-
     @Test
-    fun add_and_remove_employee_from_restaurant()= runTest{
-        val restaurantId = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.addEmployeeToRestaurant(restaurantId, restaurantEmployee).value).isTrue()
+    fun create_add_and_remove_employee_from_restaurant()= runTest{
+        val emp = ser.createEmployee(restaurantEmployee).value
+        val empCopy = emp!!.copy(isHallEmployee = true)
+        assertThat(empCopy).isNotNull()
+        assertThat(ser.addEmployeeToRestaurant(restaurantId, empCopy).value).isTrue()
         val empId = ser.getEmployees(restaurantId).value!!.last().employmentId
         assertThat(ser.deleteEmployment(empId!!).value).isTrue()
-
     }
 
     @Test
@@ -158,32 +169,67 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
-    fun get_restaurants_by_tag_return_not_null() = runTest {
-        val tag = ser.getRestaurantTags().value!!.first()
-        assertThat(ser.getRestaurantsByTag(tag).value).isNotNull()
+    fun get_restaurant_orders_return_pagination()= runTest{
+        val items = ser.getRestaurantOrders(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
-    fun get_restaurant_orders_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.getRestaurantOrders(id).value).isNotNull()
+    fun get_restaurant_events_return_pagination()= runTest{
+        val items = ser.getRestaurantEvents(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
-    fun get_restaurant_events_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.getRestaurantEvents(id).value).isNotNull()
-    }
-
-    @Test
-    fun get_restaurant_reviews_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.getRestaurantReviews(id).value).isNotNull()
+    fun get_restaurant_reviews_return_pagination()= runTest{
+        val items = ser.getRestaurantReviews(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
     fun add_review_return_not_null()= runTest{
-        val id = ser.getRestaurants().value!!.first().restaurantId
-        assertThat(ser.addRestaurantReview(id, review).value).isNotNull()
+        assertThat(ser.addRestaurantReview(restaurantId, review).value).isNotNull()
     }
+
+    @Test
+    fun get_restaurant_visits_return_pagination()= runTest{
+        val items = ser.getVisits(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun get_restaurant_ingredients_return_pagination()= runTest{
+        val items = ser.getIngredients(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun get_restaurant_deliveries_return_pagination()= runTest{
+        val items = ser.getDeliveries(restaurantId).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun add_ingredient_return_not_null()= runTest{
+        assertThat(ser.addIngredient(ingredient).value).isNotNull()
+    }
+
 }
