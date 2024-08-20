@@ -149,8 +149,15 @@
     <string name="label_back">Wróć</string>
     <string name="label_reservation_date">Data rezerwacji</string>
     <string name="label_my_reservation">Moja Rezerwacja</string>
+    <string name="label_my_profile">Mój profil</string>
     <string name="label_all">Wszystkie</string>
     <string name="label_current_filter">Aktualny filtr: %1$s</string>
+    <string name="label_profile_picture">Zdjęcie profilowe</string>
+    <string name="label_birthday">Urodziny</string>
+    <string name="label_rating">Ocena</string>
+    <string name="label_visits">Wizyty</string>
+    <string name="label_chats">Chaty</string>
+    <string name="label_friends">Znajomi</string>
     <string name="errorCode_DateMustBeInFuture">Data musi dotyczyć przyszłości</string>
     <string name="errorCode_NotNullValidator">%1$d nie może być puste</string>
     <string name="errorCode_RestaurantDoesNotExist">Dana restauracje nie istnieje</string>
@@ -159,5 +166,6 @@
     <string name="errorCode_AccessDenied">Nie masz uprawnień do wykonania tej czynności</string>
     <string name="errorCode_Duplicate">Istnieje już taki obiekt</string>
     <string name="errorCode_NotFound">Nie znaleziono</string>
-    <string name="label_chats">Czaty</string>
+    <string name="label_ticket">Nowe zgłoszenie</string>
+    <string name="label_ticket_history">Historia zgłoszeń</string>
 </resources>
