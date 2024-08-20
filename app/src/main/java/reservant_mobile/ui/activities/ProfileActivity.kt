@@ -39,7 +39,9 @@ fun ProfileActivity(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(text = "Mój profil", fontWeight = FontWeight.Bold) } },
+                title = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = stringResource(R.string.label_my_profile), fontWeight = FontWeight.Bold)
+                } },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
