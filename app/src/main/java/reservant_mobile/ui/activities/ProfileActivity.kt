@@ -80,7 +80,7 @@ fun ProfileActivity(navController: NavHostController) {
                 }
 
                 profileViewModel.user != null -> {
-                    profileViewModel.user.let { user ->
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -95,13 +95,11 @@ fun ProfileActivity(navController: NavHostController) {
                                     .clip(CircleShape),
                                 contentScale = ContentScale.Crop
                             )
-                            if (user != null) {
                                 Text(
-                                    text = "${user.firstName} ${user.lastName}",
+                                    text = "${profileViewModel.user!!.firstName} ${profileViewModel.user!!.lastName}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 24.sp
                                 )
-                            }
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center,
@@ -145,7 +143,6 @@ fun ProfileActivity(navController: NavHostController) {
                             "Chats" to { ChatsTab() },
                             "Friends" to { FriendsTab() },
                         ))
-                    }
                 }
 
                 else -> {
