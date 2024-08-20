@@ -30,6 +30,7 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
@@ -68,13 +69,13 @@ fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
             UnderlinedItem(
                 icon = Icons.Filled.ShoppingCart,
                 text = stringResource(id = R.string.label_my_orders),
-                onClick = { /* Navigate to My Orders */ }
+                onClick = { navController.navigate(RestaurantRoutes.Ticket) }
             )
 
             UnderlinedItem(
                 icon = Icons.AutoMirrored.Filled.Help,
                 text = stringResource(id = R.string.label_helpdesk),
-                onClick = { /* Navigate to Helpdesk */ }
+                onClick = { navController.navigate(RestaurantRoutes.TicketHistory) }
             )
 
             UnderlinedItem(

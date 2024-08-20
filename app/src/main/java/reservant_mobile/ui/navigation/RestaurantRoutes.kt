@@ -11,4 +11,10 @@ data object RestaurantRoutes {
     data class Details(
         val restaurantId: Int
     )
+
+    @Serializable
+    object Ticket
+
+    @Serializable
+    object TicketHistory
 }

@@ -74,6 +74,13 @@ fun HomeActivity() {
                 composable<MainRoutes.UserProfile>{
                     ProfileActivity(navController = innerNavController)
                 }
+                composable<RestaurantRoutes.Ticket>{
+                    NewTicketActivity()
+                }
+
+                composable<RestaurantRoutes.TicketHistory>{
+                    TicketHistoryActivity(navController = innerNavController)
+                }
             }
         }
     }

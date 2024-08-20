@@ -171,4 +171,6 @@
     <string name="errorCode_AccessDenied">You do not have the authority to perform this action</string>
     <string name="errorCode_Duplicate">There is already such thing</string>
     <string name="errorCode_NotFound">Not found</string>
+    <string name="label_ticket">New ticket</string>
+    <string name="label_ticket_history">Ticket History</string>
 </resources>
