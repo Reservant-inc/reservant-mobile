@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
@@ -99,7 +100,7 @@ fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
             UnderlinedItem(
                 icon = Icons.Filled.Delete,
                 text = stringResource(id = R.string.label_delete_account),
-                onClick = { /* Navigate to Delete Account */ }
+                onClick = { navController.navigate(UserRoutes.ChatList)}
             )
 
             UnderlinedItem(

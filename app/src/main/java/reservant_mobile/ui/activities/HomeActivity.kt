@@ -22,6 +22,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
@@ -70,6 +71,10 @@ fun HomeActivity() {
                 }
                 composable<MainRoutes.Orders>{
                     OrdersActivity()
+                }
+
+                composable<UserRoutes.ChatList> {
+                    ChatListActivity(navController = innerNavController)
                 }
                 composable<MainRoutes.UserProfile>{
                     ProfileActivity(navController = innerNavController)
