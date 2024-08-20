@@ -138,10 +138,10 @@ fun ProfileActivity(navController: NavHostController) {
                         )
 
                         FloatingTabSwitch(pages = listOf(
-                            "Visits" to { VisitsTab() },
-                            "Orders" to { OrdersTab() },
-                            "Chats" to { ChatsTab() },
-                            "Friends" to { FriendsTab() },
+                            stringResource(R.string.label_visits) to { VisitsTab() },
+                            stringResource(R.string.label_orders) to { OrdersTab() },
+                            stringResource(R.string.label_chats) to { ChatsTab() },
+                            stringResource(R.string.label_friends) to { FriendsTab() },
                         ))
                 }
 

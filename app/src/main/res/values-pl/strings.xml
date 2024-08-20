@@ -155,4 +155,7 @@
     <string name="label_profile_picture">Zdjęcie profilowe</string>
     <string name="label_birthday">Urodziny</string>
     <string name="label_rating">Ocena</string>
+    <string name="label_visits">Wizyty</string>
+    <string name="label_chats">Chaty</string>
+    <string name="label_friends">Znajomi</string>
 </resources>
