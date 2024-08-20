@@ -11,5 +11,8 @@ data object MainRoutes{
 
     @Serializable
     object Orders
+
+    @Serializable
+    object UserProfile
 }
 

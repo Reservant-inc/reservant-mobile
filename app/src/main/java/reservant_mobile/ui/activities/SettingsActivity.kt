@@ -29,11 +29,12 @@ import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
+import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: () -> Unit) {
+fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
     val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {
@@ -53,8 +54,10 @@ fun RestaurantOwnerProfileActivity(navController: NavController, themeChange: ()
 
             UnderlinedItem(
                 icon = Icons.Filled.Person,
-                text = stringResource(id = R.string.label_edit_profile),
-                onClick = { /* Navigate to Edit Profile */ }
+                text = stringResource(id = R.string.label_my_profile),
+                onClick = {
+                    navController.navigate(MainRoutes.UserProfile)
+                }
             )
 
             UnderlinedItem(
