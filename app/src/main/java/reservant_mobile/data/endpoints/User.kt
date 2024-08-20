@@ -9,10 +9,10 @@ class User {
     class Employees(val parent: User = User())
 
     @Resource("visits")
-    class Visits(val parent: User = User())
+    class Visits(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
 
     @Resource("visit-history")
-    class VisitHistory(val parent: User = User())
+    class VisitHistory(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
 
     @Resource("events-created")
     class EventsCreated(val parent: User = User())
@@ -21,8 +21,8 @@ class User {
     class EmployeeId(val parent: User = User(), val employeeId: String)
 
     @Resource("events-interested-in")
-    class EventsInterestedIn(val parent: User = User())
+    class EventsInterestedIn(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
 
     @Resource("threads")
-    class Threads(val parent: User = User())
+    class Threads(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
 }

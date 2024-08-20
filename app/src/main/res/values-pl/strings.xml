@@ -158,4 +158,12 @@
     <string name="label_visits">Wizyty</string>
     <string name="label_chats">Chaty</string>
     <string name="label_friends">Znajomi</string>
+    <string name="errorCode_DateMustBeInFuture">Data musi dotyczyć przyszłości</string>
+    <string name="errorCode_NotNullValidator">%1$d nie może być puste</string>
+    <string name="errorCode_RestaurantDoesNotExist">Dana restauracje nie istnieje</string>
+    <string name="errorCode_LengthValidator">%1$d musi posiadać długość pomiędzy %2$d a %3$d. Podano długość %4$d</string>
+    <string name="errorCode_MustJoinUntilMustBeBeforeEventTime">%1$d musi byc mniejsze niż %2$d</string>
+    <string name="errorCode_AccessDenied">Nie masz uprawnień do wykonania tej czynności</string>
+    <string name="errorCode_Duplicate">Istnieje już taki obiekt</string>
+    <string name="errorCode_NotFound">Nie znaleziono</string>
 </resources>

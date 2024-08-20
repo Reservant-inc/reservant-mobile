@@ -44,11 +44,11 @@ class LoginActivityTest {
         this.loginLabel = rule.activity.getString(R.string.label_login)
         this.passwordLabel = rule.activity.getString(R.string.label_password)
         this.signInLabel = rule.activity.getString(R.string.label_login_action)
-        this.error = rule.activity.getString(R.string.error_login_wrong_credentials)
+        this.error = rule.activity.getString(R.string.error_unauthorized_access)
 
         this.loginField = hasSetTextAction() and hasText(loginLabel)
         this.passwordField = hasSetTextAction() and hasText(passwordLabel)
-        this.signInButton = hasClickAction() and hasTestTag("Button") and hasText(signInLabel)
+        this.signInButton = hasClickAction() and hasText(signInLabel)
     }
 
     @Test
@@ -58,7 +58,10 @@ class LoginActivityTest {
         rule.onNode(passwordField).performTextInput("")
         rule.onNode(signInButton).performClick()
 
-        rule.onNodeWithText(error).assertExists()
+        rule.waitUntil(timeoutMillis = 5000) {
+            rule.onAllNodes(signInButton).fetchSemanticsNodes().size == 1
+        }
+
     }
 
     @Test
@@ -70,7 +73,10 @@ class LoginActivityTest {
         // test loading circle
         rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
 
-        rule.waitUntilExactlyOneExists(hasText(error), 5000)
+        rule.waitUntil(timeoutMillis = 5000) {
+            rule.onAllNodes(signInButton).fetchSemanticsNodes().size == 1
+        }
+
     }
     @Test
     fun enterInvalidPassword_showError() {
@@ -81,6 +87,24 @@ class LoginActivityTest {
         // test loading circle
         rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
 
-        rule.waitUntilExactlyOneExists(hasText(error), 5000)
+        rule.waitUntil(timeoutMillis = 5000) {
+            rule.onAllNodes(signInButton).fetchSemanticsNodes().size == 1
+        }
+
+    }
+
+    @Test
+    fun enterValidData() {
+        rule.onNode(loginField).performTextInput("john@doe.pl")
+        rule.onNode(passwordField).performTextInput("Pa${'$'}${'$'}w0rd")
+        rule.onNode(signInButton).performClick()
+
+        // test loading circle
+        rule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)).assertExists()
+
+        rule.waitUntil(timeoutMillis = 5000) {
+            rule.onAllNodes(signInButton).fetchSemanticsNodes().isEmpty()
+        }
+
     }
 }

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
@@ -47,6 +48,7 @@ class MapViewModel(): ViewModel() {
     val restaurants: StateFlow<PagingData<RestaurantDTO>> = _restaurantsState.asStateFlow()
     val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
+    lateinit var poiMarkers:RadiusMarkerClusterer
 
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
@@ -73,6 +75,9 @@ class MapViewModel(): ViewModel() {
             maxZoomLevel = 20.0
             controller.setZoom(17.0)
             controller.setCenter(startPoint)
+
+            poiMarkers = RadiusMarkerClusterer(context)
+            overlays.add(poiMarkers)
         }
 
         OsmMap.view = mv
@@ -153,8 +158,8 @@ class MapViewModel(): ViewModel() {
                 restaurantMarker.title = restaurant.name
                 restaurantMarker.setInfoWindow(null)
                 restaurantMarker.setOnMarkerClickListener(onClick)
-                OsmMap.view.overlays.add(0,restaurantMarker)
-                println("TEST MARKER:${restaurant.name}")
+                poiMarkers.add(restaurantMarker)
+//                OsmMap.view.overlays.add(0,restaurantMarker)
             }
             catch (e: Exception){
                 Log.d("[MAP MARKER]:", e.toString())
