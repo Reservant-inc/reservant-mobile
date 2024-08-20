@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import reservant_mobile.data.endpoints.Auth
-import reservant_mobile.data.models.dtos.LoggedUserDTO
+import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.endpoints.Wallet
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.LoggedUserDTO
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.PageDTO
@@ -28,7 +29,6 @@ interface IUserService{
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun logoutUser()
     suspend fun refreshToken(): Boolean
-    suspend fun getUser(): Result<LoggedUserDTO?>
     suspend fun getUsers(name: String): Result<Flow<PagingData<UserDTO>>?>
     suspend fun getUserInfo(): Result<UserDTO?>
     suspend fun editUserInfo(user: UserDTO): Result<UserDTO?>
@@ -36,11 +36,12 @@ interface IUserService{
     suspend fun getUserVisitHistory(): Result<Flow<PagingData<VisitDTO>>?>
     suspend fun getUserCreatedEvents(): Result<List<EventDTO>?>
     suspend fun getUserInterestedEvents(): Result<Flow<PagingData<EventDTO>>?>
-//     TODO: add threads implementation
+    //     TODO: add threads implementation
 //     suspend fun getUserThreads(): Result<Flow<PagingData<ThreadDTO>>?>
     suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean>
     suspend fun getWalletBalance(): Result<Double?>
     suspend fun getWalletHistory(): Result<Flow<PagingData<MoneyDTO>>?>
+    suspend fun getUser(): Result<LoggedUserDTO?>
 
 }
 
@@ -61,7 +62,7 @@ class UserService(): ServiceUtil(), IUserService {
             lastName = ""
         }
     }
-    
+
     private suspend fun wrapUser(u: UserDTO){
         u.userId?.let { UserObject.userId = it }
         UserObject.login = u.login!!
@@ -114,38 +115,24 @@ class UserService(): ServiceUtil(), IUserService {
     }
 
     override suspend fun refreshToken(): Boolean {
-         val res = api.post(Auth.RefreshToken(), "")
-
-         if(res.isError)
-             return false
-
-         return if(res.value!!.status == HttpStatusCode.OK){
-             try{
-                 val user: UserDTO = res.value.body()
-                 wrapUser(user)
-                 true
-             }
-             catch (e: Exception) {
-                false
-             }
-         }
-         else false
-    }
-
-
-    override suspend fun getUser(): Result<LoggedUserDTO?> {
-        val res = api.get(User())
+        val res = api.post(Auth.RefreshToken(), "")
 
         if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
+            return false
 
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
+        return if(res.value!!.status == HttpStatusCode.OK){
+            try{
+                val user: UserDTO = res.value.body()
+                wrapUser(user)
+                true
+            }
+            catch (e: Exception) {
+                false
+            }
         }
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        else false
     }
-        
+
     override suspend fun getUsers(name: String): Result<Flow<PagingData<UserDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Users(
@@ -229,6 +216,7 @@ class UserService(): ServiceUtil(), IUserService {
             catch (e: Exception){
                 Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
             }
+
         return Result(true, errorCodesWrapper(res.value), null)
     }
 
@@ -242,5 +230,21 @@ class UserService(): ServiceUtil(), IUserService {
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(MoneyDTO::class.serializer()))
         return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getUser(): Result<LoggedUserDTO?> {
+        val res = api.get(User())
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 }
