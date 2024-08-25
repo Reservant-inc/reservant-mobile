@@ -26,10 +26,34 @@ import reservant_mobile.ui.navigation.UserRoutes
 fun ChatActivity(navController: NavHostController, userName: String) {
     val messages = remember {
         mutableStateListOf(
-            MessageDTO("Hello!", true),
-            MessageDTO("Hi, how are you?", false),
-            MessageDTO("I'm good, thanks! How about you?", true),
-            MessageDTO("Doing well, thank you.", false)
+            MessageDTO(
+                messageId = 1,
+                contents = "Hello!",
+                authorsFirstName = "John",
+                authorsLastName = "Doe",
+                dateSent = "2024-08-24T10:15:30.000Z"
+            ),
+            MessageDTO(
+                messageId = 2,
+                contents = "Hi, how are you?",
+                authorsFirstName = "Jane",
+                authorsLastName = "Smith",
+                dateSent = "2024-08-24T10:16:00.000Z"
+            ),
+            MessageDTO(
+                messageId = 3,
+                contents = "I'm good, thanks! How about you?",
+                authorsFirstName = "John",
+                authorsLastName = "Doe",
+                dateSent = "2024-08-24T10:17:30.000Z"
+            ),
+            MessageDTO(
+                messageId = 4,
+                contents = "Doing well, thank you.",
+                authorsFirstName = "Jane",
+                authorsLastName = "Smith",
+                dateSent = "2024-08-24T10:18:00.000Z"
+            )
         )
     }
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
@@ -70,22 +94,41 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     .verticalScroll(rememberScrollState())
             ) {
                 messages.forEach { message ->
+                    val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        horizontalArrangement = if (message.isSentByMe) Arrangement.End else Arrangement.Start
+                        horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
                     ) {
-                        Text(
-                            text = message.text,
-                            modifier = Modifier
-                                .background(
-                                    if (message.isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
+                        Column(
+                            horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
+                            modifier = Modifier.widthIn(max = 300.dp)
+                        ) {
+                            Text(
+                                text = message.contents,
+                                modifier = Modifier
+                                    .background(
+                                        if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                                        shape = CircleShape
+                                    )
+                                    .padding(8.dp),
+                                color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            message.dateSent?.let { date ->
+                                Text(
+                                    text = date,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
-                                .padding(8.dp),
-                            color = if (message.isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-                        )
+                            }
+                        }
                     }
                 }
             }
@@ -106,7 +149,15 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                 )
                 IconButton(onClick = {
                     if (currentMessage.text.isNotBlank()) {
-                        messages.add(MessageDTO(currentMessage.text, true))
+                        messages.add(
+                            MessageDTO(
+                                messageId = messages.size + 1,
+                                contents = currentMessage.text,
+                                authorsFirstName = "John",
+                                authorsLastName = "Doe",
+                                dateSent = "2024-08-24T10:20:00.000Z"
+                            )
+                        )
                         currentMessage = TextFieldValue()
                     }
                 }) {
