@@ -7,3 +7,7 @@ enum class GetUsersFilter{
 enum class GetRestaurantOrdersSort{
     DateAsc, DateDesc, CostAsc, CostDesc
 }
+
+enum class GetRestaurantReviewsSort{
+    DateAsc, DateDesc, StarsAsc, StarsDesc
+}
