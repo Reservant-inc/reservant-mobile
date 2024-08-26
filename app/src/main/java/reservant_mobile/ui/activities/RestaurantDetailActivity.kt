@@ -286,7 +286,10 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                         restaurantDetailVM.loadFullMenu(menuId)
                                                     }
                                                 },
-                                                menuItems = restaurantDetailVM.currentMenu?.menuItems
+                                                menuItems = restaurantDetailVM.currentMenu?.menuItems,
+                                                getMenuPhoto = { photoString ->
+                                                    restaurantDetailVM.getPhoto(photoString)
+                                                }
                                             )
                                         },
                                         stringResource(R.string.label_events) to { EventsContent() },
@@ -332,7 +335,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 fun MenuContent(
     menus: List<RestaurantMenuDTO>,
     menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (Int) -> Unit
+    onMenuClick: (Int) -> Unit,
+    getMenuPhoto: suspend (String) -> Bitmap?
 ) {
 
     Column(
@@ -354,20 +358,18 @@ fun MenuContent(
         }
 
         menuItems?.forEach { menuItem ->
+            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
 
-            // var photo = get
-//            LaunchedEffect(key1 = Unit) {
-//                restaurantLogo = restaurant.logo?.let { logo ->
-//                    restaurantDetailVM.getPhoto(
-//                        logo
-//                    )
-//                }
-//            }
+            LaunchedEffect(menuItem.photo) {
+                menuItem.photo?.let { photo ->
+                    menuPhoto = getMenuPhoto(photo)
+                }
+            }
 
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
-                // photo = photoBitmap, // TODO: wczytywanie zdjec
+                photo = menuPhoto,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
