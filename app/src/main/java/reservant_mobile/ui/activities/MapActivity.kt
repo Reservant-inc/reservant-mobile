@@ -92,15 +92,6 @@ fun MapActivity(){
                 }
             }
 
-            LaunchedEffect(key1 = true) {
-                mapViewModel.getRestaurantsInArea(
-                    -11.2135241,
-                    17.8770032,
-                    60.192059,
-                    24.945831
-                )
-            }
-
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {

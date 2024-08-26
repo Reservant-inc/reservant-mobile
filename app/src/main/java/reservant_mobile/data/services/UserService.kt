@@ -144,7 +144,7 @@ class UserService(): ServiceUtil(), IUserService {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Users(
                 name = name,
-                filter = filter.toString(),
+                filter = filter?.toString(),
                 page = page,
                 perPage = perPage
             )

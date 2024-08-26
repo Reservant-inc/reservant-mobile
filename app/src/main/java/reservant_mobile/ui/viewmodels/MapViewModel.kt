@@ -82,6 +82,7 @@ class MapViewModel(): ViewModel() {
 
         OsmMap.view = mv
         addUserMarker(startPoint)
+        getRestaurantsInArea(startPoint)
 
         return OsmMap.view
     }
@@ -96,11 +97,14 @@ class MapViewModel(): ViewModel() {
         OsmMap.view.overlays.add(startMarker)
     }
 
-    fun getRestaurantsInArea(lat1:Double, lon1:Double, lat2:Double, lon2:Double){
+    fun getRestaurantsInArea(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
                 isLoading = true
-                val res = restaurantService.getRestaurantsInArea(lat1, lon1, lat2, lon2)
+                val res = restaurantService.getRestaurants(
+                    origLat = userLocation.latitude,
+                    origLon = userLocation.longitude
+                )
                 if(res.isError || res.value == null)
                     throw Exception()
 

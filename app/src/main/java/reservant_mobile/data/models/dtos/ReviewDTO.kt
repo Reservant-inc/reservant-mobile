@@ -10,12 +10,12 @@ data class ReviewDTO(
     val authorFullName: String? = null,
     val stars: Int,
     /***
-     * Date in 'yyyy-MM-d'T'H:mm:ss.yyyy'Z'' format
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
      */
     val createdAt: String? = null,
     val contents: String,
     /***
-     * Date in 'yyyy-MM-d'T'H:mm:ss.yyyy'Z'' format
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
      */
     val answeredAt: String? = null,
     val restaurantResponse: String? = null

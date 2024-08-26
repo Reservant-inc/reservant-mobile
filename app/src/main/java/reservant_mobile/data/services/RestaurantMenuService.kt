@@ -39,7 +39,7 @@ class RestaurantMenuService():ServiceUtil(), IRestaurantMenuService {
     }
 
     override suspend fun getOwnerMenus(restaurantId: Any): Result<List<RestaurantMenuDTO>?> {
-        val res = api.get(MyRestaurants.Id.Menus(MyRestaurants.Id(id=restaurantId.toString())))
+        val res = api.get(MyRestaurants.Id.Menus(MyRestaurants.Id(restaurantId = restaurantId.toString())))
         return complexResultWrapper(res)
     }
 
@@ -70,7 +70,7 @@ class RestaurantMenuService():ServiceUtil(), IRestaurantMenuService {
     }
 
     override suspend fun getMenuItems(restaurantId: Any): Result<List<RestaurantMenuItemDTO>?> {
-        val res = api.get(MyRestaurants.Id.MenuItems(MyRestaurants.Id(id=restaurantId.toString())))
+        val res = api.get(MyRestaurants.Id.MenuItems(MyRestaurants.Id(restaurantId=restaurantId.toString())))
         return complexResultWrapper(res)
     }
 
