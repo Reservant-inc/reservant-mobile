@@ -21,6 +21,7 @@ import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetUsersFilter
 
 
 interface IUserService{
@@ -32,9 +33,9 @@ interface IUserService{
 
     /***
      * Return users by name. Returned UserDTO also contains friendStatus attribute.
-     * Available filter values : NoFilter, FriendsOnly, StrangersOnly
+     * Available filter values : see GetUsersFilter class
      */
-    suspend fun getUsers(name: String, filter: String? = null): Result<Flow<PagingData<FoundUserDTO>>?>
+    suspend fun getUsers(name: String, filter: GetUsersFilter? = null): Result<Flow<PagingData<FoundUserDTO>>?>
     suspend fun getUserInfo(): Result<UserDTO?>
     suspend fun editUserInfo(user: UserDTO): Result<UserDTO?>
     suspend fun getUserVisits(): Result<Flow<PagingData<VisitDTO>>?>
@@ -137,11 +138,11 @@ class UserService(): ServiceUtil(), IUserService {
          else false
     }
 
-    override suspend fun getUsers(name: String, filter: String?): Result<Flow<PagingData<FoundUserDTO>>?> {
+    override suspend fun getUsers(name: String, filter: GetUsersFilter?): Result<Flow<PagingData<FoundUserDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Users(
                 name = name,
-                filter = filter,
+                filter = filter.toString(),
                 page = page,
                 perPage = perPage
             )
