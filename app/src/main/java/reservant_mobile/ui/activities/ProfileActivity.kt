@@ -52,7 +52,7 @@ fun ProfileActivity(navController: NavHostController) {
                         )
                     }else{
                         Text(
-                            text = stringResource(R.string.label_my_profile),
+                            text = stringResource(R.string.label_profile),
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(end = 48.dp)
                         )
