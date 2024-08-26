@@ -26,6 +26,7 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetIngredientsSort
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
 import reservant_mobile.data.utils.GetVisitsSort
@@ -80,9 +81,9 @@ interface IRestaurantService{
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
-     * Available order values : NameAsc, NameDesc, AmountAsc, AmountDesc
+     * Available order values : see GetIngredientsSort class
      */
-    suspend fun getIngredients(restaurantId: Any, orderBy: String? = null): Result<Flow<PagingData<IngredientDTO>>?>
+    suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<Flow<PagingData<IngredientDTO>>?>
 
     /***
      * Available order values : OrderTimeAsc, OrderTimeDesc, DeliveredTimeAsc, DeliveredTimeDesc
@@ -319,12 +320,12 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun getIngredients(
         restaurantId: Any,
-        orderBy: String?
+        orderBy: GetIngredientsSort?
     ): Result<Flow<PagingData<IngredientDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Ingredients(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                orderBy = orderBy,
+                orderBy = orderBy?.toString(),
                 page = page,
                 perPage = perPage
             ))}
