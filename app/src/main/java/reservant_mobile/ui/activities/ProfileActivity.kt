@@ -20,12 +20,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.MissingPage
@@ -39,8 +41,22 @@ fun ProfileActivity(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(R.string.label_my_profile), fontWeight = FontWeight.Bold)
+                title = { Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if(profileViewModel.isCurrentUser){
+                        Text(
+                            text = stringResource(R.string.label_my_profile),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }else{
+                        Text(
+                            text = stringResource(R.string.label_my_profile),
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(end = 48.dp)
+                        )
+                    }
                 } },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -51,13 +67,15 @@ fun ProfileActivity(navController: NavHostController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        // TODO: Edit profile
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = stringResource(R.string.label_edit_profile)
-                        )
+                    if (profileViewModel.isCurrentUser) {
+                        IconButton(onClick = {
+                            // TODO: Edit profile
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = stringResource(R.string.label_edit_profile)
+                            )
+                        }
                     }
                 }
             )
@@ -68,7 +86,6 @@ fun ProfileActivity(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-
             when {
                 profileViewModel.isLoading -> {
                     Box(
@@ -78,79 +95,88 @@ fun ProfileActivity(navController: NavHostController) {
                         CircularProgressIndicator()
                     }
                 }
-
                 profileViewModel.user != null -> {
-
-                        Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.jd),
+                            contentDescription = stringResource(R.string.label_profile_picture),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .size(100.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            text = "${profileViewModel.user!!.firstName} ${profileViewModel.user!!.lastName}",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(top = 8.dp)
                         ) {
-                            Image(
-                                painter = painterResource(R.drawable.jd),
-                                contentDescription = stringResource(R.string.label_profile_picture),
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
+                            Icon(
+                                imageVector = Icons.Filled.Cake,
+                                contentDescription = stringResource(R.string.label_birthday),
+                                tint = Color.Gray
                             )
-                                Text(
-                                    text = "${profileViewModel.user!!.firstName} ${profileViewModel.user!!.lastName}",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 24.sp
-                                )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Cake,
-                                    contentDescription = stringResource(R.string.label_birthday),
-                                    tint = Color.Gray
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                profileViewModel.user!!.birthDate?.let {
-                                    Text(text = it, color = Color.Gray)
-                                }
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
-                                    color = Color.Gray
-                                )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            profileViewModel.user!!.birthDate?.let {
+                                Text(text = it, color = Color.Gray)
                             }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
+                                color = Color.Gray
+                            )
                         }
 
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = { },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp),
-                            placeholder = {
-                                Text(
-                                    stringResource(R.string.label_search)+"..."
-                                )
-                            },
-                            trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                            singleLine = true
-                        )
+                        if (!profileViewModel.isCurrentUser) {
+                            Row(
+                                modifier = Modifier.padding(top = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(onClick = { /* TODO: Dodaj znajomego */ }) {
+                                    Text(text = stringResource(R.string.label_add_friend))
+                                }
+                                Button(onClick = { /* TODO: Wyślij wiadomość */ }) {
+                                    Text(text = stringResource(R.string.label_send_message))
+                                }
+                            }
+                        }
+                    }
 
-                        FloatingTabSwitch(pages = listOf(
-                            stringResource(R.string.label_visits) to { VisitsTab() },
-                            stringResource(R.string.label_orders) to { OrdersTab() },
-                            stringResource(R.string.label_chats) to { ChatsTab() },
-                            stringResource(R.string.label_friends) to { FriendsTab() },
-                        ))
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp),
+                        placeholder = {
+                            Text(
+                                stringResource(R.string.label_search)+"..."
+                            )
+                        },
+                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                        singleLine = true
+                    )
+
+                    FloatingTabSwitch(pages = listOf(
+                        stringResource(R.string.label_visits) to { VisitsTab() },
+                        stringResource(R.string.label_orders) to { OrdersTab() },
+                        stringResource(R.string.label_chats) to { ChatsTab() },
+                        stringResource(R.string.label_friends) to { FriendsTab() },
+                    ))
                 }
-
                 else -> {
                     MissingPage(errorStringId = R.string.error_not_found)
                 }
-
             }
-
         }
     }
 }
@@ -234,6 +260,12 @@ fun FriendsTab() {
         }
     }
 }
-// tmp data classes
+
 data class Chat(val userName: String, val message: String)
 data class Friend(val name: String)
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    ProfileActivity(rememberNavController())
+}
