@@ -173,4 +173,6 @@
     <string name="errorCode_NotFound">Not found</string>
     <string name="label_ticket">New ticket</string>
     <string name="label_ticket_history">Ticket History</string>
+    <string name="label_add_friend">Add friend</string>
+    <string name="label_send_message">Send message</string>
 </resources>
