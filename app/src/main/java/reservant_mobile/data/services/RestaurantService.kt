@@ -28,6 +28,7 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
+import reservant_mobile.data.utils.GetVisitsSort
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
@@ -71,12 +72,12 @@ interface IRestaurantService{
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
 
     /***
-     * Available visitSorting values : DateAsc, DateDesc
+     * Available visitSorting values : see GetVisitsSort class
      */
     suspend fun getVisits(restaurantId: Any,
                           dateStart: String? = null,
                           dateEnd: String? = null,
-                          orderBy: String? = null): Result<Flow<PagingData<VisitDTO>>?>
+                          orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
      * Available order values : NameAsc, NameDesc, AmountAsc, AmountDesc
@@ -300,14 +301,14 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         restaurantId: Any,
         dateStart: String?,
         dateEnd: String?,
-        orderBy: String?
+        orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Visits(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 dateStart = dateStart,
                 dateEnd = dateEnd,
-                visitSorting = orderBy,
+                visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage
             ))}

@@ -11,3 +11,7 @@ enum class GetRestaurantOrdersSort{
 enum class GetRestaurantReviewsSort{
     DateAsc, DateDesc, StarsAsc, StarsDesc
 }
+
+enum class GetVisitsSort{
+    DateAsc, DateDesc
+}
