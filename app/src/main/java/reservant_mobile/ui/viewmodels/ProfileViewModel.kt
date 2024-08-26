@@ -17,6 +17,8 @@ class ProfileViewModel(
 
     var user: LoggedUserDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
+    var isCurrentUser: Boolean by mutableStateOf(true)
+
     init {
         viewModelScope.launch {
             loadUser()
