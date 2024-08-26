@@ -26,6 +26,7 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetDeliveriesSort
 import reservant_mobile.data.utils.GetIngredientsSort
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
@@ -86,13 +87,13 @@ interface IRestaurantService{
     suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<Flow<PagingData<IngredientDTO>>?>
 
     /***
-     * Available order values : OrderTimeAsc, OrderTimeDesc, DeliveredTimeAsc, DeliveredTimeDesc
+     * Available order values : see GetDeliveriesSort class
      */
     suspend fun getDeliveries(restaurantId: Any,
                               returnDelivered: Boolean? = null,
                               userId: String? = null,
                               userName: String? = null,
-                              orderBy: String? = null): Result<Flow<PagingData<DeliveryDTO>>?>
+                              orderBy: GetDeliveriesSort? = null): Result<Flow<PagingData<DeliveryDTO>>?>
 
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
 
@@ -339,7 +340,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         returnDelivered: Boolean?,
         userId: String?,
         userName: String?,
-        orderBy: String?
+        orderBy: GetDeliveriesSort?
     ): Result<Flow<PagingData<DeliveryDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Deliveries(
@@ -347,7 +348,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                 returnDelivered = returnDelivered,
                 userId = userId,
                 userName = userName,
-                orderBy = orderBy,
+                orderBy = orderBy?.toString(),
                 page = page,
                 perPage = perPage
             ))}

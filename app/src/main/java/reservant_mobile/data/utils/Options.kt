@@ -19,3 +19,7 @@ enum class GetVisitsSort{
 enum class GetIngredientsSort{
     NameAsc, NameDesc, AmountAsc, AmountDesc
 }
+
+enum class GetDeliveriesSort{
+    OrderTimeAsc, OrderTimeDesc, DeliveredTimeAsc, DeliveredTimeDesc
+}
