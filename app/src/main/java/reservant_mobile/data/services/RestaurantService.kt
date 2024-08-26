@@ -26,6 +26,7 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetRestaurantOrdersSort
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
@@ -57,9 +58,9 @@ interface IRestaurantService{
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
     /***
-     * Available order values : DateAsc, DateDesc, CostAsc, CostDesc
+     * Available order values : see GetRestaurantOrders class
      */
-    suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, orderBy: String? = null): Result<Flow<PagingData<OrderDTO>>?>
+    suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, orderBy: GetRestaurantOrdersSort? = null): Result<Flow<PagingData<OrderDTO>>?>
     suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?>
 
@@ -243,7 +244,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun getRestaurantOrders(
         restaurantId: Any,
         returnFinished: Boolean?,
-        orderBy: String?
+        orderBy: GetRestaurantOrdersSort?
     ): Result<Flow<PagingData<OrderDTO>>?> {
         val call: suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
             api.get(
@@ -252,7 +253,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                     returnFinished = returnFinished,
                     page = page,
                     perPage = perPage,
-                    orderBy = orderBy
+                    orderBy = orderBy?.toString()
                 )
             )
         }
