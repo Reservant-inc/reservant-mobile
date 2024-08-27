@@ -43,19 +43,25 @@ fun RestaurantReservationActivity(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
+                title = { },
+                actions = {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(text = "Rezerwacja stolika", fontWeight = FontWeight.Bold)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.label_back)
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.label_back)
+                            )
+                        }
+                        Text(
+                            text = "Rezerwacja stolika",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 }
@@ -70,16 +76,14 @@ fun RestaurantReservationActivity(navController: NavHostController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(end = 16.dp),
                 contentAlignment = Alignment.TopEnd
             ) {
                 Box(
                     modifier = Modifier
                         .height(680.dp)
                         .width(360.dp)
-                        .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
                     FloatingTabSwitch(
