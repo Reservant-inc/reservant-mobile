@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import EventsContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -186,12 +187,27 @@ fun ProfileActivity(navController: NavHostController) {
                         singleLine = true
                     )
 
-                    FloatingTabSwitch(pages = listOf(
-                        stringResource(R.string.label_visits) to { VisitsTab() },
-                        stringResource(R.string.label_orders) to { OrdersTab() },
-                        stringResource(R.string.label_chats) to { ChatsTab() },
-                        stringResource(R.string.label_friends) to { FriendsTab() },
-                    ))
+                    if(profileViewModel.isCurrentUser){
+                        FloatingTabSwitch(pages = listOf(
+                            stringResource(R.string.label_visits) to { VisitsTab() },
+                            stringResource(R.string.label_orders) to { OrdersTab() },
+                            stringResource(R.string.label_chats) to { ChatsTab() },
+                            stringResource(R.string.label_friends) to { FriendsTab() },
+                        ))
+                    } else {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.label_events),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(alignment = Alignment.CenterHorizontally)
+                            )
+                            EventsContent() // TODO: better events component
+                        }
+                    }
                 }
                 else -> {
                     MissingPage(errorStringId = R.string.error_not_found)
