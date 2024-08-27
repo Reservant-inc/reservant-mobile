@@ -66,7 +66,6 @@ import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.ReservationFloatingMenu
-import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
