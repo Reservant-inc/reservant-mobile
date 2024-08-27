@@ -137,9 +137,9 @@ fun ProfileActivity(navController: NavHostController) {
                         }
 
                         if (!profileViewModel.isCurrentUser) {
-                            Row(
+                            Column(
                                 modifier = Modifier.padding(top = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Button(onClick = { /* TODO: Dodaj znajomego */ }) {
                                     Text(text = stringResource(R.string.label_add_friend))
