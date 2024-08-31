@@ -168,4 +168,5 @@
     <string name="errorCode_NotFound">Nie znaleziono</string>
     <string name="label_ticket">Nowe zgłoszenie</string>
     <string name="label_ticket_history">Historia zgłoszeń</string>
+    <string name="label_detail_reviews">opinii</string>
 </resources>

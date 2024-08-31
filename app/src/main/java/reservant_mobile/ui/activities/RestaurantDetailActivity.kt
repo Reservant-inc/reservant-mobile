@@ -1,4 +1,5 @@
-
+package reservant_mobile.ui.activities
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,18 +23,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,6 +58,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
@@ -65,15 +73,18 @@ import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
-import reservant_mobile.ui.components.ReservationFloatingMenu
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
+import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 
+
 @Composable
-fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
+fun RestaurantDetailActivity(restaurantId: Int = 1) {
+
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -81,198 +92,242 @@ fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
         }
     )
 
-    var showGallery by remember { mutableStateOf(false) }
-    var isFavorite by remember { mutableStateOf(false) }
+    val navController = rememberNavController()
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(bottom = 4.dp)) {
+    NavHost(navController = navController, startDestination = RestaurantRoutes.Details(restaurantId)){
+        composable<RestaurantRoutes.Details>{
+            var showGallery by remember { mutableStateOf(false) }
+            var isFavorite by remember { mutableStateOf(false) }
 
-        if (restaurantDetailVM.resultRestaurant.isError) {
-            ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
-        }
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 4.dp)) {
 
-        when {
-            restaurantDetailVM.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+                if (restaurantDetailVM.resultRestaurant.isError) {
+                    ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
                 }
-            }
 
-            restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null -> {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Box {
-                        restaurantDetailVM.restaurant?.let { restaurant ->
-                            Image(
-                                painter = painterResource(R.drawable.restaurant_photo),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                contentScale = ContentScale.Crop
-                            )
-
-                            IconButton(
-                                onClick = { navController.popBackStack() },
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .align(Alignment.TopStart)
-                                    .background(Color.White, CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = stringResource(R.string.label_back),
-                                    tint = Color.Black
-                                )
-                            }
+                when {
+                    restaurantDetailVM.isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
                     }
 
-                    restaurantDetailVM.restaurant?.let { restaurant ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = restaurant.name,
-                                style = MaterialTheme.typography.headlineMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(
-                                onClick = { isFavorite = !isFavorite },
-                            ) {
-                                Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                    contentDescription = null,
-                                    tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
-                                )
-                            }
-                        }
+                    restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null -> {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            Box {
+                                restaurantDetailVM.restaurant?.let { restaurant ->
 
-                        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            RatingBar(rating = 3.9f)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("3.9 (200+ opinii)")
-                        }
+                                    var restaurantLogo: Bitmap? by remember { mutableStateOf(null) }
+                                    LaunchedEffect(key1 = Unit) {
+                                        restaurantLogo = restaurant.logo?.let { logo ->
+                                            restaurantDetailVM.getPhoto(
+                                                logo
+                                            )
+                                        }
+                                    }
+                                    if(restaurantLogo != null){
+                                        Image(
+                                            bitmap = restaurantLogo!!.asImageBitmap(),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }else{
+                                        Image(
+                                            painter = painterResource(R.drawable.unknown_image),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(200.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .scale(0.9f)
-                        ) {
-                            for(tag in restaurant.tags){
-                                TagItem(
-                                    tag = tag,
-                                    removable = false
-                                )
-                            }
-                        }
 
-                        Text(
-                            text = restaurant.restaurantType,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-
-                        Text(
-                            text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-
-                        Text(
-                            text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-
-                        Text(
-                            text = stringResource(R.string.label_gallery),
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            repeat(3) {
-                                ImageCard(
-                                    painterResource(R.drawable.pizza)
-                                )
-                            }
-                            Card(
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clickable { showGallery = true },
-                                shape = RoundedCornerShape(16.dp),
-                                elevation = CardDefaults.cardElevation(8.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Black.copy(alpha = 0.8f))
-                                ) {
-                                    Image(
-                                        painter = painterResource(R.drawable.restaurant_photo),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop,
-                                        alpha = 0.35f
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.label_more),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        style = MaterialTheme.typography.headlineSmall,
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
+                                    IconButton(
+                                        onClick = { navController.popBackStack() },
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .align(Alignment.TopStart)
+                                            .background(Color.White, CircleShape)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                            contentDescription = stringResource(R.string.label_back),
+                                            tint = Color.Black
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        FloatingTabSwitch(
-                            pages = listOf(
-                                stringResource(R.string.label_menu) to {
-                                    MenuContent(
-                                        restaurantDetailVM.menus!!,
-                                        onMenuClick = { menuId ->
-                                            restaurantDetailVM.viewModelScope.launch {
-                                                restaurantDetailVM.loadFullMenu(menuId)
-                                            }
-                                        },
-                                        menuItems = restaurantDetailVM.currentMenu?.menuItems
+                            restaurantDetailVM.restaurant?.let { restaurant ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = restaurant.name,
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        modifier = Modifier.weight(1f)
                                     )
-                                },
-                                stringResource(R.string.label_events) to { EventsContent() },
-                                stringResource(R.string.label_reviews) to { ReviewsContent() }
-                            ),
-                            paneScroll = false
-                        )
+                                    IconButton(
+                                        onClick = { isFavorite = !isFavorite },
+                                    ) {
+                                        Icon(
+                                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                            contentDescription = null,
+                                            tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
+                                        )
+                                    }
+                                }
+
+                                Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    val reviews = stringResource(R.string.label_detail_reviews)
+                                    RatingBar(rating = 3.9f)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        "${restaurant.rating.toString().substring(0,3)} (${restaurant.numberReviews} $reviews)")
+                                }
+
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .scale(0.9f)
+                                ) {
+                                    for(tag in restaurant.tags){
+                                        TagItem(
+                                            tag = tag,
+                                            removable = false
+                                        )
+                                    }
+                                }
+
+                                Text(
+                                    text = restaurant.restaurantType,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.label_gallery),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    repeat(3) {
+                                        ImageCard(
+                                            painterResource(R.drawable.pizza)
+                                        )
+                                    }
+                                    Card(
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .clickable { showGallery = true },
+                                        shape = RoundedCornerShape(16.dp),
+                                        elevation = CardDefaults.cardElevation(8.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(Color.Black.copy(alpha = 0.8f))
+                                        ) {
+                                            Image(
+                                                painter = painterResource(R.drawable.restaurant_photo),
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop,
+                                                alpha = 0.35f
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.label_more),
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                modifier = Modifier.align(Alignment.Center)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                FloatingTabSwitch(
+                                    pages = listOf(
+                                        stringResource(R.string.label_menu) to {
+                                            MenuContent(
+                                                restaurantDetailVM.menus!!,
+                                                onMenuClick = { menuId ->
+                                                    restaurantDetailVM.viewModelScope.launch {
+                                                        restaurantDetailVM.loadFullMenu(menuId)
+                                                    }
+                                                },
+                                                menuItems = restaurantDetailVM.currentMenu?.menuItems,
+                                                getMenuPhoto = { photoString ->
+                                                    restaurantDetailVM.getPhoto(photoString)
+                                                }
+                                            )
+                                        },
+                                        stringResource(R.string.label_events) to { EventsContent() },
+                                        stringResource(R.string.label_reviews) to { ReviewsContent() }
+                                    ),
+                                    paneScroll = false
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        MissingPage(errorStringId = R.string.error_not_found)
                     }
                 }
             }
-            else -> {
-                MissingPage(errorStringId = R.string.error_not_found)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(RestaurantRoutes.Reservation) }
+                ) {
+                    Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
+                }
+            }
+
+            if (showGallery) {
+                FullscreenGallery(onDismiss = { showGallery = false })
             }
         }
+        composable<RestaurantRoutes.Reservation>{
+            RestaurantReservationActivity(navController = navController)
+        }
     }
-    ReservationFloatingMenu(
-        onDineInClick = {},
-        onDeliveryClick = {},
-        onTakeawayClick= {}
-    )
 
-    if (showGallery) {
-        FullscreenGallery(onDismiss = { showGallery = false })
-    }
 }
 
 
@@ -280,7 +335,8 @@ fun RestaurantDetailActivity(navController: NavController, restaurantId: Int) {
 fun MenuContent(
     menus: List<RestaurantMenuDTO>,
     menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (Int) -> Unit
+    onMenuClick: (Int) -> Unit,
+    getMenuPhoto: suspend (String) -> Bitmap?
 ) {
 
     Column(
@@ -302,10 +358,18 @@ fun MenuContent(
         }
 
         menuItems?.forEach { menuItem ->
+            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+            LaunchedEffect(menuItem.photo) {
+                menuItem.photo?.let { photo ->
+                    menuPhoto = getMenuPhoto(photo)
+                }
+            }
+
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
-                // photo = photoBitmap, // TODO: wczytywanie zdjec
+                photo = menuPhoto,
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = { /* TODO: Handle add */ }
             )
