@@ -171,4 +171,5 @@
     <string name="label_add_friend">Dodaj znajomego</string>
     <string name="label_send_message">Send message</string>
     <string name="label_profile">Profil</string>
+    <string name="label_detail_reviews">opinii</string>
 </resources>

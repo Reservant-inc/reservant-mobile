@@ -176,4 +176,5 @@
     <string name="label_add_friend">Add friend</string>
     <string name="label_send_message">Send message</string>
     <string name="label_profile">Profile</string>
+    <string name="label_detail_reviews">reviews</string>
 </resources>

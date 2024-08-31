@@ -8,7 +8,7 @@ data class MoneyDTO(
     val title: String,
     val amount: Double,
     /***
-     * Time in 'yyyy-MM-dd'T'HH:mm:ss.yyyy'Z'' format
+     * Time in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
      */
     val time: String? = null
 )

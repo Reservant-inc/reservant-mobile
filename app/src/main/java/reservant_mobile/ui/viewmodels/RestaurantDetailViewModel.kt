@@ -31,11 +31,17 @@ class RestaurantDetailViewModel(
     var currentMenu: RestaurantMenuDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
     var eventsLoading: Boolean by mutableStateOf(true)
+    //var restaurantLogo: Bitmap? by mutableStateOf(null)
 
 
     init {
         viewModelScope.launch {
             loadRestaurantAndMenus(restaurantId)
+
+//            restaurant!!.logo?.let {
+//                restaurantLogo = getPhoto(it)
+//            }
+
         }
     }
 
@@ -65,8 +71,8 @@ class RestaurantDetailViewModel(
         return true
     }
 
-    suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
-        val result = fileService.getImage(menu.photo)
+    suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
         if (!result.isError){
             return result.value!!
         }

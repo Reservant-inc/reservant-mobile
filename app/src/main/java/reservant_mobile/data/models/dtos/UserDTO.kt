@@ -11,7 +11,7 @@ class UserDTO (
     val firstName: String,
     val lastName: String,
     /***
-     * Date in 'yyyy-MM-dd'T'HH:mm:ss.yyyy'Z'' format
+     * Date in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
      */
     val registeredAt: String? = null,
     /***

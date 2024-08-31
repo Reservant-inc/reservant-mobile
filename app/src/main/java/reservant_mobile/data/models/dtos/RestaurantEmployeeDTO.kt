@@ -16,11 +16,13 @@ data class RestaurantEmployeeDTO(
     val employments: List<RestaurantEmployeeDTO> = emptyList(),
     val password: String = "",
     val roles: List<String> = emptyList(),
+    val photo: String? = null,
     val employerId: String? = null,
+    val restaurantName: String? = null,
     val isHallEmployee:Boolean = false,
     val isBackdoorEmployee:Boolean = false,
     val dateFrom: String = "",
     val dateUntil: String? = null,
-    val employmentId: String? = null,
-    val employeeId: String = ""
+    val employmentId: Int? = null,
+    val employeeId: String = userId
 )

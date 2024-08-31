@@ -1,62 +1,66 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import reservant_mobile.data.models.dtos.MessageDTO
+import androidx.paging.compose.collectAsLazyPagingItems
 import reservant_mobile.ui.navigation.UserRoutes
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatActivity(navController: NavHostController, userName: String) {
-    val messages = remember {
-        mutableStateListOf(
-            MessageDTO(
-                messageId = 1,
-                contents = "Hello!",
-                authorsFirstName = "John",
-                authorsLastName = "Doe",
-                dateSent = "2024-08-24T10:15:30.000Z"
-            ),
-            MessageDTO(
-                messageId = 2,
-                contents = "Hi, how are you?",
-                authorsFirstName = "Jane",
-                authorsLastName = "Smith",
-                dateSent = "2024-08-24T10:16:00.000Z"
-            ),
-            MessageDTO(
-                messageId = 3,
-                contents = "I'm good, thanks! How about you?",
-                authorsFirstName = "John",
-                authorsLastName = "Doe",
-                dateSent = "2024-08-24T10:17:30.000Z"
-            ),
-            MessageDTO(
-                messageId = 4,
-                contents = "Doing well, thank you.",
-                authorsFirstName = "Jane",
-                authorsLastName = "Smith",
-                dateSent = "2024-08-24T10:18:00.000Z"
-            )
-        )
-    }
+    val chatViewModel: ChatViewModel = viewModel()
+    val messagesFlow = chatViewModel.messagesFlow.collectAsState()
+
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
+
+    LaunchedEffect(Unit) {
+        // Oznacz wszystkie wiadomości jako przeczytane przy wejściu do czatu
+        chatViewModel.markMessagesAsRead()
+    }
 
     Scaffold(
         topBar = {
@@ -87,51 +91,60 @@ fun ChatActivity(navController: NavHostController, userName: String) {
         }
     ) {
         Column(modifier = Modifier.padding(it)) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+            val lazyPagingItems = messagesFlow.value?.collectAsLazyPagingItems()
+
+            LazyColumn(
+                modifier = Modifier.weight(1f).padding(16.dp),
+                reverseLayout = true // Dodanie reverseLayout, aby wyświetlić najnowsze wiadomości na dole
             ) {
-                messages.forEach { message ->
-                    val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
-                    ) {
-                        Column(
-                            horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
-                            modifier = Modifier.widthIn(max = 300.dp)
-                        ) {
-                            Text(
-                                text = message.contents,
+                lazyPagingItems?.let { pagingItems ->
+                    items(count = pagingItems.itemCount) { index ->
+                        val message = pagingItems[index]
+                        message?.let {
+                            //DO ZMIANY
+                            val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
+                            Row(
                                 modifier = Modifier
-                                    .background(
-                                        if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                                        shape = CircleShape
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
+                            ) {
+                                Column(
+                                    horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
+                                    modifier = Modifier.widthIn(max = 300.dp)
+                                ) {
+                                    Text(
+                                        text = message.contents,
+                                        modifier = Modifier
+                                            .background(
+                                                if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                                                shape = CircleShape
+                                            )
+                                            .padding(8.dp),
+                                        color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
                                     )
-                                    .padding(8.dp),
-                                color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            message.dateSent?.let { date ->
-                                Text(
-                                    text = date,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    message.dateSent?.let { date ->
+                                        val formattedDate = formatDateTime(date, "dd.MM.yyyy")
+                                        val formattedTime = formatDateTime(date, "HH:mm:ss")
+                                        Text(
+                                            text = "$formattedDate $formattedTime",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,15 +162,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                 )
                 IconButton(onClick = {
                     if (currentMessage.text.isNotBlank()) {
-                        messages.add(
-                            MessageDTO(
-                                messageId = messages.size + 1,
-                                contents = currentMessage.text,
-                                authorsFirstName = "John",
-                                authorsLastName = "Doe",
-                                dateSent = "2024-08-24T10:20:00.000Z"
-                            )
-                        )
+                        chatViewModel.createMessage(currentMessage.text) // Wysyłanie wiadomości za pomocą ViewModelu
                         currentMessage = TextFieldValue()
                     }
                 }) {
@@ -167,3 +172,23 @@ fun ChatActivity(navController: NavHostController, userName: String) {
         }
     }
 }
+
+
+
+
+fun formatDateTime(dateString: String, pattern: String): String {
+    return try {
+        val formatter = DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .optionalStart()
+            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 7, true)
+            .optionalEnd()
+            .toFormatter(Locale.getDefault())
+
+        val dateTime = LocalDateTime.parse(dateString, formatter)
+        dateTime.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
+    } catch (e: Exception) {
+        "" // Zwróć pusty string w przypadku błędu parsowania
+    }
+}
+
