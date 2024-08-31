@@ -101,6 +101,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     items(count = pagingItems.itemCount) { index ->
                         val message = pagingItems[index]
                         message?.let {
+                            //DO ZMIANY
                             val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
                             Row(
                                 modifier = Modifier
