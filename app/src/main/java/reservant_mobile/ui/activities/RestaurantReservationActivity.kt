@@ -76,13 +76,11 @@ fun RestaurantReservationActivity(navController: NavHostController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 16.dp),
+                    .padding(16.dp),
                 contentAlignment = Alignment.TopEnd
             ) {
                 Box(
                     modifier = Modifier
-                        .height(680.dp)
-                        .width(360.dp)
                         .background(MaterialTheme.colorScheme.surface)
                         .verticalScroll(rememberScrollState())
                 ) {
