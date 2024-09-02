@@ -163,6 +163,9 @@ fun MenuManagementActivity(
                             }
 
                         }
+                        viewmodel.menus.isEmpty() -> item {
+                            MissingPage(errorStringId = R.string.error_not_found)
+                        }
                         else -> item {
                             MissingPage(errorStringId = viewmodel.getToastError(viewmodel.fetchResult))
                         }
@@ -172,7 +175,6 @@ fun MenuManagementActivity(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        //.padding(8.dp)
                 ){
                     val showAddDialog = remember { mutableStateOf(false) }
 
