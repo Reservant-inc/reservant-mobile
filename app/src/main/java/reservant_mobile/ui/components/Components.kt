@@ -1147,36 +1147,40 @@ fun LoadedPhotoComponent(
     placeholderModifier: Modifier = Modifier,
     getPhoto: suspend () -> Bitmap?,
 ){
-    var isLoading = false
+    var isLoading by remember {
+        mutableStateOf(true)
+    }
+
     var bitmap by remember {
         mutableStateOf<Bitmap?>(null)
     }
 
     LaunchedEffect(key1 = Unit) {
-        isLoading = true
         bitmap = getPhoto()
         isLoading = false
     }
 
     when {
         isLoading -> {
-            CircularProgressIndicator()
-        }
-
-        !isLoading && bitmap != null -> {
-            Image(
-                bitmap = bitmap!!.asImageBitmap(),
-                contentDescription = "loaded_photo",
-                modifier = photoModifier
-            )
-        }
-
-        !isLoading && bitmap == null -> {
-            Image(
-                painterResource(id = R.drawable.unknown_image),
-                contentDescription = "placeholder_photo",
+            CircularProgressIndicator(
                 modifier = placeholderModifier
             )
+        }
+
+        !isLoading -> {
+            if (bitmap != null){
+                Image(
+                    bitmap = bitmap!!.asImageBitmap(),
+                    contentDescription = "loaded_photo",
+                    modifier = photoModifier
+                )
+            } else {
+                Image(
+                    painterResource(id = R.drawable.unknown_image),
+                    contentDescription = "placeholder_photo",
+                    modifier = placeholderModifier
+                )
+            }
         }
 
     }
