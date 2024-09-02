@@ -176,7 +176,6 @@ fun MenuCard(
     menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
-    photo: ImageBitmap? = null,
     getPhoto: suspend () -> Bitmap?,
     menu: RestaurantMenuDTO,
     onFilePicked: (Uri?) -> Unit,
