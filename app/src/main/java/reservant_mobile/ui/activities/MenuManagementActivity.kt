@@ -93,7 +93,8 @@ fun MenuManagementActivity(
                                     onClick = { },
                                     clearFields = { },
                                     onFilePicked = { },
-                                    menuTypes = emptyList()
+                                    menuTypes = emptyList(),
+                                    getPhoto = { null }
                                 )
                             }
                         }
@@ -101,13 +102,6 @@ fun MenuManagementActivity(
 
                             val showConfirmDeletePopup = remember { mutableStateOf(false) }
                             val showEditPopup = remember { mutableStateOf(false) }
-                            var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-
-                            LaunchedEffect(key1 = Unit) {
-                                viewmodel.viewModelScope.launch {
-                                    bitmap = viewmodel.getPhoto(menu)
-                                }
-                            }
 
                             MenuCard(
                                 name = viewmodel.name,
@@ -116,7 +110,6 @@ fun MenuManagementActivity(
                                 dateFrom = viewmodel.dateFrom,
                                 dateUntil = viewmodel.dateUntil,
                                 menu = menu,
-                                photo = bitmap?.asImageBitmap(),
                                 onEditClick = {
                                     viewmodel.viewModelScope.launch {
                                         viewmodel.editMenu(menu)
@@ -154,7 +147,8 @@ fun MenuManagementActivity(
                                 isNameInvalid = viewmodel.isNameInvalid(),
                                 isAltNameInvalid = viewmodel.isAltNameInvalid(),
                                 isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
-                                menuTypes = viewmodel.menuTypes
+                                menuTypes = viewmodel.menuTypes,
+                                getPhoto = { viewmodel.getPhoto(menu) }
                             )
 
                             if (viewmodel.result.isError){
