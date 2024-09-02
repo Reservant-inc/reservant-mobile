@@ -93,7 +93,8 @@ fun MenuManagementActivity(
                                     onClick = { },
                                     clearFields = { },
                                     onFilePicked = { },
-                                    menuTypes = emptyList()
+                                    menuTypes = emptyList(),
+                                    getPhoto = {null}
                                 )
                             }
                         }
@@ -154,7 +155,8 @@ fun MenuManagementActivity(
                                 isNameInvalid = viewmodel.isNameInvalid(),
                                 isAltNameInvalid = viewmodel.isAltNameInvalid(),
                                 isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
-                                menuTypes = viewmodel.menuTypes
+                                menuTypes = viewmodel.menuTypes,
+                                getPhoto = { viewmodel.getPhoto(menu) }
                             )
 
                             if (viewmodel.result.isError){

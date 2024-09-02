@@ -1,5 +1,6 @@
 package reservant_mobile.ui.components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -176,6 +177,7 @@ fun MenuCard(
     dateFrom: FormField,
     dateUntil: FormField,
     photo: ImageBitmap? = null,
+    getPhoto: suspend () -> Bitmap?,
     menu: RestaurantMenuDTO,
     onFilePicked: (Uri?) -> Unit,
     onEditClick: () -> Unit,
@@ -253,7 +255,7 @@ fun MenuCard(
             .then(loadingModifier)
     ) {
         Column {
-            if (photo != null) {
+            /*if (photo != null) {
                 Image(
                     bitmap = photo,
                     contentDescription = "${menu.name}_photo",
@@ -268,7 +270,15 @@ fun MenuCard(
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)
                 )
-            }
+            }*/
+            LoadedPhotoComponent (
+                photoModifier = Modifier.fillMaxWidth(),
+                placeholderModifier = Modifier
+                    .size(140.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
+                getPhoto = getPhoto
+            )
 
 
 

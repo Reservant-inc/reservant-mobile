@@ -1,6 +1,7 @@
 package reservant_mobile.ui.components
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
@@ -101,6 +102,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -1137,4 +1139,46 @@ fun FilterOption(status: String, onFilterSelected: (String) -> Unit) {
     TextButton(onClick = { onFilterSelected(status) }) {
         Text(text = status)
     }
+}
+
+@Composable
+fun LoadedPhotoComponent(
+    photoModifier: Modifier = Modifier,
+    placeholderModifier: Modifier = Modifier,
+    getPhoto: suspend () -> Bitmap?,
+){
+    var isLoading = false
+    var bitmap by remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        isLoading = true
+        bitmap = getPhoto()
+        isLoading = false
+    }
+
+    when {
+        isLoading -> {
+            CircularProgressIndicator()
+        }
+
+        !isLoading && bitmap != null -> {
+            Image(
+                bitmap = bitmap!!.asImageBitmap(),
+                contentDescription = "loaded_photo",
+                modifier = photoModifier
+            )
+        }
+
+        !isLoading && bitmap == null -> {
+            Image(
+                painterResource(id = R.drawable.unknown_image),
+                contentDescription = "placeholder_photo",
+                modifier = placeholderModifier
+            )
+        }
+
+    }
+
 }
