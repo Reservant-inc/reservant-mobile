@@ -177,4 +177,17 @@
     <string name="label_send_message">Send message</string>
     <string name="label_profile">Profile</string>
     <string name="label_detail_reviews">reviews</string>
+    <string name="label_no_reviews">No reviews match your criteria.</string>
+    <string name="label_loading_reviews">Loading reviews…</string>
+    <string name="label_5_stars">5 stars</string>
+    <string name="label_4_stars">4 stars</string>
+    <string name="label_3_stars">3 stars</string>
+    <string name="label_2_stars">2 stars</string>
+    <string name="label_1_star">1 star</string>
+    <string name="label_add_review">Add review</string>
+    <string name="label_review_content">Review Content</string>
+    <string name="error_duplicate_review">You cannot submit more than one review for the same restaurant.</string>
+    <string name="error_generic">An unexpected error occurred. Please try again later.</string>
+    <string name="label_edit_review">Edit Review</string>
+    <string name="label_delete_review">Delete Review</string>
 </resources>
