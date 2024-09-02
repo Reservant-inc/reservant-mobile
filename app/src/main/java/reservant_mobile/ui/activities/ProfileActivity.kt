@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import EventsContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -299,9 +298,3 @@ fun FriendsTab() {
 
 data class Chat(val userName: String, val message: String)
 data class Friend(val name: String)
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    ProfileActivity(rememberNavController())
-}
