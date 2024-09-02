@@ -201,4 +201,17 @@
     <string name="label_employee_greetings">Cześć %1$s, gdzie dzisiaj pracujesz?</string>
     <string name="label_reservations">Rezerwacje</string>
     <string name="label_stock">Zamówienia</string>
+    <string name="label_no_reviews">Brak opinii pasujących do Twoich kryteriów.</string>
+    <string name="label_loading_reviews">Ładowanie opinii…</string>
+    <string name="label_5_stars">5 gwiazdek</string>
+    <string name="label_4_stars">4 gwiazdki</string>
+    <string name="label_3_stars">3 gwiazdki</string>
+    <string name="label_2_stars">2 gwiazdki</string>
+    <string name="label_1_star">1 gwiazdka</string>
+    <string name="label_add_review">Dodaj opinie</string>
+    <string name="label_review_content">Treść recenzji</string>
+    <string name="error_duplicate_review">Nie możesz wystawić więcej niż jednej opinii dla tej samej restauracji.</string>
+    <string name="error_generic">Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.</string>
+    <string name="label_edit_review">Edytuj opinię</string>
+    <string name="label_delete_review">Usuń opinię</string>
 </resources>

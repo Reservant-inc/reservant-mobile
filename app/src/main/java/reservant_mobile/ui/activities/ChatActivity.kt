@@ -46,6 +46,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionIt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ChatViewModel
 import java.time.LocalDateTime
@@ -53,6 +54,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -216,4 +218,5 @@ fun formatDateTime(dateString: String, pattern: String): String {
     } catch (e: Exception) {
         "" // Zwróć pusty string w przypadku błędu parsowania
     }
+
 }
