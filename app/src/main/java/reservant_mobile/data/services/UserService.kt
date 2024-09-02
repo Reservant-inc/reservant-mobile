@@ -62,7 +62,7 @@ class UserService(): ServiceUtil(), IUserService {
         lateinit var lastName: String
         lateinit var roles:List<String>
 
-        fun clearData(){
+        internal fun clearData(){
             userId = ""
             login = ""
             firstName = ""
