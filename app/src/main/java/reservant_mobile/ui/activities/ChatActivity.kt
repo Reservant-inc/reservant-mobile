@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import reservant_mobile.ui.navigation.UserRoutes
+import reservant_mobile.ui.viewmodels.ChatViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -54,11 +55,12 @@ import java.util.Locale
 fun ChatActivity(navController: NavHostController, userName: String) {
     val chatViewModel: ChatViewModel = viewModel()
     val messagesFlow = chatViewModel.messagesFlow.collectAsState()
+    val participantsMap = chatViewModel.participantsMap
 
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
 
     LaunchedEffect(Unit) {
-        // Oznacz wszystkie wiadomości jako przeczytane przy wejściu do czatu
+        // Mark all messages as read when entering the chat
         chatViewModel.markMessagesAsRead()
     }
 
@@ -94,17 +96,21 @@ fun ChatActivity(navController: NavHostController, userName: String) {
             val lazyPagingItems = messagesFlow.value?.collectAsLazyPagingItems()
 
             LazyColumn(
-                modifier = Modifier.weight(1f).padding(16.dp),
-                reverseLayout = true // Dodanie reverseLayout, aby wyświetlić najnowsze wiadomości na dole
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp),
+                reverseLayout = true // Display the latest messages at the bottom
             ) {
                 lazyPagingItems?.let { pagingItems ->
                     items(count = pagingItems.itemCount) { index ->
                         val message = pagingItems[index]
                         message?.let {
-                            //DO ZMIANY
-                            val authorsFirstName = "John"
-                            val authorsLastName = "Doe"
-                            val isSentByMe = authorsFirstName == "John" && authorsLastName == "Doe"
+                            // Fetch the participant's name using the userId from the message
+                            val sender = participantsMap[message.authorId]
+
+                            // Determine if the message was sent by the current user
+                            val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -127,7 +133,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "Sent by: ${authorsFirstName} ${authorsLastName}",
+                                        text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
@@ -164,7 +170,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                 )
                 IconButton(onClick = {
                     if (currentMessage.text.isNotBlank()) {
-                        chatViewModel.createMessage(currentMessage.text) // Wysyłanie wiadomości za pomocą ViewModelu
+                        chatViewModel.createMessage(currentMessage.text) // Send message using ViewModel
                         currentMessage = TextFieldValue()
                     }
                 }) {
@@ -174,8 +180,6 @@ fun ChatActivity(navController: NavHostController, userName: String) {
         }
     }
 }
-
-
 
 
 fun formatDateTime(dateString: String, pattern: String): String {
@@ -193,4 +197,3 @@ fun formatDateTime(dateString: String, pattern: String): String {
         "" // Zwróć pusty string w przypadku błędu parsowania
     }
 }
-
