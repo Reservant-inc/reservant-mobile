@@ -11,22 +11,65 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.MessageDTO
+import reservant_mobile.data.models.dtos.ThreadDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IThreadsService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.ThreadsService
+import reservant_mobile.data.services.UserService
 
-class ChatViewModel(private val threadsService: IThreadsService = ThreadsService()) : ViewModel() {
+class ChatViewModel(
+    private val threadsService: IThreadsService = ThreadsService(),
+    private val userService: IUserService = UserService()
+) : ViewModel() {
 
     // TODO: Replace with dynamic thread ID in the future
     private val threadId: Any = 1
+    private var currentUserId: String? = null
 
     // StateFlow to hold the paging data
     private val _messagesFlow = MutableStateFlow<Flow<PagingData<MessageDTO>>?>(null)
     val messagesFlow: StateFlow<Flow<PagingData<MessageDTO>>?> = _messagesFlow
 
+    // State to hold participant information
+    private val _participantsMap = mutableMapOf<String, UserDTO>()
+    val participantsMap: Map<String, UserDTO> get() = _participantsMap
+
     init {
-        fetchMessages()
+        fetchCurrentUserId()
+        fetchThread()
     }
+
+    private fun fetchCurrentUserId() {
+        viewModelScope.launch {
+            currentUserId = userService.getUserInfo().value?.userId
+        }
+    }
+
+    fun getCurrentUserId(): String? {
+        return currentUserId
+    }
+
+    private fun fetchThread() {
+        viewModelScope.launch {
+            val result: Result<ThreadDTO?> = threadsService.getThread(threadId)
+
+            if (!result.isError) {
+                result.value?.participants?.forEach { participant ->
+                    participant.userId?.let { userId ->
+                        _participantsMap[userId] = participant
+                    }
+                }
+                fetchMessages() // Fetch messages after participants are loaded
+            } else {
+                // Handle error scenario
+                val errors = result.errors
+                // You can handle errors here, such as displaying a toast or logging
+            }
+        }
+    }
+
 
     private fun fetchMessages() {
         viewModelScope.launch {
@@ -37,7 +80,7 @@ class ChatViewModel(private val threadsService: IThreadsService = ThreadsService
             } else {
                 // Handle error scenario
                 val errors = result.errors
-                // Możesz tutaj obsłużyć błędy, np. wyświetlić toast lub zapisać log
+                // You can handle errors here, such as displaying a toast or logging
             }
         }
     }
@@ -52,7 +95,7 @@ class ChatViewModel(private val threadsService: IThreadsService = ThreadsService
             } else {
                 // Handle error scenario
                 val errors = result.errors
-                // Możesz tutaj obsłużyć błędy, np. wyświetlić toast lub zapisać log
+                // You can handle errors here, such as displaying a toast or logging
             }
         }
     }
@@ -64,9 +107,9 @@ class ChatViewModel(private val threadsService: IThreadsService = ThreadsService
                     message.messageId?.let { messageId ->
                         val result: Result<MessageDTO?> = threadsService.markMessageAsRead(messageId)
                         if (result.isError) {
-                            // Obsługa błędu, jeśli wystąpi
+                            // Error handling if any
                             val errors = result.errors
-                            // Możesz tutaj obsłużyć błędy
+                            // You can handle errors here
                         }
                     }!!
                 }
@@ -74,3 +117,4 @@ class ChatViewModel(private val threadsService: IThreadsService = ThreadsService
         }
     }
 }
+
