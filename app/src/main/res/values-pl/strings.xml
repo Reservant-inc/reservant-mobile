@@ -172,4 +172,25 @@
     <string name="label_send_message">Send message</string>
     <string name="label_profile">Profil</string>
     <string name="label_detail_reviews">opinii</string>
+    <string name="label_order_summary">Podsumowanie zamówienia</string>
+    <string name="label_order_details">Szczegóły zamówienia</string>
+    <string name="label_cancel_order">Anuluj zamówienie</string>
+    <string name="error_order_not_found">Nie znaleziono zamówienia</string>
+    <string name="label_reservation">Rezerwacja stolika</string>
+    <string name="label_dine_in">Na miejscu</string>
+    <string name="label_delivery">Dostawa</string>
+    <string name="label_takeaway">Odbiór</string>
+    <string name="label_number_of_seats">Liczba miejsc</string>
+    <string name="label_write_note">Napisz notatkę do zamówienia…</string>
+    <string name="label_order_delivery">Zamów dostawę</string>
+    <string name="label_proceed_to_summary">Przejdź do podsumowania</string>
+    <string name="label_delivery_address">Adres dostawy</string>
+    <string name="label_my_basket">Mój koszyk</string>
+    <string name="label_total_amount">Kwota całkowita</string>
+    <string name="label_enter_promo_code">Wprowadź kod promocyjny</string>
+    <string name="label_number_of_guests">Liczba gości</string>
+    <string name="label_quantity">Ilość</string>
+    <string name="label_decrease_quantity">Zmniejsz ilość</string>
+    <string name="label_increase_quantity">Zwiększ ilość</string>
+    <string name="label_cost">Koszt</string>
 </resources>
