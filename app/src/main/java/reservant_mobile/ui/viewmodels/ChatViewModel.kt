@@ -25,7 +25,6 @@ class ChatViewModel(
 
     // TODO: Replace with dynamic thread ID in the future
     private val threadId: Any = 1
-    private var currentUserId: String? = null
 
     // StateFlow to hold the paging data
     private val _messagesFlow = MutableStateFlow<Flow<PagingData<MessageDTO>>?>(null)
@@ -36,18 +35,11 @@ class ChatViewModel(
     val participantsMap: Map<String, UserDTO> get() = _participantsMap
 
     init {
-        fetchCurrentUserId()
         fetchThread()
     }
 
-    private fun fetchCurrentUserId() {
-        viewModelScope.launch {
-            currentUserId = userService.getUserInfo().value?.userId
-        }
-    }
-
     fun getCurrentUserId(): String? {
-        return currentUserId
+        return UserService.UserObject.userId
     }
 
     private fun fetchThread() {
@@ -60,9 +52,8 @@ class ChatViewModel(
                         _participantsMap[userId] = participant
                     }
                 }
-                fetchMessages() // Fetch messages after participants are loaded
+                fetchMessages()
             } else {
-                // Handle error scenario
                 val errors = result.errors
                 // You can handle errors here, such as displaying a toast or logging
             }
@@ -77,7 +68,6 @@ class ChatViewModel(
             if (!result.isError) {
                 _messagesFlow.value = result.value?.cachedIn(viewModelScope)
             } else {
-                // Handle error scenario
                 val errors = result.errors
                 // You can handle errors here, such as displaying a toast or logging
             }
@@ -89,10 +79,8 @@ class ChatViewModel(
             val result: Result<MessageDTO?> = threadsService.createMessage(threadId, contents)
 
             if (!result.isError) {
-                // Message successfully created, you might want to refresh messages or append to the list
                 fetchMessages()  // Refresh messages
             } else {
-                // Handle error scenario
                 val errors = result.errors
                 // You can handle errors here, such as displaying a toast or logging
             }
@@ -106,7 +94,6 @@ class ChatViewModel(
                     message.messageId?.let { messageId ->
                         val result: Result<MessageDTO?> = threadsService.markMessageAsRead(messageId)
                         if (result.isError) {
-                            // Error handling if any
                             val errors = result.errors
                             // You can handle errors here
                         }
