@@ -20,7 +20,11 @@ class Friends(val page: Int? = null, val perPage: Int? = null) {
     }
 
     @Resource("incoming")
-    class Incoming(val parent: Friends = Friends(), val page: Int? = null, val perPage: Int? = null)
+    class Incoming(
+        val parent: Friends = Friends(),
+        val unreadOnly: Boolean? = null,
+        val page: Int? = null,
+        val perPage: Int? = null)
 
     @Resource("outgoing")
     class Outgoing(val parent:  Friends = Friends(), val page: Int? = null, val perPage: Int? = null)

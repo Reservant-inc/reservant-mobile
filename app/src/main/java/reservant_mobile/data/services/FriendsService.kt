@@ -17,7 +17,7 @@ interface IFriendsService{
     suspend fun acceptFriendRequest(senderId: Any): Result<Boolean>
     suspend fun deleteFriendOrRequest(userId: Any): Result<Boolean>
     suspend fun getFriends(): Result<Flow<PagingData<FriendRequestDTO>>?>
-    suspend fun getIncomingFriendRequests(): Result<Flow<PagingData<FriendRequestDTO>>?>
+    suspend fun getIncomingFriendRequests(unreadOnly: Boolean? = null): Result<Flow<PagingData<FriendRequestDTO>>?>
     suspend fun getOutgoingFriendRequests(): Result<Flow<PagingData<FriendRequestDTO>>?>
 }
 
@@ -54,9 +54,10 @@ class FriendsService:ServiceUtil(), IFriendsService {
         return pagingResultWrapper(sps)
     }
 
-    override suspend fun getIncomingFriendRequests(): Result<Flow<PagingData<FriendRequestDTO>>?> {
+    override suspend fun getIncomingFriendRequests(unreadOnly: Boolean?): Result<Flow<PagingData<FriendRequestDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Friends.Incoming(
+                unreadOnly = unreadOnly,
                 page = page,
                 perPage = perPage
             ))}
