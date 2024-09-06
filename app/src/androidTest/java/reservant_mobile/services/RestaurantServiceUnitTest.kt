@@ -170,7 +170,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_restaurant_orders_return_pagination()= runTest{
-        val items = ser.getRestaurantOrders(restaurantId).value
+        val items = ser.getRestaurantOrders(restaurantId, returnFinished = true).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
