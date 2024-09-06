@@ -97,6 +97,7 @@ interface IRestaurantService{
                               orderBy: GetDeliveriesSort? = null): Result<Flow<PagingData<DeliveryDTO>>?>
 
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
+    suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
 
 }
 
@@ -362,6 +363,14 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?> {
         val res = api.post(Ingredients(), ingredient)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun editIngredient(
+        ingredientId: Any,
+        ingredient: IngredientDTO
+    ): Result<IngredientDTO?> {
+        val res = api.put(Ingredients.IngredientId(ingredientId = ingredientId.toString()), ingredient)
         return complexResultWrapper(res)
     }
 }
