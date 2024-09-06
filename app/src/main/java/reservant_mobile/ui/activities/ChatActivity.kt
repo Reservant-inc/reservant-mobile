@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
-import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.navigation.UserRoutes
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -55,6 +54,7 @@ import java.util.Locale
 fun ChatActivity(navController: NavHostController, userName: String) {
     val chatViewModel: ChatViewModel = viewModel()
     val messagesFlow = chatViewModel.messagesFlow.collectAsState()
+
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
 
     LaunchedEffect(Unit) {
@@ -101,7 +101,8 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     items(count = pagingItems.itemCount) { index ->
                         val message = pagingItems[index]
                         message?.let {
-                            val isSentByMe = message.authorId == UserService.UserObject.userId
+                            //DO ZMIANY
+                            val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -124,9 +125,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-//                                        todo: pobrac dane (wystarczy tylko imie) z authorId
-//                                        text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
-                                        text = "Sent by:",
+                                        text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
