@@ -13,6 +13,7 @@ import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
+import reservant_mobile.data.endpoints.Reviews
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.models.dtos.DeliveryDTO
@@ -73,6 +74,9 @@ interface IRestaurantService{
      * Available order values : see GetRestaurantReviewsSort class
      */
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
+    suspend fun editRestaurantReview(reviewId: Any, review: ReviewDTO): Result<ReviewDTO?>
+    suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean>
+
 
     /***
      * Available visitSorting values : see GetVisitsSort class
@@ -301,6 +305,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReviewDTO::class.serializer()))
         return pagingResultWrapper(sps)
+    }
+
+    override suspend fun editRestaurantReview(
+        reviewId: Any,
+        review: ReviewDTO
+    ): Result<ReviewDTO?> {
+        val res = api.put(Reviews.ReviewId(reviewId = reviewId.toString()), review)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean> {
+        val res = api.delete(Reviews.ReviewId(reviewId = reviewId.toString()))
+        return booleanResultWrapper(res)
     }
 
     override suspend fun getVisits(
