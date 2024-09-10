@@ -509,5 +509,4 @@ class RestaurantViewModel(
         return getToastError(result3)
     }
 
-
 }

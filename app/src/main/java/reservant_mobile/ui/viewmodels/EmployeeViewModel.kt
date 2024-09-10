@@ -200,10 +200,6 @@ class EmployeeViewModel(
                 getFieldError(result, password.name) != -1
     }
 
-    private fun isInvalidWithRegex(regex: String, str: String): Boolean {
-        return !Pattern.matches(regex, str)
-    }
-
     fun getLoginError(): Int {
         return getFieldError(result, login.name)
     }
