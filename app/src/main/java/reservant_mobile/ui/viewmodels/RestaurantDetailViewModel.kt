@@ -4,13 +4,11 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantMenuService
@@ -20,8 +18,7 @@ class RestaurantDetailViewModel(
     private var restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val menuService: IRestaurantMenuService = RestaurantMenuService(),
-    private val fileService: FileService = FileService()
-) : ViewModel() {
+) : ReservantViewModel() {
 
     var resultRestaurant: Result<RestaurantDTO?> by mutableStateOf(Result(isError = false, value=null))
     var resultMenus: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value=null))
@@ -94,9 +91,6 @@ class RestaurantDetailViewModel(
     }
 
     fun getToastError(): Int {
-        if (!resultRestaurant.isError) {
-            return -1
-        }
-        return resultRestaurant.errors?.getOrDefault("TOAST", -1) ?: -1
+        return getToastError(resultRestaurant)
     }
 }
