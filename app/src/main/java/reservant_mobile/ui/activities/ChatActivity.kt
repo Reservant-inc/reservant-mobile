@@ -102,7 +102,9 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                         val message = pagingItems[index]
                         message?.let {
                             //DO ZMIANY
-                            val isSentByMe = message.authorsFirstName == "John" && message.authorsLastName == "Doe"
+                            val authorsFirstName = "John"
+                            val authorsLastName = "Doe"
+                            val isSentByMe = authorsFirstName == "John" && authorsLastName == "Doe"
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -125,7 +127,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "Sent by: ${message.authorsFirstName} ${message.authorsLastName}",
+                                        text = "Sent by: ${authorsFirstName} ${authorsLastName}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
