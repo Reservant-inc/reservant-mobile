@@ -24,10 +24,8 @@ import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
 
 class RestaurantViewModel(
-    private val restaurantService: IRestaurantService = RestaurantService(),
-    private val fileService: FileService = FileService()
-) :
-    ViewModel() {
+    private val restaurantService: IRestaurantService = RestaurantService()
+): ReservantViewModel() {
 
     // Wynik rejestracji
     var result by mutableStateOf(Result(isError = false, value = false))
@@ -453,16 +451,6 @@ class RestaurantViewModel(
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
-
-
-    private fun <T> getFieldError(result: Result<T>, name: String): Int {
-        if (!result.isError) {
-            return -1
-        }
-
-        return result.errors?.getOrDefault(name, -1) ?: -1
-    }
-
 
     fun getNameError(): Int {
         return getFieldError(result, name.name)
