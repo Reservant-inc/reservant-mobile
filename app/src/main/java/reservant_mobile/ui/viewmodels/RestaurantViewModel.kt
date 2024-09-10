@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
@@ -15,7 +14,6 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
-import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
