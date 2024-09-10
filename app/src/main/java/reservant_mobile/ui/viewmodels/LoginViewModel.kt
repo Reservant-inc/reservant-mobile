@@ -1,6 +1,5 @@
 package reservant_mobile.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -8,7 +7,9 @@ import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.LocalBearerService
 import reservant_mobile.data.services.UserService
 
-class LoginViewModel(private val userService: IUserService = UserService()) : ViewModel() {
+class LoginViewModel(
+    private val userService: IUserService = UserService()
+) : ReservantViewModel() {
 
     var result: Result<Boolean> = Result(isError = false, value = false)
     var login: FormField = FormField(LoginCredentialsDTO::login.name)
@@ -41,12 +42,12 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
     
     private fun isLoginInvalid(): Boolean{
         return isInvalid(login.value) ||
-                getFieldError(login.name) != -1
+                getFieldError(result, login.name) != -1
     }
 
     private fun isPasswordInvalid(): Boolean{
         return isInvalid(password.value) ||
-                getFieldError(password.name) != -1
+                getFieldError(result, password.name) != -1
     }
 
     private fun isFormInvalid(): Boolean {
@@ -57,15 +58,7 @@ class LoginViewModel(private val userService: IUserService = UserService()) : Vi
         return str.isBlank()
     }
 
-    private fun getFieldError(name: String): Int{
-        if(!result.isError){
-            return -1
-        }
-
-        return result.errors!!.getOrDefault(name, -1)
-    }
-
     fun getToastError(): Int{
-        return getFieldError("TOAST")
+        return getToastError(result)
     }
 }
