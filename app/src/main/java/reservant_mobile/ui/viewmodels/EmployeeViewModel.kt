@@ -225,6 +225,6 @@ class EmployeeViewModel(
     }
 
     fun getToastError(): Int {
-        return getFieldError(result, "TOAST")
+        return getToastError(result)
     }
 }

@@ -499,4 +499,15 @@ class RestaurantViewModel(
         return getFieldError(result3, description.name)
     }
 
+    fun getToastError1(): Int {
+        return getToastError(result)
+    }
+    fun getToastError2(): Int {
+        return getToastError(result2)
+    }
+    fun getToastError3(): Int {
+        return getToastError(result3)
+    }
+
+
 }
