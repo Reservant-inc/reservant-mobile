@@ -3,4 +3,7 @@ package reservant_mobile.data.endpoints
 import io.ktor.resources.Resource
 
 @Resource("/ingredients")
-class Ingredients
+class Ingredients{
+    @Resource("{ingredientId}")
+    class IngredientId(val parent: Ingredients = Ingredients(), val ingredientId: String)
+}

@@ -13,6 +13,7 @@ import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
+import reservant_mobile.data.endpoints.Reviews
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.models.dtos.DeliveryDTO
@@ -39,6 +40,7 @@ interface IRestaurantService{
                                origLon: Double? = null,
                                name: String? = null,
                                tags: List<String>? = null,
+                               minRating: Int?= null,
                                lat1: Double? = null,
                                lon1: Double? = null,
                                lat2: Double? = null,
@@ -72,6 +74,9 @@ interface IRestaurantService{
      * Available order values : see GetRestaurantReviewsSort class
      */
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
+    suspend fun editRestaurantReview(reviewId: Any, review: ReviewDTO): Result<ReviewDTO?>
+    suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean>
+
 
     /***
      * Available visitSorting values : see GetVisitsSort class
@@ -96,6 +101,7 @@ interface IRestaurantService{
                               orderBy: GetDeliveriesSort? = null): Result<Flow<PagingData<DeliveryDTO>>?>
 
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
+    suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
 
 }
 
@@ -117,6 +123,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         origLon: Double?,
         name: String?,
         tags: List<String>?,
+        minRating: Int?,
         lat1: Double?,
         lon1: Double?,
         lat2: Double?,
@@ -129,6 +136,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                     origLon = origLon,
                     name = name,
                     tags = tags,
+                    minRating = minRating,
                     lat1 = lat1,
                     lon1 = lon1,
                     lat2 = lat2,
@@ -299,6 +307,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return pagingResultWrapper(sps)
     }
 
+    override suspend fun editRestaurantReview(
+        reviewId: Any,
+        review: ReviewDTO
+    ): Result<ReviewDTO?> {
+        val res = api.put(Reviews.ReviewId(reviewId = reviewId.toString()), review)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean> {
+        val res = api.delete(Reviews.ReviewId(reviewId = reviewId.toString()))
+        return booleanResultWrapper(res)
+    }
+
     override suspend fun getVisits(
         restaurantId: Any,
         dateStart: String?,
@@ -359,6 +380,14 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?> {
         val res = api.post(Ingredients(), ingredient)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun editIngredient(
+        ingredientId: Any,
+        ingredient: IngredientDTO
+    ): Result<IngredientDTO?> {
+        val res = api.put(Ingredients.IngredientId(ingredientId = ingredientId.toString()), ingredient)
         return complexResultWrapper(res)
     }
 }

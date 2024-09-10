@@ -15,7 +15,6 @@ data class MessageDTO (
      * Date in 'yyyy-MM-dd'T'HH:mm:ss.yyyy'Z'' format
      */
     val dateRead: String? = null,
-    val authorsFirstName: String? = null,
-    val authorsLastName: String? = null ,
+    val authorId: String? = null,
     val messageThreadId: Int? = null
 )

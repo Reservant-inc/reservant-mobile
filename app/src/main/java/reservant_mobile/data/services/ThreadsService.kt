@@ -22,6 +22,9 @@ interface IThreadsService{
     suspend fun editMessage(messageId: Any, contents: String): Result<MessageDTO?>
     suspend fun deleteMessage(messageId: Any): Result<Boolean>
     suspend fun markMessageAsRead(messageId: Any): Result<MessageDTO?>
+    suspend fun addParticipant(threadId: Any, userId: String): Result<Boolean>
+    suspend fun removeParticipant(threadId: Any, userId: String): Result<Boolean>
+
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -91,4 +94,21 @@ class ThreadsService: ServiceUtil(), IThreadsService {
         )
         return complexResultWrapper(res)
     }
+
+    override suspend fun addParticipant(threadId: Any, userId: String): Result<Boolean> {
+        val message = mapOf(
+            "userId" to userId
+        )
+        val res = api.post(Threads.ThreadId.AddParticipant(Threads.ThreadId(threadId = threadId.toString())), message)
+        return booleanResultWrapper(res)
+    }
+
+    override suspend fun removeParticipant(threadId: Any, userId: String): Result<Boolean> {
+        val message = mapOf(
+            "userId" to userId
+        )
+        val res = api.post(Threads.ThreadId.RemoveParticipant(Threads.ThreadId(threadId = threadId.toString())), message)
+        return booleanResultWrapper(res)
+    }
+
 }

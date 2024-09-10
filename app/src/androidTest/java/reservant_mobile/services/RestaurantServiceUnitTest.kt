@@ -170,7 +170,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_restaurant_orders_return_pagination()= runTest{
-        val items = ser.getRestaurantOrders(restaurantId).value
+        val items = ser.getRestaurantOrders(restaurantId, returnFinished = true).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
@@ -196,8 +196,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
-    fun add_review_return_not_null()= runTest{
-        assertThat(ser.addRestaurantReview(restaurantId, review).value).isNotNull()
+    fun add_edit_delete_review_return_not_null()= runTest{
+        val rev = ser.addRestaurantReview(restaurantId, review).value
+        assertThat(rev).isNotNull()
+        assertThat(ser.editRestaurantReview(rev!!.reviewId!!, rev)).isNotNull()
+        assertThat(ser.deleteRestaurantReview(rev.reviewId!!)).isNotNull()
     }
 
     @Test
@@ -230,6 +233,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun add_ingredient_return_not_null()= runTest{
         assertThat(ser.addIngredient(ingredient).value).isNotNull()
+    }
+
+    @Test
+    fun edit_ingredient_return_not_null()= runTest{
+        assertThat(ser.editIngredient(1,ingredient).value).isNotNull()
     }
 
 }

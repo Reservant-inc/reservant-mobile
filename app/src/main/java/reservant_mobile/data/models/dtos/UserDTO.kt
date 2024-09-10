@@ -22,5 +22,6 @@ class UserDTO (
     val employments: List<RestaurantEmployeeDTO>? = null,
     val employerId: String? = null,
     val token: String? = null,
-    val photo: String? = null
+    val photo: String? = null,
+    val friendStatus: FriendStatus? = null
 )

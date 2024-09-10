@@ -9,12 +9,4 @@ data class FoundUserDTO (
     val lastName: String? = null,
     val photo: String? = null,
     val friendStatus: FriendStatus? = null
-){
-    @Serializable
-    enum class FriendStatus{
-        Stranger,
-        OutgoingRequest,
-        IncomingRequest,
-        Friend
-    }
-}
+)

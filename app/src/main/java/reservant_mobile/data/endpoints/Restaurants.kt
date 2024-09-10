@@ -8,6 +8,7 @@ class Restaurants(
     val origLon: Double? = null,
     val name: String? = null,
     val tags: List<String>? = null,
+    val minRating: Int? = null,
     val lat1: Double? = null,
     val lon1: Double? = null,
     val lat2: Double? = null,

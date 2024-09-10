@@ -12,5 +12,11 @@ class Threads {
             val page: Int? = null,
             val perPage: Int? = null
         )
+
+        @Resource("add-participant")
+        class AddParticipant(val parent: ThreadId)
+
+        @Resource("remove-participant")
+        class RemoveParticipant(val parent: ThreadId)
     }
 }
