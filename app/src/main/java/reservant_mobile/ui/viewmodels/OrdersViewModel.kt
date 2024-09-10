@@ -1,12 +1,12 @@
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.ui.viewmodels.ReservantViewModel
 
-class OrdersViewModel : ViewModel() {
+class OrdersViewModel : ReservantViewModel() {
 
     private val _orders = MutableStateFlow<List<OrderDTO>>(emptyList())
     val orders: StateFlow<List<OrderDTO>> = _orders.asStateFlow()
