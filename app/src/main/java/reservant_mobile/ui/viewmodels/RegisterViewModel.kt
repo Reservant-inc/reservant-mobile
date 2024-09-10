@@ -14,7 +14,9 @@ import reservant_mobile.data.utils.getCountriesList
 import java.util.regex.Pattern
 
 
-class RegisterViewModel(private val userService: IUserService = UserService()) : ViewModel() {
+class RegisterViewModel(
+    private val userService: IUserService = UserService()
+) : ReservantViewModel() {
 
     var result by mutableStateOf(Result(isError=false, value=false))
 
@@ -35,7 +37,6 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
     var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
     var isLoginUnique by mutableStateOf(true)
-    
     
     suspend fun register() : Boolean{
 
@@ -74,86 +75,74 @@ class RegisterViewModel(private val userService: IUserService = UserService()) :
 
     fun isLoginInvalid(): Boolean{
         return isInvalidWithRegex(Regex.LOGIN, login.value) ||
-                getFieldError(login.name) != -1
+                getFieldError(result, login.name) != -1
     }
 
 
     fun isFirstNameInvalid() : Boolean{
         return isInvalidWithRegex(Regex.NAME_REG, firstName.value) ||
-                getFieldError(firstName.name) != -1
+                getFieldError(result, firstName.name) != -1
     }
 
     fun isLastNameInvalid() : Boolean{
         return isInvalidWithRegex(Regex.NAME_REG, lastName.value) ||
-                getFieldError(lastName.name) != -1
+                getFieldError(result, lastName.name) != -1
     }
 
     fun isBirthDateInvalid() : Boolean{
         return isInvalidWithRegex(Regex.DATE_REG, birthday.value) ||
-                getFieldError(birthday.name) != -1
+                getFieldError(result, birthday.name) != -1
     }
 
     fun isEmailInvalid() : Boolean{
         return isInvalidWithRegex(Regex.EMAIL_REG, email.value) ||
-                getFieldError(email.name) != -1
+                getFieldError(result, email.name) != -1
     }
 
     fun isPhoneInvalid() : Boolean{
         return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value) ||
-                getFieldError(phoneNum.name) != -1
+                getFieldError(result, phoneNum.name) != -1
     }
 
     fun isPasswordInvalid() : Boolean{
         return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
-                getFieldError(password.name) != -1
+                getFieldError(result, password.name) != -1
     }
 
     fun isConfirmPasswordDiff() : Boolean{
         return confirmPassword.value != password.value
     }
 
-    private fun isInvalidWithRegex(regex: String, str: String): Boolean{
-        return !Pattern.matches(regex, str)
-    }
-
-    private fun getFieldError(name: String): Int{
-        if(!result.isError){
-            return -1
-        }
-
-        return result.errors!!.getOrDefault(name, -1)
-    }
-
     fun getLoginError(): Int{
-        return getFieldError(login.name)
+        return getFieldError(result, login.name)
     }
 
     fun getFirstNameError(): Int{
-        return getFieldError(firstName.name)
+        return getFieldError(result, firstName.name)
     }
 
     fun getLastNameError(): Int{
-        return getFieldError(lastName.name)
+        return getFieldError(result, lastName.name)
     }
 
     fun getBirthDateError(): Int{
-        return getFieldError(birthday.name)
+        return getFieldError(result, birthday.name)
     }
 
     fun getEmailError(): Int{
-        return getFieldError(email.name)
+        return getFieldError(result, email.name)
     }
 
     fun getPhoneError(): Int{
-        return getFieldError(phoneNum.name)
+        return getFieldError(result, phoneNum.name)
     }
 
     fun getPasswordError(): Int{
-        return getFieldError(password.name)
+        return getFieldError(result, password.name)
     }
 
     fun getToastError(): Int{
-        return getFieldError("TOAST")
+        return getToastError(result)
     }
 
 }

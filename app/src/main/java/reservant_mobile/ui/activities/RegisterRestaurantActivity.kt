@@ -226,7 +226,7 @@ fun RegisterRestaurantActivity(
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = restaurantViewModel.getToastError(restaurantViewModel.result)
+                    id = restaurantViewModel.getToastError1()
                 )
 
                 ButtonComponent(
@@ -426,7 +426,7 @@ fun RegisterRestaurantActivity(
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = restaurantViewModel.getToastError(restaurantViewModel.result2)
+                    id = restaurantViewModel.getToastError2()
                 )
 
                 ButtonComponent(
@@ -651,7 +651,7 @@ fun RegisterRestaurantActivity(
 
                 ShowErrorToast(
                     context = LocalContext.current,
-                    id = restaurantViewModel.getToastError(restaurantViewModel.result3)
+                    id = restaurantViewModel.getToastError3()
                 )
 
                 if (restaurantId == null && group == null) {

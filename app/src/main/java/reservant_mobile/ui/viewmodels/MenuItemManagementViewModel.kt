@@ -20,8 +20,7 @@ class MenuItemManagementViewModel(
     private val menuId: Int,
     private val restaurantId: Int,
     private val service: IRestaurantMenuService = RestaurantMenuService(),
-    private val fileService: FileService = FileService()
-): ViewModel() {
+): ReservantViewModel() {
     var items by mutableStateOf<List<RestaurantMenuItemDTO>>(emptyList())
 
     val name: FormField = FormField(RestaurantMenuItemDTO::name.name)
@@ -29,8 +28,6 @@ class MenuItemManagementViewModel(
     val price: FormField = FormField(RestaurantMenuItemDTO::stringPrice.name)
     val alcoholPercentage: FormField = FormField(RestaurantMenuItemDTO::stringAlcoholPercentage.name)
     val photo: FormField = FormField(RestaurantMenuItemDTO::photoFileName.name)
-
-
 
     init {
         viewModelScope.launch {

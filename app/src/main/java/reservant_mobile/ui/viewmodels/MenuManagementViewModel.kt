@@ -23,8 +23,7 @@ import java.util.regex.Pattern
 class MenuManagementViewModel(
     private val restaurantId: Int,
     private val service: IRestaurantMenuService = RestaurantMenuService(),
-    private val fileService: FileService = FileService()
-): ViewModel() {
+): ReservantViewModel() {
 
     var menus by mutableStateOf<List<RestaurantMenuDTO>>(emptyList())
 
@@ -165,14 +164,5 @@ class MenuManagementViewModel(
         if (isFileSizeInvalid(context, photo.value)) return R.string.error_registerRestaurant_invalid_file
         return -1
     }
-
-    private fun isInvalidWithRegex(regex: String, str: String): Boolean{
-        return !Pattern.matches(regex, str)
-    }
-
-    fun <T> getToastError(result: Result<T>): Int {
-        return FormField("TOAST").getError(result)
-    }
-
 
 }

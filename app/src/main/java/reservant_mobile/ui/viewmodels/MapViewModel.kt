@@ -15,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -36,7 +35,7 @@ import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.RestaurantService
 
-class MapViewModel(): ViewModel() {
+class MapViewModel : ReservantViewModel() {
     private object OsmMap {
         lateinit var view:MapView
     }

@@ -14,15 +14,14 @@ import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 
 
-class RestaurantManagementViewModel(private val restaurantService: IRestaurantService = RestaurantService()) : ViewModel() {
+class RestaurantManagementViewModel(
+    private val restaurantService: IRestaurantService = RestaurantService()
+) : ReservantViewModel() {
 
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
     var selectedRestaurantLogo: Bitmap? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
-
-
-    private val fileService = FileService()
 
 
     init {

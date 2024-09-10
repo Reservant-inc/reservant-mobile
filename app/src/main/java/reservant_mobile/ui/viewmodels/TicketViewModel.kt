@@ -1,4 +1,4 @@
 package reservant_mobile.ui.viewmodels
 
-class TicketViewModel {
+class TicketViewModel: ReservantViewModel() {
 }

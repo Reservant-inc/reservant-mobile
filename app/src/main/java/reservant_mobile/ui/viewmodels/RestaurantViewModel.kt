@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
@@ -15,7 +14,6 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
-import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
@@ -24,10 +22,8 @@ import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
 
 class RestaurantViewModel(
-    private val restaurantService: IRestaurantService = RestaurantService(),
-    private val fileService: FileService = FileService()
-) :
-    ViewModel() {
+    private val restaurantService: IRestaurantService = RestaurantService()
+): ReservantViewModel() {
 
     // Wynik rejestracji
     var result by mutableStateOf(Result(isError = false, value = false))
@@ -447,22 +443,9 @@ class RestaurantViewModel(
                 )) || isFileSizeInvalid(context, value)
     }
 
-
-
-
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
-
-
-    private fun <T> getFieldError(result: Result<T>, name: String): Int {
-        if (!result.isError) {
-            return -1
-        }
-
-        return result.errors?.getOrDefault(name, -1) ?: -1
-    }
-
 
     fun getNameError(): Int {
         return getFieldError(result, name.name)
@@ -516,7 +499,14 @@ class RestaurantViewModel(
         return getFieldError(result3, description.name)
     }
 
-    fun <T> getToastError(result: Result<T>): Int {
-        return getFieldError(result, "TOAST")
+    fun getToastError1(): Int {
+        return getToastError(result)
     }
+    fun getToastError2(): Int {
+        return getToastError(result2)
+    }
+    fun getToastError3(): Int {
+        return getToastError(result3)
+    }
+
 }

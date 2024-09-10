@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -14,8 +13,11 @@ import reservant_mobile.data.models.dtos.MessageDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IThreadsService
 import reservant_mobile.data.services.ThreadsService
+import reservant_mobile.ui.viewmodels.ReservantViewModel
 
-class ChatViewModel(private val threadsService: IThreadsService = ThreadsService()) : ViewModel() {
+class ChatViewModel(
+    private val threadsService: IThreadsService = ThreadsService()
+) : ReservantViewModel() {
 
     // TODO: Replace with dynamic thread ID in the future
     private val threadId: Any = 1

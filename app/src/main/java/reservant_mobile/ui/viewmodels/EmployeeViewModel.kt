@@ -20,7 +20,7 @@ class EmployeeViewModel(
     private val restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val userService: IUserService = UserService()
-) : ViewModel() {
+) : ReservantViewModel() {
     var employees by mutableStateOf<List<RestaurantEmployeeDTO>>(emptyList())
     var isLoading by mutableStateOf(false)
     var result by mutableStateOf(Result(isError = false, value = false))
@@ -176,63 +176,51 @@ class EmployeeViewModel(
 
     fun isLoginInvalid(): Boolean {
         return isInvalidWithRegex(Regex.LOGIN, login.value) ||
-                getFieldError(login.name) != -1
+                getFieldError(result, login.name) != -1
     }
 
 
     fun isFirstNameInvalid(): Boolean {
         return isInvalidWithRegex(Regex.NAME_REG, firstName.value) ||
-                getFieldError(firstName.name) != -1
+                getFieldError(result, firstName.name) != -1
     }
 
     fun isLastNameInvalid(): Boolean {
         return isInvalidWithRegex(Regex.NAME_REG, lastName.value) ||
-                getFieldError(lastName.name) != -1
+                getFieldError(result, lastName.name) != -1
     }
 
     fun isPhoneInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value) ||
-                getFieldError(phoneNum.name) != -1
+                getFieldError(result, phoneNum.name) != -1
     }
 
     fun isPasswordInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
-                getFieldError(password.name) != -1
-    }
-
-    private fun isInvalidWithRegex(regex: String, str: String): Boolean {
-        return !Pattern.matches(regex, str)
-    }
-
-    private fun getFieldError(name: String): Int {
-        if (!result.isError) {
-            return -1
-        }
-
-        return result.errors!!.getOrDefault(name, -1)
+                getFieldError(result, password.name) != -1
     }
 
     fun getLoginError(): Int {
-        return getFieldError(login.name)
+        return getFieldError(result, login.name)
     }
 
     fun getFirstNameError(): Int {
-        return getFieldError(firstName.name)
+        return getFieldError(result, firstName.name)
     }
 
     fun getLastNameError(): Int {
-        return getFieldError(lastName.name)
+        return getFieldError(result, lastName.name)
     }
 
     fun getPhoneError(): Int {
-        return getFieldError(phoneNum.name)
+        return getFieldError(result, phoneNum.name)
     }
 
     fun getPasswordError(): Int {
-        return getFieldError(password.name)
+        return getFieldError(result, password.name)
     }
 
     fun getToastError(): Int {
-        return getFieldError("TOAST")
+        return getToastError(result)
     }
 }
