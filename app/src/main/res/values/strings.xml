@@ -177,4 +177,5 @@
     <string name="label_send_message">Send message</string>
     <string name="label_profile">Profile</string>
     <string name="label_detail_reviews">reviews</string>
+    <string name="label_employee">Employee</string>
 </resources>
