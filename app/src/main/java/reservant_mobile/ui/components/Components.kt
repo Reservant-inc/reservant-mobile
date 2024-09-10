@@ -121,8 +121,6 @@ import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
@@ -356,16 +354,9 @@ fun ShowErrorToast(context: Context, id: Int) {
 @Composable
 fun BottomNavigation(
     navController: NavHostController,
-    bottomBarState: MutableState<Boolean>
+    bottomBarState: MutableState<Boolean>,
+    items: List<BottomNavItem>
 ) {
-
-    val items = listOfNotNull(
-        BottomNavItem.Home,
-        BottomNavItem.Landing,
-        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
-        BottomNavItem.Profile
-    )
-
     var selectedItem by remember { mutableStateOf(items.first()) }
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
     var outlineColor by remember { mutableStateOf(outlineVariant) }
