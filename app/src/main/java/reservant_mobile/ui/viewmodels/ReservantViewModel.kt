@@ -15,4 +15,8 @@ open class ReservantViewModel(
 
         return result.errors?.getOrDefault(name, -1) ?: -1
     }
+
+    fun<T> getToastError(result: Result<T>): Int {
+        return getFieldError(result, "TOAST")
+    }
 }

@@ -443,9 +443,6 @@ class RestaurantViewModel(
                 )) || isFileSizeInvalid(context, value)
     }
 
-
-
-
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
@@ -502,7 +499,4 @@ class RestaurantViewModel(
         return getFieldError(result3, description.name)
     }
 
-    fun <T> getToastError(result: Result<T>): Int {
-        return getFieldError(result, "TOAST")
-    }
 }
