@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.text.format.DateUtils.formatDateTime
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -37,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -105,10 +108,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     items(count = pagingItems.itemCount) { index ->
                         val message = pagingItems[index]
                         message?.let {
-                            // Fetch the participant's name using the userId from the message
                             val sender = participantsMap[message.authorId]
-
-                            // Determine if the message was sent by the current user
                             val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
 
                             Row(
@@ -166,14 +166,18 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                         .weight(1f)
                         .padding(8.dp)
                         .background(Color.LightGray, shape = CircleShape)
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None) // Disable send on enter
                 )
-                IconButton(onClick = {
-                    if (currentMessage.text.isNotBlank()) {
-                        chatViewModel.createMessage(currentMessage.text) // Send message using ViewModel
-                        currentMessage = TextFieldValue()
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        if (currentMessage.text.isNotBlank() && lazyPagingItems != null) {
+                            chatViewModel.createMessage(currentMessage.text) // Send message using ViewModel
+                            currentMessage = TextFieldValue()
+                        }
+                    },
+                    enabled = lazyPagingItems != null // Disable button when chat is not loaded
+                ) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                 }
             }
