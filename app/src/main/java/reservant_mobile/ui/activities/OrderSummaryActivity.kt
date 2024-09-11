@@ -1,45 +1,44 @@
 package reservant_mobile.ui.activities
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
-import reservant_mobile.data.models.dtos.OrderDTO
+import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderSummaryActivity(orderId: Int, navController: NavHostController) {
-    val reservationViewModel = viewModel<ReservationViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T = ReservationViewModel() as T
-        }
-    )
-
-    val orderResult by reservationViewModel.orderResult.collectAsState()
-
-    LaunchedEffect(Unit) {
-        reservationViewModel.getOrder(orderId)
-    }
-
+fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(id = R.string.label_order_summary)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.label_back))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.label_back)
+                        )
                     }
                 }
             )
@@ -50,48 +49,40 @@ fun OrderSummaryActivity(orderId: Int, navController: NavHostController) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            orderResult?.let { result ->
-                if (!result.isError && result.value != null) {
-                    OrderSummaryContent(order = result.value!!)
-                } else {
-                    Text(
-                        text = stringResource(id = R.string.error_order_not_found),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
+            Text(
+                text = stringResource(id = R.string.label_order_details),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Display the summary of the order
+            Text(text = "Order Note: ${reservationViewModel.note.value}")
+            Text(text = "Order Total: ${reservationViewModel.orderCost}")
+            // Add more details about the order as needed
 
             Spacer(modifier = Modifier.height(16.dp))
 
             ButtonComponent(
                 onClick = {
-                    reservationViewModel.cancelOrder(orderId)
+                    reservationViewModel.viewModelScope.launch {
+                        // Finalize the order by creating it
+                        reservationViewModel.createOrder()
+                    }
                     navController.popBackStack()
                 },
-                label = stringResource(id = R.string.label_cancel_order),
+                label = stringResource(id = R.string.label_confirm_order),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ButtonComponent(
+                onClick = {
+                    navController.popBackStack()
+                },
+                label = stringResource(id = R.string.label_cancel),
                 modifier = Modifier.fillMaxWidth()
             )
         }
-    }
-}
-
-@Composable
-fun OrderSummaryContent(order: OrderDTO) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.label_order_details),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        // Wyświetlaj szczegóły zamówienia tutaj
-        Text(text = "Order ID: ${order.orderId}")
-        Text(text = "Order Total: ${order.cost}")
-        // Dodaj więcej szczegółów zamówienia według potrzeb
     }
 }

@@ -19,21 +19,19 @@ class ReservationViewModel(
     private val deliveryService: IDeliveryService = DeliveryService()
 ) : ViewModel() {
 
-    // Order-related fields
-    var orderNote: FormField = FormField(OrderDTO::note.name)
+
+    var note: FormField = FormField(OrderDTO::note.name)
     var promoCode: FormField = FormField("promoCode") // Assuming promoCode is a custom field
     var orderCost by mutableStateOf(0.0)
 
-    // Visit-related fields
+
     var visitDate: FormField = FormField(VisitDTO::reservationDate.name)
     var numberOfGuests by mutableStateOf(1)
     var seats by mutableStateOf(1)
-    var visitNote: FormField = FormField("visitNote")
 
-    // Delivery-related fields
+
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
-    var deliveryNote: FormField = FormField("deliveryNote")
 
     // Results
     private val _orderResult = MutableStateFlow<Result<OrderDTO?>>(Result(isError = false, value = null))
@@ -50,7 +48,7 @@ class ReservationViewModel(
         viewModelScope.launch {
             val order = OrderDTO(
                 cost = orderCost,
-                note = orderNote.value
+                note = note.value
                 // Include other necessary fields
             )
             val result = ordersService.createOrder(order)
@@ -58,7 +56,8 @@ class ReservationViewModel(
         }
     }
 
-    fun getOrder(orderId: Any) {
+    // Functions to handle orders
+    private fun getOrder(orderId: Any) {
         viewModelScope.launch {
             val result = ordersService.getOrder(orderId)
             _orderResult.value = result

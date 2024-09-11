@@ -32,14 +32,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 import java.time.LocalDate
 
 
 @Composable
 fun DeliveryContent(
+    navController: NavHostController,
     viewModel: ReservationViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -80,9 +83,9 @@ fun DeliveryContent(
         }
 
         FormInput(
-            inputText = viewModel.deliveryNote.value,
+            inputText = viewModel.note.value,
             onValueChange = {
-                viewModel.deliveryNote.value = it // Update ViewModel
+                viewModel.note.value = it // Update ViewModel
             },
             label = stringResource(R.string.label_write_note)
         )
@@ -91,14 +94,7 @@ fun DeliveryContent(
 
         ButtonComponent(
             onClick = {
-                viewModel.viewModelScope.launch {
-                    viewModel.addDelivery()
-                    if (viewModel.deliveryResult.value.isError) {
-                        // Handle error, e.g., show a toast
-                    } else {
-                        // Handle success, e.g., navigate to another screen or show confirmation
-                    }
-                }
+                navController.navigate(RestaurantRoutes.Summary)
             },
             label = stringResource(R.string.label_order_delivery),
         )
@@ -107,6 +103,7 @@ fun DeliveryContent(
 
 @Composable
 fun TakeawayContent(
+    navController: NavHostController,
     viewModel: ReservationViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -134,9 +131,9 @@ fun TakeawayContent(
         }
 
         FormInput(
-            inputText = viewModel.orderNote.value,
+            inputText = viewModel.note.value,
             onValueChange = {
-                viewModel.orderNote.value = it
+                viewModel.note.value = it
             },
             label = stringResource(R.string.label_write_note),
             isError = false
@@ -165,14 +162,7 @@ fun TakeawayContent(
 
         ButtonComponent(
             onClick = {
-                viewModel.viewModelScope.launch {
-                    viewModel.createOrder()
-                    if (viewModel.orderResult.value.isError) {
-                        // Handle error, e.g., show a toast
-                    } else {
-                        // Handle success
-                    }
-                }
+                navController.navigate(RestaurantRoutes.Summary)
             },
             label = stringResource(R.string.label_order_summary)
         )
@@ -182,6 +172,7 @@ fun TakeawayContent(
 
 @Composable
 fun DineInContent(
+    navController: NavHostController,
     viewModel: ReservationViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -261,9 +252,9 @@ fun DineInContent(
 
         // Comment Input
         FormInput(
-            inputText = viewModel.visitNote.value,
+            inputText = viewModel.note.value,
             onValueChange = {
-                viewModel.visitNote.value = it
+                viewModel.note.value = it
             },
             label = stringResource(id = R.string.label_write_note),
             isError = false
@@ -302,14 +293,7 @@ fun DineInContent(
         // Submit Button
         ButtonComponent(
             onClick = {
-                viewModel.viewModelScope.launch {
-                    viewModel.createVisit()
-                    if (viewModel.visitResult.value.isError) {
-                        // Handle error, e.g., show a toast
-                    } else {
-                        // Handle success
-                    }
-                }
+                navController.navigate(RestaurantRoutes.Summary)
             },
             label = stringResource(id = R.string.label_order_summary)
         )

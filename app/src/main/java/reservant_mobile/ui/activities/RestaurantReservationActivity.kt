@@ -19,6 +19,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.DeliveryDTO
@@ -28,6 +30,7 @@ import reservant_mobile.ui.components.DeliveryContent
 import reservant_mobile.ui.components.DineInContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.TakeawayContent
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,75 +38,91 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 fun RestaurantReservationActivity(navController: NavHostController) {
     val reservationViewModel = viewModel<ReservationViewModel>()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { },
-                actions = {
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        IconButton(
-                            onClick = { navController.popBackStack() },
-                            modifier = Modifier.align(Alignment.CenterStart)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.label_back)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.label_reservation),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            stringResource(R.string.label_dine_in) to {
-                                DineInContent(
-                                    viewModel = reservationViewModel,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                )
-                            },
-                            stringResource(R.string.label_delivery) to {
-                                DeliveryContent(
-                                    viewModel = reservationViewModel,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                )
-                            },
-                            stringResource(R.string.label_takeaway) to {
-                                TakeawayContent(
-                                    viewModel = reservationViewModel,
-                                    modifier = Modifier.padding(top = 88.dp)
+
+    val navControllerSummary = rememberNavController()
+
+    NavHost(
+        navController = navControllerSummary,
+        startDestination = RestaurantRoutes.Reservation
+    ) {
+        composable<RestaurantRoutes.Reservation> {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { },
+                        actions = {
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                IconButton(
+                                    onClick = { navController.popBackStack() },
+                                    modifier = Modifier.align(Alignment.CenterStart)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = stringResource(R.string.label_back)
+                                    )
+                                }
+                                Text(
+                                    text = stringResource(R.string.label_reservation),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.align(Alignment.Center)
                                 )
                             }
-                        ),
-                        paneScroll = false
+                        }
                     )
                 }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.surface)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            FloatingTabSwitch(
+                                pages = listOf(
+                                    stringResource(R.string.label_dine_in) to {
+                                        DineInContent(
+                                            navController = navControllerSummary,
+                                            viewModel = reservationViewModel,
+                                            modifier = Modifier.padding(top = 88.dp)
+                                        )
+                                    },
+                                    stringResource(R.string.label_delivery) to {
+                                        DeliveryContent(
+                                            navController = navControllerSummary,
+                                            viewModel = reservationViewModel,
+                                            modifier = Modifier.padding(top = 88.dp)
+                                        )
+                                    },
+                                    stringResource(R.string.label_takeaway) to {
+                                        TakeawayContent(
+                                            navController = navControllerSummary,
+                                            viewModel = reservationViewModel,
+                                            modifier = Modifier.padding(top = 88.dp)
+                                        )
+                                    }
+                                ),
+                                paneScroll = false
+                            )
+                        }
+                    }
+                }
             }
+        }
+        composable<RestaurantRoutes.Summary>{
+            OrderSummaryActivity(reservationViewModel=reservationViewModel, navController = navController)
         }
     }
 }
