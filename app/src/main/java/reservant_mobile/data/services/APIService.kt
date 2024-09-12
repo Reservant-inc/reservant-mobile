@@ -27,6 +27,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.fields.Result
 
 
@@ -34,7 +35,7 @@ class APIService{
 
     private val backendUrl= "http://172.21.40.127:12038"
 
-    private val localService = LocalBearerService()
+    private val localService = LocalDataService()
     private val client = HttpClient(CIO){
         defaultRequest {
             url(backendUrl)
@@ -66,14 +67,14 @@ class APIService{
 
     private suspend inline fun getBearerTokens():BearerTokens {
         return BearerTokens(
-            localService.getBearerToken(),
+            localService.getData(PrefsKeys.BEARER_TOKEN),
             ""
         )
     }
 
     suspend fun clearToken(){
         try{
-            localService.saveBearerToken("")
+            localService.saveData(PrefsKeys.BEARER_TOKEN,"")
 
             client.plugin(Auth).providers
                 .filterIsInstance<BearerAuthProvider>()
