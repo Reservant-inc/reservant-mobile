@@ -451,8 +451,7 @@ fun EventsContent() {
                 eventDate = "Saturday, 2024-06-22",
                 eventLocation = "John's Doe - Warsaw",
                 interestedCount = 20,
-                takePartCount = 45,
-                onClose = { /* Handle close action */ }
+                takePartCount = 45
             )
             Modifier.padding(bottom = 16.dp)
         }
