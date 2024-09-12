@@ -195,4 +195,7 @@
     <string name="label_cost">Koszt</string>
     <string name="label_confirm_order">Potwierdź zamówienie</string>
     <string name="label_employee">Pracownik</string>
+    <string name="label_employee_greetings">Cześć %1$s, gdzie dzisiaj pracujesz?</string>
+    <string name="label_reservations">Rezerwacje</string>
+    <string name="label_stock">Zamówienia</string>
 </resources>
