@@ -18,16 +18,18 @@ class EmployeeHomeViewModel(
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
     var restaurants: List<RestaurantDTO> by mutableStateOf(listOf())
     var isLoading: Boolean by mutableStateOf(false)
+    var isError: Boolean by mutableStateOf(false)
 
 
-    suspend fun getEmployeeRestaurants(): Boolean{
+
+    suspend fun getEmployeeRestaurants(){
         isLoading = true
         val res = restaurantService.getRestaurant(1);
         if(!res.isError){
             restaurants = listOf(res.value!!)
         }
         isLoading = false
-        return !res.isError
+        isError = res.isError
     }
 
     suspend fun selectRestaurant(restaurant: RestaurantDTO){

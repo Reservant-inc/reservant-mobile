@@ -216,7 +216,7 @@ fun EmployeeHomeActivity() {
                             ) {
                                 CircularProgressIndicator()
                             }
-                        } else {
+                        } else if (empHomeVM.isError) {
                             MissingPage(
                                 modifier = Modifier
                                     .fillMaxSize()
