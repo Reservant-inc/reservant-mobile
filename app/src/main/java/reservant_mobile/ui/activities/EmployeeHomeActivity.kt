@@ -29,6 +29,7 @@ import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.ShoppingBasket
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableBar
+import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -62,6 +63,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
+import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EmployeeRoutes
@@ -103,7 +105,7 @@ fun EmployeeHomeActivity() {
             }
 
 
-            val startDestination = if (empHomeVM.selectedRestaurant != null)
+            val startDestination = if(empHomeVM.selectedRestaurant != null)
                 EmployeeRoutes.Home
              else
                 EmployeeRoutes.SelectRestaurant
@@ -232,6 +234,9 @@ fun EmployeeHomeActivity() {
                     LaunchedEffect(Unit) {
                         bottomBarState.value = true
                     }
+
+                    val restaurant = empHomeVM.selectedRestaurant
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -239,6 +244,15 @@ fun EmployeeHomeActivity() {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        if(restaurant != null)
+                        IconWithHeader(
+                            icon = Icons.Rounded.RestaurantMenu,
+                            text = restaurant.name,
+                            showBackButton = empHomeVM.restaurants.size > 1,
+                            onReturnClick = {
+                                innerNavController.navigate(EmployeeRoutes.SelectRestaurant)
+                            }
+                        )
                         MenuButton(
                             stringResource(id = R.string.label_orders),
                             Icons.Outlined.Book)
