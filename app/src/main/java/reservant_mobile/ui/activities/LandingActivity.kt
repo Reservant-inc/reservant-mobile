@@ -69,7 +69,7 @@ fun LandingActivity() {
             composable<MainRoutes.Home> {
                 HomeActivity()
             }
-            composable<EmployeeRoutes.Home> {
+            composable<EmployeeRoutes.SelectRestaurant> {
                 EmployeeHomeActivity()
             }
         }
