@@ -47,6 +47,7 @@ class EmployeeHomeViewModel(
         if(restaurants.isEmpty())
             return
 
+        selectedRestaurant = restaurants.find { it.restaurantId == selectedId.toInt() }
         isLoading = false
     }
 
