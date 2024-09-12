@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -374,32 +377,88 @@ fun MenuContent(
     }
 }
 
-// TODO: EventDTO
 @Composable
-fun EventsContent(
-//    events: List<EventDTO>
+fun EventCard(
+    eventName: String,
+    eventDate: String,
+    eventLocation: String,
+    interestedCount: Int,
+    takePartCount: Int
 ) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Box {
+            Column(modifier = Modifier.padding(16.dp)) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .padding(bottom = 16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.restaurant_photo),
+                        contentDescription = "Event Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+
+                Text(
+                    text = eventDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = eventName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = eventLocation,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "$interestedCount - interested")
+                    Text(text = "$takePartCount - take part")
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun EventsContent() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(start = 16.dp, top = 80.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(64.dp))
-        repeat(3){
-            Text("Event name", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Event details")
-            Spacer(modifier = Modifier.height(16.dp))
+        repeat(3) {
+            EventCard(
+                eventName = "Name of event",
+                eventDate = "Saturday, 2024-06-22",
+                eventLocation = "John's Doe - Warsaw",
+                interestedCount = 20,
+                takePartCount = 45,
+                onClose = { /* Handle close action */ }
+            )
+            Modifier.padding(bottom = 16.dp)
         }
-
-//        events.forEach { event ->
-//            Text(event.name, style = MaterialTheme.typography.headlineSmall)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(event.details)
-//            Spacer(modifier = Modifier.height(16.dp))
-//        }
     }
 }
+
 
 @Composable
 fun ReviewsContent(
