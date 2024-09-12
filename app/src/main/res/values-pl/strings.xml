@@ -173,4 +173,7 @@
     <string name="label_profile">Profil</string>
     <string name="label_detail_reviews">opinii</string>
     <string name="label_employee">Pracownik</string>
+    <string name="label_employee_greetings">Cześć %1$s, gdzie dzisiaj pracujesz?</string>
+    <string name="label_reservations">Rezerwacje</string>
+    <string name="label_stock">Zamówienia</string>
 </resources>
