@@ -8,4 +8,7 @@ data object EmployeeRoutes{
 
     @Serializable
     object Home
+
+    @Serializable
+    object SelectRestaurant
 }
