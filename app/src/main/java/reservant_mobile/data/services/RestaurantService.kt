@@ -69,6 +69,7 @@ interface IRestaurantService{
     suspend fun getRestaurantOrders(restaurantId: Any,  returnFinished:Boolean? = null, orderBy: GetRestaurantOrdersSort? = null): Result<Flow<PagingData<OrderDTO>>?>
     suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?>
+    suspend fun getRestaurantReview(reviewId: Any): Result<ReviewDTO?>
 
     /***
      * Available order values : see GetRestaurantReviewsSort class
@@ -291,6 +292,11 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             parent = Restaurants.Id(restaurantId = restaurantId.toString())),
             review
         )
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getRestaurantReview(reviewId: Any): Result<ReviewDTO?> {
+        val res = api.get(Reviews.ReviewId(reviewId = reviewId.toString()))
         return complexResultWrapper(res)
     }
 

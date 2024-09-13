@@ -196,6 +196,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
+    fun get_restaurant_review_return_not_null()= runTest{
+        assertThat(ser.getRestaurantReview(1).value).isNotNull()
+    }
+
+    @Test
     fun add_edit_delete_review_return_not_null()= runTest{
         val rev = ser.addRestaurantReview(restaurantId, review).value
         assertThat(rev).isNotNull()
