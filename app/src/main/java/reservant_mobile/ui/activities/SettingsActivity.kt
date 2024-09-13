@@ -57,28 +57,28 @@ fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
 
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            if(Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles )
-            UnderlinedItem(
-                icon = Icons.Filled.Person,
-                text = stringResource(id = R.string.label_my_profile),
-                onClick = {
-                    navController.navigate(MainRoutes.UserProfile)
-                }
-            )
+            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                UnderlinedItem(
+                    icon = Icons.Filled.Person,
+                    text = stringResource(id = R.string.label_my_profile),
+                    onClick = {
+                        navController.navigate(MainRoutes.UserProfile)
+                    }
+                )
 
-            if(Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles )
-            UnderlinedItem(
-                icon = Icons.Filled.AccountBalanceWallet,
-                text = stringResource(id = R.string.label_wallet),
-                onClick = { /* Navigate to Wallet */ }
-            )
+            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                UnderlinedItem(
+                    icon = Icons.Filled.AccountBalanceWallet,
+                    text = stringResource(id = R.string.label_wallet),
+                    onClick = { /* Navigate to Wallet */ }
+                )
 
-            if(Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles )
-            UnderlinedItem(
-                icon = Icons.Filled.ShoppingCart,
-                text = stringResource(id = R.string.label_my_orders),
-                onClick = { navController.navigate(RestaurantRoutes.Ticket) }
-            )
+            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                UnderlinedItem(
+                    icon = Icons.Filled.ShoppingCart,
+                    text = stringResource(id = R.string.label_my_orders),
+                    onClick = { navController.navigate(RestaurantRoutes.Ticket) }
+                )
 
             UnderlinedItem(
                 icon = Icons.AutoMirrored.Filled.Help,
@@ -92,12 +92,12 @@ fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
                 onClick = { /* Navigate to FAQ */ }
             )
 
-            if(Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles )
-            UnderlinedItem(
-                icon = Icons.Filled.CardGiftcard,
-                text = stringResource(id = R.string.label_promo_codes),
-                onClick = { /* Navigate to Promo Codes */ }
-            )
+            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                UnderlinedItem(
+                    icon = Icons.Filled.CardGiftcard,
+                    text = stringResource(id = R.string.label_promo_codes),
+                    onClick = { /* Navigate to Promo Codes */ }
+                )
 
             UnderlinedItem(
                 icon = Icons.Filled.Settings,
@@ -105,19 +105,19 @@ fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
                 onClick = { /* Navigate to App Settings */ }
             )
 
-            if(Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles )
-            UnderlinedItem(
-                icon = Icons.Filled.Delete,
-                text = stringResource(id = R.string.label_delete_account),
-                onClick = { navController.navigate(UserRoutes.ChatList)}
-            )
+            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                UnderlinedItem(
+                    icon = Icons.Filled.Delete,
+                    text = stringResource(id = R.string.label_delete_account),
+                    onClick = { navController.navigate(UserRoutes.ChatList) }
+                )
 
             UnderlinedItem(
                 icon = Icons.AutoMirrored.Filled.ExitToApp,
                 text = stringResource(id = R.string.label_logout_action),
                 onClick = {
                     loginViewModel.viewModelScope.launch {
-                        if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles ) {
+                        if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
                             LocalDataService().saveData(
                                 key = PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT,
                                 data = ""
