@@ -89,30 +89,34 @@ fun EmployeeHomeActivity() {
         BottomNavItem.Profile
     )
 
-    AppTheme (darkTheme = darkTheme) {
+    AppTheme(darkTheme = darkTheme) {
         Scaffold(
             bottomBar = {
                 BottomNavigation(
-                    navController =  innerNavController,
+                    navController = innerNavController,
                     bottomBarState = bottomBarState,
                     items = items
                 )
             }
-        ){
+        ) {
             LaunchedEffect(key1 = Unit) {
                 empHomeVM.getEmployeeRestaurants()
                 empHomeVM.findSelectedRestaurants()
             }
 
 
-            val startDestination = if(empHomeVM.selectedRestaurant != null)
+            val startDestination = if (empHomeVM.selectedRestaurant != null)
                 EmployeeRoutes.Home
-             else
+            else
                 EmployeeRoutes.SelectRestaurant
 
 
-            NavHost(navController = innerNavController, startDestination = startDestination, modifier = Modifier.padding(it)){
-                composable<EmployeeRoutes.SelectRestaurant>{
+            NavHost(
+                navController = innerNavController,
+                startDestination = startDestination,
+                modifier = Modifier.padding(it)
+            ) {
+                composable<EmployeeRoutes.SelectRestaurant> {
                     LaunchedEffect(Unit) {
                         bottomBarState.value = false
                     }
@@ -125,10 +129,12 @@ fun EmployeeHomeActivity() {
                                 empHomeVM.selectRestaurant(restaurants.first())
                                 innerNavController.navigate(EmployeeRoutes.Home)
                             }
-                        }
-                        else if (restaurants.size > 1) {
+                        } else if (restaurants.size > 1) {
                             Text(
-                                text = stringResource(id = R.string.label_employee_greetings, UserService.UserObject.firstName),
+                                text = stringResource(
+                                    id = R.string.label_employee_greetings,
+                                    UserService.UserObject.firstName
+                                ),
                                 color = MaterialTheme.colorScheme.background,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
@@ -173,7 +179,7 @@ fun EmployeeHomeActivity() {
                                         .heightIn(80.dp, 150.dp)
                                 ) {
                                     Box() {
-                                        if(img!=null){
+                                        if (img != null) {
                                             Image(
                                                 bitmap = img!!.asImageBitmap(),
                                                 contentDescription = null,
@@ -190,7 +196,7 @@ fun EmployeeHomeActivity() {
                                             verticalArrangement = Arrangement.Center
                                         ) {
                                             Text(
-                                                text = restaurant.name+ " - "+ restaurant.restaurantType,
+                                                text = restaurant.name + " - " + restaurant.restaurantType,
                                                 fontWeight = FontWeight.Bold,
                                             )
                                             Spacer(modifier = Modifier.height(14.dp))
@@ -198,7 +204,7 @@ fun EmployeeHomeActivity() {
                                                 text = restaurant.address,
                                                 fontSize = 14.sp,
                                             )
-                                            if(restaurant.postalIndex.isNotEmpty())
+                                            if (restaurant.postalIndex.isNotEmpty())
                                                 Text(
                                                     text = restaurant.postalIndex,
                                                     fontSize = 14.sp,
@@ -211,7 +217,7 @@ fun EmployeeHomeActivity() {
                                     }
                                 }
                             }
-                        } else if (empHomeVM.isLoading){
+                        } else if (empHomeVM.isLoading) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -244,37 +250,44 @@ fun EmployeeHomeActivity() {
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if(restaurant != null)
-                        IconWithHeader(
-                            icon = Icons.Rounded.RestaurantMenu,
-                            text = restaurant.name,
-                            showBackButton = empHomeVM.restaurants.size > 1,
-                            onReturnClick = {
-                                innerNavController.navigate(EmployeeRoutes.SelectRestaurant)
-                            }
+                        if (restaurant != null)
+                            IconWithHeader(
+                                icon = Icons.Rounded.RestaurantMenu,
+                                text = restaurant.name,
+                                showBackButton = empHomeVM.restaurants.size > 1,
+                                onReturnClick = {
+                                    innerNavController.navigate(EmployeeRoutes.SelectRestaurant)
+                                }
+                            )
+                        MenuButton(
+                            stringResource(id = R.string.label_orders),
+                            Icons.Outlined.Book
+                        )
+                        MenuButton(
+                            stringResource(id = R.string.label_restaurant_tables),
+                            Icons.Outlined.TableBar
+                        )
+                        MenuButton(
+                            stringResource(id = R.string.label_reservations),
+                            Icons.Outlined.Inbox
+                        )
+                        MenuButton(
+                            stringResource(id = R.string.label_stock),
+                            Icons.Outlined.ShoppingBasket
                         )
                         MenuButton(
                             stringResource(id = R.string.label_orders),
-                            Icons.Outlined.Book)
-                        MenuButton(
-                            stringResource(id = R.string.label_restaurant_tables),
-                            Icons.Outlined.TableBar)
-                        MenuButton(
-                            stringResource(id = R.string.label_reservations),
-                            Icons.Outlined.Inbox)
-                        MenuButton(
-                            stringResource(id = R.string.label_stock),
-                            Icons.Outlined.ShoppingBasket)
-                        MenuButton(
-                            stringResource(id = R.string.label_orders),
-                            Icons.Outlined.Star)
+                            Icons.Outlined.Star
+                        )
                     }
 
                 }
-                composable<MainRoutes.Profile>{
-                    SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                composable<MainRoutes.Profile> {
+                    SettingsActivity(
+                        navController = innerNavController,
+                        themeChange = { darkTheme = !darkTheme })
                 }
-                composable<AuthRoutes.Landing>{
+                composable<AuthRoutes.Landing> {
                     LaunchedEffect(Unit) {
                         bottomBarState.value = false
                     }
@@ -289,13 +302,14 @@ fun EmployeeHomeActivity() {
 fun MenuButton(
     text: String,
     icon: ImageVector,
-    onClick: ()->Unit = {}) {
+    onClick: () -> Unit = {}
+) {
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         onClick = onClick
     ) {
         Row(
