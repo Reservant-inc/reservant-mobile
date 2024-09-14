@@ -1,17 +1,25 @@
 package reservant_mobile.ui.viewmodels
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.*
+import reservant_mobile.data.models.dtos.DeliveryDTO
+import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
-import reservant_mobile.data.services.*
+import reservant_mobile.data.services.DeliveryService
+import reservant_mobile.data.services.IDeliveryService
+import reservant_mobile.data.services.IOrdersService
+import reservant_mobile.data.services.IVisitsService
+import reservant_mobile.data.services.OrdersService
+import reservant_mobile.data.services.VisitsService
 
 class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
@@ -22,16 +30,16 @@ class ReservationViewModel(
 
     var note: FormField = FormField(OrderDTO::note.name)
     var promoCode: FormField = FormField("promoCode") // Assuming promoCode is a custom field
-    var orderCost by mutableStateOf(0.0)
+    var orderCost by mutableDoubleStateOf(0.0)
 
 
     var visitDate: FormField = FormField(VisitDTO::reservationDate.name)
-    var numberOfGuests by mutableStateOf(1)
-    var seats by mutableStateOf(1)
+    var numberOfGuests by mutableIntStateOf(1)
+    var seats by mutableIntStateOf(1)
 
 
     var deliveryAddress: FormField = FormField("deliveryAddress")
-    var deliveryCost by mutableStateOf(0.0)
+    var deliveryCost by mutableDoubleStateOf(0.0)
 
     // Results
     private val _orderResult = MutableStateFlow<Result<OrderDTO?>>(Result(isError = false, value = null))
