@@ -23,4 +23,7 @@ data object RestaurantRoutes {
 
     @Serializable
     object Order
+
+    @Serializable
+    object Summary
 }

@@ -1,295 +1,206 @@
 package reservant_mobile.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.ShoppingBag
-import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
+import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
+import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.viewmodels.ReservationViewModel
 import java.time.LocalDate
 
 
-// TODO: resources
-@Composable
-fun ReservationFloatingMenu(
-    onDineInClick: () -> Unit,
-    onDeliveryClick: () -> Unit,
-    onTakeawayClick: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-
-        if (expanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(onClick = { expanded = false })
-            )
-        }
-
-        AnimatedVisibility(
-            visible = expanded,
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .height(680.dp)
-                        .width(360.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            "Na miejscu" to {
-                                DineInContent(
-                                    onDineInClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                )
-                            },
-                            "Dostawa" to { // TODO: not implemented on backend
-                                DeliveryContent(
-                                    onDeliveryClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                )
-                            },
-                            "Odbiór" to { // TODO: not implemented on backend
-                                TakeawayContent(
-                                    onTakeawayClick,
-                                    modifier = Modifier.padding(top = 88.dp)
-                                )
-                            }
-                        ),
-                        paneScroll = false
-                    )
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingActionButton(onClick = { expanded = !expanded }) {
-                Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
-            }
-        }
-    }
-}
-
 @Composable
 fun DeliveryContent(
-    onDeliveryClick: () -> Unit,
+    navController: NavHostController,
+    viewModel: ReservationViewModel,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        Text(text = "Dostawa", style = MaterialTheme.typography.headlineSmall)
-
-        Button(onClick = onDeliveryClick) {
-            Text("Zamów dostawę")
-        }
-    }
-}
-
-@Composable
-fun TakeawayContent(
-    onTakeawayClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 16.dp, end = 8.dp, start = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
         Text(
-            text = "Mój koszyk",
+            text = stringResource(R.string.label_delivery),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        FormInput(
+            inputText = viewModel.deliveryAddress.value,
+            onValueChange = {
+                viewModel.deliveryAddress.value = it // Update ViewModel
+            },
+            label = stringResource(R.string.label_delivery_address)
+        )
+        
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        Text(
+            text = stringResource(R.string.label_my_basket),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             repeat(2) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                                IconButton(
-                                    onClick = { /* TODO: Decrease item count */ },
-                                    modifier = Modifier.size(40.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Remove,
-                                        contentDescription = "Remove"
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { /* TODO: Increase item count */ },
-                                    modifier = Modifier.size(40.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = "Add"
-                                    )
-                                }
-                            }
-                        }
-                        Text(
-                            text = "Kwota: 30zł",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-                }
+                OrderCard(
+                    itemName = "Danie1",
+                    itemCount = 1,
+                    itemCost = 30.0,
+                    onIncreaseClick = { /* TODO: Handle increase item count */ },
+                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
+                )
             }
         }
 
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO: Handle note change */ },
-            label = { Text(text = "Napisz notatkę do zamówienia...") },
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        OutlinedTextField(
-            value = "JSKS6X293",
-            onValueChange = { /* TODO: Change promo code */ },
-            label = {
-                Text(
-                    text = "Wpisz kod promocyjny",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
-                )
+        FormInput(
+            inputText = viewModel.note.value,
+            onValueChange = {
+                viewModel.note.value = it // Update ViewModel
             },
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.label_write_note)
         )
 
-        Column(
-            modifier = Modifier.padding(top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Kwota całkowita:",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "60zł",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { /* TODO: Go to summary */ },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(50)
-            ) {
-                Text(text = "Przejdź do podsumowania")
-            }
-        }
+        ButtonComponent(
+            onClick = {
+                navController.navigate(RestaurantRoutes.Summary)
+            },
+            label = stringResource(R.string.label_order_delivery),
+        )
     }
 }
 
 @Composable
-fun DineInContent(
-    onDineInClick: () -> Unit,
+fun TakeawayContent(
+    navController: NavHostController,
+    viewModel: ReservationViewModel,
     modifier: Modifier = Modifier
 ) {
-    var comment by remember { mutableStateOf("") }
-    var seats by remember { mutableIntStateOf(1) }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 16.dp, end = 8.dp, start = 8.dp, bottom = 16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.label_my_basket),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            repeat(2) {
+                OrderCard(
+                    itemName = "Danie1",
+                    itemCount = 1,
+                    itemCost = 30.0,
+                    onIncreaseClick = { /* TODO: Handle increase item count */ },
+                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
+                )
+            }
+        }
+
+        FormInput(
+            inputText = viewModel.note.value,
+            onValueChange = {
+                viewModel.note.value = it
+            },
+            label = stringResource(R.string.label_write_note),
+            isError = false
+        )
+
+        FormInput(
+            inputText = viewModel.promoCode.value,
+            onValueChange = {
+                viewModel.promoCode.value = it
+            },
+            label = stringResource(R.string.label_enter_promo_code),
+            isError = false
+        )
+
+        Row{
+            Text(
+                text = stringResource(R.string.label_total_amount),
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = " ${viewModel.orderCost} zł",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        ButtonComponent(
+            onClick = {
+                navController.navigate(RestaurantRoutes.Summary)
+            },
+            label = stringResource(R.string.label_order_summary)
+        )
+    }
+}
+
+
+@Composable
+fun DineInContent(
+    navController: NavHostController,
+    viewModel: ReservationViewModel,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
     ) {
         Text(
-            text = "Moja rezerwacja",
+            text = stringResource(id = R.string.label_reservation),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
         )
+
+        // Date Picker Dialog
         MyDatePickerDialog(
-            label = { Text("Data rezerwacji") },
+            label = { Text(stringResource(id = R.string.label_reservation_date)) },
             onDateChange = { selectedDate ->
-                // TODO: date change
+                // Handle date change
+                viewModel.visitDate.value = selectedDate
             },
             startDate = LocalDate.now().toString(),
             allowFutureDates = true
         )
 
+        // Number of Guests
         Text(
-            text = "Liczba miejsc",
+            text = stringResource(id = R.string.label_number_of_guests),
             style = MaterialTheme.typography.bodyLarge
         )
         Row(
@@ -298,95 +209,68 @@ fun DineInContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(
-                onClick = { if (seats > 1) seats-- },
+                onClick = { if (viewModel.seats > 1) viewModel.seats-- },
                 color = MaterialTheme.colorScheme.primary,
-                enabled = seats > 1,
+                enabled = viewModel.seats > 1,
                 icon = "-"
             )
             Text(
-                text = seats.toString(),
+                text = viewModel.seats.toString(),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             IconButton(
-                onClick = { if (seats < 10) seats++ },
+                onClick = { if (viewModel.seats < 10) viewModel.seats++ },
                 color = MaterialTheme.colorScheme.primary,
-                enabled = seats < 10,
+                enabled = viewModel.seats < 10,
                 icon = "+"
             )
         }
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* TODO: Handle note change */ },
-            label = { Text(text = "Napisz notatkę do zamówienia...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            shape = RoundedCornerShape(8.dp)
-        )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Order Summary Header
         Text(
-            text = "Mój koszyk",
+            text = stringResource(id = R.string.label_order_summary),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, shape = RoundedCornerShape(8.dp))
-                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                .padding(start = 16.dp, end = 16.dp)
-                .padding(vertical = 8.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Danie1", style = MaterialTheme.typography.bodyLarge)
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "ilość: 1", style = MaterialTheme.typography.bodyLarge)
-                        IconButton(
-                            onClick = { /* TODO: Decrease item count */ },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
-                        }
-                        IconButton(
-                            onClick = { /* TODO: Increase item count */ },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                        }
-                    }
-                }
-                Text(
-                    text = "Kwota: 30zł",
-                    style = MaterialTheme.typography.bodyLarge
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            repeat(2) {
+                OrderCard(
+                    itemName = "Danie1",
+                    itemCount = 1,
+                    itemCost = 30.0,
+                    onIncreaseClick = { /* TODO: Handle increase item count */ },
+                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
                 )
             }
         }
 
-        OutlinedTextField(
-            value = "JSKS6X293",
-            onValueChange = { /* TODO: Change promo code */ },
-            label = {
-                Text(
-                    text = "Wpisz kod promocyjny",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
+        Spacer(modifier = Modifier.height(16.dp))
 
+        // Comment Input
+        FormInput(
+            inputText = viewModel.note.value,
+            onValueChange = {
+                viewModel.note.value = it
+            },
+            label = stringResource(id = R.string.label_write_note),
+            isError = false
         )
 
+        // Promo Code Input
+        FormInput(
+            inputText = viewModel.promoCode.value,
+            onValueChange = { viewModel.promoCode.value = it },
+            label = stringResource(id = R.string.label_enter_promo_code),
+            isError = false
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Total Cost Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -394,24 +278,82 @@ fun DineInContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Kwota całkowita:",
+                text = stringResource(id = R.string.label_total_cost),
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
-                text = "60zł",
+                text = "${viewModel.orderCost} zł", // Example total cost
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        Button(
-            onClick = { /* TODO: Go to summary */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            shape = RoundedCornerShape(50)
-        ) {
-            Text(text = "Przejdź do podsumowania")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Submit Button
+        ButtonComponent(
+            onClick = {
+                navController.navigate(RestaurantRoutes.Summary)
+            },
+            label = stringResource(id = R.string.label_order_summary)
+        )
+    }
+}
+
+@Composable
+fun OrderCard(
+    itemName: String,
+    itemCount: Int,
+    itemCost: Double,
+    onIncreaseClick: () -> Unit,
+    onDecreaseClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
+            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Column {
+            // Row for item details and quantity controls
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = itemName, style = MaterialTheme.typography.bodyLarge)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "${stringResource(R.string.label_quantity)}: $itemCount", style = MaterialTheme.typography.bodyLarge)
+                    IconButton(
+                        onClick = onDecreaseClick,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = stringResource(R.string.label_decrease_quantity)
+                        )
+                    }
+                    IconButton(
+                        onClick = onIncreaseClick,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.label_increase_quantity)
+                        )
+                    }
+                }
+            }
+            // Text for item cost
+            Text(
+                text = "${stringResource(R.string.label_cost)}: ${itemCost}zł",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }

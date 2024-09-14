@@ -57,7 +57,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -75,10 +74,8 @@ import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
-import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
-
 
 
 @Composable
