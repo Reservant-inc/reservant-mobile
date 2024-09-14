@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +24,7 @@ class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
     private val visitsService: IVisitsService = VisitsService(),
     private val deliveryService: IDeliveryService = DeliveryService()
-) : ViewModel() {
+) : ReservantViewModel() {
 
 
     var note: FormField = FormField(OrderDTO::note.name)
