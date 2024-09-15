@@ -172,7 +172,7 @@ fun MapActivity(){
 
             BottomSheetScaffold(
                 scaffoldState = rememberBottomSheetScaffoldState(),
-                sheetPeekHeight = 90.dp,
+                sheetPeekHeight = 60.dp,
                 sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 sheetContent = {
                     Box(
