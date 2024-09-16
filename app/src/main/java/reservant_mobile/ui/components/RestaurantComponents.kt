@@ -39,7 +39,6 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.ui.activities.EventCard
 
 @Composable
 fun RestaurantCard(
