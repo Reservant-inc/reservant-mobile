@@ -22,19 +22,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.ui.viewmodels.ProfileViewModel
-import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,7 +103,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     }
                 }
 
-                profileViewModel.user != null -> {
+                profileViewModel.profileUser != null -> {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -121,10 +119,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             contentScale = ContentScale.Crop
                         )
                         Text(
-                            text = if(profileViewModel.isCurrentUser)
-                                "${profileViewModel.user!!.firstName} ${profileViewModel.user!!.lastName}"
-                            else
-                            "${profileViewModel.profileUser!!.firstName} ${profileViewModel.profileUser!!.lastName}",
+                            text = "${profileViewModel.profileUser!!.firstName} ${profileViewModel.profileUser!!.lastName}",
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         )
@@ -139,14 +134,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 tint = Color.Gray
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            if(profileViewModel.isCurrentUser){
-                                profileViewModel.user!!.birthDate?.let {
-                                    Text(text = it, color = Color.Gray)
-                                }
-                            }else{
-                                profileViewModel.profileUser!!.birthDate?.let {
-                                    Text(text = it, color = Color.Gray)
-                                }
+                            profileViewModel.profileUser!!.birthDate?.let {
+                                Text(text = it, color = Color.Gray)
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
@@ -162,8 +151,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                when {
-                                    profileViewModel.isFriend -> {
+                                when (profileViewModel.profileUser!!.friendStatus) {
+                                    FriendStatus.Friend -> {
                                         Button(
                                             onClick = { profileViewModel.removeFriend() },
                                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
@@ -171,7 +160,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Text(text = stringResource(R.string.label_remove_friend))
                                         }
                                     }
-                                    profileViewModel.isRequestSent -> {
+                                    FriendStatus.OutgoingRequest -> {
                                         Button(
                                             onClick = { profileViewModel.cancelFriendRequest() },
                                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
@@ -179,7 +168,24 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Text(text = stringResource(R.string.label_cancel_request))
                                         }
                                     }
-                                    else -> {
+                                    FriendStatus.IncomingRequest -> {
+                                        Row {
+                                            Button(
+                                                onClick = { /* TODO: Accept friend request */ },
+                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                            ) {
+                                                Text(text = stringResource(R.string.label_accept_request))
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Button(
+                                                onClick = { profileViewModel.cancelFriendRequest() },
+                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                            ) {
+                                                Text(text = stringResource(R.string.label_cancel_request))
+                                            }
+                                        }
+                                    }
+                                    FriendStatus.Stranger -> {
                                         Button(
                                             onClick = { profileViewModel.sendFriendRequest() },
                                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -192,6 +198,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                                             Text(text = stringResource(R.string.label_add_friend))
                                         }
+                                    }
+                                    null -> {
+
                                     }
                                 }
 

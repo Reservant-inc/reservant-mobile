@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.LoggedUserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
+import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IUserService
@@ -28,9 +29,7 @@ class ProfileViewModel(
     var profileUser: UserSummaryDTO? by mutableStateOf(null)
 
     var isLoading: Boolean by mutableStateOf(false)
-    var isCurrentUser: Boolean by mutableStateOf(true)
-    var isFriend: Boolean by mutableStateOf(false)
-    var isRequestSent: Boolean by mutableStateOf(false)
+    var isCurrentUser: Boolean by mutableStateOf(false)
     var friendRequestError: String? by mutableStateOf(null)
 
     private val _friendsFlow = MutableStateFlow<Flow<PagingData<FriendRequestDTO>>?>(null)
@@ -44,7 +43,6 @@ class ProfileViewModel(
                 loadUser(userId = profileUserId)
             }
             if (!isCurrentUser) {
-                checkFriendshipStatus()
                 fetchFriends()
             }
         }
@@ -74,24 +72,6 @@ class ProfileViewModel(
         return true
     }
 
-    private suspend fun checkFriendshipStatus() {
-        val friendsResult = friendsService.getFriends()
-        if (!friendsResult.isError) {
-            friendsResult.value?.collect { pagingData ->
-                isFriend = pagingData.toString().contains(profileUserId)
-            }
-        }
-
-        if (!isFriend) {
-            val outgoingRequestsResult = friendsService.getOutgoingFriendRequests()
-            if (!outgoingRequestsResult.isError) {
-                outgoingRequestsResult.value?.collect { pagingData ->
-                    isRequestSent = pagingData.toString().contains(profileUserId)
-                }
-            }
-        }
-    }
-
     private fun fetchFriends() {
         viewModelScope.launch {
             val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getFriends()
@@ -111,7 +91,7 @@ class ProfileViewModel(
                 if (result.isError) {
                     friendRequestError = "Nie udało się wysłać zaproszenia"
                 } else {
-                    isRequestSent = true
+                    profileUser = profileUser?.copy(friendStatus = FriendStatus.OutgoingRequest)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -126,7 +106,7 @@ class ProfileViewModel(
                 if (result.isError) {
                     friendRequestError = "Nie udało się anulować zaproszenia"
                 } else {
-                    isRequestSent = false
+                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -141,7 +121,7 @@ class ProfileViewModel(
                 if (result.isError) {
                     friendRequestError = "Nie udało się usunąć znajomego"
                 } else {
-                    isFriend = false
+                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
                     friendRequestError = null
                     fetchFriends()
                 }
