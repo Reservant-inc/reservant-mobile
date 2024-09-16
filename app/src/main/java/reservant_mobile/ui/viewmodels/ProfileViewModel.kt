@@ -25,7 +25,7 @@ class ProfileViewModel(
     private val userService: IUserService = UserService(),
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
-) : ViewModel() {
+) : ReservantViewModel() {
     private var user: LoggedUserDTO? by mutableStateOf(null)
     var profileUser: UserSummaryDTO? by mutableStateOf(null)
 
