@@ -25,7 +25,7 @@ class ProfileViewModel(
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
 ) : ViewModel() {
-    var user: LoggedUserDTO? by mutableStateOf(null)
+    private var user: LoggedUserDTO? by mutableStateOf(null)
     var profileUser: UserSummaryDTO? by mutableStateOf(null)
 
     var isLoading: Boolean by mutableStateOf(false)
@@ -128,4 +128,35 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun acceptFriendRequest() {
+        viewModelScope.launch {
+            profileUser?.userId?.let { userId ->
+                val result = friendsService.acceptFriendRequest(userId)
+                if (result.isError) {
+                    friendRequestError = "Nie udało się zaakceptować zaproszenia"
+                } else {
+                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Friend)
+                    friendRequestError = null
+                    fetchFriends()
+                }
+            }
+        }
+    }
+
+    fun rejectFriendRequest() {
+        viewModelScope.launch {
+            profileUser?.userId?.let { userId ->
+                val result = friendsService.deleteFriendOrRequest(userId)
+                if (result.isError) {
+                    friendRequestError = "Nie udało się odrzucić zaproszenia"
+                } else {
+                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    friendRequestError = null
+                    fetchFriends()
+                }
+            }
+        }
+    }
+
 }

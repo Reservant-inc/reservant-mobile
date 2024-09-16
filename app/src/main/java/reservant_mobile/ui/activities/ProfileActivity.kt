@@ -151,7 +151,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                when (profileViewModel.profileUser!!.friendStatus) {
+                                when (profileViewModel.profileUser?.friendStatus) {
                                     FriendStatus.Friend -> {
                                         Button(
                                             onClick = { profileViewModel.removeFriend() },
@@ -171,14 +171,14 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     FriendStatus.IncomingRequest -> {
                                         Row {
                                             Button(
-                                                onClick = { /* TODO: Accept friend request */ },
+                                                onClick = { profileViewModel.acceptFriendRequest() },
                                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                             ) {
                                                 Text(text = stringResource(R.string.label_accept_request))
                                             }
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Button(
-                                                onClick = { profileViewModel.cancelFriendRequest() },
+                                                onClick = { profileViewModel.rejectFriendRequest() },
                                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                                             ) {
                                                 Text(text = stringResource(R.string.label_cancel_request))
@@ -200,7 +200,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         }
                                     }
                                     null -> {
-
+                                        // Handle null case if necessary
                                     }
                                 }
 
