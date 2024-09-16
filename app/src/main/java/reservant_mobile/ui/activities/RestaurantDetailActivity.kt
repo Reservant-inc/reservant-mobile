@@ -68,9 +68,11 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
+import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
@@ -328,136 +330,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
     }
 
 }
-
-
-@Composable
-fun MenuContent(
-    menus: List<RestaurantMenuDTO>,
-    menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (Int) -> Unit,
-    getMenuPhoto: suspend (String) -> Bitmap?
-) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(64.dp))
-
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ) {
-            for (menu in menus) {
-                MenuTypeButton(
-                    menuType = menu.name,
-                    onMenuClick = { menu.menuId?.let { onMenuClick(it) } }
-                )
-            }
-        }
-
-        menuItems?.forEach { menuItem ->
-            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
-            LaunchedEffect(menuItem.photo) {
-                menuItem.photo?.let { photo ->
-                    menuPhoto = getMenuPhoto(photo)
-                }
-            }
-
-            MenuItemCard(
-                menuItem = menuItem,
-                role = Roles.CUSTOMER,
-                photo = menuPhoto,
-                onInfoClick = { /* TODO: Handle info */ },
-                onAddClick = { /* TODO: Handle add */ }
-            )
-        }
-
-    }
-}
-
-@Composable
-fun EventCard(
-    eventName: String,
-    eventDate: String,
-    eventLocation: String,
-    interestedCount: Int,
-    takePartCount: Int
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Box {
-            Column(modifier = Modifier.padding(16.dp)) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .padding(bottom = 16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.restaurant_photo),
-                        contentDescription = "Event Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-
-                Text(
-                    text = eventDate,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = eventName,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(
-                    text = eventLocation,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "$interestedCount - interested")
-                    Text(text = "$takePartCount - take part")
-                }
-            }
-
-        }
-    }
-}
-
-@Composable
-fun EventsContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 80.dp, end = 16.dp, bottom = 16.dp)
-    ) {
-        repeat(3) {
-            EventCard(
-                eventName = "Name of event",
-                eventDate = "Saturday, 2024-06-22",
-                eventLocation = "John's Doe - Warsaw",
-                interestedCount = 20,
-                takePartCount = 45
-            )
-            Modifier.padding(bottom = 16.dp)
-        }
-    }
-}
-
 
 @Composable
 fun ReviewsContent(
