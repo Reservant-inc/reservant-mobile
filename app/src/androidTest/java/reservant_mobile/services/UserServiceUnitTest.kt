@@ -35,9 +35,9 @@ class UserServiceUnitTest: ServiceTest(){
 
     @Test
     fun logout_make_empty_token() = runTest {
-        localBearer.saveBearerToken("test")
+        localBearer.saveData("test")
         userService.logoutUser()
-        val token = localBearer.getBearerToken()
+        val token = localBearer.getData()
         assertThat(token).isEmpty()
     }
 
