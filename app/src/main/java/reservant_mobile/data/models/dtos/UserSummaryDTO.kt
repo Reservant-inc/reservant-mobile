@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import reservant_mobile.data.endpoints.Employments
 
 @Serializable
-class UserSummaryDTO (
+data class UserSummaryDTO (
     val userId: String? = null,
     val login: String? = null,
     val firstName: String? = null,
