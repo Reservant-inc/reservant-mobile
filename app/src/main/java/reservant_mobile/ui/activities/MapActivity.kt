@@ -95,7 +95,7 @@ fun MapActivity(){
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {
-                    if(mapViewModel.isLoading){
+                    if(restaurants.itemCount <= 0){
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -134,7 +134,7 @@ fun MapActivity(){
                     }
                 },
                 stringResource(id = R.string.label_events) to {
-                    if(mapViewModel.isLoading){
+                    if(events.itemCount <= 0){
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
