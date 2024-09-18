@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,7 +54,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -88,6 +92,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 RestaurantDetailViewModel(restaurantId) as T
         }
     )
+    val addedItems = remember { mutableStateListOf<RestaurantMenuItemDTO>() }
+
 
     val navController = rememberNavController()
 
@@ -295,6 +301,10 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                 menuItems = restaurantDetailVM.currentMenu?.menuItems,
                                                 getMenuPhoto = { photoString ->
                                                     restaurantDetailVM.getPhoto(photoString)
+                                                },
+                                                onAddClick = {menuItem ->
+                                                    addedItems.add(menuItem)
+                                                    println("ADDED NEW ITEM: "+ addedItems.size)
                                                 }
                                             )
                                         },
@@ -318,11 +328,28 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                     .padding(16.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
+
                 FloatingActionButton(
                     onClick = { navController.navigate(RestaurantRoutes.Reservation) }
                 ) {
                     Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "ShoppingBag")
                 }
+                Box(
+                    modifier = Modifier
+                        .offset(x = (-20).dp, y = 16.dp)
+                        .size(32.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = addedItems.size.toString(),
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+
             }
 
             var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
@@ -355,7 +382,9 @@ fun MenuContent(
     menus: List<RestaurantMenuDTO>,
     menuItems: List<RestaurantMenuItemDTO>?,
     onMenuClick: (Int) -> Unit,
-    getMenuPhoto: suspend (String) -> Bitmap?
+    getMenuPhoto: suspend (String) -> Bitmap?,
+    onAddClick: (RestaurantMenuItemDTO) -> Unit,
+
 ) {
 
     Column(
@@ -390,7 +419,7 @@ fun MenuContent(
                 role = Roles.CUSTOMER,
                 photo = menuPhoto,
                 onInfoClick = { /* TODO: Handle info */ },
-                onAddClick = { /* TODO: Handle add */ }
+                onAddClick = { onAddClick(menuItem) }
             )
         }
 
