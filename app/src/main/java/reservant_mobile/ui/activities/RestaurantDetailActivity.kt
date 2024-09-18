@@ -68,6 +68,7 @@ import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
 import reservant_mobile.ui.components.MissingPage
@@ -115,35 +116,22 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
                     restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null -> {
                         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            Box {
+                            Box (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                            ){
                                 restaurantDetailVM.restaurant?.let { restaurant ->
 
-                                    var restaurantLogo: Bitmap? by remember { mutableStateOf(null) }
-                                    LaunchedEffect(key1 = Unit) {
-                                        restaurantLogo = restaurant.logo?.let { logo ->
-                                            restaurantDetailVM.getPhoto(
-                                                logo
-                                            )
+                                    LoadedPhotoComponent(
+                                        photoModifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp),
+                                        placeholderModifier = Modifier.align(Alignment.Center)
+                                    ) {
+                                        restaurant.logo?.let { logo ->
+                                            restaurantDetailVM.getPhoto(logo)
                                         }
-                                    }
-                                    if(restaurantLogo != null){
-                                        Image(
-                                            bitmap = restaurantLogo!!.asImageBitmap(),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(200.dp),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    }else{
-                                        Image(
-                                            painter = painterResource(R.drawable.unknown_image),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(200.dp),
-                                            contentScale = ContentScale.Crop
-                                        )
                                     }
 
 
@@ -226,48 +214,70 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 )
 
-                                Text(
-                                    text = stringResource(R.string.label_gallery),
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    modifier = Modifier.padding(16.dp)
-                                )
+                                if(restaurant.photos.size > 1){
+                                    var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
-                                Row(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp)
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    repeat(3) {
-                                        ImageCard(
-                                            painterResource(R.drawable.pizza)
-                                        )
+                                    LaunchedEffect(restaurant.photos) {
+                                        val loadedImages = restaurantDetailVM.getPhotos(restaurant.photos, limit = 5)
+                                        images = loadedImages
                                     }
-                                    Card(
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .clickable { showGallery = true },
-                                        shape = RoundedCornerShape(16.dp),
-                                        elevation = CardDefaults.cardElevation(8.dp)
-                                    ) {
+
+                                    Text(
+                                        text = stringResource(R.string.label_gallery),
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+
+                                    if (restaurantDetailVM.isGalleryLoading){
                                         Box(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .background(Color.Black.copy(alpha = 0.8f))
+                                            modifier = Modifier.fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            Image(
-                                                painter = painterResource(R.drawable.restaurant_photo),
-                                                contentDescription = null,
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentScale = ContentScale.Crop,
-                                                alpha = 0.35f
-                                            )
-                                            Text(
-                                                text = stringResource(R.string.label_more),
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                modifier = Modifier.align(Alignment.Center)
-                                            )
+                                            CircularProgressIndicator()
+                                        }
+                                    }
+                                    else {
+
+                                        Row(
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp)
+                                                .horizontalScroll(rememberScrollState()),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            images.take(4).forEach { img ->
+                                                ImageCard(
+                                                    image = img.asImageBitmap()
+                                                )
+                                            }
+                                            if(images.size > 4) {
+                                                Card(
+                                                    modifier = Modifier
+                                                        .size(100.dp)
+                                                        .clickable { showGallery = true },
+                                                    shape = RoundedCornerShape(16.dp),
+                                                    elevation = CardDefaults.cardElevation(8.dp)
+                                                ) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .background(Color.Black.copy(alpha = 0.8f))
+                                                    ) {
+                                                        Image(
+                                                            bitmap = images.last().asImageBitmap(),
+                                                            contentDescription = null,
+                                                            modifier = Modifier.fillMaxSize(),
+                                                            contentScale = ContentScale.Crop,
+                                                            alpha = 0.35f
+                                                        )
+                                                        Text(
+                                                            text = stringResource(R.string.label_more),
+                                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                            style = MaterialTheme.typography.headlineSmall,
+                                                            modifier = Modifier.align(Alignment.Center)
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -311,12 +321,25 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 FloatingActionButton(
                     onClick = { navController.navigate(RestaurantRoutes.Reservation) }
                 ) {
-                    Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "Plecak")
+                    Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "ShoppingBag")
                 }
             }
 
+            var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
             if (showGallery) {
-                FullscreenGallery(onDismiss = { showGallery = false })
+                if(images.isEmpty()){
+                    LaunchedEffect(restaurantDetailVM.restaurant) {
+                        val loadedImages = restaurantDetailVM.restaurant?.let { it1 ->
+                            restaurantDetailVM.getPhotos(
+                                it1.photos,
+                                withLoading = false
+                            )
+                        }
+                        images = loadedImages.orEmpty()
+                    }
+                }
+                FullscreenGallery(onDismiss = { showGallery = false }, bitmaps = images)
+
             }
         }
         composable<RestaurantRoutes.Reservation>{
