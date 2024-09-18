@@ -101,6 +101,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -745,28 +746,8 @@ fun TagItem(
 
 @Composable
 fun FullscreenGallery(
-    imageList: List<Int> = listOf(
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo
-    ),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    bitmaps: List<Bitmap>
 ) {
 
     Dialog(onDismissRequest = onDismiss) {
@@ -797,30 +778,40 @@ fun FullscreenGallery(
                     }
                 }
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(imageList.size) { index ->
-                        Card(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .aspectRatio(1f),
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(8.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(id = imageList[index]),
-                                contentDescription = "Image $index",
+                if(bitmaps.isNotEmpty()){
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        items(bitmaps.size) { index ->
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Gray),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .padding(4.dp)
+                                    .aspectRatio(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = CardDefaults.cardElevation(8.dp)
+                            ) {
+                                Image(
+                                    bitmap = bitmaps[index].asImageBitmap(),
+                                    contentDescription = "Image $index",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Gray),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
+                    }
+                }
+                else{
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
             }
@@ -1062,6 +1053,24 @@ fun ImageCard(
     ) {
         Image(
             painter = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun ImageCard(
+    image: ImageBitmap
+){
+    Card(
+        modifier = Modifier.size(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Image(
+            bitmap = image,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
