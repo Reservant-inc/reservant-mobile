@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.MoneyDTO
 import kotlin.random.Random
 
@@ -35,9 +36,9 @@ class UserServiceUnitTest: ServiceTest(){
 
     @Test
     fun logout_make_empty_token() = runTest {
-        localBearer.saveData("test")
+        localBearer.saveData(PrefsKeys.BEARER_TOKEN, "test")
         userService.logoutUser()
-        val token = localBearer.getData()
+        val token = localBearer.getData(PrefsKeys.BEARER_TOKEN)
         assertThat(token).isEmpty()
     }
 
