@@ -336,7 +336,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 }
                 Box(
                     modifier = Modifier
-                        .offset(x = (-20).dp, y = 16.dp)
+                        .offset(x = 10.dp, y = (-35).dp)
                         .size(32.dp)
                         .background(MaterialTheme.colorScheme.primary, CircleShape),
                     contentAlignment = Alignment.Center
