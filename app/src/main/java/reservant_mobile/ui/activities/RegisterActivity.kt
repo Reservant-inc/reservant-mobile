@@ -43,7 +43,7 @@ import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.LogoWithReturn
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.ShowErrorToast
-import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.viewmodels.RegisterViewModel
 
 @Composable
@@ -233,7 +233,7 @@ fun RegisterActivity(navController: NavHostController) {
                         formSent = true
 
                         if (registerViewModel.register()){
-                            navController.navigate(MainRoutes.Home)
+                            navController.navigate(AuthRoutes.Login)
                         }
 
                         isLoading = false
