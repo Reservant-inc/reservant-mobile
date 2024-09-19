@@ -18,6 +18,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,8 +32,7 @@ import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
-import reservant_mobile.data.services.FileService
+import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.services.RestaurantService
 
 class MapViewModel : ReservantViewModel() {
@@ -41,13 +41,13 @@ class MapViewModel : ReservantViewModel() {
     }
 
     private val restaurantService = RestaurantService()
-    private val _restaurantsState = MutableStateFlow<PagingData<RestaurantDTO>>(PagingData.empty())
+    private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
     private var _addedRestaurants = ArrayList<Int>()
-    val restaurants: StateFlow<PagingData<RestaurantDTO>> = _restaurantsState.asStateFlow()
+    val restaurants: StateFlow<PagingData<RestaurantOnMap>> = _restaurantsState.asStateFlow()
     val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
-    lateinit var poiMarkers:RadiusMarkerClusterer
+    private lateinit var poiMarkers:RadiusMarkerClusterer
 
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
@@ -99,7 +99,6 @@ class MapViewModel : ReservantViewModel() {
     fun getRestaurantsInArea(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
-                isLoading = true
                 val res = restaurantService.getRestaurants(
                     origLat = userLocation.latitude,
                     origLon = userLocation.longitude
@@ -107,29 +106,37 @@ class MapViewModel : ReservantViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
-                    _restaurantsState.value = pagingData
-                    isLoading = false
+                res.value.collectLatest { pagingData ->
+
+                    _restaurantsState.value = pagingData.map { dto ->
+
+                        RestaurantOnMap(
+                            restaurantId = dto.restaurantId,
+                            name = dto.name,
+                            address = dto.address,
+                            city = dto.city,
+                            logo = getPhoto(dto.logo!!),
+                            location = dto.location
+                        )
+                    }
                 }
 
             } catch (e: Exception) {
                 Log.d("[RESTAURANT]:", e.toString())
-
             }
         }
+
     }
 
     fun getEvents() {
         viewModelScope.launch {
             try {
-                isLoading = true
                 val res = restaurantService.getRestaurantEvents(1)
                 if(res.isError || res.value == null)
                     throw Exception()
 
                 res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
                     _eventsState.value = pagingData
-                    isLoading = false
                 }
 
             } catch (e: Exception) {
@@ -139,7 +146,8 @@ class MapViewModel : ReservantViewModel() {
         }
     }
 
-    fun addRestaurantMarker(restaurant:RestaurantDTO, onClick: (Marker, MapView) -> Boolean) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    fun addRestaurantMarker(restaurant:RestaurantOnMap, onClick: (Marker, MapView) -> Boolean) {
         if(_addedRestaurants.contains(restaurant.restaurantId))
             return
 
@@ -151,7 +159,7 @@ class MapViewModel : ReservantViewModel() {
                 restaurantMarker.position = position
                 restaurantMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
-                val icon: Bitmap? = FileService().getImage(restaurant.logo!!).value
+                val icon: Bitmap? = restaurant.logo
 
                 restaurantMarker.icon = if(icon!= null)
                     getMarkerDrawable(icon)
@@ -168,6 +176,14 @@ class MapViewModel : ReservantViewModel() {
                 Log.d("[MAP MARKER]:", e.toString())
             }
         }
+    }
+
+    private suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            return  result.value!!
+        }
+        return null
     }
 
     private fun getMarkerDrawable(icon: Bitmap): Drawable{
@@ -226,3 +242,12 @@ class CustomMarker(mapView: MapView) : Marker(mapView) {
         )
     }
 }
+
+data class RestaurantOnMap(
+    val restaurantId: Int = Int.MIN_VALUE,
+    val name: String,
+    val address: String,
+    val city: String,
+    val logo: Bitmap?,
+    val location: LocationDTO?
+    )

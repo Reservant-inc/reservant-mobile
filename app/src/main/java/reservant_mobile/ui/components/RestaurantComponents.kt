@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +31,8 @@ fun RestaurantCard(
     onClick: () -> Unit,
     name: String,
     location: String,
-    city: String
+    city: String,
+    image: ImageBitmap?
 ) {
     Card(
         modifier = Modifier
@@ -48,15 +50,29 @@ fun RestaurantCard(
                 .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            )
+            if(image != null){
+                Image(
+                    bitmap = image,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(100.dp),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                )
+            }
+            else {
+                Image(
+                    painter = painterResource(R.drawable.restaurant_template_icon),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(100.dp),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .padding(16.dp)
