@@ -14,14 +14,13 @@ data class NotificationDTO (
      */
     val dateRead: String? = null,
     val notificationType: NotificationType? = null,
-    val details: String? = null
+    val photo: String? = null,
+    val details: Map<String, String>? = null
 ){
     @Serializable
     enum class NotificationType{
-        UserInterestedInYourEvent,
-        AcceptedToEvent,
-        RejectedFromEvent,
-        RestaurantVerified,
-        NewRestaurantReview
+        NotificationRestaurantVerified,
+        NotificationNewRestaurantReview,
+        NotificationNewFriendRequest
     }
 }
