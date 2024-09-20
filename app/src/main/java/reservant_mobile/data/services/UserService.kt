@@ -100,6 +100,11 @@ class UserService(): ServiceUtil(), IUserService {
     }
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
+        val fcmToken = localDataService.getData(PrefsKeys.FCM_TOKEN)
+        if(fcmToken.isNotEmpty()){
+            println("FCM TOKEN: $fcmToken")
+        }
+
         //return errors in toast when connection error
         val res = api.post(Auth.Login(), credentials)
         if(res.isError)
