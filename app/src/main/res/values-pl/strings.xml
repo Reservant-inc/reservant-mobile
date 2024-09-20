@@ -214,4 +214,5 @@
     <string name="error_generic">Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.</string>
     <string name="label_edit_review">Edytuj opinię</string>
     <string name="label_delete_review">Usuń opinię</string>
+    <string name="message_notification_not_granted">Aplikacja nie będzie otrzymywała powiadomień</string>
 </resources>

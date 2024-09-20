@@ -219,4 +219,5 @@
     <string name="error_generic">An unexpected error occurred. Please try again later.</string>
     <string name="label_edit_review">Edit Review</string>
     <string name="label_delete_review">Delete Review</string>
+    <string name="message_notification_not_granted">The application will not receive notifications</string>
 </resources>
