@@ -1,6 +1,6 @@
 package reservant_mobile.services
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,6 +33,7 @@ class EventServiceUnitTest: ServiceTest() {
         event = EventDTO(
             description = "string",
             time = eventTimeString,
+            maxPeople = 10,
             mustJoinUntil = mustJoinUntilTimeString,
             restaurantId = 1
         )
@@ -40,26 +41,36 @@ class EventServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_events_return_not_null()= runTest{
-        Truth.assertThat(ser.getEvent(1).value).isNotNull()
+        assertThat(ser.getEvent(1).value).isNotNull()
     }
 
 
     @Test
     fun add_and_delete_event()= runTest{
         val e = ser.addEvent(event).value
-        Truth.assertThat(e).isNotNull()
-        Truth.assertThat(ser.deleteEvent(e!!.eventId!!).value).isTrue()
+        assertThat(e).isNotNull()
+        assertThat(ser.deleteEvent(e!!.eventId!!).value).isTrue()
     }
 
     @Test
     fun update_event_return_not_null()= runTest{
         val e = ser.updateEvent(1,event).value
-        Truth.assertThat(e).isNotNull()
+        assertThat(e).isNotNull()
     }
 
     @Test
     fun add_and_delete_event_interest()= runTest{
-        Truth.assertThat(ser.markEventAsInterested(1).value).isTrue()
-        Truth.assertThat(ser.markEventAsNotInterested(1).value).isTrue()
+        assertThat(ser.markEventAsInterested(1).value).isTrue()
+        assertThat(ser.markEventAsNotInterested(1).value).isTrue()
+    }
+
+    @Test
+    fun accept_user_return_true()= runTest{
+        assertThat(ser.acceptUser(1, "test").value).isTrue()
+    }
+
+    @Test
+    fun reject_user_return_true()= runTest{
+        assertThat(ser.rejectUser(1, "test").value).isTrue()
     }
 }
