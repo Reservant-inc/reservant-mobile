@@ -53,6 +53,7 @@ import androidx.navigation.toRoute
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.ImageCard
@@ -79,12 +80,17 @@ fun MapActivity(){
             var showRestaurantId by remember { mutableIntStateOf(0) }
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
             val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
+            var mv:MapView? by remember { mutableStateOf(null) }
 
+
+            val startPoint = GeoPoint(52.237049, 21.017532)
 
             // Init map
-            val context = LocalContext.current
-            val startPoint = GeoPoint(52.237049, 21.017532)
-            val mv = mapViewModel.initMapView(context, startPoint)
+            if(mv == null){
+                val context = LocalContext.current
+                mv = mapViewModel.initMapView(context, startPoint)
+            }
+
 
             if (showRestaurantBottomSheet) {
                 RestaurantDetailPreview(navController, showRestaurantId) {

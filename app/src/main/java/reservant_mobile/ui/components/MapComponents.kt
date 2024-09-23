@@ -38,19 +38,21 @@ fun rememberMapViewWithLifecycle(mapView: MapView): MapView {
 
 @Composable
 fun OsmMapView(
-    mapView: MapView,
+    mapView: MapView?,
     startPoint: GeoPoint,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
 
-    val geoPoint by remember { mutableStateOf(startPoint) }
-    val mapViewState = rememberMapViewWithLifecycle(mapView)
+    if(mapView!= null){
+        val geoPoint by remember { mutableStateOf(startPoint) }
+        val mapViewState = rememberMapViewWithLifecycle(mapView)
 
-    AndroidView(
-        modifier = modifier,
-        factory = { mapViewState },
-        update = { view ->
-            view.controller.setCenter(geoPoint)
-        }
-    )
+        AndroidView(
+            modifier = modifier,
+            factory = { mapViewState },
+            update = { view ->
+                view.controller.setCenter(geoPoint)
+            }
+        )
+    }
 }
