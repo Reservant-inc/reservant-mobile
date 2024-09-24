@@ -14,7 +14,6 @@ import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IThreadsService
-import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.ThreadsService
 import reservant_mobile.data.services.UserService
 

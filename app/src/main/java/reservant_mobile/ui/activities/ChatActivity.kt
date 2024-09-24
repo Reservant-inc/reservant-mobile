@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import android.text.format.DateUtils.formatDateTime
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
