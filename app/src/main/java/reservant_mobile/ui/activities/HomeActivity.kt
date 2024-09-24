@@ -86,8 +86,9 @@ fun HomeActivity() {
                 composable<UserRoutes.ChatList> {
                     ChatListActivity(navController = innerNavController)
                 }
+                // TODO: change hardcoded id - now its 'customer'
                 composable<MainRoutes.UserProfile>{
-                    ProfileActivity(navController = innerNavController)
+                    ProfileActivity(navController = innerNavController, "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29")
                 }
                 composable<RestaurantRoutes.Ticket>{
                     NewTicketActivity()

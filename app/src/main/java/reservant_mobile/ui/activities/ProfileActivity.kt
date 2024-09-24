@@ -22,21 +22,28 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileActivity(navController: NavHostController) {
-    val profileViewModel = viewModel<ProfileViewModel>()
+fun ProfileActivity(navController: NavHostController, userId: String) {
+
+    val profileViewModel = viewModel<ProfileViewModel>(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                ProfileViewModel(profileUserId = userId) as T
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -95,7 +102,8 @@ fun ProfileActivity(navController: NavHostController) {
                         CircularProgressIndicator()
                     }
                 }
-                profileViewModel.user != null -> {
+
+                profileViewModel.profileUser != null -> {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -111,7 +119,7 @@ fun ProfileActivity(navController: NavHostController) {
                             contentScale = ContentScale.Crop
                         )
                         Text(
-                            text = "${profileViewModel.user!!.firstName} ${profileViewModel.user!!.lastName}",
+                            text = "${profileViewModel.profileUser!!.firstName} ${profileViewModel.profileUser!!.lastName}",
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         )
@@ -126,7 +134,7 @@ fun ProfileActivity(navController: NavHostController) {
                                 tint = Color.Gray
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            profileViewModel.user!!.birthDate?.let {
+                            profileViewModel.profileUser!!.birthDate?.let {
                                 Text(text = it, color = Color.Gray)
                             }
                             Spacer(modifier = Modifier.width(16.dp))
@@ -143,21 +151,66 @@ fun ProfileActivity(navController: NavHostController) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Button(
-                                    onClick = { /* TODO: Dodaj znajomego */ },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Add,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(ButtonDefaults.IconSize)
-                                    )
-                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                    Text(text = stringResource(R.string.label_add_friend))
+                                when (profileViewModel.profileUser?.friendStatus) {
+                                    FriendStatus.Friend -> {
+                                        Button(
+                                            onClick = { profileViewModel.removeFriend() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_remove_friend))
+                                        }
+                                    }
+                                    FriendStatus.OutgoingRequest -> {
+                                        Button(
+                                            onClick = { profileViewModel.cancelFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_cancel_request))
+                                        }
+                                    }
+                                    FriendStatus.IncomingRequest -> {
+                                        Row {
+                                            Button(
+                                                onClick = { profileViewModel.acceptFriendRequest() },
+                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                            ) {
+                                                Text(text = stringResource(R.string.label_accept_request))
+                                            }
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Button(
+                                                onClick = { profileViewModel.rejectFriendRequest() },
+                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                            ) {
+                                                Text(text = stringResource(R.string.label_cancel_request))
+                                            }
+                                        }
+                                    }
+                                    FriendStatus.Stranger -> {
+                                        Button(
+                                            onClick = { profileViewModel.sendFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Add,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(ButtonDefaults.IconSize)
+                                            )
+                                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                            Text(text = stringResource(R.string.label_add_friend))
+                                        }
+                                    }
+                                    null -> {
+                                        // Handle null case if necessary
+                                    }
                                 }
+
+                                profileViewModel.friendRequestError?.let { error ->
+                                    Text(text = error, color = MaterialTheme.colorScheme.error)
+                                }
+
                                 Button(
                                     onClick = { /* TODO: Wyślij wiadomość */ },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary), // which color??
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                                 ) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.Send,
@@ -179,7 +232,7 @@ fun ProfileActivity(navController: NavHostController) {
                             .padding(start = 16.dp, end = 16.dp),
                         placeholder = {
                             Text(
-                                stringResource(R.string.label_search)+"..."
+                                stringResource(R.string.label_search)
                             )
                         },
                         trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
