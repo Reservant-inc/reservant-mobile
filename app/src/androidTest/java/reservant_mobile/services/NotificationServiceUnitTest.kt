@@ -19,7 +19,7 @@ class NotificationServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_notifications_return_pagination()= runTest{
-        val items = ser.getNotifications().value
+        val items = ser.getNotifications(unreadOnly = false).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
