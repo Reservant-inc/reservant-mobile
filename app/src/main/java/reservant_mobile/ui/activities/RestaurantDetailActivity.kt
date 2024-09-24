@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.StarHalf
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -46,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -69,9 +72,11 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
+import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
@@ -301,10 +306,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                 menuItems = restaurantDetailVM.currentMenu?.menuItems,
                                                 getMenuPhoto = { photoString ->
                                                     restaurantDetailVM.getPhoto(photoString)
-                                                },
-                                                onAddClick = {menuItem ->
-                                                    addedItems.add(menuItem)
-                                                    println("ADDED NEW ITEM: "+ addedItems.size)
                                                 }
                                             )
                                         },
@@ -374,83 +375,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
         }
     }
 
-}
-
-
-@Composable
-fun MenuContent(
-    menus: List<RestaurantMenuDTO>,
-    menuItems: List<RestaurantMenuItemDTO>?,
-    onMenuClick: (Int) -> Unit,
-    getMenuPhoto: suspend (String) -> Bitmap?,
-    onAddClick: (RestaurantMenuItemDTO) -> Unit,
-
-) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(64.dp))
-
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ) {
-            for (menu in menus) {
-                MenuTypeButton(
-                    menuType = menu.name,
-                    onMenuClick = { menu.menuId?.let { onMenuClick(it) } }
-                )
-            }
-        }
-
-        menuItems?.forEach { menuItem ->
-            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
-            LaunchedEffect(menuItem.photo) {
-                menuItem.photo?.let { photo ->
-                    menuPhoto = getMenuPhoto(photo)
-                }
-            }
-
-            MenuItemCard(
-                menuItem = menuItem,
-                role = Roles.CUSTOMER,
-                photo = menuPhoto,
-                onInfoClick = { /* TODO: Handle info */ },
-                onAddClick = { onAddClick(menuItem) }
-            )
-        }
-
-    }
-}
-
-// TODO: EventDTO
-@Composable
-fun EventsContent(
-//    events: List<EventDTO>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(64.dp))
-        repeat(3){
-            Text("Event name", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Event details")
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-//        events.forEach { event ->
-//            Text(event.name, style = MaterialTheme.typography.headlineSmall)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(event.details)
-//            Spacer(modifier = Modifier.height(16.dp))
-//        }
-    }
 }
 
 @Composable
