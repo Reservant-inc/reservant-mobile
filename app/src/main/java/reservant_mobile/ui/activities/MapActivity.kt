@@ -16,16 +16,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -154,7 +159,36 @@ fun MapActivity(){
                                 mapViewModel.getEvents()
                             }
                         }
-                        else
+                        else{
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextField(
+                                    value = "",
+                                    onValueChange = {},
+                                    placeholder = { Text(stringResource(id = R.string.label_search_events)) },
+                                    leadingIcon = {
+                                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                IconButton(
+                                    onClick = {
+                                    //TODO: add on click logic
+                                    }
+                                ) {
+                                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter Icon")
+                                }
+                            }
+
                             LazyColumn(
                                 Modifier
                                     .fillMaxWidth()
@@ -164,16 +198,12 @@ fun MapActivity(){
                             ) {
                                 items(events.itemCount) { index ->
                                     val item = events[index]
-                                    if(item != null)
-                                        /*RestaurantCard(
-                                            onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                            name = item.restaurantName!!,
-                                            location = item.description,
-                                            city = item.mustJoinUntil
-                                        )*/
-                                        Text(text = item.description)
+                                    if(item != null){
+//                                        EventCard(event = item)
+                                    }
                                 }
                             }
+                        }
                     }
                 }
             )
