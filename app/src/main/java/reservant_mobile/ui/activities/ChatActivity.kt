@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionItemInfoCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -97,53 +99,68 @@ fun ChatActivity(navController: NavHostController, userName: String) {
         Column(modifier = Modifier.padding(it)) {
             val lazyPagingItems = messagesFlow.value?.collectAsLazyPagingItems()
 
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(16.dp),
-                reverseLayout = true // Display the latest messages at the bottom
-            ) {
-                lazyPagingItems?.let { pagingItems ->
-                    items(count = pagingItems.itemCount) { index ->
-                        val message = pagingItems[index]
-                        message?.let {
-                            val sender = participantsMap[message.authorId]
-                            val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
+            if (chatViewModel.isLoading){
+                Box (
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ){
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(16.dp)
+                    )
+                }
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
-                            ) {
-                                Column(
-                                    horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
-                                    modifier = Modifier.widthIn(max = 300.dp)
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(16.dp),
+                    reverseLayout = true // Display the latest messages at the bottom
+                ) {
+                    lazyPagingItems?.let { pagingItems ->
+                        items(count = pagingItems.itemCount) { index ->
+                            val message = pagingItems[index]
+                            message?.let {
+                                val sender = participantsMap[message.authorId]
+                                val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
                                 ) {
-                                    Text(
-                                        text = message.contents,
-                                        modifier = Modifier
-                                            .background(
-                                                if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                                                shape = CircleShape
-                                            )
-                                            .padding(8.dp),
-                                        color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    message.dateSent?.let { date ->
-                                        val formattedDate = formatDateTime(date, "dd.MM.yyyy")
-                                        val formattedTime = formatDateTime(date, "HH:mm:ss")
+                                    Column(
+                                        horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
+                                        modifier = Modifier.widthIn(max = 300.dp)
+                                    ) {
                                         Text(
-                                            text = "$formattedDate $formattedTime",
+                                            text = message.contents,
+                                            modifier = Modifier
+                                                .background(
+                                                    if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                                                    shape = CircleShape
+                                                )
+                                                .padding(8.dp),
+                                            color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
+                                        message.dateSent?.let { date ->
+                                            val formattedDate = formatDateTime(date, "dd.MM.yyyy")
+                                            val formattedTime = formatDateTime(date, "HH:mm:ss")
+                                            Text(
+                                                text = "$formattedDate $formattedTime",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -175,7 +192,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                             currentMessage = TextFieldValue()
                         }
                     },
-                    enabled = lazyPagingItems != null // Disable button when chat is not loaded
+                    enabled = lazyPagingItems != null && !chatViewModel.isLoading // Disable button when chat is not loaded
                 ) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                 }

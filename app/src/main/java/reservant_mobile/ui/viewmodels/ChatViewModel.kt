@@ -32,6 +32,8 @@ class ChatViewModel(
     private val _participantsMap = mutableMapOf<String, UserDTO>()
     val participantsMap: Map<String, UserDTO> get() = _participantsMap
 
+    var isLoading: Boolean = true
+
     init {
         fetchThread()
     }
@@ -61,6 +63,8 @@ class ChatViewModel(
     private fun fetchMessages() {
         viewModelScope.launch {
             val result: Result<Flow<PagingData<MessageDTO>>?> = threadsService.getMessages(threadId)
+
+            isLoading = false
 
             if (!result.isError) {
                 _messagesFlow.value = result.value?.cachedIn(viewModelScope)
