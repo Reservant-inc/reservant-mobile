@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,7 +70,7 @@ fun LoginActivity(navController: NavHostController) {
                     formSent = false
                 },
                 label = stringResource(R.string.label_login),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 isError = loginViewModel.result.isError && formSent,
                 formSent = formSent
             )
@@ -116,7 +117,7 @@ fun LoginActivity(navController: NavHostController) {
                         else{
                             navController.navigate(MainRoutes.Home)
                         }
-                    }
+                    } 
 
                     isLoading = false
 

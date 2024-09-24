@@ -344,10 +344,17 @@ fun ReturnButton(
 
 @Composable
 fun ShowErrorToast(context: Context, id: Int) {
+
+    fun showToast(context: Context, msg: String){
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+
     if (id != -1) {
         val msg = stringResource(id)
-        println("[TOAST] '$msg'")
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        LaunchedEffect(key1 = id) {
+            println("[TOAST] '$msg'")
+            showToast(context, msg)
+        }
     }
 }
 

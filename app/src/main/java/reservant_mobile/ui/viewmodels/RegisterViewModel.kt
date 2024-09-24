@@ -36,6 +36,8 @@ class RegisterViewModel(
     val countriesList = getCountriesList()
     var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
+    private var phoneNumberWithCountryCode: String = "+${mobileCountry!!.code}${phoneNum.value}"
+
     var isLoginUnique by mutableStateOf(true)
     
     suspend fun register() : Boolean{
@@ -53,7 +55,7 @@ class RegisterViewModel(
             password = password.value
         )
 
-        if (!isPhoneInvalid()) user.phoneNumber = phoneNum.value
+        if (!isPhoneInvalid()) user.phoneNumber = phoneNumberWithCountryCode
 
         result = userService.registerUser(user)
         return result.value
@@ -68,6 +70,7 @@ class RegisterViewModel(
                 isFirstNameInvalid() ||
                 isLastNameInvalid()  ||
                 isBirthDateInvalid()  ||
+                isPhoneInvalid() ||
                 isEmailInvalid()    ||
                 isPasswordInvalid() ||
                 isConfirmPasswordDiff()
@@ -100,7 +103,8 @@ class RegisterViewModel(
     }
 
     fun isPhoneInvalid() : Boolean{
-        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum.value) ||
+        phoneNumberWithCountryCode = "+${mobileCountry?.code}${phoneNum.value}"
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNumberWithCountryCode) ||
                 getFieldError(result, phoneNum.name) != -1
     }
 
