@@ -85,7 +85,8 @@ fun RegisterActivity(navController: NavHostController) {
                     else
                         R.string.error_login_invalid
                 ),
-                formSent = formSent
+                formSent = formSent,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             FormInput(
@@ -99,7 +100,8 @@ fun RegisterActivity(navController: NavHostController) {
                     else
                         R.string.error_register_invalid_name
                 ),
-                formSent = formSent
+                formSent = formSent,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             FormInput(
@@ -113,7 +115,8 @@ fun RegisterActivity(navController: NavHostController) {
                     else
                         R.string.error_register_invalid_lastname
                 ),
-                formSent = formSent
+                formSent = formSent,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             MyDatePickerDialog(onDateChange = { birthday -> registerViewModel.birthday.value = birthday })
@@ -123,7 +126,7 @@ fun RegisterActivity(navController: NavHostController) {
                 onValueChange = { registerViewModel.email.value = it },
                 label = stringResource(R.string.label_email),
                 isError = registerViewModel.isEmailInvalid(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 errorText = stringResource(
                     if (registerViewModel.getEmailError() != -1)
                         registerViewModel.getEmailError()
@@ -148,7 +151,7 @@ fun RegisterActivity(navController: NavHostController) {
                         )
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
                 isError = registerViewModel.isPhoneInvalid(),
                 errorText = stringResource(
                     if (registerViewModel.getPhoneError() != -1)
@@ -182,7 +185,7 @@ fun RegisterActivity(navController: NavHostController) {
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                 isError = registerViewModel.isPasswordInvalid(),
                 errorText = stringResource(
                     if (registerViewModel.getPasswordError() != -1)
