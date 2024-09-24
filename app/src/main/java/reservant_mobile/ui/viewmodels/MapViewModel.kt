@@ -31,7 +31,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.services.RestaurantService
 
@@ -42,10 +41,10 @@ class MapViewModel : ReservantViewModel() {
 
     private val restaurantService = RestaurantService()
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
-    private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
+    private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
     private var _addedRestaurants = ArrayList<Int>()
     val restaurants: StateFlow<PagingData<RestaurantOnMap>> = _restaurantsState.asStateFlow()
-    val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
+    val events: StateFlow<PagingData<EventOnMap>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
     private lateinit var poiMarkers:RadiusMarkerClusterer
 
@@ -136,7 +135,10 @@ class MapViewModel : ReservantViewModel() {
                     throw Exception()
 
                 res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
-                    _eventsState.value = pagingData
+                    _eventsState.value = pagingData.map { dto ->
+                        EventOnMap()
+
+                    }
                 }
 
             } catch (e: Exception) {
@@ -251,3 +253,17 @@ data class RestaurantOnMap(
     val logo: Bitmap?,
     val location: LocationDTO?
     )
+
+data class EventOnMap(
+    val eventId: Int? = null,
+    val createdAt: String? = null,
+    val description: String? = null,
+    val time: String? = null,
+    val mustJoinUntil: String? = null,
+    val creatorId: String? = null,
+    val creatorFullName: String? = null,
+    val restaurantId: Int? = null,
+    val restaurantName:String? = null,
+    val visitId: Int? = null,
+    val image:Bitmap? = null
+)
