@@ -4,9 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.reservant_mobile.R
+import reservant_mobile.ui.navigation.EmployeeRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 
@@ -42,6 +44,13 @@ sealed class BottomNavItem(
             MainRoutes.Profile,
             Icons.Filled.Settings,
             R.string.label_settings
+        )
+
+    data object Employee :
+        BottomNavItem(
+            EmployeeRoutes.Home,
+            Icons.Filled.RestaurantMenu,
+            R.string.label_employee
         )
 
 }

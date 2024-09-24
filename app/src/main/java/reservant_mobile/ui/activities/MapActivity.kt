@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -94,7 +95,7 @@ fun MapActivity(){
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {
-                    if(mapViewModel.isLoading){
+                    if(restaurants.itemCount <= 0){
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -117,7 +118,8 @@ fun MapActivity(){
                                         onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
                                         name = item.name,
                                         location = item.address,
-                                        city = item.city
+                                        city = item.city,
+                                        image = item.logo?.asImageBitmap()
                                     )
                                         mapViewModel.addRestaurantMarker(item) { _, _ ->
                                             showRestaurantId = item.restaurantId
@@ -132,7 +134,7 @@ fun MapActivity(){
                     }
                 },
                 stringResource(id = R.string.label_events) to {
-                    if(mapViewModel.isLoading){
+                    if(events.itemCount <= 0){
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -143,7 +145,6 @@ fun MapActivity(){
                     else {
                         if (events.itemCount < 1){
                             LaunchedEffect(key1 = true) {
-                                println("TEST")
                                 mapViewModel.getEvents()
                             }
                         }
@@ -158,12 +159,13 @@ fun MapActivity(){
                                 items(events.itemCount) { index ->
                                     val item = events[index]
                                     if(item != null)
-                                        RestaurantCard(
+                                        /*RestaurantCard(
                                             onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
                                             name = item.restaurantName!!,
                                             location = item.description,
                                             city = item.mustJoinUntil
-                                        )
+                                        )*/
+                                        Text(text = item.description)
                                 }
                             }
                     }
@@ -249,16 +251,35 @@ fun RestaurantDetailPreview(
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         restaurantDetailVM.restaurant?.let { restaurant ->
 
-                            Row(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .horizontalScroll(rememberScrollState()),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                repeat(5) {
-                                    ImageCard(
-                                        painterResource(R.drawable.pizza)
-                                    )
+                            if(restaurant.photos.size > 1){
+                                var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
+
+                                LaunchedEffect(restaurant.photos) {
+                                    val loadedImages = restaurantDetailVM.getPhotos(restaurant.photos, limit = 6)
+                                    images = loadedImages
+                                }
+
+                                if (restaurantDetailVM.isGalleryLoading){
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                                else {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .horizontalScroll(rememberScrollState()),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        images.forEach { img ->
+                                            ImageCard(
+                                                image = img.asImageBitmap()
+                                            )
+                                        }
+                                    }
                                 }
                             }
 
@@ -316,7 +337,6 @@ fun RestaurantDetailPreview(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text("3.9 (200+ opinii)")
                                 }
-
                             }
 
                             ButtonComponent(

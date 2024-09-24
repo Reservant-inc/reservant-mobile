@@ -7,4 +7,7 @@ class Users(val name: String? = null, val filter: String? = null, val page: Int?
 
     @Resource("{employeeId}")
     class Id(val parent: Users = Users(), val employeeId: String)
+
+    @Resource("{userId}")
+    class UserId(val parent: Users = Users(), val userId: String)
 }

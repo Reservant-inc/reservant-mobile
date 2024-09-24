@@ -6,24 +6,24 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.firstOrNull
 import reservant_mobile.ApplicationService
+import reservant_mobile.data.constants.PrefsKeys
 
 
-class LocalBearerService{
+class LocalDataService{
 
     companion object {
         private val context  = ApplicationService.instance
         private val Context.dataStore by preferencesDataStore(context.packageName)
-        private val bearerTokenKey = stringPreferencesKey("bearer_token")
     }
 
-        suspend fun saveBearerToken(bearerToken: String) {
+    suspend fun saveData(key: PrefsKeys, data: String) {
         context.dataStore.edit {
-            it[bearerTokenKey] = bearerToken
+            it[stringPreferencesKey(key.keyName)] = data
         }
     }
 
-    suspend fun getBearerToken(): String {
-            return context.dataStore.data.firstOrNull()?.get(bearerTokenKey).orEmpty()
+    suspend fun getData(key: PrefsKeys): String {
+            return context.dataStore.data.firstOrNull()?.get(stringPreferencesKey(key.keyName)).orEmpty()
     }
 
 }

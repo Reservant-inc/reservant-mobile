@@ -15,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
@@ -37,12 +40,20 @@ fun HomeActivity() {
         mutableStateOf(isSystemInDarkMode)
     }
 
+    val items = listOfNotNull(
+        BottomNavItem.Home,
+        BottomNavItem.Landing,
+        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
+        BottomNavItem.Profile
+    )
+
     AppTheme (darkTheme = darkTheme) {
         Scaffold(
             bottomBar = {
                  BottomNavigation(
                      navController =  innerNavController,
-                     bottomBarState = bottomBarState
+                     bottomBarState = bottomBarState,
+                     items = items
                  )
             }
         ){
@@ -75,8 +86,9 @@ fun HomeActivity() {
                 composable<UserRoutes.ChatList> {
                     ChatListActivity(navController = innerNavController)
                 }
+                // TODO: change hardcoded id - now its 'customer'
                 composable<MainRoutes.UserProfile>{
-                    ProfileActivity(navController = innerNavController)
+                    ProfileActivity(navController = innerNavController, "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29")
                 }
                 composable<RestaurantRoutes.Ticket>{
                     NewTicketActivity()

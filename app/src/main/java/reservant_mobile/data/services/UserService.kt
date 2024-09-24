@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
@@ -20,6 +21,7 @@ import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.UserDTO
+import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.utils.GetUsersFilter
@@ -49,12 +51,13 @@ interface IUserService{
     suspend fun getWalletBalance(): Result<Double?>
     suspend fun getWalletHistory(): Result<Flow<PagingData<MoneyDTO>>?>
     suspend fun getUser(): Result<LoggedUserDTO?>
+    suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?>
 
 }
 
 @OptIn(InternalSerializationApi::class)
 class UserService(): ServiceUtil(), IUserService {
-    private val localBearer = LocalBearerService()
+    private val localDataService = LocalDataService()
     object UserObject {
         lateinit var userId: String
         lateinit var login: String
@@ -76,7 +79,7 @@ class UserService(): ServiceUtil(), IUserService {
         UserObject.firstName = u.firstName
         UserObject.lastName = u.lastName
         UserObject.roles = u.roles!!
-        localBearer.saveBearerToken(u.token!!)
+        localDataService.saveData(PrefsKeys.BEARER_TOKEN, u.token!!)
     }
 
 
@@ -255,4 +258,21 @@ class UserService(): ServiceUtil(), IUserService {
         }
         return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
+
+    override suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?> {
+        val res = api.get(Users.UserId(userId = userId.toString()))
+
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                Result(isError = false, value = res.value.body())
+            }
+            catch (e: Exception){
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    }
+
 }

@@ -101,6 +101,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -121,8 +122,6 @@ import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
@@ -356,16 +355,9 @@ fun ShowErrorToast(context: Context, id: Int) {
 @Composable
 fun BottomNavigation(
     navController: NavHostController,
-    bottomBarState: MutableState<Boolean>
+    bottomBarState: MutableState<Boolean>,
+    items: List<BottomNavItem>
 ) {
-
-    val items = listOfNotNull(
-        BottomNavItem.Home,
-        BottomNavItem.Landing,
-        BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
-        BottomNavItem.Profile
-    )
-
     var selectedItem by remember { mutableStateOf(items.first()) }
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
     var outlineColor by remember { mutableStateOf(outlineVariant) }
@@ -745,28 +737,8 @@ fun TagItem(
 
 @Composable
 fun FullscreenGallery(
-    imageList: List<Int> = listOf(
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo,
-        R.drawable.restaurant_photo
-    ),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    bitmaps: List<Bitmap>
 ) {
 
     Dialog(onDismissRequest = onDismiss) {
@@ -797,30 +769,40 @@ fun FullscreenGallery(
                     }
                 }
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(imageList.size) { index ->
-                        Card(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .aspectRatio(1f),
-                            shape = RoundedCornerShape(8.dp),
-                            elevation = CardDefaults.cardElevation(8.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(id = imageList[index]),
-                                contentDescription = "Image $index",
+                if(bitmaps.isNotEmpty()){
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        items(bitmaps.size) { index ->
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Gray),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .padding(4.dp)
+                                    .aspectRatio(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                elevation = CardDefaults.cardElevation(8.dp)
+                            ) {
+                                Image(
+                                    bitmap = bitmaps[index].asImageBitmap(),
+                                    contentDescription = "Image $index",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Gray),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
+                    }
+                }
+                else{
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
             }
@@ -1062,6 +1044,24 @@ fun ImageCard(
     ) {
         Image(
             painter = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun ImageCard(
+    image: ImageBitmap
+){
+    Card(
+        modifier = Modifier.size(100.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Image(
+            bitmap = image,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
