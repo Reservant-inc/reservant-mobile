@@ -27,6 +27,7 @@ class RestaurantDetailViewModel(
     var menus: List<RestaurantMenuDTO>? by mutableStateOf(emptyList())
     var currentMenu: RestaurantMenuDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
+    var isGalleryLoading: Boolean by mutableStateOf(false)
     var eventsLoading: Boolean by mutableStateOf(true)
     //var restaurantLogo: Bitmap? by mutableStateOf(null)
 
@@ -66,6 +67,13 @@ class RestaurantDetailViewModel(
         }
         restaurant = resultRestaurant.value
         return true
+    }
+
+    suspend fun getPhotos(urls: List<String>, limit: Int = urls.size, withLoading:Boolean = true): List<Bitmap>{
+        if(withLoading) isGalleryLoading = true
+        val photos = urls.take(limit).mapNotNull { url -> getPhoto(url) }
+        if(withLoading) isGalleryLoading = false
+        return photos;
     }
 
     suspend fun getPhoto(photoStr: String): Bitmap? {

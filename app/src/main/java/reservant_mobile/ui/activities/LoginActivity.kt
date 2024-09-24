@@ -33,11 +33,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.LogoWithReturn
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.AuthRoutes
+import reservant_mobile.ui.navigation.EmployeeRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
@@ -107,7 +110,12 @@ fun LoginActivity(navController: NavHostController) {
                     formSent = true
 
                     if (loginViewModel.login()){
-                        navController.navigate(MainRoutes.Home)
+                        if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
+                            navController.navigate(EmployeeRoutes.SelectRestaurant)
+                        }
+                        else{
+                            navController.navigate(MainRoutes.Home)
+                        }
                     }
 
                     isLoading = false

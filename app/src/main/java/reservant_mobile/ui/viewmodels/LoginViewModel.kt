@@ -1,10 +1,11 @@
 package reservant_mobile.ui.viewmodels
 
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IUserService
-import reservant_mobile.data.services.LocalBearerService
+import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
 
 class LoginViewModel(
@@ -37,7 +38,7 @@ class LoginViewModel(
     }
 
     suspend fun refreshToken(): Boolean{
-        return LocalBearerService().getBearerToken().isNotEmpty() && userService.refreshToken()
+        return LocalDataService().getData(PrefsKeys.BEARER_TOKEN).isNotEmpty() && userService.refreshToken()
     }
     
     private fun isLoginInvalid(): Boolean{

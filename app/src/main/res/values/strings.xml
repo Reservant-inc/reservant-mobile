@@ -202,4 +202,8 @@
     <string name="label_remove_friend">Remove friend</string>
     <string name="label_cancel_request">Cancel request</string>
     <string name="label_accept_request">Accept request</string>
+    <string name="label_employee">Employee</string>
+    <string name="label_employee_greetings">Hi %1$s, where are you working today?</string>
+    <string name="label_reservations">Reservations</string>
+    <string name="label_stock">Stock</string>
 </resources>

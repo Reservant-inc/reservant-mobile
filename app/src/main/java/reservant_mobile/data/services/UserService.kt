@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
@@ -56,7 +57,7 @@ interface IUserService{
 
 @OptIn(InternalSerializationApi::class)
 class UserService(): ServiceUtil(), IUserService {
-    private val localBearer = LocalBearerService()
+    private val localDataService = LocalDataService()
     object UserObject {
         lateinit var userId: String
         lateinit var login: String
@@ -78,7 +79,7 @@ class UserService(): ServiceUtil(), IUserService {
         UserObject.firstName = u.firstName
         UserObject.lastName = u.lastName
         UserObject.roles = u.roles!!
-        localBearer.saveBearerToken(u.token!!)
+        localDataService.saveData(PrefsKeys.BEARER_TOKEN, u.token!!)
     }
 
 

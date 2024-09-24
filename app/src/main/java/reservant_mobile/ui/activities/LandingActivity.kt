@@ -21,6 +21,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.Logo
 import reservant_mobile.ui.navigation.AuthRoutes
+import reservant_mobile.ui.navigation.EmployeeRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.theme.AppTheme
 
@@ -67,6 +68,9 @@ fun LandingActivity() {
             }
             composable<MainRoutes.Home> {
                 HomeActivity()
+            }
+            composable<EmployeeRoutes.SelectRestaurant> {
+                EmployeeHomeActivity()
             }
         }
     }
