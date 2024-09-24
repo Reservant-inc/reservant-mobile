@@ -20,7 +20,6 @@ import reservant_mobile.data.services.UserService
 
 class ChatViewModel(
     private val threadsService: IThreadsService = ThreadsService(),
-    private val userService: IUserService = UserService(),
 ) : ReservantViewModel() {
 
     // TODO: Replace with dynamic thread ID in the future
@@ -38,7 +37,7 @@ class ChatViewModel(
         fetchThread()
     }
 
-    fun getCurrentUserId(): String? {
+    fun getCurrentUserId(): String {
         return UserService.UserObject.userId
     }
 
@@ -59,7 +58,6 @@ class ChatViewModel(
             }
         }
     }
-
 
     private fun fetchMessages() {
         viewModelScope.launch {
