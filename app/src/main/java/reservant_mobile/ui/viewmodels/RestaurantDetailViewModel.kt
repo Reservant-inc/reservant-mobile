@@ -5,9 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.MessageDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
+import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
@@ -25,21 +32,21 @@ class RestaurantDetailViewModel(
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
     var menus: List<RestaurantMenuDTO>? by mutableStateOf(emptyList())
+    var reviews: List<RestaurantMenuDTO>? by mutableStateOf(emptyList())
     var currentMenu: RestaurantMenuDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
     var isGalleryLoading: Boolean by mutableStateOf(false)
     var eventsLoading: Boolean by mutableStateOf(true)
-    //var restaurantLogo: Bitmap? by mutableStateOf(null)
+    var reviewsLoading: Boolean by mutableStateOf(true)
+
+    // StateFlow to hold the paging data
+    private val _reviewsFlow = MutableStateFlow<Flow<PagingData<ReviewDTO>>?>(null)
+    val reviewsFlow: StateFlow<Flow<PagingData<ReviewDTO>>?> = _reviewsFlow
 
 
     init {
         viewModelScope.launch {
             loadRestaurantAndMenus(restaurantId)
-
-//            restaurant!!.logo?.let {
-//                restaurantLogo = getPhoto(it)
-//            }
-
         }
     }
 
@@ -67,6 +74,21 @@ class RestaurantDetailViewModel(
         }
         restaurant = resultRestaurant.value
         return true
+    }
+
+    fun loadReviews(){
+        viewModelScope.launch {
+            val result: Result<Flow<PagingData<ReviewDTO>>?> = restaurantService.getRestaurantReviews(restaurantId)
+
+            reviewsLoading = false
+
+            if (!result.isError) {
+                _reviewsFlow.value = result.value?.cachedIn(viewModelScope)
+            } else {
+                val errors = result.errors
+
+            }
+        }
     }
 
     suspend fun getPhotos(urls: List<String>, limit: Int = urls.size, withLoading:Boolean = true): List<Bitmap>{
