@@ -105,7 +105,7 @@ class MapViewModel : ReservantViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.collectLatest { pagingData ->
+                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
 
                     _restaurantsState.value = pagingData.map { dto ->
 
