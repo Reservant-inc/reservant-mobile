@@ -42,7 +42,7 @@ class MapViewModel : ReservantViewModel() {
     private val restaurantService = RestaurantService()
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
-    private var _addedRestaurants = ArrayList<Int>()
+    private val _addedRestaurants = mutableListOf<Int>()
     val restaurants: StateFlow<PagingData<RestaurantOnMap>> = _restaurantsState.asStateFlow()
     val events: StateFlow<PagingData<EventOnMap>> = _eventsState.asStateFlow()
     var isLoading: Boolean by mutableStateOf(false)
