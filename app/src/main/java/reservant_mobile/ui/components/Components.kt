@@ -1214,6 +1214,7 @@ fun MessageSheet(
     content: @Composable () -> Unit,
     onDismiss: () -> Unit = {},
     height: Dp = 600.dp,
+    width: Dp = Dp.Unspecified,
     buttonLabelId: Int? = null,
     buttonLabel: String = "",
     buttonOnClick: () -> Unit = {}
@@ -1225,6 +1226,7 @@ fun MessageSheet(
         onDismissRequest = onDismiss,
         sheetState = modalBottomSheetState,
         modifier = Modifier.height(height),
+        sheetMaxWidth = width
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
