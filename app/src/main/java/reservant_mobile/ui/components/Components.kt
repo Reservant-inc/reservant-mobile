@@ -41,8 +41,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -74,6 +76,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
@@ -84,6 +87,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -1202,5 +1206,49 @@ fun LoadedPhotoComponent(
         }
 
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageSheet(
+    content: @Composable () -> Unit,
+    onDismiss: () -> Unit = {},
+    height: Dp = 600.dp,
+    buttonLabelId: Int? = null,
+    buttonLabel: String = "",
+    buttonOnClick: () -> Unit = {}
+){
+    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var buttonLabelValue by remember { mutableStateOf(buttonLabel) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = modalBottomSheetState,
+        modifier = Modifier.height(height),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(bottom = 80.dp),
+            ) {
+                content()
+            }
+            
+            if(buttonLabelId != null){
+                buttonLabelValue = stringResource(id = buttonLabelId)
+            }
+
+            if(buttonLabelValue.isNotEmpty()){
+                ButtonComponent(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    onClick = buttonOnClick,
+                    label = buttonLabelValue
+                )
+            }
+        }
+    }
 }
