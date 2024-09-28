@@ -216,4 +216,8 @@
     <string name="label_delete_review">Usuń opinię</string>
     <string name="message_notification_not_granted">Aplikacja nie będzie otrzymywała powiadomień</string>
     <string name="label_search_events">Szykaj wydarzeń</string>
+    <string name="label_search_filter_rating">Filtruj przez minimalną ocenę</string>
+    <string name="label_search_filter_tags">Wybierz do5 tagów</string>
+    <string name="error_too_many_tags">Możesz wybrać maksymalnie 5 tagów</string>
+    <string name="label_apply">Zastosuj</string>
 </resources>
