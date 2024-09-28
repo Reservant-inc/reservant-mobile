@@ -1221,6 +1221,11 @@ fun MessageSheet(
 ){
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var buttonLabelValue by remember { mutableStateOf(buttonLabel) }
+    val coroutineScope = rememberCoroutineScope()
+    val hideModalBottomSheet: () -> Unit = { coroutineScope.launch {
+        modalBottomSheetState.hide()
+        onDismiss()
+    } }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1247,7 +1252,10 @@ fun MessageSheet(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp),
-                    onClick = buttonOnClick,
+                    onClick = {
+                        buttonOnClick()
+                        hideModalBottomSheet()
+                    },
                     label = buttonLabelValue
                 )
             }
