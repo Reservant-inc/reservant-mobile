@@ -20,6 +20,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,11 +44,16 @@ class MapViewModel : ReservantViewModel() {
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
     private val _addedRestaurants = mutableListOf<Int>()
+    var restaurantTags = mutableListOf<String>()
     val restaurants: StateFlow<PagingData<RestaurantOnMap>> = _restaurantsState.asStateFlow()
     val events: StateFlow<PagingData<EventOnMap>> = _eventsState.asStateFlow()
-    var isLoading: Boolean by mutableStateOf(false)
+    var areFiltersLoading: Boolean by mutableStateOf(false)
+
     private lateinit var poiMarkers:RadiusMarkerClusterer
 
+    var search: String? = null
+    var selectedTags: List<String>? = null
+    var minRating: Int? = null
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
 
@@ -80,7 +86,7 @@ class MapViewModel : ReservantViewModel() {
 
         OsmMap.view = mv
         addUserMarker(startPoint)
-        getRestaurantsInArea(startPoint)
+        getRestaurants(startPoint)
 
         return OsmMap.view
     }
@@ -95,20 +101,29 @@ class MapViewModel : ReservantViewModel() {
         OsmMap.view.overlays.add(startMarker)
     }
 
-    fun getRestaurantsInArea(userLocation: GeoPoint){
+    fun refreshRestaurants(userLocation: GeoPoint) {
+        _restaurantsState.value = PagingData.empty()
+        getRestaurants(userLocation)
+    }
+
+
+    @OptIn(FlowPreview::class)
+    fun getRestaurants(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
                 val res = restaurantService.getRestaurants(
                     origLat = userLocation.latitude,
-                    origLon = userLocation.longitude
+                    origLon = userLocation.longitude,
+                    name = search,
+                    tags = selectedTags,
+                    minRating = minRating,
                 )
+
                 if(res.isError || res.value == null)
                     throw Exception()
 
                 res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
-
                     _restaurantsState.value = pagingData.map { dto ->
-
                         RestaurantOnMap(
                             restaurantId = dto.restaurantId,
                             name = dto.name,
@@ -136,7 +151,16 @@ class MapViewModel : ReservantViewModel() {
 
                 res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
                     _eventsState.value = pagingData.map { dto ->
-                        EventOnMap()
+                        EventOnMap(
+                            eventId = dto.eventId!!,
+                            time = dto.time,
+                            creatorId = dto.creatorId!!,
+                            creatorFullName = dto.creatorFullName!!,
+                            restaurantId = dto.restaurantId,
+                            restaurantName = dto.restaurantName!!,
+                            participants = dto.participants!!.size,
+                            numberInterested = dto.numberInterested!!
+                        )
 
                     }
                 }
@@ -145,6 +169,21 @@ class MapViewModel : ReservantViewModel() {
                 Log.d("[EVENT]:", e.toString())
 
             }
+        }
+    }
+
+    fun getRestaurantTags(){
+        if(restaurantTags.isNotEmpty()){
+            return
+        }
+
+        areFiltersLoading = true
+        viewModelScope.launch {
+            val res = restaurantService.getRestaurantTags()
+            if(!res.isError){
+                restaurantTags = res.value as MutableList<String>
+            }
+            areFiltersLoading = false
         }
     }
 
@@ -255,15 +294,13 @@ data class RestaurantOnMap(
     )
 
 data class EventOnMap(
-    val eventId: Int? = null,
-    val createdAt: String? = null,
-    val description: String? = null,
-    val time: String? = null,
-    val mustJoinUntil: String? = null,
-    val creatorId: String? = null,
-    val creatorFullName: String? = null,
-    val restaurantId: Int? = null,
-    val restaurantName:String? = null,
-    val visitId: Int? = null,
-    val image:Bitmap? = null
+    val eventId: Int,
+    val time: String,
+    val creatorId: String,
+    val creatorFullName: String,
+    val restaurantId: Int,
+    val restaurantName:String,
+    val image:Bitmap? = null,
+    val participants: Int,
+    val numberInterested: Int
 )
