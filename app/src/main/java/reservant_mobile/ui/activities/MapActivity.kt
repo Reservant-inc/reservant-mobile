@@ -1,26 +1,33 @@
 package reservant_mobile.ui.activities
 
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -47,6 +55,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -59,9 +68,13 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import reservant_mobile.ApplicationService
 import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.ImageCard
+import reservant_mobile.ui.components.LoadingScreenWithTimeout
+import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
@@ -70,14 +83,13 @@ import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MapActivity(){
 
     val navController = rememberNavController()
-
-
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
@@ -86,6 +98,10 @@ fun MapActivity(){
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
             val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
             var mv:MapView? by remember { mutableStateOf(null) }
+            var searchQuery by remember { mutableStateOf("") }
+            val selectedTags = remember { mutableStateListOf<String>() }
+            var selectedRating by remember { mutableIntStateOf(5) }
+            var showFiltersSheet by remember { mutableStateOf(false) }
 
 
             val startPoint = GeoPoint(52.237049, 21.017532)
@@ -106,46 +122,84 @@ fun MapActivity(){
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {
-                    if(restaurants.itemCount <= 0){
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                    else {
-                        LazyColumn(
-                            Modifier
+                    Column {
+                        Row(
+                            modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 75.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(top = 75.dp, start = 20.dp, end = 20.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(restaurants.itemCount) { index ->
-                                val item = restaurants[index]
-                                if(item != null){
-                                    RestaurantCard(
-                                        onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId)) },
-                                        name = item.name,
-                                        location = item.address,
-                                        city = item.city,
-                                        image = item.logo?.asImageBitmap()
-                                    )
+
+
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = {
+                                    searchQuery = it
+                                    mapViewModel.search = it
+                                    mapViewModel.refreshRestaurants(startPoint)
+                                },
+                                singleLine = true,
+                                placeholder = { Text(text = stringResource(id = R.string.label_search)) },
+                                modifier = Modifier
+                                    .padding(vertical = 4.dp),
+                                shape = RoundedCornerShape(20.dp),
+
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            IconButton(
+                                onClick = { showFiltersSheet = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FilterList,
+                                    contentDescription = "Filter Icon"
+                                )
+                            }
+                        }
+
+                        if (restaurants.itemCount <= 0) {
+                            LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
+                        } else {
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                items(restaurants.itemCount) { index ->
+                                    val item = restaurants[index]
+                                    if (item != null) {
+                                        RestaurantCard(
+                                            onClick = {
+                                                navController.navigate(
+                                                    RestaurantRoutes.Details(
+                                                        restaurantId = item.restaurantId
+                                                    )
+                                                )
+                                            },
+                                            name = item.name,
+                                            location = item.address,
+                                            city = item.city,
+                                            image = item.logo?.asImageBitmap()
+                                        )
                                         mapViewModel.addRestaurantMarker(item) { _, _ ->
                                             showRestaurantId = item.restaurantId
                                             showRestaurantBottomSheet = true
                                             true
                                         }
 
-                                }
+                                    }
 
+                                }
                             }
+
                         }
                     }
                 },
                 stringResource(id = R.string.label_events) to {
                     if(events.itemCount <= 0){
+
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -160,38 +214,9 @@ fun MapActivity(){
                             }
                         }
                         else{
-                            Row(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TextField(
-                                    value = "",
-                                    onValueChange = {},
-                                    placeholder = { Text(stringResource(id = R.string.label_search_events)) },
-                                    leadingIcon = {
-                                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-                                    },
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(56.dp),
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                IconButton(
-                                    onClick = {
-                                    //TODO: add on click logic
-                                    }
-                                ) {
-                                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter Icon")
-                                }
-                            }
-
                             LazyColumn(
                                 Modifier
-                                    .fillMaxWidth()
+                                    .fillMaxSize()
                                     .padding(top = 75.dp)
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -199,7 +224,13 @@ fun MapActivity(){
                                 items(events.itemCount) { index ->
                                     val item = events[index]
                                     if(item != null){
-//                                        EventCard(event = item)
+                                        EventCard(
+                                            eventName = item.creatorFullName,
+                                            eventDate = item.time,
+                                            eventLocation = item.restaurantName,
+                                            interestedCount = item.numberInterested,
+                                            takePartCount = item.participants
+                                        )
                                     }
                                 }
                             }
@@ -214,9 +245,7 @@ fun MapActivity(){
                 sheetContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 sheetContent = {
                     Box(
-                        modifier = Modifier
-                            .height(550.dp)
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxSize()
                     ){
 
                         FloatingTabSwitch(
@@ -232,6 +261,84 @@ fun MapActivity(){
                 },
                 contentColor = MaterialTheme.colorScheme.surface
             )
+
+            val onDismiss = {showFiltersSheet = false}
+            if(showFiltersSheet){
+                MessageSheet(
+                    buttonLabelId = R.string.label_apply,
+                    onDismiss = onDismiss,
+                    buttonOnClick = {
+                        mapViewModel.selectedTags = selectedTags
+                        mapViewModel.minRating = selectedRating
+                        mapViewModel.refreshRestaurants(userLocation = startPoint)
+                    },
+                    content = {
+                        mapViewModel.getRestaurantTags()
+                        if(mapViewModel.areFiltersLoading){
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        else{
+                            val context = ApplicationService.instance
+                            val tagList = mapViewModel.restaurantTags
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.label_search_filter_rating),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+                                StarRatingFilter(
+                                    selectedRating = selectedRating,
+                                    onRatingSelected = { rating -> selectedRating = rating }
+                                )
+
+                                Spacer(modifier = Modifier.height(25.dp))
+
+                                Text(
+                                    text = stringResource(id = R.string.label_search_filter_tags),
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+                                FlowRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    tagList.forEach { brand ->
+                                        val  errorString = stringResource(id = R.string.error_too_many_tags)
+
+                                        TagChip(
+                                            tagName = brand,
+                                            isSelected = selectedTags.contains(brand),
+                                            onClick = {
+                                                if (selectedTags.contains(brand)) {
+                                                    selectedTags.remove(brand)
+                                                } else {
+                                                    if (selectedTags.size < 5) {
+                                                        selectedTags.add(brand)
+                                                    } else {
+                                                        Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                )
+            }
         }
         composable<RestaurantRoutes.Details> {
             RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
@@ -240,6 +347,8 @@ fun MapActivity(){
             RestaurantReservationActivity(navController = navController)
         }
     }
+
+
 
 
 }
@@ -397,6 +506,59 @@ fun RestaurantDetailPreview(
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun TagChip(tagName: String, isSelected: Boolean, onClick: () -> Unit) {
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val notSelectedColor = MaterialTheme.colorScheme.background
+
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .background(
+                color = if (isSelected) selectedColor else notSelectedColor,
+                shape = RoundedCornerShape(20.dp)
+            )
+            .toggleable(
+                value = isSelected,
+                onValueChange = { onClick() }
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = tagName,
+        )
+    }
+}
+
+@Composable
+fun StarRatingFilter(
+    selectedRating: Int,
+    onRatingSelected: (Int) -> Unit
+) {
+    val selectedColor = MaterialTheme.colorScheme.primary
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        for (star in 1..5) {
+            Icon(
+                imageVector = if (star <= selectedRating) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                contentDescription = null,
+                tint = selectedColor,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(32.dp)
+                    .clickable {
+                        onRatingSelected(star)
+                    }
+            )
         }
     }
 }
