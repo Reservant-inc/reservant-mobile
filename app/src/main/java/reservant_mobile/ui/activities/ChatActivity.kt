@@ -42,17 +42,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.CollectionItemInfoCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ChatViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.temporal.ChronoField
-import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,18 +198,3 @@ fun ChatActivity(navController: NavHostController, userName: String) {
 }
 
 
-fun formatDateTime(dateString: String, pattern: String): String {
-    return try {
-        val formatter = DateTimeFormatterBuilder()
-            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-            .optionalStart()
-            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 7, true)
-            .optionalEnd()
-            .toFormatter(Locale.getDefault())
-
-        val dateTime = LocalDateTime.parse(dateString, formatter)
-        dateTime.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
-    } catch (e: Exception) {
-        "" // Zwróć pusty string w przypadku błędu parsowania
-    }
-}

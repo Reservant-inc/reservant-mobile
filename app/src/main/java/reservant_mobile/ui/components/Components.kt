@@ -192,7 +192,8 @@ fun ButtonComponent(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    icon: ImageVector? = null // Opcjonalny parametr dla ikony
 ) {
     val gradientBrush = Brush.horizontalGradient(
         colors = listOf(
@@ -219,10 +220,20 @@ fun ButtonComponent(
                 color = MaterialTheme.colorScheme.onPrimary
             )
         } else {
+            // Wyświetlanie ikony, jeśli jest dostępna
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(end = 8.dp) // Dodaj padding między ikoną a tekstem
+                )
+            }
             Text(text = label)
         }
     }
 }
+
 
 
 @Composable

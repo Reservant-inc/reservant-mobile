@@ -22,8 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
@@ -31,7 +29,6 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -41,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -64,28 +61,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
-import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.LoadedPhotoComponent
-import reservant_mobile.ui.components.MenuItemCard
-import reservant_mobile.ui.components.MenuTypeButton
+import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
+import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
+import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 
 @Composable
@@ -99,6 +101,15 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
     )
     val addedItems = remember { mutableStateListOf<RestaurantMenuItemDTO>() }
 
+    val reviewsViewModel: ReviewsViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ReviewsViewModel(restaurantId = restaurantId) as T
+            }
+        }
+    )
+
+    val reviewsFlow = reviewsViewModel.reviewsFlow.collectAsState().value?.collectAsLazyPagingItems()
 
     val navController = rememberNavController()
 
@@ -186,13 +197,18 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     }
                                 }
 
-                                Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                ) {
                                     val reviews = stringResource(R.string.label_detail_reviews)
-                                    RatingBar(rating = 3.9f)
+                                    restaurant.rating?.let { it1 -> RatingBar(rating = it1.toFloat()) }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        "${restaurant.rating.toString().substring(0,3)} (${restaurant.numberReviews} $reviews)")
+                                        "${restaurant.rating.toString().substring(0, 3)} (${restaurant.numberReviews} $reviews)"
+                                    )
                                 }
+
 
                                 Row(
                                     modifier = Modifier
@@ -310,10 +326,11 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                             )
                                         },
                                         stringResource(R.string.label_events) to { EventsContent() },
-                                        stringResource(R.string.label_reviews) to { ReviewsContent() }
+                                        stringResource(R.string.label_reviews) to { ReviewsContent(reviewsFlow, navController, restaurantId, reviewsViewModel) }
                                     ),
                                     paneScroll = false
                                 )
+
                             }
                         }
                     }
@@ -373,37 +390,114 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
         composable<RestaurantRoutes.Reservation>{
             RestaurantReservationActivity(navController = navController)
         }
+
+        composable<RestaurantRoutes.AddReview> {
+            AddReviewActivity(restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId, navController = navController)
+        }
+
+        composable<RestaurantRoutes.EditReview> {
+            EditReviewActivity(restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId, reviewId = it.toRoute<RestaurantRoutes.EditReview>().reviewId, navController = navController)
+        }
     }
 
 }
 
 @Composable
 fun ReviewsContent(
-    reviews: List<ReviewDTO> = sampleReviews(),
+    reviewsFlow: LazyPagingItems<ReviewDTO>?,
+    navController: NavController,
+    restaurantId: Int,
+    reviewsViewModel: ReviewsViewModel // Dodaj ViewModel jako parametr
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    var currentFilter by remember { mutableStateOf<String?>(null) }
+
+    // Dodaj LaunchedEffect do odświeżania opinii
+    LaunchedEffect(Unit) {
+        reviewsViewModel.fetchReviews()  // Odświeżanie opinii przy każdorazowym wejściu na ekran
+    }
+
+    // Lista opcji filtrowania
+    val filterOptions = listOf(
+        stringResource(id = R.string.label_5_stars),
+        stringResource(id = R.string.label_4_stars),
+        stringResource(id = R.string.label_3_stars),
+        stringResource(id = R.string.label_2_stars),
+        stringResource(id = R.string.label_1_star)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        //TODO wypełnić zgodnie z możliwymi opcjami filtrowania przykład w OrdersActivity
-        //SearchBarWithFilter()
+        // Search Bar with Filter
+
+        Row(Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier.fillMaxWidth(0.8f)) {
+                SearchBarWithFilter(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { query -> searchQuery = query },
+                    onFilterSelected = { filter -> currentFilter = filter },
+                    currentFilter = currentFilter,
+                    filterOptions = filterOptions
+                )
+            }
+            ButtonComponent(
+                onClick = { navController.navigate(RestaurantRoutes.AddReview(restaurantId = restaurantId)) },
+                label = "+",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        reviews.forEach { review ->
-            ReviewCard(review)
-            Spacer(modifier = Modifier.height(16.dp))
+        reviewsFlow?.let { lazyPagingItems ->
+            val filteredReviews = lazyPagingItems.itemSnapshotList.items.filter { review ->
+                val matchesQuery = review.contents.contains(searchQuery, ignoreCase = true)
+                val matchesFilter = currentFilter.isNullOrEmpty() ||
+                        currentFilter == stringResource(id = R.string.label_all) ||
+                        review.stars.toString() == currentFilter?.split(" ")?.get(0)
+                matchesQuery && matchesFilter
+            }
+
+            if (filteredReviews.isNotEmpty()) {
+                Column {
+                    filteredReviews.forEach { review ->
+                        ReviewCard(
+                            review = review,
+                            onClick = { navController.navigate(RestaurantRoutes.EditReview(restaurantId = restaurantId, reviewId = review.reviewId!!)) }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+            } else {
+                Text(
+                    text = stringResource(id = R.string.label_no_reviews),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        } ?: run {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(stringResource(id = R.string.label_loading_reviews))
+            }
         }
     }
 }
 
+
 @Composable
-fun ReviewCard(review: ReviewDTO) {
+fun ReviewCard(review: ReviewDTO, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp),
+            .padding(start = 8.dp, end = 8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -419,21 +513,18 @@ fun ReviewCard(review: ReviewDTO) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = review.date,
+                    text = review.authorFullName ?: "Gall Anonim",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = review.content,
+                text = review.contents,
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                val fullStars = review.rating.toInt()
-                val halfStar = (review.rating % 1 >= 0.5)
-
-                repeat(fullStars) {
+                repeat(review.stars) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
@@ -442,17 +533,7 @@ fun ReviewCard(review: ReviewDTO) {
                     )
                 }
 
-                if (halfStar) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.StarHalf,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                val emptyStars = 5 - fullStars - if (halfStar) 1 else 0
-                repeat(emptyStars) {
+                repeat(5 - review.stars) {
                     Icon(
                         imageVector = Icons.Default.StarBorder,
                         contentDescription = null,
@@ -460,21 +541,13 @@ fun ReviewCard(review: ReviewDTO) {
                         modifier = Modifier.size(24.dp)
                     )
                 }
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                    Text(
+                        text = review.createdAt?.let { formatDateTime(it, "dd.MM.yyyy") } ?: "",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
     }
-}
-
-data class ReviewDTO(
-    val date: String,
-    val content: String,
-    val rating: Float
-)
-
-fun sampleReviews(): List<ReviewDTO> {
-    return listOf(
-        ReviewDTO("12/01/2024", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tincidunt in ipsum vehicula commodo. Etiam tincidunt, odio et ultrices dapibus...", 5.0f),
-        ReviewDTO("12/01/2024", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tincidunt in ipsum vehicula commodo. Etiam tincidunt, odio et ultrices dapibus...", 4.5f),
-        ReviewDTO("12/01/2024", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tincidunt in ipsum vehicula commodo. Etiam tincidunt, odio et ultrices dapibus...", 2.1f)
-    )
 }
