@@ -300,7 +300,6 @@ data class EventOnMap(
     val creatorFullName: String,
     val restaurantId: Int,
     val restaurantName:String,
-    val image:Bitmap? = null,
     val participants: Int,
     val numberInterested: Int
 )

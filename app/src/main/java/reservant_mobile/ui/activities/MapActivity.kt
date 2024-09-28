@@ -199,39 +199,29 @@ fun MapActivity(){
                 },
                 stringResource(id = R.string.label_events) to {
                     if(events.itemCount <= 0){
-
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                        LaunchedEffect(key1 = true) {
+                            mapViewModel.getEvents()
                         }
+                        LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                     }
                     else {
-                        if (events.itemCount < 1){
-                            LaunchedEffect(key1 = true) {
-                                mapViewModel.getEvents()
-                            }
-                        }
-                        else{
-                            LazyColumn(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(top = 75.dp)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                items(events.itemCount) { index ->
-                                    val item = events[index]
-                                    if(item != null){
-                                        EventCard(
-                                            eventName = item.creatorFullName,
-                                            eventDate = item.time,
-                                            eventLocation = item.restaurantName,
-                                            interestedCount = item.numberInterested,
-                                            takePartCount = item.participants
-                                        )
-                                    }
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(top = 75.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(events.itemCount) { index ->
+                                val item = events[index]
+                                if(item != null){
+                                    EventCard(
+                                        eventName = item.creatorFullName,
+                                        eventDate = item.time,
+                                        eventLocation = item.restaurantName,
+                                        interestedCount = item.numberInterested,
+                                        takePartCount = item.participants
+                                    )
                                 }
                             }
                         }
