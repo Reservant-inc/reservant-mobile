@@ -129,6 +129,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
+import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1093,9 +1094,9 @@ fun ImageCard(
 
 @Composable
 fun MissingPage(
-    errorStringId: Int,
-    modifier:Modifier = Modifier
-        .fillMaxSize()
+    modifier:Modifier = Modifier.fillMaxSize(),
+    errorStringId: Int? = null,
+    errorString: String = "",
 ){
     Column(
         modifier = modifier,
@@ -1110,9 +1111,15 @@ fun MissingPage(
             contentDescription = "Missing page error",
             tint = MaterialTheme.colorScheme.secondary
         )
+
+        var stringValue = errorString
+        if(errorStringId != null){
+            stringValue = stringResource(id = errorStringId)
+        }
+
         Text(
             modifier = Modifier.padding(16.dp),
-            text = if (errorStringId != -1) stringResource(id = errorStringId) else ""
+            text = stringValue
         )
     }
 }
@@ -1259,6 +1266,33 @@ fun MessageSheet(
                     label = buttonLabelValue
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LoadingScreenWithTimeout(
+    timeoutMillis: Duration,
+    afterTimeoutMessage: String = stringResource(id = R.string.error_not_found),
+    modifier: Modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp),
+) {
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = true) {
+        delay(timeoutMillis)
+        loading = false
+    }
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        if (loading) {
+            CircularProgressIndicator()
+        } else {
+            MissingPage(errorString = afterTimeoutMessage)
         }
     }
 }
