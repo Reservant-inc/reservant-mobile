@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,15 +16,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.StarHalf
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
@@ -33,7 +29,6 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -51,7 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -76,20 +70,16 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
 import reservant_mobile.ui.components.ImageCard
-import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.LoadedPhotoComponent
-import reservant_mobile.ui.components.MenuItemCard
-import reservant_mobile.ui.components.MenuTypeButton
+import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.SearchBarWithFilter
@@ -98,8 +88,7 @@ import reservant_mobile.ui.components.TagItem
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
+
 
 @Composable
 fun RestaurantDetailActivity(restaurantId: Int = 1) {
@@ -111,7 +100,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
         }
     )
     val addedItems = remember { mutableStateListOf<RestaurantMenuItemDTO>() }
-
 
     val reviewsViewModel: ReviewsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
