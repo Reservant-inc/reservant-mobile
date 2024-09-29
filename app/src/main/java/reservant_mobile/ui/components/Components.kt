@@ -3,6 +3,8 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -124,8 +126,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
@@ -1293,6 +1299,32 @@ fun LoadingScreenWithTimeout(
             CircularProgressIndicator()
         } else {
             MissingPage(errorString = afterTimeoutMessage)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun RequestPermission(
+    permission: PermissionStrings,
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit = {}) {
+    val permissionState = rememberPermissionState(permission.string)
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            onPermissionGranted()
+        }
+        else{
+            onPermissionDenied()
+        }
+    }
+
+    LaunchedEffect(permissionState) {
+        if (permission.string.isNotEmpty() && !permissionState.status.isGranted) {
+            requestPermissionLauncher.launch(permission.string)
         }
     }
 }
