@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -32,15 +33,21 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.services.RestaurantService
+
 
 class MapViewModel : ReservantViewModel() {
     private object OsmMap {
         lateinit var view:MapView
     }
 
+    var userPosition = GeoPoint(52.237049, 21.017532)
+
     private val restaurantService = RestaurantService()
+
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
     private var _addedRestaurants = mutableListOf<Int>()
@@ -56,7 +63,6 @@ class MapViewModel : ReservantViewModel() {
     var minRating: Int? = null
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
-
         val mv = MapView(context).apply {
 
             val customTiles = object : XYTileSource(
@@ -78,7 +84,7 @@ class MapViewModel : ReservantViewModel() {
             minZoomLevel = 4.0
             maxZoomLevel = 20.0
             controller.setZoom(17.0)
-            controller.setCenter(startPoint)
+//            controller.setCenter(startPoint)
 
             poiMarkers = RadiusMarkerClusterer(context)
             overlays.add(poiMarkers)
@@ -86,20 +92,31 @@ class MapViewModel : ReservantViewModel() {
 
         _addedRestaurants = emptyList<Int>().toMutableList()
         OsmMap.view = mv
-        addUserMarker(startPoint)
+        addUserMarker()
         getRestaurants(startPoint)
 
         return OsmMap.view
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun addUserMarker(startPoint: GeoPoint){
-        val startMarker = Marker(OsmMap.view)
-        startMarker.position = startPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.icon = OsmMap.view.context.getDrawable( R.drawable.user)
-        startMarker.setInfoWindow(null)
-        OsmMap.view.overlays.add(startMarker)
+    private fun addUserMarker(){
+        val context = OsmMap.view.context
+        val userMarker = MyLocationNewOverlay(GpsMyLocationProvider(context), OsmMap.view)
+        userMarker.enableMyLocation()
+        userMarker.enableFollowLocation()
+        userMarker.runOnFirstFix {
+            userPosition =  GeoPoint(userMarker.lastFix)
+        }
+        val icon = context.getDrawable( R.drawable.user)
+        val iconBitmap = (icon as BitmapDrawable).bitmap
+        userMarker.setPersonIcon(iconBitmap)
+        userMarker.setDirectionIcon(iconBitmap);
+        userMarker.setPersonAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        userMarker.setDirectionAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+
+        if(!OsmMap.view.overlays.contains(userMarker)){
+            OsmMap.view.overlays.add(userMarker)
+        }
     }
 
     fun refreshRestaurants(userLocation: GeoPoint) {
