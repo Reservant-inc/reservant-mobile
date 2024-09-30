@@ -16,5 +16,9 @@ class Auth {
     class IsUniqueLogin(val parent: Auth = Auth(), val login: String? = "")
     @Resource("refresh-token")
     class RefreshToken(val parent: Auth = Auth())
+    @Resource("register-firebase-token")
+    class RegisterFirebaseToken(val parent: Auth = Auth())
+    @Resource("unregister-firebase-token")
+    class UnregisterFirebaseToken(val parent: Auth = Auth())
 
 }
