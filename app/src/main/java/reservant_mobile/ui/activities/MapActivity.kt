@@ -66,7 +66,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.ui.components.ButtonComponent
@@ -104,7 +103,7 @@ fun MapActivity(){
             var showFiltersSheet by remember { mutableStateOf(false) }
 
 
-            val startPoint = GeoPoint(52.237049, 21.017532)
+            val startPoint by remember { mutableStateOf(mapViewModel.userPosition) }
 
             // Init map
             if(mv == null){
