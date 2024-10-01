@@ -34,4 +34,6 @@ jobs:
       run: chmod +x ./gradlew
       
     - name: Build with Gradle
+      env:
+          GOOGLE_SERVICES_KEY: ${{ secrets.GOOGLE_SERVICES_KEY }}
       run: ./gradlew build
