@@ -33,6 +33,9 @@ interface IUserService{
     suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean>
     suspend fun logoutUser()
     suspend fun refreshToken(): Boolean
+    suspend fun registerFCMToken(token: String): Boolean
+    suspend fun unregisterFCMToken(token: String): Boolean
+
 
     /***
      * Return users by name. Returned UserDTO also contains friendStatus attribute.
@@ -100,6 +103,11 @@ class UserService(): ServiceUtil(), IUserService {
     }
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
+        val fcmToken = localDataService.getData(PrefsKeys.FCM_TOKEN)
+        if(fcmToken.isNotEmpty()){
+            registerFCMToken(fcmToken)
+        }
+
         //return errors in toast when connection error
         val res = api.post(Auth.Login(), credentials)
         if(res.isError)
@@ -120,11 +128,21 @@ class UserService(): ServiceUtil(), IUserService {
     }
 
     override suspend fun logoutUser() {
+        val fcmToken = localDataService.getData(PrefsKeys.FCM_TOKEN)
+        if(fcmToken.isNotEmpty()){
+            unregisterFCMToken(fcmToken)
+            localDataService.saveData(PrefsKeys.FCM_TOKEN, "")
+        }
         UserObject.clearData()
         api.clearToken()
     }
 
     override suspend fun refreshToken(): Boolean {
+        val fcmToken = localDataService.getData(PrefsKeys.FCM_TOKEN)
+        if(fcmToken.isNotEmpty()){
+            registerFCMToken(fcmToken)
+        }
+
         val res = api.post(Auth.RefreshToken(), "")
 
         if(res.isError)
@@ -142,6 +160,23 @@ class UserService(): ServiceUtil(), IUserService {
         }
         else false
     }
+
+    override suspend fun registerFCMToken(token: String): Boolean {
+        val body: HashMap<String, String> = hashMapOf("deviceToken" to token)
+        val res = api.post(Auth.RegisterFirebaseToken(), body)
+        if(res.isError)
+            return false
+
+        return res.value!!.status == HttpStatusCode.OK
+    }
+
+    override suspend fun unregisterFCMToken(token: String): Boolean {
+        val body: HashMap<String, String> = hashMapOf("deviceToken" to token)
+        val res = api.post(Auth.UnregisterFirebaseToken(), body)
+        if(res.isError)
+            return false
+
+        return res.value!!.status == HttpStatusCode.OK    }
 
     override suspend fun getUsers(name: String, filter: GetUsersFilter?): Result<Flow<PagingData<FoundUserDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
