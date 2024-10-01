@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "802234769564",
+    "project_id": "reservant-b6af0",
+    "storage_bucket": "reservant-b6af0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:802234769564:android:d5a4e21b4ae1e23a458d59",
+        "android_client_info": {
+          "package_name": "com.example.reservant_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "$GOOGLE_SERVICES_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
