@@ -21,6 +21,9 @@ data class NotificationDTO (
     enum class NotificationType{
         NotificationRestaurantVerified,
         NotificationNewRestaurantReview,
-        NotificationNewFriendRequest
+        NotificationNewFriendRequest,
+        NotificationFriendRequestAccepted,
+        NotificationNewParticipationRequest,
+        NotificationParticipationRequestResponse
     }
 }
