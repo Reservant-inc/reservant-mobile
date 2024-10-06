@@ -296,18 +296,7 @@ class UserService(): ServiceUtil(), IUserService {
 
     override suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?> {
         val res = api.get(Users.UserId(userId = userId.toString()))
-
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+        return complexResultWrapper(res)
     }
 
 }
