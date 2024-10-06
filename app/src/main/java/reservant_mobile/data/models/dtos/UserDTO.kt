@@ -18,6 +18,7 @@ class UserDTO (
      * Date in 'yyyy-MM-dd' format
      */
     val birthDate: String? = null,
+    val language: String? = null,
     val roles: List<String>? = null,
     val employments: List<RestaurantEmployeeDTO>? = null,
     val employerId: String? = null,

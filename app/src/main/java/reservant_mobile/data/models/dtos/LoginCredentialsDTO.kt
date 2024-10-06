@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class LoginCredentialsDTO(
     val login: String,
     val password: String,
-    val rememberMe: Boolean
+    val rememberMe: Boolean,
+    val firebaseDeviceToken: String? = null
 )
