@@ -31,6 +31,7 @@ class EventServiceUnitTest: ServiceTest() {
         val mustJoinUntilTimeString = mustJoinUntilTime.format(formatter)
 
         event = EventDTO(
+            name = "Biba w JD",
             description = "string",
             time = eventTimeString,
             maxPeople = 10,
