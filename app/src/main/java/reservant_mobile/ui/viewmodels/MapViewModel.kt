@@ -21,11 +21,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.reservant_mobile.R
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -94,6 +92,7 @@ class MapViewModel : ReservantViewModel() {
         OsmMap.view = mv
         addUserMarker()
         getRestaurants(startPoint)
+        getEvents()
 
         return OsmMap.view
     }
@@ -105,7 +104,7 @@ class MapViewModel : ReservantViewModel() {
         userMarker.enableMyLocation()
         userMarker.enableFollowLocation()
         userMarker.runOnFirstFix {
-            userPosition =  GeoPoint(userMarker.lastFix)
+            userPosition =  GeoPoint(userMarker.myLocation)
         }
         val icon = context.getDrawable( R.drawable.user)
         val iconBitmap = (icon as BitmapDrawable).bitmap
@@ -113,19 +112,15 @@ class MapViewModel : ReservantViewModel() {
         userMarker.setDirectionIcon(iconBitmap);
         userMarker.setPersonAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         userMarker.setDirectionAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-
-        if(!OsmMap.view.overlays.contains(userMarker)){
-            OsmMap.view.overlays.add(userMarker)
-        }
+        OsmMap.view.overlays.add(userMarker)
     }
 
     fun refreshRestaurants(userLocation: GeoPoint) {
-        _restaurantsState.value = PagingData.empty()
+//        _restaurantsState.value = PagingData.empty()
         getRestaurants(userLocation)
     }
 
 
-    @OptIn(FlowPreview::class)
     fun getRestaurants(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
@@ -140,7 +135,7 @@ class MapViewModel : ReservantViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
+                res.value.cachedIn(viewModelScope).collect { pagingData ->
                     _restaurantsState.value = pagingData.map { dto ->
                         RestaurantOnMap(
                             restaurantId = dto.restaurantId,
@@ -167,7 +162,7 @@ class MapViewModel : ReservantViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
+                res.value.cachedIn(viewModelScope).collect { pagingData ->
                     _eventsState.value = pagingData.map { dto ->
                         EventOnMap(
                             eventId = dto.eventId!!,
@@ -184,7 +179,6 @@ class MapViewModel : ReservantViewModel() {
 
             } catch (e: Exception) {
                 Log.d("[EVENT]:", e.toString())
-
             }
         }
     }
@@ -319,4 +313,8 @@ data class EventOnMap(
     val restaurantName:String,
     val participants: Int,
     val numberInterested: Int
-)
+){
+    init {
+        println("NEW EVENT CREATED: $creatorFullName")
+    }
+}
