@@ -171,7 +171,7 @@ class MapViewModel : ReservantViewModel() {
                             creatorFullName = dto.creatorFullName!!,
                             restaurantId = dto.restaurantId,
                             restaurantName = dto.restaurantName!!,
-                            participants = dto.participants!!.size,
+                            participants = dto.participants?.size ?: 0,
                             numberInterested = dto.numberInterested!!
                         )
                     }
@@ -313,8 +313,4 @@ data class EventOnMap(
     val restaurantName:String,
     val participants: Int,
     val numberInterested: Int
-){
-    init {
-        println("NEW EVENT CREATED: $creatorFullName")
-    }
-}
+)
