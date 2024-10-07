@@ -64,10 +64,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
+import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -77,6 +79,7 @@ import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
+import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -99,19 +102,20 @@ fun MapActivity(){
             var mv:MapView? by remember { mutableStateOf(null) }
             var searchQuery by remember { mutableStateOf("") }
             val selectedTags = remember { mutableStateListOf<String>() }
-            var selectedRating by remember { mutableIntStateOf(5) }
+            var selectedRating by remember { mutableIntStateOf(0) }
             var showFiltersSheet by remember { mutableStateOf(false) }
 
 
             val startPoint by remember { mutableStateOf(mapViewModel.userPosition) }
 
-            // Init map
-            if(mv == null){
+            RequestPermission(
+                permission = PermissionStrings.LOCATION,
+            )
+
+            if (mv == null) {
                 val context = LocalContext.current
                 mv = mapViewModel.initMapView(context, startPoint)
             }
-
-
             if (showRestaurantBottomSheet) {
                 RestaurantDetailPreview(navController, showRestaurantId) {
                     showRestaurantBottomSheet = false
@@ -157,8 +161,12 @@ fun MapActivity(){
                             }
                         }
 
-                        if (restaurants.itemCount <= 0) {
+                        if (restaurants.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
+                        } else if(restaurants.itemCount < 1 || restaurants.loadState.hasError){
+                            MissingPage(
+                                errorString = stringResource(id = R.string.label_no_restaurants_found)
+                            )
                         } else {
                             LazyColumn(
                                 Modifier
@@ -197,13 +205,17 @@ fun MapActivity(){
                     }
                 },
                 stringResource(id = R.string.label_events) to {
-                    if(events.itemCount <= 0){
-                        LaunchedEffect(key1 = true) {
-                            mapViewModel.getEvents()
-                        }
+                    if(events.loadState.refresh is LoadState.Loading){
                         LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                     }
-                    else {
+                    else if (events.itemCount < 1 || events.loadState.hasError){
+                        MissingPage(
+                            errorString = stringResource(
+                                id = R.string.message_not_found_any,
+                                stringResource(id = R.string.label_events)
+                            )
+                        )
+                    } else {
                         LazyColumn(
                             Modifier
                                 .fillMaxSize()
