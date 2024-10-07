@@ -1307,7 +1307,7 @@ fun LoadingScreenWithTimeout(
 @Composable
 fun RequestPermission(
     permission: PermissionStrings,
-    onPermissionGranted: () -> Unit,
+    onPermissionGranted: () -> Unit = {},
     onPermissionDenied: () -> Unit = {}) {
     val permissionState = rememberPermissionState(permission.string)
 
