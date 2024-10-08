@@ -41,7 +41,7 @@ fun HomeActivity() {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
-        BottomNavItem.Landing,
+        BottomNavItem.Social,
         BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
         BottomNavItem.Profile
     )
