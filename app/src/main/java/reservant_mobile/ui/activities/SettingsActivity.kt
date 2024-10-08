@@ -168,9 +168,6 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
             composable<UserRoutes.TicketHistory>{
                 TicketHistoryActivity(navController = navController)
             }
-            composable<UserRoutes.ChatList> {
-                ChatListActivity(navController = navController)
-            }
 
         }
 
