@@ -71,8 +71,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             icon = Icons.Filled.Person,
                             text = stringResource(id = R.string.label_my_profile),
                             onClick = {
-                                // TODO: change hardcoded id - now its 'customer'
-                                navController.navigate(UserRoutes.UserProfile(userId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29"))
+                                navController.navigate(UserRoutes.UserProfile(userId = UserService.UserObject.userId))
                             }
                         )
 
@@ -158,7 +157,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 }
             }
             composable<UserRoutes.UserProfile>{
-                ProfileActivity(navController = homeNavController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
+                ProfileActivity(navController = navController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
             }
             composable<UserRoutes.Orders>{
                 OrdersActivity()
@@ -167,10 +166,10 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 NewTicketActivity()
             }
             composable<UserRoutes.TicketHistory>{
-                TicketHistoryActivity(navController = homeNavController)
+                TicketHistoryActivity(navController = navController)
             }
             composable<UserRoutes.ChatList> {
-                ChatListActivity(navController = homeNavController)
+                ChatListActivity(navController = navController)
             }
 
         }
