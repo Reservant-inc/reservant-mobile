@@ -2,6 +2,7 @@ package reservant_mobile.data.utils
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PersonPin
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.RestaurantMenu
@@ -25,10 +26,10 @@ sealed class BottomNavItem(
             R.string.label_home
         )
 
-    data object Landing :
+    data object Social :
         BottomNavItem(
             MainRoutes.Social,
-            Icons.Filled.PersonSearch,
+            Icons.Filled.PersonPin,
             R.string.label_social
         )
 

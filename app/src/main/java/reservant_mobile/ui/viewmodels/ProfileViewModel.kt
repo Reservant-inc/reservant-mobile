@@ -3,7 +3,6 @@ package reservant_mobile.ui.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FriendRequestDTO
-import reservant_mobile.data.models.dtos.LoggedUserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.services.FriendsService
@@ -26,7 +24,6 @@ class ProfileViewModel(
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
-    private var user: LoggedUserDTO? by mutableStateOf(null)
     var profileUser: UserSummaryDTO? by mutableStateOf(null)
 
     var isLoading: Boolean by mutableStateOf(false)
