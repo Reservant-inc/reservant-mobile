@@ -38,27 +38,13 @@ class ProfileViewModel(
 
     init {
         viewModelScope.launch {
-            loadUser()
-            if (user?.userId != profileUserId) {
-                isCurrentUser = false
-                loadUser(userId = profileUserId)
-            }
-            if (!isCurrentUser) {
+            loadUser(userId = profileUserId)
+            if (UserService.UserObject.userId == profileUserId) {
+                isCurrentUser = true
+            } else {
                 fetchFriends()
             }
         }
-    }
-
-    private suspend fun loadUser(): Boolean {
-        isLoading = true
-        val resultUser = userService.getUser()
-        if (resultUser.isError) {
-            isLoading = false
-            return false
-        }
-        user = resultUser.value
-        isLoading = false
-        return true
     }
 
     private suspend fun loadUser(userId: String): Boolean {
