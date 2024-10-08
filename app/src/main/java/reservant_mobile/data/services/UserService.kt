@@ -16,7 +16,6 @@ import reservant_mobile.data.endpoints.Wallet
 import reservant_mobile.data.models.dtos.EmploymentDTO
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FoundUserDTO
-import reservant_mobile.data.models.dtos.LoggedUserDTO
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.PageDTO
