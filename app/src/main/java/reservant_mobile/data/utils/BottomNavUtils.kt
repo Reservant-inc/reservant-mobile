@@ -1,8 +1,8 @@
 package reservant_mobile.data.utils
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Settings
@@ -27,9 +27,9 @@ sealed class BottomNavItem(
 
     data object Landing :
         BottomNavItem(
-            MainRoutes.Home,
-            Icons.Filled.History,
-            R.string.label_orders
+            MainRoutes.Social,
+            Icons.Filled.PersonSearch,
+            R.string.label_social
         )
 
     data object Management :
