@@ -27,7 +27,7 @@ sealed class BottomNavItem(
 
     data object Landing :
         BottomNavItem(
-            MainRoutes.Orders,
+            MainRoutes.Home,
             Icons.Filled.History,
             R.string.label_orders
         )
