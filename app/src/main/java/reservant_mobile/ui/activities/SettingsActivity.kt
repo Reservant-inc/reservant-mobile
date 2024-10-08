@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.RestaurantMenu
@@ -92,17 +93,20 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         )
 
                     UnderlinedItem(
-                        icon = Icons.AutoMirrored.Filled.Help,
-                        text = stringResource(id = R.string.label_helpdesk),
+                        icon = Icons.Filled.Report,
+                        text = stringResource(id = R.string.label_complaints),
                         onClick = {
-                            //navController.navigate()
+                            navController.navigate(UserRoutes.TicketHistory)
                         }
                     )
 
+
                     UnderlinedItem(
-                        icon = Icons.Filled.Info,
-                        text = stringResource(id = R.string.label_faq),
-                        onClick = { /* Navigate to FAQ */ }
+                        icon = Icons.AutoMirrored.Filled.Help,
+                        text = stringResource(id = R.string.label_helpdesk),
+                        onClick = {
+                            navController.navigate(UserRoutes.Ticket)
+                        }
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
@@ -139,7 +143,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                                     )
                                 }
                                 loginViewModel.logout()
-                                navController.navigate(AuthRoutes.Landing) {
+                                homeNavController.navigate(AuthRoutes.Landing) {
                                     popUpTo(0)
                                 }
                             }
