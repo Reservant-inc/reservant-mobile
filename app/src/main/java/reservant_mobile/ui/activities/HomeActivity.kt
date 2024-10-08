@@ -67,8 +67,8 @@ fun HomeActivity() {
                 composable<RegisterRestaurantRoutes.Register>{
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
-                composable<MainRoutes.Profile>{
-                    SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                composable<MainRoutes.Settings>{
+                    SettingsActivity(homeNavController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
@@ -83,20 +83,6 @@ fun HomeActivity() {
                     OrdersActivity()
                 }
 
-                composable<UserRoutes.ChatList> {
-                    ChatListActivity(navController = innerNavController)
-                }
-                // TODO: change hardcoded id - now its 'customer'
-                composable<MainRoutes.UserProfile>{
-                    ProfileActivity(navController = innerNavController, "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29")
-                }
-                composable<RestaurantRoutes.Ticket>{
-                    NewTicketActivity()
-                }
-
-                composable<RestaurantRoutes.TicketHistory>{
-                    TicketHistoryActivity(navController = innerNavController)
-                }
             }
         }
     }
