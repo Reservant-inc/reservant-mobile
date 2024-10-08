@@ -1,8 +1,16 @@
 package reservant_mobile.data.services
 
+import androidx.paging.PagingData
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.serializer
 import reservant_mobile.data.endpoints.Events
+import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.FoundUserDTO
+import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
 interface IEventService{
@@ -14,6 +22,7 @@ interface IEventService{
     suspend fun markEventAsNotInterested(eventId: Any): Result<Boolean>
     suspend fun acceptUser(eventId: Any, userId: String): Result<Boolean>
     suspend fun rejectUser(eventId: Any, userId: String): Result<Boolean>
+    suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participants>>?>
 
 }
 class EventService(): ServiceUtil(), IEventService{
@@ -61,6 +70,20 @@ class EventService(): ServiceUtil(), IEventService{
             userId = userId
         ),"")
         return booleanResultWrapper(res)
+    }
+
+    @OptIn(InternalSerializationApi::class)
+    override suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participants>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Events.Id.Interested(
+                parent = Events.Id(eventId = eventId.toString()),
+                page = page,
+                perPage = perPage
+            )
+        )}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO.Participants::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 
 }

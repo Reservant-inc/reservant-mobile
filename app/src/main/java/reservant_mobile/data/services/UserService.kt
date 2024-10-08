@@ -13,14 +13,16 @@ import reservant_mobile.data.endpoints.Auth
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.endpoints.Wallet
+import reservant_mobile.data.models.dtos.EmploymentDTO
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FoundUserDTO
-import reservant_mobile.data.models.dtos.LoggedUserDTO
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
+import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
+import reservant_mobile.data.models.dtos.UserSettingsDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -48,13 +50,15 @@ interface IUserService{
     suspend fun getUserVisitHistory(): Result<Flow<PagingData<VisitDTO>>?>
     suspend fun getUserCreatedEvents(): Result<List<EventDTO>?>
     suspend fun getUserInterestedEvents(): Result<Flow<PagingData<EventDTO>>?>
-    //     TODO: add threads implementation
-//     suspend fun getUserThreads(): Result<Flow<PagingData<ThreadDTO>>?>
+    suspend fun getUserThreads(): Result<Flow<PagingData<ThreadDTO>>?>
+    suspend fun getUserEmployments(returnTerminated: Boolean? = null): Result<List<EmploymentDTO>?>
     suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean>
     suspend fun getWalletBalance(): Result<Double?>
     suspend fun getWalletHistory(): Result<Flow<PagingData<MoneyDTO>>?>
-    suspend fun getUser(): Result<LoggedUserDTO?>
     suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?>
+    suspend fun getUserSettings(): Result<UserSettingsDTO?>
+    suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?>
+
 
 }
 
@@ -104,12 +108,10 @@ class UserService(): ServiceUtil(), IUserService {
 
     override suspend fun loginUser(credentials: LoginCredentialsDTO): Result<Boolean> {
         val fcmToken = localDataService.getData(PrefsKeys.FCM_TOKEN)
-        if(fcmToken.isNotEmpty()){
-            registerFCMToken(fcmToken)
-        }
+        val loginData = credentials.copy(firebaseDeviceToken = fcmToken)
 
         //return errors in toast when connection error
-        val res = api.post(Auth.Login(), credentials)
+        val res = api.post(Auth.Login(), loginData)
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 
@@ -243,6 +245,23 @@ class UserService(): ServiceUtil(), IUserService {
         return pagingResultWrapper(sps)
     }
 
+    override suspend fun getUserThreads(): Result<Flow<PagingData<ThreadDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            User.Threads(
+                page = page,
+                perPage = perPage
+            )
+        )}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ThreadDTO::class.serializer()))
+        return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getUserEmployments(returnTerminated: Boolean?): Result<List<EmploymentDTO>?> {
+        val res = api.get(User.Employments(returnTerminated = returnTerminated))
+        return complexResultWrapper(res)
+    }
+
     override suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean> {
         val res = api.post(Wallet.AddMoney(), money)
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
@@ -278,36 +297,19 @@ class UserService(): ServiceUtil(), IUserService {
         return pagingResultWrapper(sps)
     }
 
-    override suspend fun getUser(): Result<LoggedUserDTO?> {
-        val res = api.get(User())
-
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
-    }
-
     override suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?> {
         val res = api.get(Users.UserId(userId = userId.toString()))
+        return complexResultWrapper(res)
+    }
 
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
+    override suspend fun getUserSettings(): Result<UserSettingsDTO?> {
+        val res = api.get(User.Settings())
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?> {
+        val res = api.put(User.Settings(), settings)
+        return complexResultWrapper(res)
     }
 
 }

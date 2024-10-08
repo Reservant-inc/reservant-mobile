@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.MoneyDTO
+import reservant_mobile.data.models.dtos.UserSettingsDTO
 import kotlin.random.Random
 
 class UserServiceUnitTest: ServiceTest(){
@@ -122,5 +123,33 @@ class UserServiceUnitTest: ServiceTest(){
             scrollTo(index = 10)
         }
         assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun get_threads_return_pagination()= runTest{
+        val items = userService.getUserThreads().value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    // JD is not an employee, so it wont work for him
+    @Test
+    fun get_employments_return_not_null()= runTest{
+        assertThat(userService.getUserEmployments().value).isNotNull()
+    }
+
+    @Test
+    fun get_settings_return_not_null()= runTest{
+        assertThat(userService.getUserSettings().value).isNotNull()
+    }
+
+    @Test
+    fun update_settings_return_not_null()= runTest{
+        val settings = UserSettingsDTO(
+            language = "PL"
+        )
+        assertThat(userService.updateUserSettings(settings).value).isNotNull()
     }
 }

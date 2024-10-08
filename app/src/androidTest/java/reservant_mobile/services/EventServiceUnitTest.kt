@@ -1,5 +1,6 @@
 package reservant_mobile.services
 
+import androidx.paging.testing.asSnapshot
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -31,6 +32,7 @@ class EventServiceUnitTest: ServiceTest() {
         val mustJoinUntilTimeString = mustJoinUntilTime.format(formatter)
 
         event = EventDTO(
+            name = "Biba w JD",
             description = "string",
             time = eventTimeString,
             maxPeople = 10,
@@ -72,5 +74,14 @@ class EventServiceUnitTest: ServiceTest() {
     @Test
     fun reject_user_return_true()= runTest{
         assertThat(ser.rejectUser(1, "test").value).isTrue()
+    }
+
+    @Test
+    fun get_interested_users_return_pagination()= runTest{
+        val items = ser.getInterestedUser(1).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 }

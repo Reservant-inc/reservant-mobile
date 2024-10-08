@@ -25,4 +25,10 @@ class User {
 
     @Resource("threads")
     class Threads(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
+
+    @Resource("employments")
+    class Employments(val parent: User = User(), val returnTerminated: Boolean? = null)
+
+    @Resource("settings")
+    class Settings(val parent: User = User())
 }
