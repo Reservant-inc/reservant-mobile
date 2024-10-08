@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import OrdersActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,7 +39,6 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
-import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
@@ -89,7 +87,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             icon = Icons.Filled.ShoppingCart,
                             text = stringResource(id = R.string.label_my_orders),
                             onClick = {
-                                //navController.navigate()
+                                navController.navigate(UserRoutes.Orders)
                             }
                         )
 
@@ -157,6 +155,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
             }
             composable<UserRoutes.UserProfile>{
                 ProfileActivity(navController = homeNavController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
+            }
+            composable<UserRoutes.Orders>{
+                OrdersActivity()
             }
             composable<UserRoutes.Ticket>{
                 NewTicketActivity()

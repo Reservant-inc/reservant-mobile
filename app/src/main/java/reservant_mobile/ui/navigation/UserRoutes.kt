@@ -22,4 +22,7 @@ data object UserRoutes {
 
     @Serializable
     object TicketHistory
+
+    @Serializable
+    object Orders
 }

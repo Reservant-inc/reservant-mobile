@@ -9,8 +9,5 @@ data object MainRoutes{
     @Serializable
     object Settings
 
-    @Serializable
-    object Orders
-
 }
 
