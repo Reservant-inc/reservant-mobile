@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import OrdersActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -16,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -25,7 +23,6 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
-import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")

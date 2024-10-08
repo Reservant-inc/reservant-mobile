@@ -9,5 +9,8 @@ data object MainRoutes{
     @Serializable
     object Settings
 
+    @Serializable
+    object Social
+
 }
 
