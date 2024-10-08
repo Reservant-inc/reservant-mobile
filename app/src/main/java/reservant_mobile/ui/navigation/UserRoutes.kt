@@ -11,4 +11,15 @@ data object UserRoutes {
     data class Chat(
         val userName: String
     )
+
+    @Serializable
+    data class UserProfile(
+        val userId: String
+    )
+
+    @Serializable
+    object Ticket
+
+    @Serializable
+    object TicketHistory
 }

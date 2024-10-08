@@ -24,6 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PrefsKeys
@@ -39,103 +45,130 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun SettingsActivity(navController: NavController, themeChange: () -> Unit) {
+fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit) {
     val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Spacer(modifier = Modifier.padding(top = 8.dp))
+        val navController = rememberNavController()
 
-            IconWithHeader(
-                icon = Icons.Rounded.RestaurantMenu,
-                text = stringResource(R.string.label_settings),
-            )
+        NavHost(navController = navController, startDestination = MainRoutes.Settings){
+            composable<MainRoutes.Settings> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.padding(top = 8.dp))
 
-            Spacer(modifier = Modifier.padding(top = 16.dp))
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_settings),
+                    )
 
-            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                UnderlinedItem(
-                    icon = Icons.Filled.Person,
-                    text = stringResource(id = R.string.label_my_profile),
-                    onClick = {
-                        navController.navigate(MainRoutes.UserProfile)
-                    }
-                )
+                    Spacer(modifier = Modifier.padding(top = 16.dp))
 
-            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                UnderlinedItem(
-                    icon = Icons.Filled.AccountBalanceWallet,
-                    text = stringResource(id = R.string.label_wallet),
-                    onClick = { /* Navigate to Wallet */ }
-                )
+                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.Person,
+                            text = stringResource(id = R.string.label_my_profile),
+                            onClick = {
+                                // TODO: change hardcoded id - now its 'customer'
+                                navController.navigate(UserRoutes.UserProfile(userId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29"))
+                            }
+                        )
 
-            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                UnderlinedItem(
-                    icon = Icons.Filled.ShoppingCart,
-                    text = stringResource(id = R.string.label_my_orders),
-                    onClick = { navController.navigate(RestaurantRoutes.Ticket) }
-                )
+                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.AccountBalanceWallet,
+                            text = stringResource(id = R.string.label_wallet),
+                            onClick = { /* Navigate to Wallet */ }
+                        )
 
-            UnderlinedItem(
-                icon = Icons.AutoMirrored.Filled.Help,
-                text = stringResource(id = R.string.label_helpdesk),
-                onClick = { navController.navigate(RestaurantRoutes.TicketHistory) }
-            )
+                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.ShoppingCart,
+                            text = stringResource(id = R.string.label_my_orders),
+                            onClick = {
+                                //navController.navigate()
+                            }
+                        )
 
-            UnderlinedItem(
-                icon = Icons.Filled.Info,
-                text = stringResource(id = R.string.label_faq),
-                onClick = { /* Navigate to FAQ */ }
-            )
-
-            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                UnderlinedItem(
-                    icon = Icons.Filled.CardGiftcard,
-                    text = stringResource(id = R.string.label_promo_codes),
-                    onClick = { /* Navigate to Promo Codes */ }
-                )
-
-            UnderlinedItem(
-                icon = Icons.Filled.Settings,
-                text = stringResource(id = R.string.label_app_settings),
-                onClick = { /* Navigate to App Settings */ }
-            )
-
-            if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                UnderlinedItem(
-                    icon = Icons.Filled.Delete,
-                    text = stringResource(id = R.string.label_delete_account),
-                    onClick = { navController.navigate(UserRoutes.ChatList) }
-                )
-
-            UnderlinedItem(
-                icon = Icons.AutoMirrored.Filled.ExitToApp,
-                text = stringResource(id = R.string.label_logout_action),
-                onClick = {
-                    loginViewModel.viewModelScope.launch {
-                        if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
-                            LocalDataService().saveData(
-                                key = PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT,
-                                data = ""
-                            )
+                    UnderlinedItem(
+                        icon = Icons.AutoMirrored.Filled.Help,
+                        text = stringResource(id = R.string.label_helpdesk),
+                        onClick = {
+                            //navController.navigate()
                         }
-                        loginViewModel.logout()
-                        navController.navigate(AuthRoutes.Landing) {
-                            popUpTo(0)
+                    )
+
+                    UnderlinedItem(
+                        icon = Icons.Filled.Info,
+                        text = stringResource(id = R.string.label_faq),
+                        onClick = { /* Navigate to FAQ */ }
+                    )
+
+                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.CardGiftcard,
+                            text = stringResource(id = R.string.label_promo_codes),
+                            onClick = { /* Navigate to Promo Codes */ }
+                        )
+
+                    UnderlinedItem(
+                        icon = Icons.Filled.Settings,
+                        text = stringResource(id = R.string.label_app_settings),
+                        onClick = { /* Navigate to App Settings */ }
+                    )
+
+                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.Delete,
+                            text = stringResource(id = R.string.label_delete_account),
+                            onClick = {
+                                //navController.navigate()
+                            }
+                        )
+
+                    UnderlinedItem(
+                        icon = Icons.AutoMirrored.Filled.ExitToApp,
+                        text = stringResource(id = R.string.label_logout_action),
+                        onClick = {
+                            loginViewModel.viewModelScope.launch {
+                                if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
+                                    LocalDataService().saveData(
+                                        key = PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT,
+                                        data = ""
+                                    )
+                                }
+                                loginViewModel.logout()
+                                navController.navigate(AuthRoutes.Landing) {
+                                    popUpTo(0)
+                                }
+                            }
                         }
-                    }
+                    )
+
+                    UnderlinedItem(
+                        icon = Icons.Filled.Brightness4,
+                        text = "Temporary theme changer",
+                        onClick = { themeChange() }
+                    )
                 }
-            )
+            }
+            composable<UserRoutes.UserProfile>{
+                ProfileActivity(navController = homeNavController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
+            }
+            composable<UserRoutes.Ticket>{
+                NewTicketActivity()
+            }
+            composable<UserRoutes.TicketHistory>{
+                TicketHistoryActivity(navController = homeNavController)
+            }
+            composable<UserRoutes.ChatList> {
+                ChatListActivity(navController = homeNavController)
+            }
 
-            UnderlinedItem(
-                icon = Icons.Filled.Brightness4,
-                text = "Temporary theme changer",
-                onClick = { themeChange() }
-            )
         }
+
     }
 }

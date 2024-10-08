@@ -41,7 +41,7 @@ sealed class BottomNavItem(
 
     data object Profile :
         BottomNavItem(
-            MainRoutes.Profile,
+            MainRoutes.Settings,
             Icons.Filled.Settings,
             R.string.label_settings
         )
