@@ -14,6 +14,10 @@ import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyFloatingActionButton
+import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.UserRoutes
@@ -52,6 +57,18 @@ fun SocialActivity(){
                     IconWithHeader(
                         icon = Icons.Rounded.PersonSearch,
                         text = stringResource(R.string.label_social)
+                    )
+
+                    var query by remember {
+                        mutableStateOf("")
+                    }
+
+                    SearchBarWithFilter(
+                        searchQuery = query,
+                        onSearchQueryChange = { query = it },
+                        onFilterSelected = {},
+                        currentFilter = "",
+                        filterOptions = listOf()
                     )
                 }
 
