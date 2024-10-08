@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EventDTO (
     val eventId: Int? = null,
+    val name: String? = null,
     val createdAt: String? = null,
     val description: String,
     val maxPeople: Int? = null,

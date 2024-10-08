@@ -220,4 +220,10 @@
     <string name="label_edit_review">Edit Review</string>
     <string name="label_delete_review">Delete Review</string>
     <string name="message_notification_not_granted">The application will not receive notifications</string>
+    <string name="label_search_events">Search for events</string>
+    <string name="label_search_filter_rating">Filter by Minimum Star Rating</string>
+    <string name="label_search_filter_tags">Select up to 5 tags</string>
+    <string name="error_too_many_tags">You can select up to 5 tags only</string>
+    <string name="label_apply">Apply</string>
+    <string name="message_not_found_any">Not found any %1$s</string>
 </resources>

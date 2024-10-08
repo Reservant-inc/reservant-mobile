@@ -3,6 +3,8 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -41,8 +43,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -74,6 +78,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
@@ -84,6 +89,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -120,11 +126,16 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
+import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1089,9 +1100,9 @@ fun ImageCard(
 
 @Composable
 fun MissingPage(
-    errorStringId: Int,
-    modifier:Modifier = Modifier
-        .fillMaxSize()
+    modifier:Modifier = Modifier.fillMaxSize(),
+    errorStringId: Int? = null,
+    errorString: String = "",
 ){
     Column(
         modifier = modifier,
@@ -1106,9 +1117,15 @@ fun MissingPage(
             contentDescription = "Missing page error",
             tint = MaterialTheme.colorScheme.secondary
         )
+
+        var stringValue = errorString
+        if(errorStringId != null){
+            stringValue = stringResource(id = errorStringId)
+        }
+
         Text(
             modifier = Modifier.padding(16.dp),
-            text = if (errorStringId != -1) stringResource(id = errorStringId) else ""
+            text = stringValue
         )
     }
 }
@@ -1202,5 +1219,112 @@ fun LoadedPhotoComponent(
         }
 
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageSheet(
+    content: @Composable () -> Unit,
+    onDismiss: () -> Unit = {},
+    height: Dp = 600.dp,
+    width: Dp = Dp.Unspecified,
+    buttonLabelId: Int? = null,
+    buttonLabel: String = "",
+    buttonOnClick: () -> Unit = {}
+){
+    val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var buttonLabelValue by remember { mutableStateOf(buttonLabel) }
+    val coroutineScope = rememberCoroutineScope()
+    val hideModalBottomSheet: () -> Unit = { coroutineScope.launch {
+        modalBottomSheetState.hide()
+        onDismiss()
+    } }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = modalBottomSheetState,
+        modifier = Modifier.height(height),
+        sheetMaxWidth = width
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(bottom = 80.dp),
+            ) {
+                content()
+            }
+            
+            if(buttonLabelId != null){
+                buttonLabelValue = stringResource(id = buttonLabelId)
+            }
+
+            if(buttonLabelValue.isNotEmpty()){
+                ButtonComponent(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    onClick = {
+                        buttonOnClick()
+                        hideModalBottomSheet()
+                    },
+                    label = buttonLabelValue
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingScreenWithTimeout(
+    timeoutMillis: Duration,
+    afterTimeoutMessage: String = stringResource(id = R.string.error_not_found),
+    modifier: Modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp),
+) {
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = true) {
+        delay(timeoutMillis)
+        loading = false
+    }
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        if (loading) {
+            CircularProgressIndicator()
+        } else {
+            MissingPage(errorString = afterTimeoutMessage)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun RequestPermission(
+    permission: PermissionStrings,
+    onPermissionGranted: () -> Unit = {},
+    onPermissionDenied: () -> Unit = {}) {
+    val permissionState = rememberPermissionState(permission.string)
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            onPermissionGranted()
+        }
+        else{
+            onPermissionDenied()
+        }
+    }
+
+    LaunchedEffect(permissionState) {
+        if (permission.string.isNotEmpty() && !permissionState.status.isGranted) {
+            requestPermissionLauncher.launch(permission.string)
+        }
+    }
 }

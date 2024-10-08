@@ -99,6 +99,9 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
     implementation ("org.osmdroid:osmdroid-android:6.1.18")
     implementation ("com.github.MKergall:osmbonuspack:6.9.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.32.0")
+
 
     val pagingVersion = "3.3.0"
     implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
