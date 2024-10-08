@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -78,9 +79,6 @@ fun HomeActivity() {
                         bottomBarState.value = false
                     }
                     LandingActivity()
-                }
-                composable<MainRoutes.Orders>{
-                    OrdersActivity()
                 }
 
             }
