@@ -56,7 +56,6 @@ interface IUserService{
     suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean>
     suspend fun getWalletBalance(): Result<Double?>
     suspend fun getWalletHistory(): Result<Flow<PagingData<MoneyDTO>>?>
-    suspend fun getUser(): Result<LoggedUserDTO?>
     suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?>
     suspend fun getUserSettings(): Result<UserSettingsDTO?>
     suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?>
@@ -297,22 +296,6 @@ class UserService(): ServiceUtil(), IUserService {
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(MoneyDTO::class.serializer()))
         return pagingResultWrapper(sps)
-    }
-
-    override suspend fun getUser(): Result<LoggedUserDTO?> {
-        val res = api.get(User())
-
-        if(res.isError)
-            return Result(isError = true, errors = res.errors, value = null)
-        if (res.value!!.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.value.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-        return Result(true, mapOf(pair = Pair("TOAST", R.string.error_unknown)), null)
     }
 
     override suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?> {
