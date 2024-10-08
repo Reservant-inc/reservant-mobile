@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,6 +71,9 @@ fun HomeActivity() {
                 }
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
+                }
+                composable<MainRoutes.Social> { 
+                    SocialActivity()
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
