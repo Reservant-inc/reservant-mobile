@@ -601,6 +601,7 @@ fun MyFloatingActionButton(
     bottomPadding: Dp = 16.dp,
     startPadding: Dp = 16.dp,
     endPadding: Dp = 16.dp,
+    icon: ImageVector = Icons.Default.Add
 ) {
     FloatingActionButton(
         onClick = onClick,
@@ -614,7 +615,7 @@ fun MyFloatingActionButton(
             ),
         content = {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = icon,
                 contentDescription = "Dodaj"
             )
         }

@@ -29,6 +29,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.TicketDTO
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 
 @Composable
 fun TicketHistoryActivity(navController: NavController) {
@@ -62,7 +63,7 @@ fun TicketHistoryActivity(navController: NavController) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(RestaurantRoutes.Ticket) },
+                onClick = { navController.navigate(UserRoutes.Ticket) },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ticket")

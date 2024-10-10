@@ -13,13 +13,7 @@ data object RestaurantRoutes {
     )
 
     @Serializable
-    object Ticket
-
-    @Serializable
     object Reservation
-
-    @Serializable
-    object TicketHistory
 
     @Serializable
     object Order

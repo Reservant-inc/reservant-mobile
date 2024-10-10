@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FriendRequestDTO
-import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.services.FriendsService
@@ -25,7 +24,6 @@ class ProfileViewModel(
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
-    private var user: UserDTO? by mutableStateOf(null)
     var profileUser: UserSummaryDTO? by mutableStateOf(null)
 
     var isLoading: Boolean by mutableStateOf(false)
@@ -37,29 +35,15 @@ class ProfileViewModel(
 
     init {
         viewModelScope.launch {
-            loadUser()
-            if (user?.userId != profileUserId) {
-                isCurrentUser = false
-                loadUser(userId = profileUserId)
-            }
-            if (!isCurrentUser) {
+            loadUser(userId = profileUserId)
+            if (UserService.UserObject.userId == profileUserId) {
+                isCurrentUser = true
+            } else {
                 fetchFriends()
             }
         }
     }
-
-    private suspend fun loadUser(): Boolean {
-        isLoading = true
-        val resultUser = userService.getUserInfo()
-        if (resultUser.isError) {
-            isLoading = false
-            return false
-        }
-        user = resultUser.value
-        isLoading = false
-        return true
-    }
-
+    
     private suspend fun loadUser(userId: String): Boolean {
         isLoading = true
         val resultUser = userService.getUserSimpleInfo(userId)

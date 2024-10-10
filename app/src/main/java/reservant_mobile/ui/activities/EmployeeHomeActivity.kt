@@ -282,9 +282,9 @@ fun EmployeeHomeActivity() {
                     }
 
                 }
-                composable<MainRoutes.Profile> {
+                composable<MainRoutes.Settings> {
                     SettingsActivity(
-                        navController = innerNavController,
+                        homeNavController = innerNavController,
                         themeChange = { darkTheme = !darkTheme })
                 }
                 composable<AuthRoutes.Landing> {
