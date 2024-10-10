@@ -74,7 +74,7 @@ fun ChatListActivity(navController: NavHostController) {
                     icon = Icons.Rounded.Person,
                     text = "User02",
                     showBackButton = true,
-                    onReturnClick = { navController.navigate(MainRoutes.Settings) } //TODO zmienic w przyszłości
+                    onReturnClick = { navController.popBackStack() }
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
