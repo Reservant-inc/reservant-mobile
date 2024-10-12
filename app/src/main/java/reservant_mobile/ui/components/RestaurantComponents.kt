@@ -179,8 +179,10 @@ fun EventCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "$interestedCount - interested")
-                    Text(text = "$takePartCount - take part")
+                    if(interestedCount != 0)
+                        Text(text = "$interestedCount - interested")
+                    if(takePartCount != 0)
+                        Text(text = "$takePartCount - take part")
                 }
             }
 
