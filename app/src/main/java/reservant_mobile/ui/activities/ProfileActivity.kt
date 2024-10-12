@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -90,7 +91,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
             )
         }
     ) { paddingValues ->
-        // Zastępujemy Column z verticalScroll na LazyColumn
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -144,10 +144,20 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     Text(text = it, color = Color.Gray)
                                 }
                                 Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    text = "5,00 " + stringResource(R.string.label_rating), // TODO: zmienna z oceną użytkownika
-                                    color = Color.Gray
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        contentDescription = null,
+                                        tint = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "5,00 " + stringResource(R.string.label_rating), // TODO: zmienna z oceną użytkownika
+                                        color = Color.Gray
+                                    )
+                                }
                             }
 
                             if (!profileViewModel.isCurrentUser) {
@@ -168,11 +178,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         }
 
                                         FriendStatus.OutgoingRequest -> {
+                                            // Refactored button after sending friend request
                                             Button(
                                                 onClick = { profileViewModel.cancelFriendRequest() },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                                             ) {
-                                                Text(text = stringResource(R.string.label_cancel_request))
+                                                Text(text = stringResource(R.string.label_cancel))
                                             }
                                         }
 
@@ -218,6 +229,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         Text(text = error, color = MaterialTheme.colorScheme.error)
                                     }
 
+                                    // Removed text from 'Send Message' button
                                     Button(
                                         onClick = { /* TODO: Wyślij wiadomość */ },
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
@@ -227,8 +239,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             contentDescription = null,
                                             modifier = Modifier.size(ButtonDefaults.IconSize)
                                         )
-                                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                        Text(text = stringResource(R.string.label_send_message))
                                     }
                                 }
                             }
@@ -261,11 +271,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
                                 .padding(16.dp)
-                                //.align(alignment = Alignment.CenterHorizontally)
+                            //.align(alignment = Alignment.CenterHorizontally)
                         )
                     }
-
-
 
                     if (eventsPagingItems == null) {
                         item {
