@@ -70,6 +70,7 @@ import com.example.reservant_mobile.R
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -226,9 +227,11 @@ fun MapActivity(){
                             items(events.itemCount) { index ->
                                 val item = events[index]
                                 if(item != null){
+                                    val day = formatDateTime(item.time, "dd MMMM yyyy")
+                                    val time = formatDateTime(item.time, "HH:mm")
                                     EventCard(
                                         eventName = item.creatorFullName,
-                                        eventDate = item.time,
+                                        eventDate = "$time | $day",
                                         eventLocation = item.restaurantName,
                                         interestedCount = item.numberInterested,
                                         takePartCount = item.participants
