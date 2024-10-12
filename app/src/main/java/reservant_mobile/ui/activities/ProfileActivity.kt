@@ -244,8 +244,41 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             }
                         }
                     }
-                    else -> {
-                        MissingPage(errorStringId = R.string.error_not_found)
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp),
+                        placeholder = {
+                            Text(
+                                stringResource(R.string.label_search)
+                            )
+                        },
+                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                        singleLine = true
+                    )
+
+                    if(profileViewModel.isCurrentUser){
+                        FloatingTabSwitch(pages = listOf(
+                            stringResource(R.string.label_visits) to { VisitsTab() },
+                            stringResource(R.string.label_orders) to { OrdersTab() },
+                            stringResource(R.string.label_chats) to { ChatsTab() },
+                            stringResource(R.string.label_friends) to { FriendsTab() },
+                        ))
+                    } else {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.label_events),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(alignment = Alignment.CenterHorizontally)
+                            )
+                            EventsContent()
+                        }
                     }
                 }
             }
