@@ -257,4 +257,6 @@
     <string name="label_event_category_participated">Wzięty udział</string>
     <string name="label_event_category_interested">Zainteresowane</string>
     <string name="label_with_friends_only">Tylko ze znajomymi</string>
+    <string name="label_interested">zainteresowani</string>
+    <string name="label_takePart">bierze udział</string>
 </resources>
