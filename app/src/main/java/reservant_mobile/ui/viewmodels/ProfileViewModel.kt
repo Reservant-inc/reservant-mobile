@@ -10,15 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
+import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
-import reservant_mobile.data.models.dtos.fields.Result
 
 class ProfileViewModel(
     private val userService: IUserService = UserService(),
@@ -35,16 +36,32 @@ class ProfileViewModel(
     private val _friendsFlow = MutableStateFlow<Flow<PagingData<FriendRequestDTO>>?>(null)
     val friendsFlow: StateFlow<Flow<PagingData<FriendRequestDTO>>?> = _friendsFlow
 
+    private val _eventsFlow = MutableStateFlow<Flow<PagingData<EventDTO>>?>(null)
+    val eventsFlow: StateFlow<Flow<PagingData<EventDTO>>?> = _eventsFlow
+
     init {
         viewModelScope.launch {
             loadUser()
             if (user?.userId != profileUserId) {
                 isCurrentUser = false
                 loadUser(userId = profileUserId)
+            } else {
+                isCurrentUser = true
+                profileUser = user?.let {
+                    UserSummaryDTO(
+                        userId = it.userId!!,
+                        login = it.login!!,
+                        firstName = it.firstName,
+                        lastName = it.lastName,
+                        birthDate = it.birthDate,
+                        friendStatus = null
+                    )
+                }
             }
             if (!isCurrentUser) {
                 fetchFriends()
             }
+            fetchUserEvents()
         }
     }
 
@@ -83,6 +100,22 @@ class ProfileViewModel(
             }
         }
     }
+
+
+    private fun fetchUserEvents() {
+        viewModelScope.launch {
+            isLoading = true
+            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserInterestedEvents()
+
+            if (!result.isError) {
+                _eventsFlow.value = result.value?.cachedIn(viewModelScope)
+            } else {
+                // Obsługa błędów
+            }
+            isLoading = false
+        }
+    }
+
 
     fun sendFriendRequest() {
         viewModelScope.launch {
@@ -158,5 +191,4 @@ class ProfileViewModel(
             }
         }
     }
-
 }

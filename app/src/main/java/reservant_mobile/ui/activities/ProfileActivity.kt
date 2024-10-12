@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -33,6 +35,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,11 +51,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
-import reservant_mobile.ui.components.EventsContent
+import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
+import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.MissingPage
-import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,23 +75,25 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if(profileViewModel.isCurrentUser){
-                        Text(
-                            text = stringResource(R.string.label_my_profile),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }else{
-                        Text(
-                            text = stringResource(R.string.label_profile),
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(end = 48.dp)
-                        )
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (profileViewModel.isCurrentUser) {
+                            Text(
+                                text = stringResource(R.string.label_my_profile),
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.label_profile),
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(end = 48.dp)
+                            )
+                        }
                     }
-                } },
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -96,7 +105,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 actions = {
                     if (profileViewModel.isCurrentUser) {
                         IconButton(onClick = {
-                            // TODO: Edit profile
+                            // TODO: Edycja profilu
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
@@ -159,7 +168,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                text = "5,00 "+stringResource(R.string.label_rating), // TODO: user rating variable
+                                text = "5,00 " + stringResource(R.string.label_rating), // TODO: zmienna z oceną użytkownika
                                 color = Color.Gray
                             )
                         }
@@ -180,6 +189,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Text(text = stringResource(R.string.label_remove_friend))
                                         }
                                     }
+
                                     FriendStatus.OutgoingRequest -> {
                                         Button(
                                             onClick = { profileViewModel.cancelFriendRequest() },
@@ -188,6 +198,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Text(text = stringResource(R.string.label_cancel_request))
                                         }
                                     }
+
                                     FriendStatus.IncomingRequest -> {
                                         Row {
                                             Button(
@@ -205,6 +216,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             }
                                         }
                                     }
+
                                     FriendStatus.Stranger -> {
                                         Button(
                                             onClick = { profileViewModel.sendFriendRequest() },
@@ -219,8 +231,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             Text(text = stringResource(R.string.label_add_friend))
                                         }
                                     }
+
                                     null -> {
-                                        // Handle null case if necessary
+                                        // Obsługa przypadku null, jeśli konieczne
                                     }
                                 }
 
@@ -244,28 +257,15 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                         }
                     }
 
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp),
-                        placeholder = {
-                            Text(
-                                stringResource(R.string.label_search)
+                    if (profileViewModel.isCurrentUser) {
+                        FloatingTabSwitch(
+                            pages = listOf(
+                                stringResource(R.string.label_visits) to { VisitsTab() },
+                                stringResource(R.string.label_orders) to { OrdersTab() },
+                                stringResource(R.string.label_chats) to { ChatsTab() },
+                                stringResource(R.string.label_friends) to { FriendsTab() },
                             )
-                        },
-                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                        singleLine = true
-                    )
-
-                    if(profileViewModel.isCurrentUser){
-                        FloatingTabSwitch(pages = listOf(
-                            stringResource(R.string.label_visits) to { VisitsTab() },
-                            stringResource(R.string.label_orders) to { OrdersTab() },
-                            stringResource(R.string.label_chats) to { ChatsTab() },
-                            stringResource(R.string.label_friends) to { FriendsTab() },
-                        ))
+                        )
                     } else {
                         Column {
                             Text(
@@ -277,12 +277,91 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     .padding(16.dp)
                                     .align(alignment = Alignment.CenterHorizontally)
                             )
-                            EventsContent()
+                            UserEventsContent(profileViewModel)
                         }
                     }
+                } else -> {
+                MissingPage(errorStringId = R.string.error_not_found)
+            }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserEventsContent(profileViewModel: ProfileViewModel) {
+    val eventsFlow = profileViewModel.eventsFlow.collectAsState()
+    val eventsPagingItems = eventsFlow.value?.collectAsLazyPagingItems()
+
+    if (eventsPagingItems == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        val listState = rememberLazyListState()
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(eventsPagingItems.itemCount) { index ->
+                val event = eventsPagingItems[index]
+                if (event != null) {
+                    EventCard(
+                        eventCreator = event.creatorFullName ?: "",
+                        eventDate = event.time ?: "",
+                        eventLocation = event.restaurantName ?: "",
+                        interestedCount = event.numberInterested ?: 0,
+                        takePartCount = event.participants?.size ?: 0
+                    )
                 }
-                else -> {
-                    MissingPage(errorStringId = R.string.error_not_found)
+            }
+
+            eventsPagingItems.apply {
+                when {
+                    loadState.refresh is androidx.paging.LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.append is androidx.paging.LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.refresh is androidx.paging.LoadState.Error -> {
+                        val e = eventsPagingItems.loadState.refresh as androidx.paging.LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                    loadState.append is androidx.paging.LoadState.Error -> {
+                        val e = eventsPagingItems.loadState.append as androidx.paging.LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_more_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -291,83 +370,22 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
 @Composable
 fun VisitsTab() {
-    // Content for the Visits tab
+    // Visits tab
 }
 
 @Composable
 fun OrdersTab() {
-    // Content for the Orders tab
+    // Orders tab
 }
 
 @Composable
 fun ChatsTab() {
-    val chats = listOf(
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?")
-    )
-
-    LazyColumn(modifier = Modifier.padding(top = 72.dp)) {
-        items(chats) { chat ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = "Chat User Picture",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Column(modifier = Modifier.padding(start = 16.dp)) {
-                    Text(text = chat.userName, fontWeight = FontWeight.Bold)
-                    Text(text = chat.message, color = Color.Gray)
-                }
-            }
-        }
-    }
+    // Chats tab
 }
 
 @Composable
 fun FriendsTab() {
-    val friends = listOf(
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe")
-    )
-
-    LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 72.dp)) {
-        items(friends) { friend ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.jd),
-                    contentDescription = "Friend Profile Picture",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = friend.name, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
+    // Friends tab
 
 data class Chat(val userName: String, val message: String)
 data class Friend(val name: String)
