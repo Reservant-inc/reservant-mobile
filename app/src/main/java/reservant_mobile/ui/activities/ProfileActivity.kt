@@ -6,11 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,10 +29,10 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
+import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileActivity(navController: NavHostController, userId: String) {
 
@@ -48,46 +48,27 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (profileViewModel.isCurrentUser) {
-                            Text(
-                                text = stringResource(R.string.label_my_profile),
-                                fontWeight = FontWeight.Bold
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(R.string.label_profile),
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(end = 48.dp)
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.label_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (profileViewModel.isCurrentUser) {
+            IconWithHeader(
+                icon = Icons.Default.Person,
+                text = if (profileViewModel.isCurrentUser)
+                    stringResource(R.string.label_my_profile)
+                else
+                    stringResource(R.string.label_profile),
+                showBackButton = true,
+                onReturnClick = { navController.popBackStack() },
+                actions = if (profileViewModel.isCurrentUser) {
+                    {
                         IconButton(onClick = {
                             // TODO: Edycja profilu
                         }) {
                             Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = stringResource(R.string.label_edit_profile)
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.label_edit_profile),
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
-                }
+                } else null
             )
         }
     ) { paddingValues ->
@@ -178,7 +159,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         }
 
                                         FriendStatus.OutgoingRequest -> {
-                                            // Refactored button after sending friend request
                                             Button(
                                                 onClick = { profileViewModel.cancelFriendRequest() },
                                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
@@ -229,7 +209,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         Text(text = error, color = MaterialTheme.colorScheme.error)
                                     }
 
-                                    // Removed text from 'Send Message' button
                                     Button(
                                         onClick = { /* TODO: Wyślij wiadomość */ },
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
@@ -243,13 +222,13 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 }
                             }
                         }
-                    } else -> {
-                    MissingPage(errorStringId = R.string.error_not_found)
-                }
+                    }
+                    else -> {
+                        MissingPage(errorStringId = R.string.error_not_found)
+                    }
                 }
             }
 
-            // Jeśli profil jest załadowany
             if (profileViewModel.profileUser != null) {
                 if (profileViewModel.isCurrentUser) {
                     item {
