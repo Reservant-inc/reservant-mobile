@@ -253,4 +253,6 @@
     <string name="error_users_not_found">Nie znaleziono żadnego użytkownika</string>
     <string name="label_sent_by">Nadawca</string>
     <string name="label_read_at">Przeczytano o</string>
+    <string name="label_interested">zainteresowani</string>
+    <string name="label_takePart">bierze udział</string>
 </resources>

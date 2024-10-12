@@ -262,4 +262,6 @@
     <string name="error_users_not_found">Not found any users</string>
     <string name="label_sent_by">Sent by</string>
     <string name="label_read_at">Read at</string>
+    <string name="label_interested">interested</string>
+    <string name="label_takePart">take part</string>
 </resources>
