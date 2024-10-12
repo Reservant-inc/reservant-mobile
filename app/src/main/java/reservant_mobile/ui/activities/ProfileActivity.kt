@@ -277,7 +277,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     .padding(16.dp)
                                     .align(alignment = Alignment.CenterHorizontally)
                             )
-                            EventsContent() // TODO: better events component
+                            EventsContent()
                         }
                     }
                 }

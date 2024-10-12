@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
@@ -139,9 +140,12 @@ fun EventCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
                 Box(
@@ -180,9 +184,13 @@ fun EventCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if(interestedCount != 0)
-                        Text(text = "$interestedCount - interested")
+                        Text(
+                            text = "$interestedCount "+stringResource(R.string.label_interested)
+                        )
                     if(takePartCount != 0)
-                        Text(text = "$takePartCount - take part")
+                        Text(
+                            text = "$takePartCount "+stringResource(R.string.label_takePart)
+                        )
                 }
             }
 
