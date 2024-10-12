@@ -283,8 +283,6 @@ fun MapActivity(){
                             items(events.itemCount) { index ->
                                 val item = events[index]
                                 if(item != null){
-                                    val day = formatDateTime(item.time, "dd MMMM yyyy")
-                                    val time = formatDateTime(item.time, "HH:mm")
                                     EventCard(
                                         eventCreator = item.creatorFullName,
                                         eventDate = "$time | $day",
