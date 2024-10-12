@@ -230,7 +230,7 @@ fun MapActivity(){
                                     val day = formatDateTime(item.time, "dd MMMM yyyy")
                                     val time = formatDateTime(item.time, "HH:mm")
                                     EventCard(
-                                        eventName = item.creatorFullName,
+                                        eventCreator = item.creatorFullName,
                                         eventDate = "$time | $day",
                                         eventLocation = item.restaurantName,
                                         interestedCount = item.numberInterested,
