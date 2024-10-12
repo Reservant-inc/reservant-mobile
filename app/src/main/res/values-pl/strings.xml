@@ -223,4 +223,6 @@
     <string name="message_not_found_any">Nie znaleziono %1$s</string>
     <string name="label_interested">zainteresowani</string>
     <string name="label_takePart">bierze udział</string>
+    <string name="error_loading_events">Błąd podczas wczytywania wydarzeń</string>
+    <string name="error_loading_more_events">Bład podczas wczytywania następnych wydarzeń</string>
 </resources>
