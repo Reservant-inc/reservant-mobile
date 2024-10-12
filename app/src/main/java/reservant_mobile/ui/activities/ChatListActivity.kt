@@ -46,7 +46,6 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.ChatDTO
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.MainRoutes
-import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 
 @Composable
@@ -75,7 +74,7 @@ fun ChatListActivity(navController: NavHostController) {
                     icon = Icons.Rounded.Person,
                     text = "User02",
                     showBackButton = true,
-                    onReturnClick = { navController.navigate(MainRoutes.Profile) } //TODO zmienic w przyszłości
+                    onReturnClick = { navController.popBackStack() }
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -83,7 +82,7 @@ fun ChatListActivity(navController: NavHostController) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_profile_placeholder),
-                        contentDescription = "Profile Picture",
+                        contentDescription = "Settings Picture",
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
@@ -188,7 +187,7 @@ fun ChatListItem(chat: ChatDTO, onClick: () -> Unit) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_profile_placeholder),
-            contentDescription = "Profile Picture",
+            contentDescription = "Settings Picture",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)

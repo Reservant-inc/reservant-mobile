@@ -122,6 +122,7 @@
     <string name="label_alcohol">Alcohol Percentage</string>
     <string name="label_logout_action">Log out</string>
     <string name="label_orders">Orders</string>
+    <string name="label_social">Social</string>
     <string name="label_search">Search...</string>
     <string name="label_filters">Filters</string>
     <string name="label_date">Date</string>
@@ -141,7 +142,7 @@
     <string name="label_wallet">Wallet</string>
     <string name="label_my_orders">My orders</string>
     <string name="label_helpdesk">Helpdesk</string>
-    <string name="label_faq">FAQ</string>
+    <string name="label_complaints">Complaints</string>
     <string name="label_promo_codes">Promo codes</string>
     <string name="label_app_settings">App settings</string>
     <string name="label_delete_account">Delete Account</string>

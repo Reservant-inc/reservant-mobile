@@ -7,12 +7,10 @@ data object MainRoutes{
     object Home
 
     @Serializable
-    object Profile
+    object Settings
 
     @Serializable
-    object Orders
+    object Social
 
-    @Serializable
-    object UserProfile
 }
 
