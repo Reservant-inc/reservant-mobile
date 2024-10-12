@@ -75,6 +75,7 @@ import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.services.NotificationService
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -236,8 +237,6 @@ fun MapActivity(){
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-
                             TextField(
                                 value = eventSearchQuery,
                                 onValueChange = {
@@ -279,17 +278,18 @@ fun MapActivity(){
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                items(events.itemCount) { index ->
-                                    val item = events[index]
-                                    if(item != null){
-                                        EventCard(
-                                            eventCreator = item.name,
-                                            eventDate = item.time,
-                                            eventLocation = item.restaurant.address,
-                                            interestedCount = item.numberInterested,
-                                            takePartCount = item.numberParticipants
-                                        )
-                                    }
+                            items(events.itemCount) { index ->
+                                val item = events[index]
+                                if(item != null){
+                                    val day = formatDateTime(item.time, "dd MMMM yyyy")
+                                    val time = formatDateTime(item.time, "HH:mm")
+                                    EventCard(
+                                        eventName = item.creatorFullName,
+                                        eventDate = "$time | $day",
+                                        eventLocation = item.restaurantName,
+                                        interestedCount = item.numberInterested,
+                                        takePartCount = item.participants
+                                    )
                                 }
                             }
                         }
