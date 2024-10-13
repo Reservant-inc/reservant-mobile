@@ -3,6 +3,8 @@ package reservant_mobile.data.services
 import androidx.paging.PagingData
 import com.example.reservant_mobile.R
 import io.ktor.client.call.body
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +51,16 @@ abstract class ServiceUtil(protected var api: APIService = APIService()) {
                 Result(isError = true, errors = r.value?.let { errorCodesWrapper(it) },value = null)
             }
             Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        }
+    }
+
+    protected suspend inline fun <reified T> websocketResultWrapper(session: DefaultClientWebSocketSession): Result<T?> {
+        return try{
+            val receivedMessage = session.receiveDeserialized<T>()
+            Result(isError = false, value = receivedMessage)
+        } catch (e: Exception){
+            println("SERVICE ERROR (websocket): $e")
+            Result(isError = true, errors = mapOf("TOAST" to R.string.error_unknown), value = null)
         }
     }
 

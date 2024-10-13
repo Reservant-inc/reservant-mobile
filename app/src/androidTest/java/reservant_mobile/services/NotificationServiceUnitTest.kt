@@ -2,6 +2,8 @@ package reservant_mobile.services
 
 import androidx.paging.testing.asSnapshot
 import com.google.common.truth.Truth.assertThat
+import io.ktor.websocket.close
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -34,5 +36,12 @@ class NotificationServiceUnitTest: ServiceTest() {
     @Test
     fun mark_notification_as_read_return_true()= runTest{
         assertThat(ser.markAsRead(listOf(1)).value).isTrue()
+    }
+
+    @Test
+    fun receive_notification_session_return_not_null()= runTest{
+        val session = ser.getNotificationSession().value!!
+        assertThat(session).isNotNull()
+        session.close()
     }
 }

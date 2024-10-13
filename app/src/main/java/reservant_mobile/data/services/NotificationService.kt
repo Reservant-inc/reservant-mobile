@@ -3,6 +3,7 @@ package reservant_mobile.data.services
 import androidx.paging.PagingData
 import com.example.reservant_mobile.R
 import io.ktor.client.call.body
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,9 @@ interface INotificationService{
     suspend fun getNotifications(unreadOnly: Boolean = false): Result<Flow<PagingData<NotificationDTO>>?>
     suspend fun getBubbleInfo(): Result<Int?>
     suspend fun markAsRead(notificationIds: List<Int>): Result<Boolean>
+    suspend fun getNotificationSession(): Result<DefaultClientWebSocketSession?>
+    suspend fun receiveNotificationFromSession(session: DefaultClientWebSocketSession): Result<NotificationDTO?>
+
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -57,5 +61,13 @@ class NotificationService: ServiceUtil(), INotificationService {
         val id: HashMap<String, List<Int>> = hashMapOf("notificationIds" to notificationIds)
         val res = api.post(Notifications.MarkRead(), id)
         return booleanResultWrapper(res)
+    }
+
+    override suspend fun getNotificationSession(): Result<DefaultClientWebSocketSession?> {
+        return api.createWebsocketSession("/notifications/ws")
+    }
+
+    override suspend fun receiveNotificationFromSession(session: DefaultClientWebSocketSession): Result<NotificationDTO?> {
+        return websocketResultWrapper(session)
     }
 }

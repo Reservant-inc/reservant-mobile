@@ -35,7 +35,7 @@ class VisitServiceUnitTest: ServiceTest() {
             takeaway = false,
             restaurantId = 1,
             tableId = 1,
-            participants = emptyList()
+            participantIds = emptyList()
             )
     }
 

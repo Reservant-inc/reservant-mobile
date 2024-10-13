@@ -245,4 +245,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
         assertThat(ser.editIngredient(1,ingredient).value).isNotNull()
     }
 
+    @Test
+    fun correct_ingredient_return_not_null()= runTest{
+        assertThat(ser.correctIngredient(
+            ingredientId = 1,
+            newAmount = 10.0,
+            comment = "Test"
+        ).value).isNotNull()
+    }
+
 }

@@ -1,6 +1,8 @@
 package reservant_mobile.data.services
 
 import androidx.paging.PagingData
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
@@ -24,7 +26,9 @@ interface IThreadsService{
     suspend fun markMessageAsRead(messageId: Any): Result<MessageDTO?>
     suspend fun addParticipant(threadId: Any, userId: String): Result<Boolean>
     suspend fun removeParticipant(threadId: Any, userId: String): Result<Boolean>
-
+    suspend fun getThreadSession(threadId: Any): Result<DefaultClientWebSocketSession?>
+    suspend fun receiveMessageFromSession(session: DefaultClientWebSocketSession): Result<MessageDTO?>
+    suspend fun sendMessageFromSession(session: DefaultClientWebSocketSession, message: String): Boolean
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -109,6 +113,23 @@ class ThreadsService: ServiceUtil(), IThreadsService {
         )
         val res = api.post(Threads.ThreadId.RemoveParticipant(Threads.ThreadId(threadId = threadId.toString())), message)
         return booleanResultWrapper(res)
+    }
+
+    override suspend fun getThreadSession(threadId: Any): Result<DefaultClientWebSocketSession?> {
+        return api.createWebsocketSession("/threads/$threadId/ws")
+    }
+
+    override suspend fun receiveMessageFromSession(session: DefaultClientWebSocketSession): Result<MessageDTO?> {
+        return websocketResultWrapper(session)
+    }
+
+    override suspend fun sendMessageFromSession(session: DefaultClientWebSocketSession, message: String): Boolean {
+        return try{
+            session.sendSerialized(message)
+            true
+        } catch (e : Exception){
+            false
+        }
     }
 
 }

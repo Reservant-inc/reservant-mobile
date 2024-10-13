@@ -20,4 +20,21 @@ data class IngredientDTO (
         val amountUsed: Double
     )
 
+    @Serializable
+    data class CorrectionDTO(
+        val correctionId: Int? = null,
+        val ingredient: IngredientDTO? = null,
+        val oldAmount: Double? = null,
+        val newAmount: Double,
+        /***
+         * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
+         */
+        val correctionDate: String? = null,
+        /***
+         * userId, firstName, lastName, photo
+         */
+        val user:UserSummaryDTO? = null,
+        val comment: String? = null
+    )
+
 }
