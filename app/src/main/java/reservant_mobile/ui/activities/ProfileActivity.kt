@@ -301,72 +301,12 @@ fun OrdersTab() {
 
 @Composable
 fun ChatsTab() {
-    val chats = listOf(
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?"),
-        Chat("John Doe", "Whats up?")
-    )
-
-    LazyColumn(modifier = Modifier.padding(top = 72.dp)) {
-        items(chats) { chat ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = "Chat User Picture",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Column(modifier = Modifier.padding(start = 16.dp)) {
-                    Text(text = chat.userName, fontWeight = FontWeight.Bold)
-                    Text(text = chat.message, color = Color.Gray)
-                }
-            }
-        }
-    }
+    // Chats
 }
 
 @Composable
 fun FriendsTab() {
-    val friends = listOf(
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe"),
-        Friend("John Doe")
-    )
-
-    LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 72.dp)) {
-        items(friends) { friend ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.jd),
-                    contentDescription = "Friend Settings Picture",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = friend.name, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
+    // Friends
 }
 
 data class Chat(val userName: String, val message: String)
