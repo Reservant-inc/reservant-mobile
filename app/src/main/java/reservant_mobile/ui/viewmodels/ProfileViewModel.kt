@@ -19,6 +19,7 @@ import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.services.UserService.UserObject
 
 class ProfileViewModel(
     private val userService: IUserService = UserService(),
@@ -40,24 +41,11 @@ class ProfileViewModel(
     init {
         viewModelScope.launch {
             loadUser(userId = profileUserId)
-            if (UserService.UserObject.userId == profileUserId) {
+            if (UserObject.userId == profileUserId) {
                 isCurrentUser = true
             } else {
                 fetchFriends()
-            } else {
-                isCurrentUser = true
-                profileUser = user?.let {
-                    UserSummaryDTO(
-                        userId = it.userId!!,
-                        login = it.login!!,
-                        firstName = it.firstName,
-                        lastName = it.lastName,
-                        birthDate = it.birthDate,
-                        friendStatus = null
-                    )
-                }
             }
-            fetchUserEvents()
         }
     }
     
