@@ -45,6 +45,7 @@ class ProfileViewModel(
             if (user?.userId != profileUserId) {
                 isCurrentUser = false
                 loadUser(userId = profileUserId)
+                fetchFriends()
             } else {
                 isCurrentUser = true
                 profileUser = user?.let {
@@ -57,9 +58,6 @@ class ProfileViewModel(
                         friendStatus = null
                     )
                 }
-            }
-            if (!isCurrentUser) {
-                fetchFriends()
             }
             fetchUserEvents()
         }
