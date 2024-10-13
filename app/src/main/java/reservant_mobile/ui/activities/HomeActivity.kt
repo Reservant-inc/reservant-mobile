@@ -1,10 +1,10 @@
 package reservant_mobile.ui.activities
 
-import OrdersActivity
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,7 +24,6 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
-import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
@@ -42,7 +41,7 @@ fun HomeActivity() {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
-        BottomNavItem.Landing,
+        BottomNavItem.Social,
         BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
         BottomNavItem.Profile
     )
@@ -67,11 +66,14 @@ fun HomeActivity() {
                 composable<RegisterRestaurantRoutes.Register>{
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
-                composable<MainRoutes.Profile>{
-                    SettingsActivity(navController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                composable<MainRoutes.Settings>{
+                    SettingsActivity(homeNavController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
+                }
+                composable<MainRoutes.Social> { 
+                    SocialActivity()
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
@@ -79,24 +81,7 @@ fun HomeActivity() {
                     }
                     LandingActivity()
                 }
-                composable<MainRoutes.Orders>{
-                    OrdersActivity()
-                }
 
-                composable<UserRoutes.ChatList> {
-                    ChatListActivity(navController = innerNavController)
-                }
-                // TODO: change hardcoded id - now its 'customer'
-                composable<MainRoutes.UserProfile>{
-                    ProfileActivity(navController = innerNavController, "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29")
-                }
-                composable<RestaurantRoutes.Ticket>{
-                    NewTicketActivity()
-                }
-
-                composable<RestaurantRoutes.TicketHistory>{
-                    TicketHistoryActivity(navController = innerNavController)
-                }
             }
         }
     }

@@ -393,7 +393,7 @@ fun FriendsTab() {
             ) {
                 Image(
                     painter = painterResource(R.drawable.jd),
-                    contentDescription = "Friend Profile Picture",
+                    contentDescription = "Friend Settings Picture",
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape),
