@@ -160,7 +160,6 @@ fun EventCard(
                     Image(
                         painter = painterResource(id = R.drawable.restaurant_photo),
                         contentDescription = "Event Image",
-                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
                     )
