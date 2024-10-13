@@ -117,6 +117,7 @@
     <string name="label_alcohol">Zawartość alkoholu</string>
     <string name="label_logout_action">Wyloguj się</string>
     <string name="label_orders">Zamówienia</string>
+    <string name="label_social">Społeczność</string>
     <string name="label_search">Szukaj...</string>
     <string name="label_filters">Filtry</string>
     <string name="label_date">Data</string>
@@ -136,7 +137,7 @@
     <string name="label_wallet">Portfel</string>
     <string name="label_my_orders">Moje zamówienia</string>
     <string name="label_helpdesk">Pomoc techniczna</string>
-    <string name="label_faq">FAQ</string>
+    <string name="label_complaints">Zgłoszenia</string>
     <string name="label_promo_codes">Kody promocyjne</string>
     <string name="label_app_settings">Ustawienia aplikacji</string>
     <string name="label_delete_account">Usuń konto</string>
@@ -215,4 +216,10 @@
     <string name="label_edit_review">Edytuj opinię</string>
     <string name="label_delete_review">Usuń opinię</string>
     <string name="message_notification_not_granted">Aplikacja nie będzie otrzymywała powiadomień</string>
+    <string name="label_search_events">Szykaj wydarzeń</string>
+    <string name="label_search_filter_rating">Filtruj przez minimalną ocenę</string>
+    <string name="label_search_filter_tags">Wybierz do5 tagów</string>
+    <string name="error_too_many_tags">Możesz wybrać maksymalnie 5 tagów</string>
+    <string name="label_apply">Zastosuj</string>
+    <string name="message_not_found_any">Nie znaleziono %1$s</string>
 </resources>

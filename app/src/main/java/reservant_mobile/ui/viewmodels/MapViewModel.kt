@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -23,7 +24,6 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -31,27 +31,36 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import reservant_mobile.data.models.dtos.EventDTO
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import reservant_mobile.data.models.dtos.LocationDTO
 import reservant_mobile.data.services.RestaurantService
+
 
 class MapViewModel : ReservantViewModel() {
     private object OsmMap {
         lateinit var view:MapView
     }
 
+    var userPosition = GeoPoint(52.237049, 21.017532)
+
     private val restaurantService = RestaurantService()
+
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
-    private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
-    private var _addedRestaurants = ArrayList<Int>()
+    private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
+    private var _addedRestaurants = mutableListOf<Int>()
+    var restaurantTags = mutableListOf<String>()
     val restaurants: StateFlow<PagingData<RestaurantOnMap>> = _restaurantsState.asStateFlow()
-    val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
-    var isLoading: Boolean by mutableStateOf(false)
+    val events: StateFlow<PagingData<EventOnMap>> = _eventsState.asStateFlow()
+    var areFiltersLoading: Boolean by mutableStateOf(false)
+
     private lateinit var poiMarkers:RadiusMarkerClusterer
 
+    var search: String? = null
+    var selectedTags: List<String>? = null
+    var minRating: Int? = null
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
-
         val mv = MapView(context).apply {
 
             val customTiles = object : XYTileSource(
@@ -73,43 +82,61 @@ class MapViewModel : ReservantViewModel() {
             minZoomLevel = 4.0
             maxZoomLevel = 20.0
             controller.setZoom(17.0)
-            controller.setCenter(startPoint)
+//            controller.setCenter(startPoint)
 
             poiMarkers = RadiusMarkerClusterer(context)
             overlays.add(poiMarkers)
         }
 
+        _addedRestaurants = emptyList<Int>().toMutableList()
         OsmMap.view = mv
-        addUserMarker(startPoint)
-        getRestaurantsInArea(startPoint)
+        addUserMarker()
+        getRestaurants(startPoint)
+        getEvents()
 
         return OsmMap.view
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun addUserMarker(startPoint: GeoPoint){
-        val startMarker = Marker(OsmMap.view)
-        startMarker.position = startPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.icon = OsmMap.view.context.getDrawable( R.drawable.user)
-        startMarker.setInfoWindow(null)
-        OsmMap.view.overlays.add(startMarker)
+    private fun addUserMarker(){
+        val context = OsmMap.view.context
+        val userMarker = MyLocationNewOverlay(GpsMyLocationProvider(context), OsmMap.view)
+        userMarker.enableMyLocation()
+        userMarker.enableFollowLocation()
+        userMarker.runOnFirstFix {
+            userPosition =  GeoPoint(userMarker.myLocation)
+        }
+        val icon = context.getDrawable( R.drawable.user)
+        val iconBitmap = (icon as BitmapDrawable).bitmap
+        userMarker.setPersonIcon(iconBitmap)
+        userMarker.setDirectionIcon(iconBitmap);
+        userMarker.setPersonAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        userMarker.setDirectionAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        OsmMap.view.overlays.add(userMarker)
     }
 
-    fun getRestaurantsInArea(userLocation: GeoPoint){
+    fun refreshRestaurants(userLocation: GeoPoint) {
+//        _restaurantsState.value = PagingData.empty()
+        getRestaurants(userLocation)
+    }
+
+
+    fun getRestaurants(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
                 val res = restaurantService.getRestaurants(
                     origLat = userLocation.latitude,
-                    origLon = userLocation.longitude
+                    origLon = userLocation.longitude,
+                    name = search,
+                    tags = selectedTags,
+                    minRating = minRating,
                 )
+
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.collectLatest { pagingData ->
-
+                res.value.cachedIn(viewModelScope).collect { pagingData ->
                     _restaurantsState.value = pagingData.map { dto ->
-
                         RestaurantOnMap(
                             restaurantId = dto.restaurantId,
                             name = dto.name,
@@ -135,14 +162,39 @@ class MapViewModel : ReservantViewModel() {
                 if(res.isError || res.value == null)
                     throw Exception()
 
-                res.value.cachedIn(viewModelScope).collectLatest { pagingData ->
-                    _eventsState.value = pagingData
+                res.value.cachedIn(viewModelScope).collect { pagingData ->
+                    _eventsState.value = pagingData.map { dto ->
+                        EventOnMap(
+                            eventId = dto.eventId!!,
+                            time = dto.time,
+                            creatorId = dto.creatorId!!,
+                            creatorFullName = dto.creatorFullName!!,
+                            restaurantId = dto.restaurantId,
+                            restaurantName = dto.restaurantName!!,
+                            participants = dto.participants?.size ?: 0,
+                            numberInterested = dto.numberInterested!!
+                        )
+                    }
                 }
 
             } catch (e: Exception) {
                 Log.d("[EVENT]:", e.toString())
-
             }
+        }
+    }
+
+    fun getRestaurantTags(){
+        if(restaurantTags.isNotEmpty()){
+            return
+        }
+
+        areFiltersLoading = true
+        viewModelScope.launch {
+            val res = restaurantService.getRestaurantTags()
+            if(!res.isError){
+                restaurantTags = res.value as MutableList<String>
+            }
+            areFiltersLoading = false
         }
     }
 
@@ -251,3 +303,14 @@ data class RestaurantOnMap(
     val logo: Bitmap?,
     val location: LocationDTO?
     )
+
+data class EventOnMap(
+    val eventId: Int,
+    val time: String,
+    val creatorId: String,
+    val creatorFullName: String,
+    val restaurantId: Int,
+    val restaurantName:String,
+    val participants: Int,
+    val numberInterested: Int
+)

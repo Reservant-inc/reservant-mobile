@@ -26,9 +26,9 @@ import reservant_mobile.ui.viewmodels.LoginViewModel
 class MainActivity : ComponentActivity() {
     private val fcmService = FirebaseService()
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
         val splashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
 
         var isLoading = true
         var startPoint: @Composable ()->Unit
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                      { EmployeeHomeActivity() }
                  }
                  else{
-                     {HomeActivity()}
+                     { HomeActivity() }
                  }
              } else {
                  { LandingActivity() }
