@@ -103,6 +103,7 @@ interface IRestaurantService{
 
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
+    suspend fun correctIngredient(ingredientId: Any, newAmount: Double, comment: String): Result<IngredientDTO.CorrectionDTO?>
 
 }
 
@@ -394,6 +395,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         ingredient: IngredientDTO
     ): Result<IngredientDTO?> {
         val res = api.put(Ingredients.IngredientId(ingredientId = ingredientId.toString()), ingredient)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun correctIngredient(
+        ingredientId: Any,
+        newAmount: Double,
+        comment: String
+    ): Result<IngredientDTO.CorrectionDTO?> {
+        val correction = IngredientDTO.CorrectionDTO(
+            newAmount = newAmount,
+            comment = comment
+        )
+        val res = api.post(Ingredients.IngredientId.CorrectAmount(parent = Ingredients.IngredientId(ingredientId = ingredientId.toString())), correction)
         return complexResultWrapper(res)
     }
 }
