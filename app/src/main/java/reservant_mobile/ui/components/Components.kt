@@ -608,6 +608,7 @@ fun DeleteCountdownPopup(
 @Composable
 fun MyFloatingActionButton(
     onClick: () -> Unit,
+    modifier: Modifier? = null,
     allPadding: Dp = 16.dp,
     topPadding: Dp = 16.dp,
     bottomPadding: Dp = 16.dp,
@@ -617,7 +618,7 @@ fun MyFloatingActionButton(
 ) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = Modifier
+        modifier = if(modifier != null) modifier else Modifier
             .padding(allPadding)
             .padding(
                 top = topPadding,
