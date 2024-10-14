@@ -135,7 +135,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "5,00 " + stringResource(R.string.label_rating), // TODO: zmienna z oceną użytkownika
+                                        text = "5,00", // TODO: zmienna z oceną użytkownika z backu
                                         color = Color.Gray
                                     )
                                 }
