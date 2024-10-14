@@ -255,4 +255,12 @@
     <string name="label_read_at">Przeczytano o</string>
     <string name="label_interested">zainteresowani</string>
     <string name="label_takePart">bierze udział</string>
+    <string name="label_add_event">Dodaj Wydarzenie</string>
+    <string name="label_event_name">Nazwa wydarzenia</string>
+    <string name="label_event_description">Opis wydarzenia</string>
+    <string name="label_event_max_people">Maksymalna liczba osób</string>
+    <string name="label_search_restaurants">Wyszukaj restaurację</string>
+    <string name="label_selected_restaurant">Wybrana restauracja</string>
+    <string name="error_add_event_failed">Dodawanie eventu nieudane</string>
+    <string name="error_fill_all_fields">Wypełnij wszystkie pola</string>
 </resources>
