@@ -78,12 +78,15 @@ import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import kotlin.time.Duration.Companion.milliseconds
@@ -217,25 +220,36 @@ fun MapActivity(){
                             )
                         )
                     } else {
-                        LazyColumn(
-                            Modifier
-                                .fillMaxSize()
-                                .padding(top = 75.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            items(events.itemCount) { index ->
-                                val item = events[index]
-                                if(item != null){
-                                    EventCard(
-                                        eventCreator = item.creatorFullName,
-                                        eventDate = item.time,
-                                        eventLocation = item.restaurantName,
-                                        interestedCount = item.numberInterested,
-                                        takePartCount = item.participants
-                                    )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 75.dp)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                items(events.itemCount) { index ->
+                                    val item = events[index]
+                                    if(item != null){
+                                        EventCard(
+                                            eventCreator = item.creatorFullName,
+                                            eventDate = item.time,
+                                            eventLocation = item.restaurantName,
+                                            interestedCount = item.numberInterested,
+                                            takePartCount = item.participants
+                                        )
+                                    }
                                 }
                             }
+
+                            MyFloatingActionButton(
+                                onClick = {
+                                    navController.navigate(EventRoutes.AddEvent)
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(16.dp)
+                            )
                         }
                     }
                 }
@@ -347,6 +361,9 @@ fun MapActivity(){
         }
         composable<RestaurantRoutes.Reservation>{
             RestaurantReservationActivity(navController = navController)
+        }
+        composable<EventRoutes.AddEvent>{
+            AddEventActivity(navController = navController)
         }
     }
 
