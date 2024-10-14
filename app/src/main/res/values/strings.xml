@@ -272,4 +272,5 @@
     <string name="label_selected_restaurant">Selected restaurant</string>
     <string name="error_add_event_failed">Adding event failed</string>
     <string name="error_fill_all_fields">Fill all fields</string>
+    <string name="label_available_restaurants">Available restaurants:</string>
 </resources>
