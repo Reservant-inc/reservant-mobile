@@ -80,10 +80,41 @@ class ReviewsViewModel(
     }
 
     fun editReview(reviewId: Int, stars: Int, contents: String) {
-        // TODO: Implementacja edycji opinii
+        viewModelScope.launch {
+            isSaving = true
+
+            val updatedReview = ReviewDTO(
+                stars = stars,
+                contents = contents
+            )
+
+            val result = restaurantService.editRestaurantReview(reviewId, updatedReview)
+
+            this@ReviewsViewModel.result.isError = result.isError
+
+            if (!result.isError) {
+                fetchReviews()
+            }
+
+            isSaving = false
+        }
     }
 
+
     fun deleteReview(reviewId: Int) {
-        // TODO: Implementacja usuwania opinii
+        viewModelScope.launch {
+            isSaving = true
+
+            val result = restaurantService.deleteRestaurantReview(reviewId)
+
+            this@ReviewsViewModel.result.isError = result.isError
+
+            if (!result.isError) {
+                fetchReviews()
+            }
+
+            isSaving = false
+        }
     }
+
 }
