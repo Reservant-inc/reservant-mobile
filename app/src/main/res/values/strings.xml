@@ -231,4 +231,8 @@
     <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
+    <string name="label_current_reports">Current reports</string>
+    <string name="label_unresolved">Unresolved</string>
+    <string name="label_to_be_reviewed">To be reviewed</string>
+    <string name="label_in_progress">In progress</string>
 </resources>
