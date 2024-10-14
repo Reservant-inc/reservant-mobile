@@ -28,6 +28,7 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.viewmodels.AddEventViewModel
 import androidx.compose.runtime.setValue
+import java.time.LocalDate
 
 @Composable
 fun AddEventActivity(navController: NavHostController) {
@@ -88,7 +89,9 @@ fun AddEventActivity(navController: NavHostController) {
                 label = { stringResource(R.string.label_event_start_date)},
                 onDateChange = {
                     time = it
-                }
+                },
+                allowFutureDates = true,
+                startDate = (LocalDate.now().year).toString() + "-10-15" // TODO: better startDate
             )
         }
 
@@ -97,7 +100,9 @@ fun AddEventActivity(navController: NavHostController) {
                 label = { stringResource(R.string.label_event_must_join_until)},
                 onDateChange = {
                     mustJoinUntil = it
-                }
+                },
+                allowFutureDates = true,
+                startDate = (LocalDate.now().year).toString() + "-10-15" // TODO: better startDate
             )
         }
 
