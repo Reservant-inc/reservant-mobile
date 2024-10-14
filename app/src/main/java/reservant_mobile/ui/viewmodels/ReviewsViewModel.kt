@@ -24,6 +24,9 @@ class ReviewsViewModel(
     private val _reviewsFlow = MutableStateFlow<Flow<PagingData<ReviewDTO>>?>(null)
     val reviewsFlow: StateFlow<Flow<PagingData<ReviewDTO>>?> = _reviewsFlow
 
+    private val _review = MutableStateFlow<Result<ReviewDTO?>>(Result(isError = false, value = null))
+    val review: StateFlow<Result<ReviewDTO?>> = _review
+
     var result: Result<ReviewDTO?> = Result(isError = false, value = null)
         private set
 
@@ -43,6 +46,19 @@ class ReviewsViewModel(
             }
         }
     }
+
+    fun fetchReview(reviewId: Int) {
+        viewModelScope.launch {
+            val result: Result<ReviewDTO?> = restaurantService.getRestaurantReview(reviewId)
+
+            if (!result.isError) {
+                _review.value = result
+            } else {
+                _review.value = Result(isError = true, value = null)
+            }
+        }
+    }
+
 
     suspend fun addReview(stars: Int, contents: String) {
         isSaving = true // Ustawienie flagi isSaving na true przed rozpoczęciem zapisu
