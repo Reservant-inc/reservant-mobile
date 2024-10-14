@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CalendarMonth
@@ -28,6 +27,7 @@ import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.viewmodels.AddEventViewModel
+import androidx.compose.runtime.setValue
 
 @Composable
 fun AddEventActivity(navController: NavHostController) {
@@ -41,11 +41,10 @@ fun AddEventActivity(navController: NavHostController) {
     var time by remember { mutableStateOf("") }
     var mustJoinUntil by remember { mutableStateOf("") }
     var maxPeople by remember { mutableStateOf("") }
-    var selectedRestaurant: RestaurantDTO? by remember { mutableStateOf(null) }
+    var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
 
     val context = LocalContext.current
 
-    // Update search query in the ViewModel
     LaunchedEffect(searchQuery) {
         addEventViewModel.searchQuery.value = searchQuery
     }
@@ -86,6 +85,7 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             MyDatePickerDialog(
+                label = { stringResource(R.string.)},
                 onDateChange = {
                     time = it
                 }
@@ -148,7 +148,7 @@ fun AddEventActivity(navController: NavHostController) {
         item {
             selectedRestaurant?.let {
                 Text(
-                    text = stringResource(id = R.string.label_selected_restaurant, it.name),
+                    text = stringResource(id = R.string.label_selected_restaurant) + " "+it.name,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
