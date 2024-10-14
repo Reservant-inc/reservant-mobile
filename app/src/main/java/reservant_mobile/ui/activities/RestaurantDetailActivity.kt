@@ -72,6 +72,7 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventsContent
@@ -460,12 +461,14 @@ fun ReviewsContent(
                         ReviewCard(
                             review = review,
                             onClick = {
-                                navController.navigate(
-                                    RestaurantRoutes.EditReview(
-                                        restaurantId = restaurantId,
-                                        reviewId = review.reviewId!!
+                                if(review.authorId == UserService.UserObject.userId) {
+                                    navController.navigate(
+                                        RestaurantRoutes.EditReview(
+                                            restaurantId = restaurantId,
+                                            reviewId = review.reviewId!!
+                                        )
                                     )
-                                )
+                                }
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))

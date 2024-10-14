@@ -15,6 +15,7 @@ import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 
 class ReviewsViewModel(
     private val restaurantId: Int,
@@ -24,7 +25,8 @@ class ReviewsViewModel(
     private val _reviewsFlow = MutableStateFlow<Flow<PagingData<ReviewDTO>>?>(null)
     val reviewsFlow: StateFlow<Flow<PagingData<ReviewDTO>>?> = _reviewsFlow
 
-    private val _review = MutableStateFlow<Result<ReviewDTO?>>(Result(isError = false, value = null))
+    private val _review =
+        MutableStateFlow<Result<ReviewDTO?>>(Result(isError = false, value = null))
     val review: StateFlow<Result<ReviewDTO?>> = _review
 
     var result: Result<ReviewDTO?> = Result(isError = false, value = null)
@@ -39,7 +41,8 @@ class ReviewsViewModel(
 
     fun fetchReviews() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<ReviewDTO>>?> = restaurantService.getRestaurantReviews(restaurantId)
+            val result: Result<Flow<PagingData<ReviewDTO>>?> =
+                restaurantService.getRestaurantReviews(restaurantId)
 
             if (!result.isError) {
                 _reviewsFlow.value = result.value?.cachedIn(viewModelScope)
@@ -116,5 +119,4 @@ class ReviewsViewModel(
             isSaving = false
         }
     }
-
 }
