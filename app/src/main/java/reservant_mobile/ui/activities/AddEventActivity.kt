@@ -85,9 +85,18 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             MyDatePickerDialog(
-                label = { stringResource(R.string.)},
+                label = { stringResource(R.string.label_event_start_date)},
                 onDateChange = {
                     time = it
+                }
+            )
+        }
+
+        item {
+            MyDatePickerDialog(
+                label = { stringResource(R.string.label_event_must_join_until)},
+                onDateChange = {
+                    mustJoinUntil = it
                 }
             )
         }
