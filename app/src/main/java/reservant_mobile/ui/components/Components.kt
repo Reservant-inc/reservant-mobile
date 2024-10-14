@@ -977,37 +977,38 @@ fun SearchBarWithFilter(
                 }
             }
         }
-    }
 
-    // Show current filter if applicable (string or int)
-    currentFilter?.let {
-        if (it.isNotEmpty()) {
-            Text(
-                text = stringResource(id = R.string.label_current_filter, it),
-                style = TextStyle(
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(top = 8.dp)
-            )
+
+        // Show current filter if applicable (string or int)
+        currentFilter?.let {
+            if (it.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.label_current_filter, it),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
-    }
 
-    currentFilterInt?.let {
-        if (it > 0) {
-            Text(
-                text = stringResource(
-                    id = R.string.label_current_filter,
-                    "$it ${stringResource(id = R.string.label_stars)}"
-                ),
-                style = TextStyle(
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(top = 8.dp)
-            )
+        currentFilterInt?.let {
+            if (it > 0) {
+                Text(
+                    text = stringResource(
+                        id = R.string.label_current_filter,
+                        "$it ${stringResource(id = R.string.label_stars)}"
+                    ),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
