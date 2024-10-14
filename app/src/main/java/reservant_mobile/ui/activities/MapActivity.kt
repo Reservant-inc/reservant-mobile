@@ -85,12 +85,15 @@ import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.NotificationHandler
+import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import java.time.LocalDate
@@ -290,6 +293,15 @@ fun MapActivity(){
                                     )
                                 }
                             }
+
+                            MyFloatingActionButton(
+                                onClick = {
+                                    navController.navigate(EventRoutes.AddEvent)
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(16.dp)
+                            )
                         }
                     }
                 }
@@ -483,6 +495,9 @@ fun MapActivity(){
         }
         composable<RestaurantRoutes.Reservation>{
             RestaurantReservationActivity(navController = navController)
+        }
+        composable<EventRoutes.AddEvent>{
+            AddEventActivity(navController = navController)
         }
     }
 
