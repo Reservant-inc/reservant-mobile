@@ -407,24 +407,18 @@ fun ReviewsContent(
     reviewsFlow: LazyPagingItems<ReviewDTO>?,
     navController: NavController,
     restaurantId: Int,
-    reviewsViewModel: ReviewsViewModel // Dodaj ViewModel jako parametr
+    reviewsViewModel: ReviewsViewModel
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var currentFilter by remember { mutableStateOf<String?>(null) }
+    var currentFilterInt by remember { mutableStateOf<Int?>(null) }
 
-    // Dodaj LaunchedEffect do odświeżania opinii
+    // Fetch reviews on screen enter
     LaunchedEffect(Unit) {
-        reviewsViewModel.fetchReviews()  // Odświeżanie opinii przy każdorazowym wejściu na ekran
+        reviewsViewModel.fetchReviews()
     }
 
-    // Lista opcji filtrowania
-    val filterOptions = listOf(
-        stringResource(id = R.string.label_5_stars),
-        stringResource(id = R.string.label_4_stars),
-        stringResource(id = R.string.label_3_stars),
-        stringResource(id = R.string.label_2_stars),
-        stringResource(id = R.string.label_1_star)
-    )
+    // Filter options for stars (integer values for the dropdown menu)
+    val filterOptionsInt = listOf(5, 4, 3, 2, 1)
 
     Column(
         modifier = Modifier
@@ -432,16 +426,16 @@ fun ReviewsContent(
             .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(64.dp))
-        // Search Bar with Filter
 
+        // Search Bar with Filter
         Row(Modifier.fillMaxWidth()) {
             Box(modifier = Modifier.fillMaxWidth(0.8f)) {
                 SearchBarWithFilter(
                     searchQuery = searchQuery,
                     onSearchQueryChange = { query -> searchQuery = query },
-                    onFilterSelected = { filter -> currentFilter = filter },
-                    currentFilter = currentFilter,
-                    filterOptions = filterOptions
+                    onFilterSelectedInt = { filterInt -> currentFilterInt = filterInt },
+                    currentFilterInt = currentFilterInt,
+                    filterOptionsInt = filterOptionsInt
                 )
             }
             ButtonComponent(
@@ -456,9 +450,7 @@ fun ReviewsContent(
         reviewsFlow?.let { lazyPagingItems ->
             val filteredReviews = lazyPagingItems.itemSnapshotList.items.filter { review ->
                 val matchesQuery = review.contents.contains(searchQuery, ignoreCase = true)
-                val matchesFilter = currentFilter.isNullOrEmpty() ||
-                        currentFilter == stringResource(id = R.string.label_all) ||
-                        review.stars.toString() == currentFilter?.split(" ")?.get(0)
+                val matchesFilter = currentFilterInt == null || review.stars == currentFilterInt
                 matchesQuery && matchesFilter
             }
 
@@ -467,7 +459,14 @@ fun ReviewsContent(
                     filteredReviews.forEach { review ->
                         ReviewCard(
                             review = review,
-                            onClick = { navController.navigate(RestaurantRoutes.EditReview(restaurantId = restaurantId, reviewId = review.reviewId!!)) }
+                            onClick = {
+                                navController.navigate(
+                                    RestaurantRoutes.EditReview(
+                                        restaurantId = restaurantId,
+                                        reviewId = review.reviewId!!
+                                    )
+                                )
+                            }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -489,6 +488,7 @@ fun ReviewsContent(
         }
     }
 }
+
 
 
 @Composable
@@ -548,6 +548,30 @@ fun ReviewCard(review: ReviewDTO, onClick: () -> Unit) {
                     )
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun FilterOptionWithStars(stars: Int) {
+    Row {
+        repeat(stars) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        repeat(5 - stars) {
+            Icon(
+                imageVector = Icons.Default.StarBorder,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

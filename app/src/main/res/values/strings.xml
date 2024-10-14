@@ -227,4 +227,5 @@
     <string name="error_too_many_tags">You can select up to 5 tags only</string>
     <string name="label_apply">Apply</string>
     <string name="message_not_found_any">Not found any %1$s</string>
+    <string name="label_stars">stars</string>
 </resources>

@@ -133,6 +133,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.utils.BottomNavItem
+import reservant_mobile.ui.activities.FilterOptionWithStars
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -148,7 +149,7 @@ fun ComboBox(
     label: String,
     isError: Boolean = false,
     errorText: String = ""
-){
+) {
 
     val onDismiss = { expanded.value = false }
     var beginValidation by remember {
@@ -176,7 +177,10 @@ fun ComboBox(
                 isError = isError && beginValidation
             )
 
-            if (isError && beginValidation) Text(text = errorText, color = MaterialTheme.colorScheme.error)
+            if (isError && beginValidation) Text(
+                text = errorText,
+                color = MaterialTheme.colorScheme.error
+            )
         }
 
         ExposedDropdownMenu(
@@ -246,7 +250,6 @@ fun ButtonComponent(
 }
 
 
-
 @Composable
 fun Logo(modifier: Modifier = Modifier) {
     Image(
@@ -295,17 +298,17 @@ fun IconWithHeader(
             .padding(bottom = 8.dp)
     ) {
         Box(Modifier.fillMaxWidth()) {
-            if (showBackButton){
+            if (showBackButton) {
                 ReturnButton(
                     onReturnClick = onReturnClick,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
-            Row (
+            Row(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .align(Alignment.Center)
-            ){
+            ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = icon.name,
@@ -344,7 +347,7 @@ fun LogoWithReturn(
 fun ReturnButton(
     onReturnClick: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Button(
         onClick = onReturnClick,
         contentPadding = PaddingValues(2.dp),
@@ -367,7 +370,7 @@ fun ReturnButton(
 @Composable
 fun ShowErrorToast(context: Context, id: Int) {
 
-    fun showToast(context: Context, msg: String){
+    fun showToast(context: Context, msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -391,7 +394,7 @@ fun BottomNavigation(
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
     var outlineColor by remember { mutableStateOf(outlineVariant) }
 
-    if (isSystemInDarkTheme()){
+    if (isSystemInDarkTheme()) {
         outlineColor = MaterialTheme.colorScheme.outline
     }
 
@@ -404,12 +407,12 @@ fun BottomNavigation(
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.drawBehind {
-                drawLine(
-                    color = outlineColor,
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth = 1.5f
-                )
+                    drawLine(
+                        color = outlineColor,
+                        start = Offset(0f, 0f),
+                        end = Offset(size.width, 0f),
+                        strokeWidth = 1.5f
+                    )
                 }
             ) {
                 items.forEach { item ->
@@ -424,7 +427,7 @@ fun BottomNavigation(
                                 selectedItem = item
                             }
                         }
-                    )    
+                    )
 
                 }
             }
@@ -736,7 +739,7 @@ fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
         modifier = Modifier
             .padding(vertical = 8.dp)
     ) {
-        items(tags){ tag ->
+        items(tags) { tag ->
             TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
@@ -752,7 +755,7 @@ fun TagItem(
         onClick = { onRemove() },
         label = { Text(tag) },
         trailingIcon = {
-            if(removable){
+            if (removable) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Remove tag"
@@ -799,7 +802,7 @@ fun FullscreenGallery(
                     }
                 }
 
-                if(bitmaps.isNotEmpty()){
+                if (bitmaps.isNotEmpty()) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
                         modifier = Modifier
@@ -826,8 +829,7 @@ fun FullscreenGallery(
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -872,9 +874,12 @@ fun IconButton(
 fun SearchBarWithFilter(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onFilterSelected: (String?) -> Unit,
-    currentFilter: String?,
-    filterOptions: List<String>
+    onFilterSelected: ((String?) -> Unit)? = null, // Optional string filter
+    onFilterSelectedInt: ((Int?) -> Unit)? = null, // Optional int filter
+    currentFilter: String? = null, // Optional string filter
+    currentFilterInt: Int? = null, // Optional int filter
+    filterOptions: List<String>? = null, // Optional list for string filters
+    filterOptionsInt: List<Int>? = null // Optional list for int filters
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
@@ -918,6 +923,8 @@ fun SearchBarWithFilter(
                     }
                 )
             }
+
+            // Show filter options dropdown
             Box {
                 IconButton(
                     onClick = { expanded = true },
@@ -937,34 +944,74 @@ fun SearchBarWithFilter(
                     DropdownMenuItem(
                         text = { Text(text = labelAll) },
                         onClick = {
-                            onFilterSelected("")
+                            onFilterSelected?.invoke(null) // Reset string filter if applicable
+                            onFilterSelectedInt?.invoke(null) // Reset int filter if applicable
                             expanded = false
                         }
                     )
-                    filterOptions.forEach { filter ->
+
+                    // Show string filter options if provided
+                    filterOptions?.forEach { filter ->
                         DropdownMenuItem(
                             text = { Text(text = filter) },
                             onClick = {
-                                onFilterSelected(if (filter == labelAll) "" else filter)
+                                onFilterSelected?.invoke(filter)
                                 expanded = false
                             }
                         )
                     }
+
+                    // Show int filter options if provided
+                    filterOptionsInt?.forEach { filterInt ->
+                        DropdownMenuItem(
+                            text = {
+                                FilterOptionWithStars(stars = filterInt) // Correct usage of text parameter
+                            },
+                            onClick = {
+                                onFilterSelectedInt?.invoke(filterInt)
+                                expanded = false
+                            }
+                        )
+                    }
+
                 }
             }
         }
+    }
 
-        currentFilter?.let {
-            if (it.isNotEmpty()) {
-                Text(
-                    text = stringResource(id = R.string.label_current_filter, it),
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp, fontWeight = FontWeight.Bold),
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+    // Show current filter if applicable (string or int)
+    currentFilter?.let {
+        if (it.isNotEmpty()) {
+            Text(
+                text = stringResource(id = R.string.label_current_filter, it),
+                style = TextStyle(
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+
+    currentFilterInt?.let {
+        if (it > 0) {
+            Text(
+                text = stringResource(
+                    id = R.string.label_current_filter,
+                    "$it ${stringResource(id = R.string.label_stars)}"
+                ),
+                style = TextStyle(
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
+
 
 @Composable
 fun FloatingTabSwitch(
@@ -1066,7 +1113,7 @@ fun FloatingTabSwitch(
 @Composable
 fun ImageCard(
     image: Painter
-){
+) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
@@ -1084,7 +1131,7 @@ fun ImageCard(
 @Composable
 fun ImageCard(
     image: ImageBitmap
-){
+) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
@@ -1101,15 +1148,15 @@ fun ImageCard(
 
 @Composable
 fun MissingPage(
-    modifier:Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier.fillMaxSize(),
     errorStringId: Int? = null,
     errorString: String = "",
-){
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         Icon(
             modifier = Modifier
                 .height(100.dp)
@@ -1120,7 +1167,7 @@ fun MissingPage(
         )
 
         var stringValue = errorString
-        if(errorStringId != null){
+        if (errorStringId != null) {
             stringValue = stringResource(id = errorStringId)
         }
 
@@ -1182,7 +1229,7 @@ fun LoadedPhotoComponent(
     photoModifier: Modifier = Modifier,
     placeholderModifier: Modifier = Modifier,
     getPhoto: suspend () -> Bitmap?,
-){
+) {
     var isLoading by remember {
         mutableStateOf(true)
     }
@@ -1204,7 +1251,7 @@ fun LoadedPhotoComponent(
         }
 
         !isLoading -> {
-            if (bitmap != null){
+            if (bitmap != null) {
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = "loaded_photo",
@@ -1232,14 +1279,16 @@ fun MessageSheet(
     buttonLabelId: Int? = null,
     buttonLabel: String = "",
     buttonOnClick: () -> Unit = {}
-){
+) {
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var buttonLabelValue by remember { mutableStateOf(buttonLabel) }
     val coroutineScope = rememberCoroutineScope()
-    val hideModalBottomSheet: () -> Unit = { coroutineScope.launch {
-        modalBottomSheetState.hide()
-        onDismiss()
-    } }
+    val hideModalBottomSheet: () -> Unit = {
+        coroutineScope.launch {
+            modalBottomSheetState.hide()
+            onDismiss()
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1256,12 +1305,12 @@ fun MessageSheet(
             ) {
                 content()
             }
-            
-            if(buttonLabelId != null){
+
+            if (buttonLabelId != null) {
                 buttonLabelValue = stringResource(id = buttonLabelId)
             }
 
-            if(buttonLabelValue.isNotEmpty()){
+            if (buttonLabelValue.isNotEmpty()) {
                 ButtonComponent(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -1309,7 +1358,8 @@ fun LoadingScreenWithTimeout(
 fun RequestPermission(
     permission: PermissionStrings,
     onPermissionGranted: () -> Unit = {},
-    onPermissionDenied: () -> Unit = {}) {
+    onPermissionDenied: () -> Unit = {}
+) {
     val permissionState = rememberPermissionState(permission.string)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -1317,8 +1367,7 @@ fun RequestPermission(
     ) { isGranted ->
         if (isGranted) {
             onPermissionGranted()
-        }
-        else{
+        } else {
             onPermissionDenied()
         }
     }
