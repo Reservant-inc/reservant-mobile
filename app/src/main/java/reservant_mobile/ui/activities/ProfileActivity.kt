@@ -271,7 +271,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             if (event != null) {
                                 EventCard(
                                     eventCreator = event.creatorFullName ?: "",
-                                    eventDate = event.time ?: "",
+                                    eventDate = event.time,
                                     eventLocation = event.restaurantName ?: "",
                                     interestedCount = event.numberInterested ?: 0,
                                     takePartCount = event.participants?.size ?: 0
