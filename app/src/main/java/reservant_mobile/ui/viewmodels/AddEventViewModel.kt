@@ -24,7 +24,6 @@ class AddEventViewModel(
     private val _restaurantsFlow = MutableStateFlow<Flow<PagingData<RestaurantDTO>>?>(null)
     val restaurantsFlow: StateFlow<Flow<PagingData<RestaurantDTO>>?> = _restaurantsFlow
 
-    // Optional: Search query to filter restaurants
     val searchQuery = MutableStateFlow("")
 
     var result: Result<EventDTO?> = Result(isError = false, value = null)
