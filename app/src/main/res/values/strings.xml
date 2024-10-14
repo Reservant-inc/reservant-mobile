@@ -227,4 +227,8 @@
     <string name="error_too_many_tags">You can select up to 5 tags only</string>
     <string name="label_apply">Apply</string>
     <string name="message_not_found_any">Not found any %1$s</string>
+    <string name="label_interested">interested</string>
+    <string name="label_takePart">take part</string>
+    <string name="error_loading_events">Error while loading events</string>
+    <string name="error_loading_more_events">Error while loading more events</string>
 </resources>

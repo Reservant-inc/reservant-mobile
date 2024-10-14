@@ -34,12 +34,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.data.utils.formatDateTime
 
 @Composable
 fun RestaurantCard(
@@ -116,7 +118,7 @@ fun EventsContent() {
     ) {
         repeat(3) {
             EventCard(
-                eventName = "Name of event",
+                eventCreator = "Name of event",
                 eventDate = "Saturday, 2024-06-22",
                 eventLocation = "John's Doe - Warsaw",
                 interestedCount = 20,
@@ -129,19 +131,24 @@ fun EventsContent() {
 
 @Composable
 fun EventCard(
-    eventName: String,
+    eventCreator: String,
     eventDate: String,
     eventLocation: String,
     interestedCount: Int,
     takePartCount: Int
 ) {
+    val date = formatDateTime(eventDate, "dd MMMM yyyy")
+    val time = formatDateTime(eventDate, "HH:mm")
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
                 Box(
@@ -153,24 +160,23 @@ fun EventCard(
                     Image(
                         painter = painterResource(id = R.drawable.restaurant_photo),
                         contentDescription = "Event Image",
-                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
                     )
                 }
 
                 Text(
-                    text = eventDate,
+                    text = "$time | $date",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventName,
+                    text = eventLocation,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventLocation,
+                    text = eventCreator,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -179,8 +185,14 @@ fun EventCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "$interestedCount - interested")
-                    Text(text = "$takePartCount - take part")
+                    if(interestedCount != 0)
+                        Text(
+                            text = "$interestedCount "+stringResource(R.string.label_interested)
+                        )
+                    if(takePartCount != 0)
+                        Text(
+                            text = "$takePartCount "+stringResource(R.string.label_takePart)
+                        )
                 }
             }
 

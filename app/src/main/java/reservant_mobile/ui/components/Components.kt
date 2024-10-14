@@ -287,7 +287,8 @@ fun IconWithHeader(
     icon: ImageVector,
     text: String,
     showBackButton: Boolean = false,
-    onReturnClick: () -> Unit = {}
+    onReturnClick: () -> Unit = {},
+    actions: @Composable (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -295,17 +296,17 @@ fun IconWithHeader(
             .padding(bottom = 8.dp)
     ) {
         Box(Modifier.fillMaxWidth()) {
-            if (showBackButton){
+            if (showBackButton) {
                 ReturnButton(
                     onReturnClick = onReturnClick,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
-            Row (
+            Row(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .align(Alignment.Center)
-            ){
+            ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = icon.name,
@@ -320,6 +321,14 @@ fun IconWithHeader(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                 )
+            }
+            if (actions != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                ) {
+                    actions()
+                }
             }
         }
 
