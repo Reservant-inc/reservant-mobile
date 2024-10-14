@@ -260,7 +260,7 @@
     <string name="label_event_description">Opis wydarzenia</string>
     <string name="label_event_max_people">Maksymalna liczba osób</string>
     <string name="label_search_restaurants">Wyszukaj restaurację</string>
-    <string name="label_selected_restaurant">Wybrana restauracja</string>
+    <string name="label_selected_restaurant">Wybrana restauracja:</string>
     <string name="error_add_event_failed">Dodawanie eventu nieudane</string>
     <string name="error_fill_all_fields">Wypełnij wszystkie pola</string>
     <string name="label_available_restaurants">Dostępne restauracje:</string>
