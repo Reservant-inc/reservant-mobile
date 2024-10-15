@@ -19,21 +19,29 @@ import io.ktor.client.plugins.resources.delete
 import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.resources.put
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.accept
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.fields.Result
 
 
 class APIService{
 
-    private val backendUrl= "http://172.21.40.127:12038"
+    private val backendIp= "172.21.40.127"
+    private val backendPort= 12038
+    private val backendUrl= "http://$backendIp:$backendPort"
 
     private val localService = LocalDataService()
     private val client = HttpClient(CIO){
@@ -60,6 +68,10 @@ class APIService{
                     getBearerTokens()
                 }
             }
+        }
+        install(WebSockets) {
+                pingInterval = 10_000
+                contentConverter = KotlinxWebsocketSerializationConverter(Json)
         }
         install(Resources)
 
@@ -152,6 +164,15 @@ class APIService{
             return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
 
         return Result(isError = false, value = res)
+    }
 
+    suspend fun createWebsocketSession(path: String):Result<DefaultClientWebSocketSession?> {
+        return try {
+            val ws = client.webSocketSession(method = HttpMethod.Get, host = backendIp, port = backendPort, path = path)
+            Result(isError = false, value = ws)
+        }catch (e: Exception){
+            println("[WS ERROR]: "+e.message)
+            Result(isError = true, errors = mapOf("TOAST" to  R.string.error_connection_server), value = null)
+        }
     }
 }

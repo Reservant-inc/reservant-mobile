@@ -220,25 +220,23 @@ fun MapActivity(){
                             )
                         )
                     } else {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            LazyColumn(
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(top = 75.dp)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                items(events.itemCount) { index ->
-                                    val item = events[index]
-                                    if(item != null){
-                                        EventCard(
-                                            eventCreator = item.creatorFullName,
-                                            eventDate = item.time,
-                                            eventLocation = item.restaurantName,
-                                            interestedCount = item.numberInterested,
-                                            takePartCount = item.participants
-                                        )
-                                    }
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(top = 75.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(events.itemCount) { index ->
+                                val item = events[index]
+                                if(item != null){
+                                    EventCard(
+                                        eventCreator = item.creatorFullName,
+                                        eventDate = item.time,
+                                        eventLocation = item.restaurantName,
+                                        interestedCount = item.numberInterested,
+                                        takePartCount = item.participants
+                                    )
                                 }
                             }
 

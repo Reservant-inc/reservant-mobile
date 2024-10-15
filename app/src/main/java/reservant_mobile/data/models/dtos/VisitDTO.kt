@@ -26,6 +26,7 @@ data class VisitDTO(
      * List of users containing: userId, firstName, lastname
      */
     val participants: List<UserDTO>? = null,
+    val participantIds: List<String>? = null,
     /***
      * List of orders containing: orderId, visitId, date, note, cost, status
      */
