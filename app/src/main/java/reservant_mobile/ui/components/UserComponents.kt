@@ -54,13 +54,8 @@ fun UserCard(){
             )
             Column(Modifier.weight(0.8f).align(Alignment.CenterVertically)) {
                 Text(
-                    text = UserService.UserObject.login,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
-                )
-                Text(
                     text = "${UserService.UserObject.firstName} ${UserService.UserObject.lastName}",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.W300
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
                 )
             }
         }

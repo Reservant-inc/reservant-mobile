@@ -109,16 +109,6 @@ fun ChatListActivity() {
                             )
                         }
                     )
-                    /*Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        onClick = { *//* Handle adding new chat *//* },
-                        modifier = Modifier.size(48.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.GroupAdd,
-                            contentDescription = "Add Chat"
-                        )
-                    }*/
                 }
 
                 LazyColumn {
