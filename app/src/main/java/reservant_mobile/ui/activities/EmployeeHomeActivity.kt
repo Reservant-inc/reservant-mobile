@@ -60,6 +60,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.services.UserService
@@ -70,6 +71,7 @@ import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EmployeeRoutes
 import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
 
@@ -235,11 +237,19 @@ fun EmployeeHomeActivity() {
                 }
 
                 composable<EmployeeRoutes.Home> {
+                    val restaurant = empHomeVM.selectedRestaurant!!
                     val options: List<EmpMenuOption> = listOf(
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_orders),
                             icon = Icons.Outlined.Book,
-                            background = painterResource(id = R.drawable.people_restaurant)
+                            background = painterResource(id = R.drawable.people_restaurant),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.ManageOrders(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_restaurant_tables),
@@ -263,7 +273,7 @@ fun EmployeeHomeActivity() {
                         ),
                     )
 
-                    val restaurant = empHomeVM.selectedRestaurant
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -303,6 +313,12 @@ fun EmployeeHomeActivity() {
                 }
                 composable<AuthRoutes.Landing> {
                     LandingActivity()
+                }
+                composable<RestaurantRoutes.ManageOrders> {
+                    OrderManagementScreen(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId
+                    )
                 }
             }
         }
