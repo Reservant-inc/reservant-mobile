@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,65 +34,48 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.SocialViewModel
 
 @Composable
-fun SocialActivity(){
+fun SocialActivity(navController: NavHostController){
     val viewmodel = viewModel<SocialViewModel>()
-    val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = MainRoutes.Social){
-        composable<MainRoutes.Social> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 16.dp, horizontal = 8.dp)
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    item {
-                        IconWithHeader(
-                            icon = Icons.Rounded.PersonPin,
-                            text = stringResource(R.string.label_social)
-                        )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp, horizontal = 8.dp)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            item {
+                IconWithHeader(
+                    icon = Icons.Rounded.PersonPin,
+                    text = stringResource(R.string.label_social),
+                    showBackButton = true,
+                    onReturnClick = { navController.popBackStack() }
+                )
 
-                        var query by remember {
-                            mutableStateOf("")
-                        }
-
-                        SearchBarWithFilter(
-                            searchQuery = query,
-                            onSearchQueryChange = { query = it },
-                            onFilterSelected = {},
-                            currentFilter = "",
-                            filterOptions = listOf()
-                        )
-
-                        Spacer(modifier = Modifier.size(32.dp))
-                    }
-
-                    items(7) {
-                        UserCard()
-                    }
+                var query by remember {
+                    mutableStateOf("")
                 }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.BottomEnd
-                ) {
-                    MyFloatingActionButton(
-                        onClick = {
-                            navController.navigate(UserRoutes.ChatList)
-                        },
-                        icon = Icons.AutoMirrored.Filled.Chat
-                    )
-                }
+                SearchBarWithFilter(
+                    searchQuery = query,
+                    onSearchQueryChange = { query = it },
+                    onFilterSelected = {},
+                    currentFilter = "",
+                    filterOptions = listOf()
+                )
+
+                Spacer(modifier = Modifier.size(32.dp))
+            }
+
+            items(7) {
+                UserCard()
             }
         }
-        composable<UserRoutes.ChatList> {
-            ChatListActivity(navController = navController)
-        }
+
+
     }
 }
