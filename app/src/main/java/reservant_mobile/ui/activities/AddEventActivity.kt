@@ -86,23 +86,27 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             MyDatePickerDialog(
-                label = { stringResource(R.string.label_event_start_date)},
+                label = {
+                    Text(stringResource(R.string.label_event_start_date))
+                },
                 onDateChange = {
                     time = it
                 },
                 allowFutureDates = true,
-                startDate = (LocalDate.now().year).toString() + "-10-15" // TODO: better startDate
+                startDate = LocalDate.now().toString() // TODO: better startDate (hours), move text() to MyDatePicker
+
             )
         }
 
         item {
             MyDatePickerDialog(
-                label = { stringResource(R.string.label_event_must_join_until)},
+                label = {
+                    Text(stringResource(R.string.label_event_must_join_until))},
                 onDateChange = {
                     mustJoinUntil = it
                 },
                 allowFutureDates = true,
-                startDate = (LocalDate.now().year).toString() + "-10-15" // TODO: better startDate
+                startDate = LocalDate.now().toString() // TODO: better startDate (hours), move text() to MyDatePicker
             )
         }
 
