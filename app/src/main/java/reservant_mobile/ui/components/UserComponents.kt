@@ -35,9 +35,10 @@ fun UserCard(
     firstName: String?,
     lastName: String?,
     getImage: suspend () -> Bitmap?,
+    onClick: () -> Unit = {  }
 ){
     Card (
-        onClick = {},
+        onClick = onClick,
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
