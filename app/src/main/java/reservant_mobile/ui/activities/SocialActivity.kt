@@ -37,7 +37,7 @@ fun SocialActivity(navController: NavHostController){
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 16.dp, horizontal = 16.dp)
+            .padding(16.dp)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -61,7 +61,7 @@ fun SocialActivity(navController: NavHostController){
                     value = query,
                     onValueChange = { query = it },
                     placeholder = { Text(text = "Search...") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ManageSearch,
@@ -70,10 +70,9 @@ fun SocialActivity(navController: NavHostController){
                     }
                 )
 
-                Spacer(modifier = Modifier.size(32.dp))
             }
 
-            items(7) {
+            items(15) {
                 UserCard()
             }
         }

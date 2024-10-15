@@ -100,7 +100,7 @@ fun ChatListActivity() {
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         placeholder = { Text(text = "Search...") },
                         leadingIcon = {
                             Icon(
