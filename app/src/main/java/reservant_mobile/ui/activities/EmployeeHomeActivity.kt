@@ -339,7 +339,7 @@ fun EmpMenuButton(
                     painter = option.background,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    alpha = 0.3F
+                    alpha = 0.25F
                 )
             }
 
