@@ -293,7 +293,6 @@ fun MapActivity(){
                                     )
                                 }
                             }
-
                             MyFloatingActionButton(
                                 onClick = {
                                     navController.navigate(EventRoutes.AddEvent)
