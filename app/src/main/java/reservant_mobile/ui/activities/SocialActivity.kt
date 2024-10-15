@@ -84,6 +84,12 @@ fun SocialActivity(navController: NavHostController){
 
             }
 
+            items(3){
+                UserCard(firstName = "John", lastName = "Doe") {
+                    null
+                }
+            }
+
 
             items(users.itemCount) { i ->
                 val user = users[i]

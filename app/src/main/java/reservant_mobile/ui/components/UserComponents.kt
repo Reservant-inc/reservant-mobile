@@ -53,6 +53,12 @@ fun UserCard(
                     .size(50.dp)
                     .weight(0.2f)
                     .clip(CircleShape),
+                placeholderModifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(50.dp)
+                    .weight(0.2f)
+                    .clip(CircleShape),
                 getPhoto = getImage
             )
 
