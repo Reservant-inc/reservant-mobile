@@ -239,22 +239,22 @@ fun EmployeeHomeActivity() {
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_orders),
                             icon = Icons.Outlined.Book,
-                            background = painterResource(id = R.drawable.restaurant_photo)
+                            background = painterResource(id = R.drawable.people_restaurant)
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_restaurant_tables),
                             icon = Icons.Outlined.TableBar,
-                            background = painterResource(id = R.drawable.restaurant_photo)
+                            background = painterResource(id = R.drawable.table_cafe_town_restaurant)
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_reservations),
                             icon = Icons.Outlined.Inbox,
-                            background = painterResource(id = R.drawable.restaurant_photo)
+                            background = painterResource(id = R.drawable.reservation_checklist)
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_stock),
                             icon = Icons.Outlined.ShoppingBasket,
-                            background = painterResource(id = R.drawable.restaurant_photo)
+                            background = painterResource(id = R.drawable.wood_wine_store)
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
@@ -337,7 +337,7 @@ fun EmpMenuButton(
                     painter = option.background,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    alpha = 0.2F
+                    alpha = 0.3F
                 )
             }
 
