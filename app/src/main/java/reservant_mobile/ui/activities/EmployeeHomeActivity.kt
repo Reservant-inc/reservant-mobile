@@ -237,11 +237,19 @@ fun EmployeeHomeActivity() {
                 }
 
                 composable<EmployeeRoutes.Home> {
+                    val restaurant = empHomeVM.selectedRestaurant!!
                     val options: List<EmpMenuOption> = listOf(
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_orders),
                             icon = Icons.Outlined.Book,
-                            background = painterResource(id = R.drawable.people_restaurant)
+                            background = painterResource(id = R.drawable.people_restaurant),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.ManageOrders(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_restaurant_tables),
@@ -265,7 +273,7 @@ fun EmployeeHomeActivity() {
                         ),
                     )
 
-                    val restaurant = empHomeVM.selectedRestaurant
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -307,7 +315,10 @@ fun EmployeeHomeActivity() {
                     LandingActivity()
                 }
                 composable<RestaurantRoutes.ManageOrders> {
-                    OrderManagementScreen(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
+                    OrderManagementScreen(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId
+                    )
                 }
             }
         }

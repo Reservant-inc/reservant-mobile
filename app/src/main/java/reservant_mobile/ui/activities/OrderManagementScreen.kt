@@ -28,7 +28,10 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 
 @Composable
-fun OrderManagementScreen(restaurantId: Int) {
+fun OrderManagementScreen(
+    onReturnClick: () -> Unit,
+    restaurantId: Int
+) {
     val viewModel = viewModel<EmployeeOrderViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -45,7 +48,7 @@ fun OrderManagementScreen(restaurantId: Int) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        IconWithHeader(icon = Icons.Outlined.Book, text = "Orders management")
+        IconWithHeader(icon = Icons.Outlined.Book, text = "Orders management", showBackButton = true, onReturnClick = onReturnClick)
 
         // FloatingTabSwitch for selecting current or past orders
         FloatingTabSwitch(
