@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ManageSearch
+import androidx.compose.material.icons.automirrored.rounded.Chat
+import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.GroupAdd
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Search
@@ -31,12 +33,16 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,59 +82,9 @@ fun ChatListActivity() {
                     .padding(16.dp)
             ) {
                 IconWithHeader(
-                    icon = Icons.Rounded.Person,
-                    text = "User02"
+                    icon = Icons.AutoMirrored.Rounded.Chat,
+                    text = stringResource(id = R.string.label_chats)
                 )
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_profile_placeholder),
-                        contentDescription = "Settings Picture",
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "John Doe",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_calendar), // Placeholder for calendar icon
-                            contentDescription = "Date of Birth",
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "01-01-2000")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Rep.: 3.78 / 5.00")
-                    }
-                }
-
-                // Tabs
-                TabRow(
-                    selectedTabIndex = 2,
-                    modifier = Modifier.padding(vertical = 16.dp)
-                ) {
-                    listOf(
-                        "Visits",
-                        "Orders",
-                        "Chats",
-                        "Friends"
-                    ).forEachIndexed { index, title ->
-                        Tab(
-                            selected = index == 2,
-                            onClick = { /* Handle tab click */ },
-                            text = { Text(title) }
-                        )
-                    }
-                }
 
                 Row(
                     modifier = Modifier
@@ -136,10 +92,15 @@ fun ChatListActivity() {
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
+                    var query by remember {
+                        mutableStateOf("")
+                    }
+
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = { /* Handle search query */ },
-                        modifier = Modifier.weight(1f),
+                        value = query,
+                        onValueChange = { query = it },
+                        modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(text = "Search...") },
                         leadingIcon = {
                             Icon(
@@ -148,16 +109,16 @@ fun ChatListActivity() {
                             )
                         }
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    /*Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
-                        onClick = { /* Handle adding new chat */ },
+                        onClick = { *//* Handle adding new chat *//* },
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.GroupAdd,
                             contentDescription = "Add Chat"
                         )
-                    }
+                    }*/
                 }
 
                 LazyColumn {
