@@ -297,7 +297,9 @@ fun EmployeeHomeActivity() {
                 composable<MainRoutes.Settings> {
                     SettingsActivity(
                         homeNavController = innerNavController,
-                        themeChange = { darkTheme = !darkTheme })
+                        themeChange = { darkTheme = !darkTheme },
+                        withBackButton = true
+                    )
                 }
                 composable<AuthRoutes.Landing> {
                     LandingActivity()
