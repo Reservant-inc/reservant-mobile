@@ -9,10 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FoundUserDTO
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
 
 class SocialViewModel(
-    private val userService: UserService = UserService()
+    private val userService: IUserService = UserService()
 ): ReservantViewModel() {
 
     private val _users = MutableStateFlow<PagingData<FoundUserDTO>>(PagingData.empty())
