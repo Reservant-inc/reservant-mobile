@@ -1,13 +1,14 @@
 package reservant_mobile.ui.activities
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.rounded.PersonPin
@@ -18,13 +19,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UserCard
@@ -33,6 +39,7 @@ import reservant_mobile.ui.viewmodels.SocialViewModel
 @Composable
 fun SocialActivity(navController: NavHostController){
     val viewmodel = viewModel<SocialViewModel>()
+    val users by rememberUpdatedState(viewmodel.users.collectAsLazyPagingItems())
 
     Box(
         modifier = Modifier
@@ -61,7 +68,9 @@ fun SocialActivity(navController: NavHostController){
                     value = query,
                     onValueChange = { query = it },
                     placeholder = { Text(text = "Search...") },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ManageSearch,
@@ -72,8 +81,31 @@ fun SocialActivity(navController: NavHostController){
 
             }
 
-            items(15) {
-                UserCard()
+
+            items(users.itemCount) { i ->
+                val user = users[i]
+
+                user?.let {
+                    UserCard(
+                        firstName = it.firstName,
+                        lastName = it.lastName,
+                        image = {
+                            Image(
+                                painterResource(id = R.drawable.jd),
+                                contentDescription = "placeholder",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    //.align(Alignment.CenterVertically)
+                                    .padding(start = 8.dp, end = 16.dp)
+                                    .size(50.dp)
+                                    //.weight(0.2f)
+                                    .clip(CircleShape),
+                            )
+                        }
+                    )
+
+                }
+
             }
         }
 

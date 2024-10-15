@@ -30,7 +30,11 @@ import reservant_mobile.data.models.dtos.ChatDTO
 import reservant_mobile.data.services.UserService
 
 @Composable
-fun UserCard(){
+fun UserCard(
+    firstName: String?,
+    lastName: String?,
+    image: @Composable (() -> Unit)?
+){
     Card (
         onClick = {},
         elevation = CardDefaults.cardElevation(
@@ -41,20 +45,10 @@ fun UserCard(){
             .padding(8.dp)
     ){
         Row(modifier = Modifier.padding(8.dp)) {
-            Image(
-                painterResource(id = R.drawable.jd),
-                contentDescription = "placeholder",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 8.dp ,end = 16.dp)
-                    .size(50.dp)
-                    .weight(0.2f)
-                    .clip(CircleShape),
-            )
+            image?.invoke()
             Column(Modifier.weight(0.8f).align(Alignment.CenterVertically)) {
                 Text(
-                    text = "${UserService.UserObject.firstName} ${UserService.UserObject.lastName}",
+                    text = "$firstName $lastName",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
                 )
             }
