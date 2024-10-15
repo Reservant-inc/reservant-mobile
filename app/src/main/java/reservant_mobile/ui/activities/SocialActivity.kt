@@ -7,8 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.rounded.PersonPin
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,6 +29,9 @@ import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UserCard
 import reservant_mobile.ui.viewmodels.SocialViewModel
+import androidx.compose.material3.IconButton
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun SocialActivity(navController: NavHostController){
@@ -65,12 +68,16 @@ fun SocialActivity(navController: NavHostController){
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
-                    leadingIcon = {
-                        Icon(
-
-                            imageVector = Icons.AutoMirrored.Filled.ManageSearch,
-                            contentDescription = "Search Icon"
-                        )
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                viewmodel.viewModelScope.launch {
+                                    viewmodel.getUsers(query)
+                                }
+                            }
+                        ){
+                            Icon(imageVector = Icons.Rounded.Search, contentDescription = "Send")
+                        }
                     },
                     singleLine = true
                 )
