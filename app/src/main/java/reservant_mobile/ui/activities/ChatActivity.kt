@@ -198,7 +198,8 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     ) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
-                }
+                },
+                singleLine = true
             )
 
         }

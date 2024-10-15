@@ -1,14 +1,11 @@
 package reservant_mobile.ui.activities
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.rounded.PersonPin
@@ -23,9 +20,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,10 +67,12 @@ fun SocialActivity(navController: NavHostController){
                         .padding(vertical = 8.dp),
                     leadingIcon = {
                         Icon(
+
                             imageVector = Icons.AutoMirrored.Filled.ManageSearch,
                             contentDescription = "Search Icon"
                         )
-                    }
+                    },
+                    singleLine = true
                 )
 
             }
@@ -89,18 +85,10 @@ fun SocialActivity(navController: NavHostController){
                     UserCard(
                         firstName = it.firstName,
                         lastName = it.lastName,
-                        image = {
-                            Image(
-                                painterResource(id = R.drawable.jd),
-                                contentDescription = "placeholder",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    //.align(Alignment.CenterVertically)
-                                    .padding(start = 8.dp, end = 16.dp)
-                                    .size(50.dp)
-                                    //.weight(0.2f)
-                                    .clip(CircleShape),
-                            )
+                        getImage = {
+                            user.photo?.let { photo ->
+                                viewmodel.getPhoto(photo)
+                            }
                         }
                     )
 

@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -11,7 +12,7 @@ import reservant_mobile.data.models.dtos.FoundUserDTO
 import reservant_mobile.data.services.UserService
 
 class SocialViewModel(
-    userService: UserService = UserService()
+    private val userService: UserService = UserService()
 ): ReservantViewModel() {
 
     private val _users = MutableStateFlow<PagingData<FoundUserDTO>>(PagingData.empty())
@@ -19,15 +20,27 @@ class SocialViewModel(
 
     init {
         viewModelScope.launch {
-            val res = userService.getUsers(name = "")
+            getUsers("")
+        }
+    }
 
-            if (res.isError || res.value == null){
-                throw Exception()
-            }
+    suspend fun getPhoto(url: String): Bitmap?{
+        val result = fileService.getImage(url)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
 
-            res.value.cachedIn(viewModelScope).collect{
-                _users.value = it
-            }
+    suspend fun getUsers(query: String){
+        val res = userService.getUsers(name = query)
+
+        if (res.isError || res.value == null){
+            throw Exception()
+        }
+
+        res.value.cachedIn(viewModelScope).collect{
+            _users.value = it
         }
     }
     

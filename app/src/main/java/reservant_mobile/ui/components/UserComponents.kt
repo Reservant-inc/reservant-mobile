@@ -1,5 +1,6 @@
 package reservant_mobile.ui.components
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,7 +34,7 @@ import reservant_mobile.data.services.UserService
 fun UserCard(
     firstName: String?,
     lastName: String?,
-    image: @Composable (() -> Unit)?
+    getImage: suspend () -> Bitmap?,
 ){
     Card (
         onClick = {},
@@ -45,7 +46,16 @@ fun UserCard(
             .padding(8.dp)
     ){
         Row(modifier = Modifier.padding(8.dp)) {
-            image?.invoke()
+            LoadedPhotoComponent(
+                photoModifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(50.dp)
+                    .weight(0.2f)
+                    .clip(CircleShape),
+                getPhoto = getImage
+            )
+
             Column(Modifier.weight(0.8f).align(Alignment.CenterVertically)) {
                 Text(
                     text = "$firstName $lastName",
