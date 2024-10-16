@@ -169,7 +169,7 @@ class MapViewModel : ReservantViewModel() {
                             time = dto.time,
                             creatorId = dto.creatorId!!,
                             creatorFullName = dto.creatorFullName!!,
-                            restaurantId = dto.restaurantId,
+                            restaurantId = dto.restaurantId!!,
                             restaurantName = dto.restaurantName!!,
                             participants = dto.participants?.size ?: 0,
                             numberInterested = dto.numberInterested!!

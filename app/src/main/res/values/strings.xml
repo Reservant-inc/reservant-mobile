@@ -229,6 +229,17 @@
     <string name="message_not_found_any">Not found any %1$s</string>
     <string name="label_interested">interested</string>
     <string name="label_takePart">take part</string>
+    <string name="label_add_event">Add Event</string>
+    <string name="label_event_name">Event name</string>
+    <string name="label_event_description">Event description</string>
+    <string name="label_event_max_people">Max people</string>
+    <string name="label_search_restaurants">Search restaurant</string>
+    <string name="label_selected_restaurant">Selected restaurant:</string>
+    <string name="error_add_event_failed">Adding event failed</string>
+    <string name="error_fill_all_fields">Fill all fields</string>
+    <string name="label_available_restaurants">Available restaurants:</string>
+    <string name="label_event_start_date">Event start date</string>
+    <string name="label_event_must_join_until">Must join until</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
 </resources>
