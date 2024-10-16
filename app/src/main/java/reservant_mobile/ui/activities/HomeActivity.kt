@@ -73,7 +73,7 @@ fun HomeActivity() {
                     RestaurantReservationActivity(navController = innerNavController)
                 }
                 composable<MainRoutes.Social> { 
-                    SocialActivity()
+                    ChatListActivity()
                 }
                 composable<AuthRoutes.Landing>{
                     LaunchedEffect(Unit) {
