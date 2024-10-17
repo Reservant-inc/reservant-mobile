@@ -73,6 +73,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,6 +90,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -937,12 +939,20 @@ fun SearchBarWithFilter(
                 Button(
                     onClick = additionalButtonOnClick,
                     modifier = Modifier
-                        .height(56.dp)
+                        .height(56.dp),
+                    colors = ButtonColors(
+                        containerColor = FloatingActionButtonDefaults.containerColor,
+                        contentColor = contentColorFor(FloatingActionButtonDefaults.containerColor),
+                        disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor,
+                        disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor
+                    )
                 ) {
 //                    Text(text = additionalButtonLabel,
 //                        fontSize = 20.sp)
-                    Icon(imageVector = additionalButtonIcon,
-                        contentDescription = stringResource(id = R.string.label_add_review))
+                    Icon(
+                        imageVector = additionalButtonIcon,
+                        contentDescription = stringResource(id = R.string.label_add_review)
+                    )
                 }
             }
         }
