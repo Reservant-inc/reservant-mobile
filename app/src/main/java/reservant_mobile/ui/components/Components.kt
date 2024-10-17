@@ -872,6 +872,7 @@ fun IconButton(
 // TODO: verify colors and add vars
 @Composable
 fun SearchBarWithFilter(
+    modifier: Modifier = Modifier,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onFilterSelected: ((String?) -> Unit)? = null, // Optional string filter
@@ -881,8 +882,7 @@ fun SearchBarWithFilter(
     filterOptions: List<String>? = null, // Optional list for string filters
     filterOptionsInt: List<Int>? = null, // Optional list for int filters
     additionalButtonOnClick: (() -> Unit)? = null,
-    additionalButtonLabel: String? = null,
-    modifier: Modifier = Modifier
+    additionalButtonIcon: ImageVector? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
@@ -892,7 +892,7 @@ fun SearchBarWithFilter(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Pole wyszukiwania
@@ -933,13 +933,16 @@ fun SearchBarWithFilter(
             }
 
             // Dodatkowy przycisk, jeśli parametry zostały podane
-            if (additionalButtonOnClick != null && additionalButtonLabel != null) {
+            if (additionalButtonOnClick != null && additionalButtonIcon != null) {
                 Button(
                     onClick = additionalButtonOnClick,
                     modifier = Modifier
-                        .height(56.dp) // Wysokość dopasowana do pola tekstowego
+                        .height(56.dp)
                 ) {
-                    Text(text = additionalButtonLabel)
+//                    Text(text = additionalButtonLabel,
+//                        fontSize = 20.sp)
+                    Icon(imageVector = additionalButtonIcon,
+                        contentDescription = stringResource(id = R.string.label_add_review))
                 }
             }
         }

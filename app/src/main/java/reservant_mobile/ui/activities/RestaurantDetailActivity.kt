@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
@@ -470,7 +471,7 @@ fun ReviewsContent(
             additionalButtonOnClick = {
                 navController.navigate(RestaurantRoutes.AddReview(restaurantId = restaurantId))
             },
-            additionalButtonLabel = "+"
+            additionalButtonIcon = Icons.Default.Add
         )
 
         Spacer(modifier = Modifier.height(16.dp))
