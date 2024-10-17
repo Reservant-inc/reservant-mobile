@@ -1,4 +1,5 @@
 package reservant_mobile.ui.activities
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -110,21 +111,30 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
         }
     )
 
-    val reviewsFlow = reviewsViewModel.reviewsFlow.collectAsState().value?.collectAsLazyPagingItems()
+    val reviewsFlow =
+        reviewsViewModel.reviewsFlow.collectAsState().value?.collectAsLazyPagingItems()
 
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = RestaurantRoutes.Details(restaurantId)){
-        composable<RestaurantRoutes.Details>{
+    NavHost(
+        navController = navController,
+        startDestination = RestaurantRoutes.Details(restaurantId)
+    ) {
+        composable<RestaurantRoutes.Details> {
             var showGallery by remember { mutableStateOf(false) }
             var isFavorite by remember { mutableStateOf(false) }
 
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 4.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 4.dp)
+            ) {
 
                 if (restaurantDetailVM.resultRestaurant.isError) {
-                    ShowErrorToast(context = LocalContext.current, id = restaurantDetailVM.getToastError())
+                    ShowErrorToast(
+                        context = LocalContext.current,
+                        id = restaurantDetailVM.getToastError()
+                    )
                 }
 
                 when {
@@ -139,11 +149,11 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
                     restaurantDetailVM.restaurant != null && restaurantDetailVM.menus != null -> {
                         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            Box (
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-                            ){
+                            ) {
                                 restaurantDetailVM.restaurant?.let { restaurant ->
 
                                     LoadedPhotoComponent(
@@ -206,7 +216,9 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     restaurant.rating?.let { it1 -> RatingBar(rating = it1.toFloat()) }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        "${restaurant.rating.toString().substring(0, 3)} (${restaurant.numberReviews} $reviews)"
+                                        "${
+                                            restaurant.rating.toString().substring(0, 3)
+                                        } (${restaurant.numberReviews} $reviews)"
                                     )
                                 }
 
@@ -216,7 +228,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                         .padding(horizontal = 8.dp)
                                         .scale(0.9f)
                                 ) {
-                                    for(tag in restaurant.tags){
+                                    for (tag in restaurant.tags) {
                                         TagItem(
                                             tag = tag,
                                             removable = false
@@ -242,11 +254,14 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 )
 
-                                if(restaurant.photos.size > 1){
+                                if (restaurant.photos.size > 1) {
                                     var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
                                     LaunchedEffect(restaurant.photos) {
-                                        val loadedImages = restaurantDetailVM.getPhotos(restaurant.photos, limit = 5)
+                                        val loadedImages = restaurantDetailVM.getPhotos(
+                                            restaurant.photos,
+                                            limit = 5
+                                        )
                                         images = loadedImages
                                     }
 
@@ -256,15 +271,14 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                         modifier = Modifier.padding(16.dp)
                                     )
 
-                                    if (restaurantDetailVM.isGalleryLoading){
+                                    if (restaurantDetailVM.isGalleryLoading) {
                                         Box(
                                             modifier = Modifier.fillMaxWidth(),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             CircularProgressIndicator()
                                         }
-                                    }
-                                    else {
+                                    } else {
 
                                         Row(
                                             modifier = Modifier
@@ -277,7 +291,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                     image = img.asImageBitmap()
                                                 )
                                             }
-                                            if(images.size > 4) {
+                                            if (images.size > 4) {
                                                 Card(
                                                     modifier = Modifier
                                                         .size(100.dp)
@@ -327,7 +341,14 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                             )
                                         },
                                         stringResource(R.string.label_events) to { EventsContent() },
-                                        stringResource(R.string.label_reviews) to { ReviewsContent(reviewsFlow, navController, restaurantId, reviewsViewModel) }
+                                        stringResource(R.string.label_reviews) to {
+                                            ReviewsContent(
+                                                reviewsFlow,
+                                                navController,
+                                                restaurantId,
+                                                reviewsViewModel
+                                            )
+                                        }
                                     ),
                                     paneScroll = false
                                 )
@@ -335,6 +356,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                             }
                         }
                     }
+
                     else -> {
                         MissingPage(errorStringId = R.string.error_not_found)
                     }
@@ -351,7 +373,10 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 FloatingActionButton(
                     onClick = { navController.navigate(RestaurantRoutes.Reservation) }
                 ) {
-                    Icon(imageVector = Icons.Default.ShoppingBag, contentDescription = "ShoppingBag")
+                    Icon(
+                        imageVector = Icons.Default.ShoppingBag,
+                        contentDescription = "ShoppingBag"
+                    )
                 }
                 Box(
                     modifier = Modifier
@@ -373,7 +398,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
             var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
             if (showGallery) {
-                if(images.isEmpty()){
+                if (images.isEmpty()) {
                     LaunchedEffect(restaurantDetailVM.restaurant) {
                         val loadedImages = restaurantDetailVM.restaurant?.let { it1 ->
                             restaurantDetailVM.getPhotos(
@@ -388,16 +413,23 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
             }
         }
-        composable<RestaurantRoutes.Reservation>{
+        composable<RestaurantRoutes.Reservation> {
             RestaurantReservationActivity(navController = navController)
         }
 
         composable<RestaurantRoutes.AddReview> {
-            AddReviewActivity(restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId, navController = navController)
+            AddReviewActivity(
+                restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId,
+                navController = navController
+            )
         }
 
         composable<RestaurantRoutes.EditReview> {
-            EditReviewActivity(restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId, reviewId = it.toRoute<RestaurantRoutes.EditReview>().reviewId, navController = navController)
+            EditReviewActivity(
+                restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId,
+                reviewId = it.toRoute<RestaurantRoutes.EditReview>().reviewId,
+                navController = navController
+            )
         }
     }
 
@@ -429,22 +461,17 @@ fun ReviewsContent(
         Spacer(modifier = Modifier.height(64.dp))
 
         // Search Bar with Filter
-        Row(Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier.fillMaxWidth(0.8f)) {
-                SearchBarWithFilter(
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { query -> searchQuery = query },
-                    onFilterSelectedInt = { filterInt -> currentFilterInt = filterInt },
-                    currentFilterInt = currentFilterInt,
-                    filterOptionsInt = filterOptionsInt
-                )
-            }
-            ButtonComponent(
-                onClick = { navController.navigate(RestaurantRoutes.AddReview(restaurantId = restaurantId)) },
-                label = "+",
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
+        SearchBarWithFilter(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { query -> searchQuery = query },
+            onFilterSelectedInt = { filterInt -> currentFilterInt = filterInt },
+            currentFilterInt = currentFilterInt,
+            filterOptionsInt = filterOptionsInt,
+            additionalButtonOnClick = {
+                navController.navigate(RestaurantRoutes.AddReview(restaurantId = restaurantId))
+            },
+            additionalButtonLabel = "+"
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -461,7 +488,7 @@ fun ReviewsContent(
                         ReviewCard(
                             review = review,
                             onClick = {
-                                if(review.authorId == UserService.UserObject.userId) {
+                                if (review.authorId == UserService.UserObject.userId) {
                                     navController.navigate(
                                         RestaurantRoutes.EditReview(
                                             restaurantId = restaurantId,
@@ -491,7 +518,6 @@ fun ReviewsContent(
         }
     }
 }
-
 
 
 @Composable

@@ -879,107 +879,109 @@ fun SearchBarWithFilter(
     currentFilter: String? = null, // Optional string filter
     currentFilterInt: Int? = null, // Optional int filter
     filterOptions: List<String>? = null, // Optional list for string filters
-    filterOptionsInt: List<Int>? = null // Optional list for int filters
+    filterOptionsInt: List<Int>? = null, // Optional list for int filters
+    additionalButtonOnClick: (() -> Unit)? = null,
+    additionalButtonLabel: String? = null,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
 
-    Column {
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart
+            // Pole wyszukiwania
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                singleLine = true,
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.label_search),
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            // Ikona filtra
+            IconButton(
+                onClick = { expanded = true },
+                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 16.dp),
-                    singleLine = true,
-                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.label_search),
-                            color = Color.Gray,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 4.dp)
-                        )
-                    }
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = stringResource(id = R.string.label_filters),
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
 
-            // Show filter options dropdown
-            Box {
-                IconButton(
-                    onClick = { expanded = true },
-                    modifier = Modifier.padding(start = 8.dp)
+            // Dodatkowy przycisk, jeśli parametry zostały podane
+            if (additionalButtonOnClick != null && additionalButtonLabel != null) {
+                Button(
+                    onClick = additionalButtonOnClick,
+                    modifier = Modifier
+                        .height(56.dp) // Wysokość dopasowana do pola tekstowego
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = stringResource(id = R.string.label_filters),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = labelAll) },
-                        onClick = {
-                            onFilterSelected?.invoke(null) // Reset string filter if applicable
-                            onFilterSelectedInt?.invoke(null) // Reset int filter if applicable
-                            expanded = false
-                        }
-                    )
-
-                    // Show string filter options if provided
-                    filterOptions?.forEach { filter ->
-                        DropdownMenuItem(
-                            text = { Text(text = filter) },
-                            onClick = {
-                                onFilterSelected?.invoke(filter)
-                                expanded = false
-                            }
-                        )
-                    }
-
-                    // Show int filter options if provided
-                    filterOptionsInt?.forEach { filterInt ->
-                        DropdownMenuItem(
-                            text = {
-                                FilterOptionWithStars(stars = filterInt) // Correct usage of text parameter
-                            },
-                            onClick = {
-                                onFilterSelectedInt?.invoke(filterInt)
-                                expanded = false
-                            }
-                        )
-                    }
-
+                    Text(text = additionalButtonLabel)
                 }
             }
         }
 
+        // DropdownMenu dla opcji filtra
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = labelAll) },
+                onClick = {
+                    onFilterSelected?.invoke(null)
+                    onFilterSelectedInt?.invoke(null)
+                    expanded = false
+                }
+            )
 
-        // Show current filter if applicable (string or int)
+            // Opcje filtrowania dla stringów
+            filterOptions?.forEach { filter ->
+                DropdownMenuItem(
+                    text = { Text(text = filter) },
+                    onClick = {
+                        onFilterSelected?.invoke(filter)
+                        expanded = false
+                    }
+                )
+            }
+
+            // Opcje filtrowania dla int
+            filterOptionsInt?.forEach { filterInt ->
+                DropdownMenuItem(
+                    text = { FilterOptionWithStars(stars = filterInt) },
+                    onClick = {
+                        onFilterSelectedInt?.invoke(filterInt)
+                        expanded = false
+                    }
+                )
+            }
+        }
+
+        // Wyświetlanie aktualnego filtra (opcjonalnie)
         currentFilter?.let {
             if (it.isNotEmpty()) {
                 Text(
