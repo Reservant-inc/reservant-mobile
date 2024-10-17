@@ -235,4 +235,12 @@
     <string name="label_unresolved">Unresolved</string>
     <string name="label_to_be_reviewed">To be reviewed</string>
     <string name="label_in_progress">In progress</string>
+    <string name="label_topic">Topic</string>
+    <string name="label_category">Category</string>
+    <string name="label_message_content">Message Content…</string>
+    <string name="label_send">SEND</string>
+    <string name="error_topic_required">Topic is required</string>
+    <string name="error_category_required">Category is required</string>
+    <string name="error_message_content_required">Message content is required</string>
+    <string name="cd_category_dropdown">Category Dropdown</string>
 </resources>

@@ -230,4 +230,12 @@
     <string name="label_unresolved">Nierozpatrzone</string>
     <string name="label_to_be_reviewed">Do rozpatrzenia</string>
     <string name="label_in_progress">W trakcie rozpatrywania</string>
+    <string name="label_topic">Temat</string>
+    <string name="label_category">Kategoria</string>
+    <string name="label_message_content">Treść wiadomości…</string>
+    <string name="label_send">WYŚLIJ</string>
+    <string name="error_topic_required">Temat jest wymagany</string>
+    <string name="error_category_required">Kategoria jest wymagana</string>
+    <string name="error_message_content_required">Treść wiadomości jest wymagana</string>
+    <string name="cd_category_dropdown">Rozwijane menu kategorii</string>
 </resources>

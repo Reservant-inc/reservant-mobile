@@ -165,6 +165,7 @@ fun ComboBox(
         Column {
             OutlinedTextField(
                 modifier = modifier
+                    .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .menuAnchor(),
                 label = { Text(text = label) },
