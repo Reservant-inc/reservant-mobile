@@ -292,7 +292,8 @@ fun IconWithHeader(
     icon: ImageVector,
     text: String,
     showBackButton: Boolean = false,
-    onReturnClick: () -> Unit = {}
+    onReturnClick: () -> Unit = {},
+    actions: @Composable (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -325,6 +326,14 @@ fun IconWithHeader(
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                 )
+            }
+            if (actions != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                ) {
+                    actions()
+                }
             }
         }
 

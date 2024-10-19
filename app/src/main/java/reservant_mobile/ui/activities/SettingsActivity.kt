@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Settings
@@ -44,7 +43,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit) {
+fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false) {
     val loginViewModel = viewModel<LoginViewModel>()
 
     Surface {
@@ -62,6 +61,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_settings),
+                        showBackButton = withBackButton
                     )
 
                     Spacer(modifier = Modifier.padding(top = 16.dp))

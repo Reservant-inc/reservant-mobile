@@ -70,6 +70,7 @@ import com.example.reservant_mobile.R
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -227,7 +228,7 @@ fun MapActivity(){
                                 val item = events[index]
                                 if(item != null){
                                     EventCard(
-                                        eventName = item.creatorFullName,
+                                        eventCreator = item.creatorFullName,
                                         eventDate = item.time,
                                         eventLocation = item.restaurantName,
                                         interestedCount = item.numberInterested,
