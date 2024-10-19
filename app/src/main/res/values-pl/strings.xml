@@ -222,6 +222,7 @@
     <string name="error_too_many_tags">Możesz wybrać maksymalnie 5 tagów</string>
     <string name="label_apply">Zastosuj</string>
     <string name="message_not_found_any">Nie znaleziono %1$s</string>
+    <string name="label_stars">gwiazdki</string>
     <string name="label_interested">zainteresowani</string>
     <string name="label_takePart">bierze udział</string>
     <string name="error_loading_events">Błąd podczas wczytywania wydarzeń</string>
