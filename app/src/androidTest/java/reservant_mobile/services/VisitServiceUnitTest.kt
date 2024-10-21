@@ -48,4 +48,14 @@ class VisitServiceUnitTest: ServiceTest() {
     fun create_visit_return_not_null()= runTest{
         assertThat(ser.createVisit(visit).value).isNotNull()
     }
+
+    @Test
+    fun approve_visit_return_true()= runTest{
+        assertThat(ser.approveVisit(1).value).isTrue()
+    }
+
+    @Test
+    fun decline_visit_return_true()= runTest{
+        assertThat(ser.declineVisit(1).value).isTrue()
+    }
 }
