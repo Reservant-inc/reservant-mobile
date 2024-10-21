@@ -32,6 +32,8 @@ import reservant_mobile.data.utils.GetIngredientsSort
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
 import reservant_mobile.data.utils.GetVisitsSort
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
@@ -104,7 +106,7 @@ interface IRestaurantService{
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun correctIngredient(ingredientId: Any, newAmount: Double, comment: String): Result<IngredientDTO.CorrectionDTO?>
-
+    suspend fun getAvailableHours(restaurantId: Any, date: LocalDateTime? = null, numberOfGuests: Int? = null): Result<List<RestaurantDTO.AvailableHours>?>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -408,6 +410,20 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             comment = comment
         )
         val res = api.post(Ingredients.IngredientId.CorrectAmount(parent = Ingredients.IngredientId(ingredientId = ingredientId.toString())), correction)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getAvailableHours(
+        restaurantId: Any,
+        date: LocalDateTime?,
+        numberOfGuests: Int?
+    ): Result<List<RestaurantDTO.AvailableHours>?> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        val res  = api.get(Restaurants.Id.AvailableHours(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+            date = formatter.format(date),
+            numberOfGuests = numberOfGuests
+        ))
         return complexResultWrapper(res)
     }
 }
