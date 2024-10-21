@@ -59,7 +59,8 @@ fun NewTicketActivity() {
             options = categories,
             isError = ticketViewModel.isCategoryInvalid(),
             errorText = stringResource(R.string.error_category_required),
-            expanded = categoryExpanded
+            expanded = categoryExpanded,
+            formSent = formSent
         )
 
         // Message Content Field
