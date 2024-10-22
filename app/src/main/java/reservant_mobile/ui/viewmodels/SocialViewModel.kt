@@ -29,12 +29,12 @@ class SocialViewModel(
     private val _threads = MutableStateFlow<PagingData<ThreadDTO>>(PagingData.empty())
     var threads: StateFlow<PagingData<ThreadDTO>> = _threads.asStateFlow()
 
-    var threadQuery = ""
+    var threadQuery = mutableStateOf("")
     var userQuery = mutableStateOf("")
 
     init {
         viewModelScope.launch {
-            getThreads(threadQuery)
+            getThreads(threadQuery.value)
             getUsers(userQuery.value)
         }
     }

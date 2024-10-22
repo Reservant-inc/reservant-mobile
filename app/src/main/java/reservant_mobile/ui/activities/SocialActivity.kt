@@ -78,7 +78,6 @@ fun SocialActivity(navController: NavHostController){
                     horizontalAlignment = Alignment.Start
                 ) {
                     
-                    
                     item {
                         IconWithHeader(
                             icon = Icons.Rounded.PersonPin,

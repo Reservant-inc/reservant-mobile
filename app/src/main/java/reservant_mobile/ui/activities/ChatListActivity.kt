@@ -74,24 +74,23 @@ fun ChatListActivity() {
                 ) {
 
                     var query by remember {
-                        mutableStateOf(viewmodel.threadQuery)
+                        viewmodel.threadQuery
                     }
 
                     OutlinedTextField(
                         value = query,
-                        onValueChange = { query = it },
+                        onValueChange = {
+                            query = it
+                            viewmodel.viewModelScope.launch {
+                                viewmodel.getThreads(query)
+                            }
+                        },
                         placeholder = { Text(text = "Search...") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    viewmodel.viewModelScope.launch {
-                                        viewmodel.getThreads(query)
-                                    }
-                                }
-                            ){
+                            IconButton(onClick = {}){
                                 Icon(imageVector = Icons.Rounded.Search, contentDescription = "Send")
                             }
                         },
