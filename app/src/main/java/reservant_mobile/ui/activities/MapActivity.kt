@@ -79,6 +79,7 @@ import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
@@ -87,7 +88,7 @@ import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
-import java.time.LocalDateTime
+import java.time.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -113,14 +114,9 @@ fun MapActivity(){
             //events fiters
             var eventSearchQuery by remember { mutableStateOf("") }
             var selectedEventStatus: EventDTO.EventStatus? by remember { mutableStateOf(null) }
-            var eventSelectedDateFrom: LocalDateTime? by remember { mutableStateOf(null) }
-            var eventSelectedDateUntil: LocalDateTime? by remember { mutableStateOf(null) }
+            var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
+            var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
-
-
-
-
-
 
             val startPoint by remember { mutableStateOf(mapViewModel.userPosition) }
 
@@ -157,6 +153,7 @@ fun MapActivity(){
                                     restaurantSearchQuery = it
                                     mapViewModel.restaurant_search = it
                                     mapViewModel.refreshRestaurants(startPoint)
+                                    mapViewModel.refreshEvents(startPoint)
                                 },
                                 singleLine = true,
                                 placeholder = { Text(text = stringResource(id = R.string.label_search)) },
@@ -424,12 +421,47 @@ fun MapActivity(){
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
-//                            MyDatePickerDialog(onDateChange = { date -> eventSelectedDateFrom = LocalDateTime.parse(date) })
-                            DateRangePickerModal(
-                                onDismiss = {},
-                                onDateRangeSelected = {}
-                            )
+                                val dialogWidth = 210.dp
+                                val parseString = {date: String ->
+                                    try{
+                                        LocalDate.parse(date)
+                                    } catch (_: Exception){
+                                        null
+                                    }
+
+                                }
+                                MyDatePickerDialog(
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                        .width(dialogWidth),
+                                    label = { Text(stringResource(id = R.string.label_date_from)) },
+                                    startDate = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else LocalDate.now().toString(),
+                                    startStringValue = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    onDateChange = { date ->
+                                        eventSelectedDateFrom = parseString(date)
+                                    },
+                                    allowFutureDates = true
+                                )
+                                Text(text = "-")
+                                MyDatePickerDialog(
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                        .width(dialogWidth),
+                                    label = { Text(stringResource(id = R.string.label_date_to)) },
+                                    startDate = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else LocalDate.now().toString(),
+                                    startStringValue = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    onDateChange = { date ->
+                                        eventSelectedDateUntil = parseString(date)
+                                    },
+                                    allowFutureDates = true
+                                )
+                            }
                         }
                     }
                 )
@@ -656,53 +688,6 @@ fun StarRatingFilter(
             )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DateRangePickerModal(
-    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
-    onDismiss: () -> Unit
-) {
-//    val dateRangePickerState = rememberDateRangePickerState()
-//
-//    DatePickerDialog(
-//        onDismissRequest = onDismiss,
-//        confirmButton = {
-//            TextButton(
-//                onClick = {
-//                    onDateRangeSelected(
-//                        Pair(
-//                            dateRangePickerState.selectedStartDateMillis,
-//                            dateRangePickerState.selectedEndDateMillis
-//                        )
-//                    )
-//                    onDismiss()
-//                }
-//            ) {
-//                Text("OK")
-//            }
-//        },
-//        dismissButton = {
-//            TextButton(onClick = onDismiss) {
-//                Text("Cancel")
-//            }
-//        }
-//    ) {
-//        DateRangePicker(
-//            state = dateRangePickerState,
-//            title = {
-//                Text(
-//                    text = "Select date range"
-//                )
-//            },
-//            showModeToggle = false,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(500.dp)
-//                .padding(16.dp)
-//        )
-//    }
 }
 
 @Composable

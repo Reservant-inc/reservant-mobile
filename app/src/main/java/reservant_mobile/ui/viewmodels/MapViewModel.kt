@@ -40,7 +40,7 @@ import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 
 class MapViewModel : ReservantViewModel() {
@@ -69,8 +69,8 @@ class MapViewModel : ReservantViewModel() {
     var restaurant_minRating: Int? = null
 
     var event_search: String? = null
-    var event_dateFrom: LocalDateTime? = null
-    var event_dateUntil: LocalDateTime? = null
+    var event_dateFrom: LocalDate? = null
+    var event_dateUntil: LocalDate? = null
     var event_status: EventDTO.EventStatus? = null
 
 
