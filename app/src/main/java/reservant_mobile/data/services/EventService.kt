@@ -10,7 +10,7 @@ import reservant_mobile.data.endpoints.Events
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.fields.Result
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 interface IEventService{
     suspend fun getEvents(origLat: Double? = null,
@@ -18,8 +18,8 @@ interface IEventService{
                           restaurantId: Int? = null,
                           restaurantName: String? = null,
                           name: String? = null,
-                          dateFrom: LocalDateTime? = null,
-                          dateUntil: LocalDateTime? = null,
+                          dateFrom: LocalDate? = null,
+                          dateUntil: LocalDate? = null,
                           eventStatus: EventDTO.EventStatus? = null): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>
     suspend fun getEvent(eventId: Any): Result<EventDTO?>
@@ -40,8 +40,8 @@ class EventService(): ServiceUtil(), IEventService{
         restaurantId: Int?,
         restaurantName: String?,
         name: String?,
-        dateFrom: LocalDateTime?,
-        dateUntil: LocalDateTime?,
+        dateFrom: LocalDate?,
+        dateUntil: LocalDate?,
         eventStatus: EventDTO.EventStatus?
     ): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
