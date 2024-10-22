@@ -21,3 +21,18 @@ fun formatDateTime(dateString: String, pattern: String): String {
         "" // Zwróć pusty string w przypadku błędu parsowania
     }
 }
+
+fun formatDateTime(dateString: String): LocalDateTime {
+    return try {
+        val formatter = DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+            .optionalStart()
+            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 7, true)
+            .optionalEnd()
+            .toFormatter(Locale.getDefault())
+
+        return LocalDateTime.parse(dateString, formatter)
+    } catch (e: Exception) {
+        LocalDateTime.now()
+    }
+}
