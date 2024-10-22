@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.flow
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.utils.formatDateTime
+import java.time.LocalDateTime
 
 class EmployeeOrderViewModel(
     private val restaurantId: Int,
@@ -20,7 +22,7 @@ class EmployeeOrderViewModel(
     val currentVisits: Flow<PagingData<VisitDTO>> = flow {
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
-            dateStart = null,
+            dateStart = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
             dateEnd = null,
             orderBy = null
         )
@@ -42,7 +44,7 @@ class EmployeeOrderViewModel(
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
             dateStart = null,
-            dateEnd = null,
+            dateEnd = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
             orderBy = null
         )
 
