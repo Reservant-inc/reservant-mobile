@@ -21,6 +21,7 @@ import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.RestaurantMenuService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.formatDateTime
 import java.time.LocalDateTime
 
 class EmployeeOrderViewModel(
@@ -36,7 +37,7 @@ class EmployeeOrderViewModel(
     val currentVisits: Flow<PagingData<VisitDTO>> = flow {
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
-            dateStart = LocalDateTime.now(),
+            dateStart = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
             dateEnd = null,
             orderBy = null
         )
@@ -54,7 +55,7 @@ class EmployeeOrderViewModel(
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
             dateStart = null,
-            dateEnd = LocalDateTime.now(),
+            dateEnd = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
             orderBy = null
         )
 
