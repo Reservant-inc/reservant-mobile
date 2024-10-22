@@ -38,7 +38,16 @@ class EventServiceUnitTest: ServiceTest() {
             maxPeople = 10,
             mustJoinUntil = mustJoinUntilTimeString,
             restaurantId = 1
-        )
+         )
+    }
+
+    @Test
+    fun get_events_return_pagination()= runTest{
+        val items = ser.getEvents().value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test

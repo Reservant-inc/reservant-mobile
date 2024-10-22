@@ -232,4 +232,9 @@
     <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
+    <string name="label_event_status_future">Upcoming</string>
+    <string name="label_event_status_nonJoinable">Non joinable</string>
+    <string name="label_event_status_past">Past</string>
+    <string name="label_search_filter_event_status">Find event by current status</string>
+    <string name="label_search_filter_date_range">Filter by date range</string>
 </resources>

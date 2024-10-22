@@ -25,10 +25,10 @@ class OrdersServiceUnitTest: ServiceTest(){
             note = "Test note",
             items = listOf(
                 OrderDTO.OrderItemDTO(
-                menuItemId = 1,
+                menuItemId = 2,
                 amount = 1),
                 OrderDTO.OrderItemDTO(
-                    menuItemId = 1,
+                    menuItemId = 2,
                     amount = 2),
             )
         )
@@ -49,7 +49,7 @@ class OrdersServiceUnitTest: ServiceTest(){
         assertThat(ser.createOrder(order).value).isNotNull()
     }
 
-//    todo: need to wait for proper emp implementation
+//    todo: does not work as JD
     @Test
     fun set_order_status_return_not_null()= runTest{
         assertThat(ser.changeOrderStatus(orderId, order).value).isNotNull()

@@ -24,6 +24,7 @@ data class NotificationDTO (
         NotificationNewFriendRequest,
         NotificationFriendRequestAccepted,
         NotificationNewParticipationRequest,
-        NotificationParticipationRequestResponse
+        NotificationParticipationRequestResponse,
+        NotificationVisitApprovedDeclined
     }
 }

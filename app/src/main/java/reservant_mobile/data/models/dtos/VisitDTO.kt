@@ -22,13 +22,11 @@ data class VisitDTO(
     val clientId: String? = null,
     val restaurantId: Int? = null,
     val tableId: Int? = null,
-    /***
-     * List of users containing: userId, firstName, lastname
-     */
-    val participants: List<UserDTO>? = null,
+    val participants: List<UserSummaryDTO>? = null,
     val participantIds: List<String>? = null,
     /***
      * List of orders containing: orderId, visitId, date, note, cost, status
      */
-    val orders: List<OrderDTO>? = null
+    val orders: List<OrderDTO>? = null,
+    val isArchived: Boolean? = null
 )

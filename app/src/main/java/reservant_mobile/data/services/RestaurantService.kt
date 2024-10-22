@@ -32,6 +32,7 @@ import reservant_mobile.data.utils.GetIngredientsSort
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
 import reservant_mobile.data.utils.GetVisitsSort
+import java.time.LocalDateTime
 
 interface IRestaurantService{
     suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?>
@@ -83,8 +84,8 @@ interface IRestaurantService{
      * Available visitSorting values : see GetVisitsSort class
      */
     suspend fun getVisits(restaurantId: Any,
-                          dateStart: String? = null,
-                          dateEnd: String? = null,
+                          dateStart: LocalDateTime? = null,
+                          dateEnd: LocalDateTime? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
@@ -104,7 +105,12 @@ interface IRestaurantService{
     suspend fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun correctIngredient(ingredientId: Any, newAmount: Double, comment: String): Result<IngredientDTO.CorrectionDTO?>
-
+    suspend fun getAvailableHours(restaurantId: Any, date: LocalDateTime? = null, numberOfGuests: Int? = null): Result<List<RestaurantDTO.AvailableHours>?>
+    suspend fun getIngredientHistory(ingredientId: Any,
+                                     dateFrom: LocalDateTime? = null,
+                                     dateUntil: LocalDateTime? = null,
+                                     userId: String? = null,
+                                     comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -329,15 +335,15 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun getVisits(
         restaurantId: Any,
-        dateStart: String?,
-        dateEnd: String?,
+        dateStart: LocalDateTime?,
+        dateEnd: LocalDateTime?,
         orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Visits(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                dateStart = dateStart,
-                dateEnd = dateEnd,
+                dateStart = dateStart.toString(),
+                dateEnd = dateEnd.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage
@@ -409,5 +415,40 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         )
         val res = api.post(Ingredients.IngredientId.CorrectAmount(parent = Ingredients.IngredientId(ingredientId = ingredientId.toString())), correction)
         return complexResultWrapper(res)
+    }
+
+    override suspend fun getAvailableHours(
+        restaurantId: Any,
+        date: LocalDateTime?,
+        numberOfGuests: Int?
+    ): Result<List<RestaurantDTO.AvailableHours>?> {
+        val res  = api.get(Restaurants.Id.AvailableHours(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+            date = date.toString(),
+            numberOfGuests = numberOfGuests
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getIngredientHistory(
+        ingredientId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        userId: String?,
+        comment: String?
+    ): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Ingredients.IngredientId.History(
+                parent = Ingredients.IngredientId(ingredientId = ingredientId.toString()),
+                dateFrom = dateFrom?.toString(),
+                dateUntil = dateUntil?.toString(),
+                userId = userId,
+                comment = comment,
+                page = page,
+                perPage = perPage
+            ))}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(IngredientDTO.CorrectionDTO::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 }
