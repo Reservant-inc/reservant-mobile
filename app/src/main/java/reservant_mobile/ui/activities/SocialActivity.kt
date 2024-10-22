@@ -2,15 +2,21 @@ package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.PersonPin
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +35,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.serialization.generateRouteWithArgs
 import androidx.navigation.toRoute
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.UserCard
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.UserRoutes
@@ -57,12 +66,19 @@ fun SocialActivity(navController: NavHostController){
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+
+                var query by remember {
+                    viewmodel.userQuery
+                }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.Start
                 ) {
+                    
+                    
                     item {
                         IconWithHeader(
                             icon = Icons.Rounded.PersonPin,
@@ -71,9 +87,7 @@ fun SocialActivity(navController: NavHostController){
                             onReturnClick = { navController.popBackStack() }
                         )
 
-                        var query by remember {
-                            mutableStateOf("")
-                        }
+
 
                         OutlinedTextField(
                             value = query,
@@ -98,44 +112,68 @@ fun SocialActivity(navController: NavHostController){
 
                     }
 
-                    items(3){
-                        UserCard(
-                            firstName = "John",
-                            lastName = "Doe",
-                            getImage = { null },
-                            onClick = {
-                                innerNavController.navigate(
-                                    UserRoutes.UserProfile(
-                                        userId = UserService.UserObject.userId
-                                    )
+                    
+                    if (query == ""){
+                        item {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .height(100.dp)
+                                        .width(100.dp),
+                                    imageVector = Icons.Rounded.Search,
+                                    contentDescription = "Search for user",
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+
+                                Text(
+                                    modifier = Modifier.padding(16.dp),
+                                    text = stringResource(id = R.string.empty_search)
                                 )
                             }
-                        )
-                    }
-
-
-                    items(users.itemCount) { i ->
-                        val user = users[i]
-
-                        user?.let {
-                            UserCard(
-                                firstName = it.firstName,
-                                lastName = it.lastName,
-                                getImage = {
-                                    user.photo?.let { photo ->
-                                        viewmodel.getPhoto(photo)
-                                    }
-                                },
-                                onClick = {
-                                    innerNavController.navigate(
-                                        UserRoutes.UserProfile(
-                                            userId = it.userId!!
-                                        )
-                                    )
-                                }
+                        }
+                    } else if (users.loadState.refresh is LoadState.Loading){
+                        item {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    } else if (users.loadState.hasError || users.itemCount < 1) {
+                        item {
+                            MissingPage(
+                                errorString = stringResource(
+                                    id = R.string.error_users_not_found
+                                )
                             )
                         }
+                    } else {
+                        items(users.itemCount) { i ->
+                            val user by remember {
+                                mutableStateOf(users[i])
+                            }
+
+                            user?.let { user ->
+                                UserCard(
+                                    firstName = user.firstName,
+                                    lastName = user.lastName,
+                                    getImage = {
+                                        user.photo?.let { photo ->
+                                            viewmodel.getPhoto(photo)
+                                        }
+                                    },
+                                    onClick = {
+                                        innerNavController.navigate(
+                                            UserRoutes.UserProfile(
+                                                userId = user.userId!!
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
+
                 }
             }
         }

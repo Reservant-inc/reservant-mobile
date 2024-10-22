@@ -245,4 +245,6 @@
     <string name="label_search_filter_event_status">Znajdz wydarzenie przez status</string>
     <string name="label_search_filter_date_range">Wydarzenia z podanego okresu</string>
     <string name="error_threads_not_found">Nie znaleziono żadnych wątków wiadomości</string>
+    <string name="empty_search">Wpisz w wyszukiwarkę żeby zobaczyć użytkowników</string>
+    <string name="error_users_not_found">Nie znaleziono żadnego użytkownika</string>
 </resources>

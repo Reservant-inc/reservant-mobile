@@ -250,4 +250,6 @@
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
     <string name="error_threads_not_found">Not found any message threads</string>
+    <string name="empty_search">Type in search to see results</string>
+    <string name="error_users_not_found">Not found any users</string>
 </resources>
