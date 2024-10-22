@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -70,7 +71,7 @@ import com.example.reservant_mobile.R
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -86,6 +87,7 @@ import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
+import java.time.LocalDateTime
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -101,10 +103,23 @@ fun MapActivity(){
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
             val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
             var mv:MapView? by remember { mutableStateOf(null) }
-            var searchQuery by remember { mutableStateOf("") }
-            val selectedTags = remember { mutableStateListOf<String>() }
-            var selectedRating by remember { mutableIntStateOf(0) }
-            var showFiltersSheet by remember { mutableStateOf(false) }
+
+            // restaurant filters
+            var restaurantSearchQuery by remember { mutableStateOf("") }
+            val restaurantSelectedTags = remember { mutableStateListOf<String>() }
+            var restaurantSelectedRating by remember { mutableIntStateOf(0) }
+            var showRestaurantFiltersSheet by remember { mutableStateOf(false) }
+
+            //events fiters
+            var eventSearchQuery by remember { mutableStateOf("") }
+            var selectedEventStatus: EventDTO.EventStatus? by remember { mutableStateOf(null) }
+            var eventSelectedDateFrom: LocalDateTime? by remember { mutableStateOf(null) }
+            var eventSelectedDateUntil: LocalDateTime? by remember { mutableStateOf(null) }
+            var showEventFiltersSheet by remember { mutableStateOf(false) }
+
+
+
+
 
 
             val startPoint by remember { mutableStateOf(mapViewModel.userPosition) }
@@ -137,10 +152,10 @@ fun MapActivity(){
 
 
                             TextField(
-                                value = searchQuery,
+                                value = restaurantSearchQuery,
                                 onValueChange = {
-                                    searchQuery = it
-                                    mapViewModel.search = it
+                                    restaurantSearchQuery = it
+                                    mapViewModel.restaurant_search = it
                                     mapViewModel.refreshRestaurants(startPoint)
                                 },
                                 singleLine = true,
@@ -153,7 +168,7 @@ fun MapActivity(){
                             Spacer(modifier = Modifier.width(16.dp))
 
                             IconButton(
-                                onClick = { showFiltersSheet = true }
+                                onClick = { showRestaurantFiltersSheet = true }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.FilterList,
@@ -206,34 +221,68 @@ fun MapActivity(){
                     }
                 },
                 stringResource(id = R.string.label_events) to {
-                    if(events.loadState.refresh is LoadState.Loading){
-                        LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
-                    }
-                    else if (events.itemCount < 1 || events.loadState.hasError){
-                        MissingPage(
-                            errorString = stringResource(
-                                id = R.string.message_not_found_any,
-                                stringResource(id = R.string.label_events)
-                            )
-                        )
-                    } else {
-                        LazyColumn(
-                            Modifier
-                                .fillMaxSize()
-                                .padding(top = 75.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 75.dp, start = 20.dp, end = 20.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(events.itemCount) { index ->
-                                val item = events[index]
-                                if(item != null){
-                                    EventCard(
-                                        eventCreator = item.creatorFullName,
-                                        eventDate = item.time,
-                                        eventLocation = item.restaurantName,
-                                        interestedCount = item.numberInterested,
-                                        takePartCount = item.participants
-                                    )
+
+
+                            TextField(
+                                value = eventSearchQuery,
+                                onValueChange = {
+                                    eventSearchQuery = it
+                                    mapViewModel.event_search = it
+                                    mapViewModel.refreshEvents(startPoint)
+                                },
+                                singleLine = true,
+                                placeholder = { Text(text = stringResource(id = R.string.label_search)) },
+                                modifier = Modifier
+                                    .padding(vertical = 4.dp),
+                                shape = RoundedCornerShape(20.dp))
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            IconButton(
+                                onClick = { showEventFiltersSheet = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FilterList,
+                                    contentDescription = "Filter Icon"
+                                )
+                            }
+                        }
+
+                        if(events.loadState.refresh is LoadState.Loading){
+                            LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
+                        }
+                        else if (events.itemCount < 1 || events.loadState.hasError){
+                            MissingPage(
+                                errorString = stringResource(
+                                    id = R.string.message_not_found_any,
+                                    stringResource(id = R.string.label_events)
+                                )
+                            )
+                        } else {
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                items(events.itemCount) { index ->
+                                    val item = events[index]
+                                    if(item != null){
+                                        EventCard(
+                                            eventCreator = item.name,
+                                            eventDate = item.time,
+                                            eventLocation = item.restaurant.address,
+                                            interestedCount = item.numberInterested,
+                                            takePartCount = item.numberParticipants
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -264,14 +313,13 @@ fun MapActivity(){
                 contentColor = MaterialTheme.colorScheme.surface
             )
 
-            val onDismiss = {showFiltersSheet = false}
-            if(showFiltersSheet){
+            if(showRestaurantFiltersSheet){
                 MessageSheet(
                     buttonLabelId = R.string.label_apply,
-                    onDismiss = onDismiss,
+                    onDismiss = {showRestaurantFiltersSheet = false},
                     buttonOnClick = {
-                        mapViewModel.selectedTags = selectedTags
-                        mapViewModel.minRating = selectedRating
+                        mapViewModel.restaurant_selectedTags = restaurantSelectedTags
+                        mapViewModel.restaurant_minRating = restaurantSelectedRating
                         mapViewModel.refreshRestaurants(userLocation = startPoint)
                     },
                     content = {
@@ -299,8 +347,8 @@ fun MapActivity(){
                                     modifier = Modifier.padding(vertical = 8.dp)
                                 )
                                 StarRatingFilter(
-                                    selectedRating = selectedRating,
-                                    onRatingSelected = { rating -> selectedRating = rating }
+                                    selectedRating = restaurantSelectedRating,
+                                    onRatingSelected = { rating -> restaurantSelectedRating = rating }
                                 )
 
                                 Spacer(modifier = Modifier.height(25.dp))
@@ -321,13 +369,13 @@ fun MapActivity(){
 
                                         TagChip(
                                             tagName = brand,
-                                            isSelected = selectedTags.contains(brand),
+                                            isSelected = restaurantSelectedTags.contains(brand),
                                             onClick = {
-                                                if (selectedTags.contains(brand)) {
-                                                    selectedTags.remove(brand)
+                                                if (restaurantSelectedTags.contains(brand)) {
+                                                    restaurantSelectedTags.remove(brand)
                                                 } else {
-                                                    if (selectedTags.size < 5) {
-                                                        selectedTags.add(brand)
+                                                    if (restaurantSelectedTags.size < 5) {
+                                                        restaurantSelectedTags.add(brand)
                                                     } else {
                                                         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
                                                     }
@@ -338,7 +386,52 @@ fun MapActivity(){
                                 }
                             }
                         }
+                    }
+                )
+            }
+
+            if(showEventFiltersSheet){
+                MessageSheet(
+                    buttonLabelId = R.string.label_apply,
+                    onDismiss = {showEventFiltersSheet = false},
+                    buttonOnClick = {
+                        mapViewModel.event_status = selectedEventStatus
+                        mapViewModel.event_dateFrom = eventSelectedDateFrom
+                        mapViewModel.event_dateUntil = eventSelectedDateUntil
+
+                        mapViewModel.refreshEvents(userLocation = startPoint)
                     },
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.label_search_filter_event_status),
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                            )
+                            EventStatusRadioFilter(
+                                selectedStatus = selectedEventStatus,
+                                onStatusSelected = {status -> selectedEventStatus = status}
+                            )
+
+                            Spacer(modifier = Modifier.height(25.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.label_search_filter_date_range),
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+
+//                            MyDatePickerDialog(onDateChange = { date -> eventSelectedDateFrom = LocalDateTime.parse(date) })
+                            DateRangePickerModal(
+                                onDismiss = {},
+                                onDateRangeSelected = {}
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -561,6 +654,103 @@ fun StarRatingFilter(
                         onRatingSelected(star)
                     }
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateRangePickerModal(
+    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
+    onDismiss: () -> Unit
+) {
+//    val dateRangePickerState = rememberDateRangePickerState()
+//
+//    DatePickerDialog(
+//        onDismissRequest = onDismiss,
+//        confirmButton = {
+//            TextButton(
+//                onClick = {
+//                    onDateRangeSelected(
+//                        Pair(
+//                            dateRangePickerState.selectedStartDateMillis,
+//                            dateRangePickerState.selectedEndDateMillis
+//                        )
+//                    )
+//                    onDismiss()
+//                }
+//            ) {
+//                Text("OK")
+//            }
+//        },
+//        dismissButton = {
+//            TextButton(onClick = onDismiss) {
+//                Text("Cancel")
+//            }
+//        }
+//    ) {
+//        DateRangePicker(
+//            state = dateRangePickerState,
+//            title = {
+//                Text(
+//                    text = "Select date range"
+//                )
+//            },
+//            showModeToggle = false,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(500.dp)
+//                .padding(16.dp)
+//        )
+//    }
+}
+
+@Composable
+fun EventStatusRadioFilter(
+    selectedStatus: EventDTO.EventStatus?,
+    onStatusSelected: (EventDTO.EventStatus?) -> Unit
+) {
+    var currentStatus by remember { mutableStateOf(selectedStatus) }
+    val selectStatus = {status:EventDTO.EventStatus? ->
+      currentStatus = status
+      onStatusSelected(status)
+    }
+    val spaceBetween = 1.dp
+
+    Column(
+        modifier = Modifier.padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { selectStatus(null) }
+                .padding(vertical = spaceBetween / 2)
+        ) {
+            RadioButton(
+                selected = currentStatus == null,
+                onClick = { selectStatus(null) }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = stringResource(id = R.string.label_all))
+        }
+
+        EventDTO.EventStatus.entries.forEach { status ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { selectStatus(status) }
+                    .padding(vertical = spaceBetween / 2)
+            ) {
+                RadioButton(
+                    selected = currentStatus == status,
+                    onClick = { selectStatus(status) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(id = status.stringId))
+            }
         }
     }
 }
