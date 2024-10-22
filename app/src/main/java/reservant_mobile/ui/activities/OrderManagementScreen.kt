@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -177,7 +178,9 @@ fun OrderList(visits: LazyPagingItems<VisitDTO>?, homeNavController: NavHostCont
             }
         }
     }
+
 }
+
 
 @Composable
 fun VisitCard(visit: VisitDTO, homeNavController: NavHostController) {

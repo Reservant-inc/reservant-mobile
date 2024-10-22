@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -122,6 +123,9 @@ class EmployeeOrderViewModel(
                 tableId = visit.tableId ?: -1
             )
         }
+    }.catch { exception ->
+        emit(PagingData.empty())
+        Log.e("ViewModel", "Exception in pastVisits flow: $exception")
     }
 }
 
