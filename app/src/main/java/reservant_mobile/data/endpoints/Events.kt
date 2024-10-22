@@ -7,7 +7,7 @@ class Events(
     val origLat: Double? = null,
     val origLon: Double? = null,
     val restaurantId: Int? = null,
-    val restaurantName: Int? = null,
+    val restaurantName: String? = null,
     val name: String? = null,
     val dateFrom: String? = null,
     val dateUntil: String? = null,
