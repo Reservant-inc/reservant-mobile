@@ -7,13 +7,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import reservant_mobile.data.endpoints.Events
-import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.models.dtos.FoundUserDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import java.time.LocalDateTime
 
 interface IEventService{
+    suspend fun getEvents(origLat: Double? = null,
+                          origLon: Double? = null,
+                          restaurantId: Int? = null,
+                          restaurantName: Int? = null,
+                          name: String? = null,
+                          dateFrom: LocalDateTime? = null,
+                          dateUntil: LocalDateTime? = null,
+                          eventStatus: EventDTO.EventStatus? = null): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>
     suspend fun getEvent(eventId: Any): Result<EventDTO?>
     suspend fun updateEvent(eventId: Any, event:EventDTO): Result<EventDTO?>
@@ -22,10 +29,40 @@ interface IEventService{
     suspend fun markEventAsNotInterested(eventId: Any): Result<Boolean>
     suspend fun acceptUser(eventId: Any, userId: String): Result<Boolean>
     suspend fun rejectUser(eventId: Any, userId: String): Result<Boolean>
-    suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participants>>?>
+    suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participant>>?>
 
 }
 class EventService(): ServiceUtil(), IEventService{
+    @OptIn(InternalSerializationApi::class)
+    override suspend fun getEvents(
+        origLat: Double?,
+        origLon: Double?,
+        restaurantId: Int?,
+        restaurantName: Int?,
+        name: String?,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        eventStatus: EventDTO.EventStatus?
+    ): Result<Flow<PagingData<EventDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Events(
+                origLat = origLat,
+                origLon = origLon,
+                restaurantId = restaurantId,
+                restaurantName = restaurantName,
+                name = name,
+                dateFrom = dateFrom?.toString(),
+                dateUntil = dateUntil?.toString(),
+                eventStatus = eventStatus?.toString(),
+                page = page,
+                perPage = perPage
+            )
+        )}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO::class.serializer()))
+        return pagingResultWrapper(sps)
+    }
+
     override suspend fun addEvent(event: EventDTO): Result<EventDTO?> {
         val res = api.post(Events(), event)
         return complexResultWrapper(res)
@@ -73,7 +110,7 @@ class EventService(): ServiceUtil(), IEventService{
     }
 
     @OptIn(InternalSerializationApi::class)
-    override suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participants>>?> {
+    override suspend fun getInterestedUser(eventId: Any): Result<Flow<PagingData<EventDTO.Participant>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Events.Id.Interested(
                 parent = Events.Id(eventId = eventId.toString()),
@@ -82,7 +119,7 @@ class EventService(): ServiceUtil(), IEventService{
             )
         )}
 
-        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO.Participants::class.serializer()))
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(EventDTO.Participant::class.serializer()))
         return pagingResultWrapper(sps)
     }
 
