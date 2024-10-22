@@ -1,14 +1,14 @@
 package reservant_mobile.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.fields.Result
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 
@@ -17,46 +17,44 @@ class EmployeeOrderViewModel(
     private val restaurantService: IRestaurantService = RestaurantService()
 ) : ReservantViewModel() {
 
-    // State for current orders
-    private val _currentOrders = MutableStateFlow<Flow<PagingData<OrderDTO>>?>(null)
-    val currentOrders: StateFlow<Flow<PagingData<OrderDTO>>?> = _currentOrders
+    val currentVisits: Flow<PagingData<VisitDTO>> = flow {
+        val result = restaurantService.getVisits(
+            restaurantId = restaurantId,
+            dateStart = null,
+            dateEnd = null,
+            orderBy = null
+        )
 
-    // State for past orders
-    private val _pastOrders = MutableStateFlow<Flow<PagingData<OrderDTO>>?>(null)
-    val pastOrders: StateFlow<Flow<PagingData<OrderDTO>>?> = _pastOrders
-
-    init {
-        fetchCurrentOrders()
-        fetchPastOrders()
+        if (!result.isError && result.value != null) {
+            emitAll(result.value.cachedIn(viewModelScope))
+        } else {
+            // Handle the error, e.g., log it or emit an empty PagingData
+            emit(PagingData.empty())
+            Log.e("ViewModel", "Error fetching current visits: ${result.errors}")
+        }
+    }.catch { exception ->
+        emit(PagingData.empty())
+        Log.e("ViewModel", "Exception in currentVisits flow: $exception")
     }
 
-    // Fetch current (unfinished) orders
-    fun fetchCurrentOrders() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<OrderDTO>>?> = restaurantService.getRestaurantOrders(
-                restaurantId = restaurantId,
-                returnFinished = false,
-                orderBy = null
-            )
+    // Similarly for pastVisits
+    val pastVisits: Flow<PagingData<VisitDTO>> = flow {
+        val result = restaurantService.getVisits(
+            restaurantId = restaurantId,
+            dateStart = null,
+            dateEnd = null,
+            orderBy = null
+        )
 
-            if (!result.isError) {
-                _currentOrders.value = result.value?.cachedIn(viewModelScope)
-            }
+        if (!result.isError && result.value != null) {
+            emitAll(result.value.cachedIn(viewModelScope))
+        } else {
+            emit(PagingData.empty())
+            Log.e("ViewModel", "Error fetching past visits: ${result.errors}")
         }
-    }
-
-    // Fetch past (finished) orders
-    fun fetchPastOrders() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<OrderDTO>>?> = restaurantService.getRestaurantOrders(
-                restaurantId = restaurantId,
-                returnFinished = true,
-                orderBy = null
-            )
-
-            if (!result.isError) {
-                _pastOrders.value = result.value?.cachedIn(viewModelScope)
-            }
-        }
+    }.catch { exception ->
+        emit(PagingData.empty())
+        Log.e("ViewModel", "Exception in pastVisits flow: $exception")
     }
 }
+
