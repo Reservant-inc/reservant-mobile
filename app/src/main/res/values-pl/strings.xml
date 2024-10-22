@@ -227,4 +227,9 @@
     <string name="label_takePart">bierze udział</string>
     <string name="error_loading_events">Błąd podczas wczytywania wydarzeń</string>
     <string name="error_loading_more_events">Bład podczas wczytywania następnych wydarzeń</string>
+    <string name="label_event_status_future">W przyszłości</string>
+    <string name="label_event_status_nonJoinable">Niedostępne</string>
+    <string name="label_event_status_past">W przeszłości</string>
+    <string name="label_search_filter_event_status">Znajdz wydarzenie przez status</string>
+    <string name="label_search_filter_date_range">Wydarzenia z podanego okresu</string>
 </resources>
