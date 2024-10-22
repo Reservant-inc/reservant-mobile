@@ -100,14 +100,11 @@ fun ChatListActivity() {
                 }
 
                 LazyColumn {
-
                     if (threads.loadState.refresh is LoadState.Loading){
                         item {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
-                    }
-
-                    if (threads.loadState.hasError || threads.itemCount < 1) {
+                    } else if (threads.loadState.hasError || threads.itemCount < 1) {
                         item {
                             MissingPage(
                                 errorString = stringResource(
@@ -115,51 +112,52 @@ fun ChatListActivity() {
                                 )
                             )
                         }
-                    }
-
-                    items(threads.itemCount) { i ->
-                        val thread by remember {
-                            mutableStateOf(threads[i])
-                        }
-
-                        thread?.let { thread ->
-
-                            //TODO: check if thread is group thread
-                            val isGroup by remember {
-                                mutableStateOf(i==1)
+                    } else {
+                        items(threads.itemCount) { i ->
+                            val thread by remember {
+                                mutableStateOf(threads[i])
                             }
 
-                            val title by remember {
-                                mutableStateOf(
-                                    if (isGroup) {
-                                        thread.title ?: thread.participants!!.joinToString { "${it.firstName}," }
-                                    }
-                                    else {
-                                        thread.participants!![0].firstName
-                                    }
-                                )
-                            }
+                            thread?.let { thread ->
 
-                            val usernames by remember {
-                                mutableStateOf(
-                                    if (isGroup) {
-                                        thread.participants!!.joinToString { "${it.firstName}," }
-                                    }
-                                    else {
-                                        null
-                                    }
-                                )
-                            }
-
-                            ThreadListItem(
-                                title = title,
-                                userNames = usernames,
-                                onClick = {
-                                    nav.navigate(UserRoutes.Chat(userName = thread.participants!![0].firstName))
+                                //TODO: check if thread is group thread
+                                val isGroup by remember {
+                                    mutableStateOf(i==1)
                                 }
-                            )
+
+                                val title by remember {
+                                    mutableStateOf(
+                                        if (isGroup) {
+                                            thread.title ?: thread.participants!!.joinToString { "${it.firstName}," }
+                                        }
+                                        else {
+                                            thread.participants!![0].firstName
+                                        }
+                                    )
+                                }
+
+                                val usernames by remember {
+                                    mutableStateOf(
+                                        if (isGroup) {
+                                            thread.participants!!.joinToString { "${it.firstName}," }
+                                        }
+                                        else {
+                                            null
+                                        }
+                                    )
+                                }
+
+                                ThreadListItem(
+                                    title = title,
+                                    userNames = usernames,
+                                    onClick = {
+                                        nav.navigate(UserRoutes.Chat(userName = thread.participants!![0].firstName))
+                                    }
+                                )
+                            }
                         }
                     }
+
                 }
             }
 

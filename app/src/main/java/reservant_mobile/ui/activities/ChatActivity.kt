@@ -42,6 +42,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.ChatViewModel
+import java.time.LocalDate
+import java.time.Period
+import java.util.Date
 
 
 @Composable
@@ -94,8 +97,12 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     items(count = pagingItems.itemCount) { index ->
                         val message = pagingItems[index]
                         message?.let {
-                            val sender = participantsMap[message.authorId]
-                            val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
+                            val sender by remember {
+                                mutableStateOf(participantsMap[message.authorId])
+                            }
+                            val isSentByMe by remember {
+                                mutableStateOf(message.authorId == chatViewModel.getCurrentUserId())
+                            }
 
                             Row(
                                 modifier = Modifier
@@ -118,19 +125,48 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                         color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    message.dateSent?.let { date ->
-                                        val formattedDate = formatDateTime(date, "dd.MM.yyyy")
-                                        val formattedTime = formatDateTime(date, "HH:mm:ss")
+
+                                    if (!isSentByMe) {
                                         Text(
-                                            text = "$formattedDate $formattedTime",
+                                            text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
+                                    }
+
+                                    message.dateSent?.let { date ->
+                                        val parsedDate by remember {
+                                            mutableStateOf(formatDateTime(date))
+                                        }
+
+                                        val formattedDate by remember {
+                                            mutableStateOf(formatDateTime(date, "dd.MM.yyyy"))
+                                        }
+                                        val formattedTime by remember {
+                                            mutableStateOf(formatDateTime(date, "HH:mm"))
+                                        }
+
+                                        val isDateToday by remember {
+                                            mutableStateOf(
+                                                Period.between(LocalDate.now(), parsedDate.toLocalDate()).days > 0
+                                            )
+                                        }
+
+
+
+                                        if (isDateToday) {
+                                            Text(
+                                                text = formattedTime,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        } else {
+                                            Text(
+                                                text = "$formattedDate $formattedTime",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
                                     }
                                 }
                             }
