@@ -232,4 +232,5 @@
     <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
+    <string name="error_threads_not_found">Not found any message threads</string>
 </resources>
