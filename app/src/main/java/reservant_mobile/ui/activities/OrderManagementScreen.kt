@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
@@ -160,7 +159,7 @@ fun VisitCard(visit: VisitDTO) {
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
     // Retrieve client information (if any)
-    val clientId = visit.clientId ?: "Unknown Client"
+    val clientId = "Pracownik - brakuje w Backu"
     val tableId = visit.tableId ?: "Unknown Table"
 
     Card(
