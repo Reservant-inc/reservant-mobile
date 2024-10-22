@@ -87,23 +87,20 @@ fun SocialActivity(navController: NavHostController){
                             onReturnClick = { navController.popBackStack() }
                         )
 
-
-
                         OutlinedTextField(
                             value = query,
-                            onValueChange = { query = it },
+                            onValueChange = {
+                                query = it
+                                viewmodel.viewModelScope.launch {
+                                    viewmodel.getUsers(query)
+                                }
+                            },
                             placeholder = { Text(text = "Search...") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
                             trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        viewmodel.viewModelScope.launch {
-                                            viewmodel.getUsers(query)
-                                        }
-                                    }
-                                ){
+                                IconButton(onClick = {}){
                                     Icon(imageVector = Icons.Rounded.Search, contentDescription = "Send")
                                 }
                             },
