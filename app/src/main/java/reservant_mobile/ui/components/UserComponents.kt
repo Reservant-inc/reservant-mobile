@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.ChatDTO
-import reservant_mobile.data.services.UserService
 
 @Composable
 fun UserCard(
@@ -74,7 +73,11 @@ fun UserCard(
 }
 
 @Composable
-fun ChatListItem(chat: ChatDTO, onClick: () -> Unit) {
+fun ThreadListItem(
+    title: String,
+    userNames: String? = null,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,15 +96,17 @@ fun ChatListItem(chat: ChatDTO, onClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = chat.userName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(text = chat.lastMessage, fontSize = 14.sp)
+            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            userNames?.let {
+                Text(text = userNames, fontSize = 14.sp)
+            }
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = chat.timeStamp,
+        /*Text(
+            text = thread.timeStamp,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        )*/
     }
     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 }

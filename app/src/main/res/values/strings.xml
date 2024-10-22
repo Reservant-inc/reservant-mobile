@@ -249,4 +249,5 @@
     <string name="label_event_status_past">Past</string>
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
+    <string name="error_threads_not_found">Not found any message threads</string>
 </resources>

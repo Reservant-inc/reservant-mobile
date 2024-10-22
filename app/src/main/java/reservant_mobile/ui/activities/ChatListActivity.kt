@@ -7,11 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -20,37 +19,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.ChatDTO
-import reservant_mobile.ui.components.ChatListItem
+import reservant_mobile.ui.components.ThreadListItem
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.UserRoutes
+import reservant_mobile.ui.viewmodels.SocialViewModel
 
 @Composable
 fun ChatListActivity() {
-    val chats = remember {
-        listOf(
-            ChatDTO("John Doe's staff", "John: What's up?", "10:45 AM"),
-            ChatDTO("John Doe", "What's up?", "Yesterday"),
-            ChatDTO("John Doe", "What's up?", "12:30 PM"),
-            ChatDTO("John Doe", "What's up?", "9:15 AM"),
-            ChatDTO("John Doe", "What's up?", "2 days ago")
-        )
-    }
+    val viewmodel = viewModel<SocialViewModel>()
+    val threads by rememberUpdatedState(viewmodel.threads.collectAsLazyPagingItems())
     val nav = rememberNavController()
+
+
     NavHost(
         navController = nav,
         startDestination = UserRoutes.ChatList
@@ -74,7 +74,7 @@ fun ChatListActivity() {
                 ) {
 
                     var query by remember {
-                        mutableStateOf("")
+                        mutableStateOf(viewmodel.threadQuery)
                     }
 
                     OutlinedTextField(
@@ -87,7 +87,9 @@ fun ChatListActivity() {
                         trailingIcon = {
                             IconButton(
                                 onClick = {
-                                    //reload items from backend
+                                    viewmodel.viewModelScope.launch {
+                                        viewmodel.getThreads(query)
+                                    }
                                 }
                             ){
                                 Icon(imageVector = Icons.Rounded.Search, contentDescription = "Send")
@@ -98,10 +100,65 @@ fun ChatListActivity() {
                 }
 
                 LazyColumn {
-                    items(chats) { chat ->
-                        ChatListItem(chat = chat, onClick = {
-                            nav.navigate(UserRoutes.Chat(userName = chat.userName))
-                        })
+
+                    if (threads.loadState.refresh is LoadState.Loading){
+                        item {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    if (threads.loadState.hasError || threads.itemCount < 1) {
+                        item {
+                            MissingPage(
+                                errorString = stringResource(
+                                    id = R.string.error_threads_not_found
+                                )
+                            )
+                        }
+                    }
+
+                    items(threads.itemCount) { i ->
+                        val thread by remember {
+                            mutableStateOf(threads[i])
+                        }
+
+                        thread?.let { thread ->
+
+                            //TODO: check if thread is group thread
+                            val isGroup by remember {
+                                mutableStateOf(i==1)
+                            }
+
+                            val title by remember {
+                                mutableStateOf(
+                                    if (isGroup) {
+                                        thread.title ?: thread.participants!!.joinToString { "${it.firstName}," }
+                                    }
+                                    else {
+                                        thread.participants!![0].firstName
+                                    }
+                                )
+                            }
+
+                            val usernames by remember {
+                                mutableStateOf(
+                                    if (isGroup) {
+                                        thread.participants!!.joinToString { "${it.firstName}," }
+                                    }
+                                    else {
+                                        null
+                                    }
+                                )
+                            }
+
+                            ThreadListItem(
+                                title = title,
+                                userNames = usernames,
+                                onClick = {
+                                    nav.navigate(UserRoutes.Chat(userName = thread.participants!![0].firstName))
+                                }
+                            )
+                        }
                     }
                 }
             }
