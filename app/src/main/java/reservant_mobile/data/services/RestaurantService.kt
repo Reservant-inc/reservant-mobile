@@ -106,6 +106,11 @@ interface IRestaurantService{
     suspend fun editIngredient(ingredientId: Any, ingredient: IngredientDTO): Result<IngredientDTO?>
     suspend fun correctIngredient(ingredientId: Any, newAmount: Double, comment: String): Result<IngredientDTO.CorrectionDTO?>
     suspend fun getAvailableHours(restaurantId: Any, date: LocalDateTime? = null, numberOfGuests: Int? = null): Result<List<RestaurantDTO.AvailableHours>?>
+    suspend fun getIngredientHistory(ingredientId: Any,
+                                     dateFrom: LocalDateTime? = null,
+                                     dateUntil: LocalDateTime? = null,
+                                     userId: String? = null,
+                                     comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -423,5 +428,27 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             numberOfGuests = numberOfGuests
         ))
         return complexResultWrapper(res)
+    }
+
+    override suspend fun getIngredientHistory(
+        ingredientId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        userId: String?,
+        comment: String?
+    ): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+            Ingredients.IngredientId.History(
+                parent = Ingredients.IngredientId(ingredientId = ingredientId.toString()),
+                dateFrom = dateFrom?.toString(),
+                dateUntil = dateUntil?.toString(),
+                userId = userId,
+                comment = comment,
+                page = page,
+                perPage = perPage
+            ))}
+
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(IngredientDTO.CorrectionDTO::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 }

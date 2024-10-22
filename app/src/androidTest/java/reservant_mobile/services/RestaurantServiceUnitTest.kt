@@ -265,4 +265,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
         ).value).isNotNull()
     }
 
+    @Test
+    fun get_ingredient_history_return_pagination()= runTest{
+        val items = ser.getIngredientHistory(1).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
 }
