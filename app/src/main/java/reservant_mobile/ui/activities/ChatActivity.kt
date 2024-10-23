@@ -26,32 +26,45 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.reservant_mobile.R
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ChatViewModel
 import java.time.LocalDate
 import java.time.Period
-import java.util.Date
 
 
 @Composable
-fun ChatActivity(navController: NavHostController, userName: String) {
-    val chatViewModel: ChatViewModel = viewModel()
-    val messagesFlow = chatViewModel.messagesFlow.collectAsState()
-    val participantsMap = chatViewModel.participantsMap
+fun ChatActivity(navController: NavHostController, threadId: Int) {
+    val chatViewModel: ChatViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                ChatViewModel(threadId = threadId) as T
+        }
+    )
+
+    val messages by rememberUpdatedState(chatViewModel.messagesFlow.collectAsLazyPagingItems())
+    val participantsMap by remember {
+        mutableStateOf(chatViewModel.participantsMap)
+    }
 
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
 
@@ -67,12 +80,12 @@ fun ChatActivity(navController: NavHostController, userName: String) {
 
         IconWithHeader(
             icon = Icons.AutoMirrored.Rounded.Chat,
-            text = userName,
+            text = "Thread",
             showBackButton = true,
             onReturnClick = { navController.popBackStack() }
         )
 
-        val lazyPagingItems = messagesFlow.value?.collectAsLazyPagingItems()
+
 
         if (chatViewModel.isLoading){
             Box (
@@ -93,10 +106,26 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     .weight(1f),
                 reverseLayout = true // Display the latest messages at the bottom
             ) {
-                lazyPagingItems?.let { pagingItems ->
-                    items(count = pagingItems.itemCount) { index ->
-                        val message = pagingItems[index]
-                        message?.let {
+
+                if (messages.loadState.refresh is LoadState.Loading){
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                } else if (messages.loadState.hasError || messages.itemCount < 1) {
+                    item {
+                        MissingPage(
+                            errorString = stringResource(
+                                id = R.string.error_threads_not_found
+                            )
+                        )
+                    }
+                } else {
+                    items(count = messages.itemCount) { index ->
+                        val message by remember {
+                            mutableStateOf(messages[index])
+                        }
+
+                        message?.let { message ->
                             val sender by remember {
                                 mutableStateOf(participantsMap[message.authorId])
                             }
@@ -118,7 +147,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                         text = message.contents,
                                         modifier = Modifier
                                             .background(
-                                                if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                                                if (isSentByMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
                                                 shape = CircleShape
                                             )
                                             .padding(8.dp),
@@ -132,42 +161,18 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
+
+                                        message.dateSent.ShowDate()
                                     }
 
-                                    message.dateSent?.let { date ->
-                                        val parsedDate by remember {
-                                            mutableStateOf(formatDateTime(date))
-                                        }
+                                    if (isSentByMe){
+                                        message.dateRead.ShowDate("Read at: ")
 
-                                        val formattedDate by remember {
-                                            mutableStateOf(formatDateTime(date, "dd.MM.yyyy"))
-                                        }
-                                        val formattedTime by remember {
-                                            mutableStateOf(formatDateTime(date, "HH:mm"))
-                                        }
-
-                                        val isDateToday by remember {
-                                            mutableStateOf(
-                                                Period.between(LocalDate.now(), parsedDate.toLocalDate()).days > 0
-                                            )
-                                        }
-
-
-
-                                        if (isDateToday) {
-                                            Text(
-                                                text = formattedTime,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
-                                        } else {
-                                            Text(
-                                                text = "$formattedDate $formattedTime",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
+                                        if (message.dateRead == null){
+                                            message.dateSent.ShowDate()
                                         }
                                     }
+
                                 }
                             }
                         }
@@ -211,7 +216,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (currentMessage.text.isNotBlank() && lazyPagingItems != null) {
+                            if (currentMessage.text.isNotBlank()) {
                                 chatViewModel.createMessage(currentMessage.text)
                                 currentMessage = TextFieldValue()
                             }
@@ -229,3 +234,40 @@ fun ChatActivity(navController: NavHostController, userName: String) {
 }
 
 
+@Composable
+fun String?.ShowDate(prefix: String = ""){
+    this?.let {
+        val parsedDate by remember {
+            mutableStateOf(formatDateTime(it))
+        }
+
+        val formattedDate by remember {
+            mutableStateOf(formatDateTime(it, "dd.MM.yyyy"))
+        }
+        val formattedTime by remember {
+            mutableStateOf(formatDateTime(it, "HH:mm"))
+        }
+
+        val isDateToday by remember {
+            mutableStateOf(
+                Period.between(LocalDate.now(), parsedDate.toLocalDate()).days == 0
+            )
+        }
+
+        if (isDateToday) {
+            Text(
+                text = "$prefix$formattedTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        } else {
+            Text(
+                text = "$prefix$formattedDate $formattedTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+
+
+}
