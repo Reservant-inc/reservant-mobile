@@ -3,18 +3,23 @@ package reservant_mobile.ui.viewmodels
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.*
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.IOrdersService
-import reservant_mobile.data.services.IRestaurantService
-import reservant_mobile.data.services.RestaurantService
-import reservant_mobile.data.services.IUserService
-import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.IRestaurantMenuService
+import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.RestaurantMenuService
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 import java.time.LocalDateTime
 
 class EmployeeOrderViewModel(
@@ -30,7 +35,7 @@ class EmployeeOrderViewModel(
     val currentVisits: Flow<PagingData<VisitDTO>> = flow {
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
-            dateStart = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
+            dateStart = LocalDateTime.now(),
             dateEnd = null,
             orderBy = null
         )
@@ -48,7 +53,7 @@ class EmployeeOrderViewModel(
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
             dateStart = null,
-            dateEnd = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
+            dateEnd = LocalDateTime.now(),
             orderBy = null
         )
 
