@@ -342,8 +342,8 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Visits(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                dateStart = dateStart.toString(),
-                dateEnd = dateEnd.toString(),
+                dateStart = dateStart?.toString(),
+                dateEnd = dateEnd?.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage
@@ -424,7 +424,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     ): Result<List<RestaurantDTO.AvailableHours>?> {
         val res  = api.get(Restaurants.Id.AvailableHours(
             parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-            date = date.toString(),
+            date = date?.toString(),
             numberOfGuests = numberOfGuests
         ))
         return complexResultWrapper(res)
