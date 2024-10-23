@@ -41,7 +41,7 @@ class OrdersViewModel : ReservantViewModel() {
         _filteredOrders.value = if (status.isNullOrBlank()) {
             allOrders
         } else {
-            allOrders.filter { it.status == status }
+            allOrders.filter { it.status.toString() == status }
         }
     }
 }

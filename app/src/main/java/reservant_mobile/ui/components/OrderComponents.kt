@@ -22,6 +22,6 @@ fun OrderItem(order: OrderDTO) {
 //        Text(text = stringResource(id = R.string.label_date) + ": ${order.date}")
         Text(text = stringResource(id = R.string.label_total_cost) + ": ${order.cost}")
 //        Text(text = order.customer)
-        Text(text = order.status!!, fontWeight = FontWeight.Bold)
+        Text(text = order.status!!.toString(), fontWeight = FontWeight.Bold)
     }
 }

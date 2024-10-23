@@ -254,4 +254,9 @@
     <string name="unknown_date">Nieznana data</string>
     <string name="unknown_cost">Nieznany koszt</string>
     <string name="unknown_table">Nieznany stół</string>
+    <string name="label_event_status_future">W przyszłości</string>
+    <string name="label_event_status_nonJoinable">Niedostępne</string>
+    <string name="label_event_status_past">W przeszłości</string>
+    <string name="label_search_filter_event_status">Znajdz wydarzenie przez status</string>
+    <string name="label_search_filter_date_range">Wydarzenia z podanego okresu</string>
 </resources>

@@ -28,7 +28,9 @@ class OrdersService():ServiceUtil(), IOrdersService {
     }
 
     override suspend fun changeOrderStatus(orderId: Any, order: OrderDTO): Result<OrderDTO?> {
-        val res = api.put(Orders.OrderId(orderId=orderId.toString()), order)
+        val res = api.put(Orders.OrderId.Status(
+            parent = Orders.OrderId(orderId=orderId.toString())
+        ), order)
         return complexResultWrapper(res)
     }
 }

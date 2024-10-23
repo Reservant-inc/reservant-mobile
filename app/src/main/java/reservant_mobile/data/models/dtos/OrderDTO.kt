@@ -10,10 +10,11 @@ data class OrderDTO(
      * Date in 'yyyy-MM-d'T'H:mm:ss.SS' format
      */
     val date: String? = null,
-    val status: String? = null,
+    val status: OrderStatus? = null,
     val note: String? = null,
     val items: List<OrderItemDTO>? = null,
     val employees: List<RestaurantEmployeeDTO>? = null
+    val employeeId: String? = null,
 ){
     @Serializable
     data class OrderItemDTO(
@@ -22,4 +23,12 @@ data class OrderDTO(
         val cost: Double? = null,
         val status: String? = null
     )
+
+    @Serializable
+    enum class OrderStatus{
+        InProgress,
+        Ready,
+        Taken,
+        Cancelled
+    }
 }
