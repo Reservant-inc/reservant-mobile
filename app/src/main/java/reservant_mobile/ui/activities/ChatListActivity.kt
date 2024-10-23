@@ -35,7 +35,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.ChatDTO
 import reservant_mobile.ui.components.ThreadListItem
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
@@ -127,7 +126,7 @@ fun ChatListActivity() {
                                 val title by remember {
                                     mutableStateOf(
                                         if (isGroup) {
-                                            thread.title ?: thread.participants!!.joinToString { "${it.firstName}," }
+                                            thread.title ?: thread.participants!!.joinToString(separator = ", ") { it.firstName }
                                         }
                                         else {
                                             thread.participants!![0].firstName
@@ -138,7 +137,7 @@ fun ChatListActivity() {
                                 val usernames by remember {
                                     mutableStateOf(
                                         if (isGroup) {
-                                            thread.participants!!.joinToString { "${it.firstName}," }
+                                            thread.participants!!.joinToString(separator = ", ") { it.firstName }
                                         }
                                         else {
                                             null
@@ -150,7 +149,7 @@ fun ChatListActivity() {
                                     title = title,
                                     userNames = usernames,
                                     onClick = {
-                                        nav.navigate(UserRoutes.Chat(userName = thread.participants!![0].firstName))
+                                        nav.navigate(UserRoutes.Chat(threadId = thread.threadId!!))
                                     }
                                 )
                             }
@@ -177,7 +176,7 @@ fun ChatListActivity() {
         composable<UserRoutes.Chat> {
             ChatActivity(
                 navController = nav,
-                userName = it.toRoute<UserRoutes.Chat>().userName,
+                threadId = it.toRoute<UserRoutes.Chat>().threadId,
             )
         }
         composable<MainRoutes.Social> {
