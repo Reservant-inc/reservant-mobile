@@ -13,7 +13,7 @@ data class OrderDTO(
     val status: String? = null,
     val note: String? = null,
     val items: List<OrderItemDTO>? = null,
-    val employeeId: String? = null
+    val employees: List<RestaurantEmployeeDTO>? = null
 ){
     @Serializable
     data class OrderItemDTO(
