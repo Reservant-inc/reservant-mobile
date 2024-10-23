@@ -277,6 +277,13 @@
     <string name="total_cost_label">Total Cost: %1$s zł</string>
     <string name="participants_label">Participants:</string>
     <string name="order_id_label">Order: %1$d</string>
+    <string name="order_details">Order Details</string>
+    <string name="orders_label">Orders:</string>
+    <string name="client_label">Client: %1$s</string>
+    <string name="table_label">Table: %1$d</string>
+    <string name="total_cost_label">Total Cost: %1$s zł</string>
+    <string name="participants_label">Participants:</string>
+    <string name="order_id_label">Order ID: %1$d</string>
     <string name="quantity_label">Quantity: %1$d</string>
     <string name="status_label">Status: %1$s</string>
     <string name="price_label">%1$.2f zł</string>

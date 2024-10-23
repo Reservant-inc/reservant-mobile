@@ -1,6 +1,5 @@
 package reservant_mobile.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
