@@ -36,7 +36,7 @@ class EmployeeOrderViewModel(
     val currentVisits: Flow<PagingData<VisitDTO>> = flow {
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
-            dateStart = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
+            dateStart = LocalDateTime.now(),
             dateEnd = null,
             orderBy = null
         )
@@ -54,7 +54,7 @@ class EmployeeOrderViewModel(
         val result = restaurantService.getVisits(
             restaurantId = restaurantId,
             dateStart = null,
-            dateEnd = formatDateTime(LocalDateTime.now().toString(), "yyyy-MM-dd'T'HH:mm:ss\n"),
+            dateEnd = LocalDateTime.now(),
             orderBy = null
         )
 
