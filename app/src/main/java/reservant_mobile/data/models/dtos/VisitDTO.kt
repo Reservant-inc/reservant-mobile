@@ -9,6 +9,7 @@ data class VisitDTO(
      * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
      */
     val date: String? = null,
+    val endTime: String? = null,
     val numberOfGuests: Int? = null,
     val numberOfPeople: Int? = null,
     val paymentTime: String? = null,
@@ -20,7 +21,7 @@ data class VisitDTO(
     val tip: Double? = null,
     val takeaway: Boolean? = null,
     val clientId: String? = null,
-    val restaurantId: Int? = null,
+    val restaurant: RestaurantDTO? = null,
     val tableId: Int? = null,
     val participants: List<UserSummaryDTO>? = null,
     val participantIds: List<String>? = null,

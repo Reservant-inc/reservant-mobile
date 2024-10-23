@@ -1,4 +1,3 @@
-
 @file:Suppress("IMPLICIT_CAST_TO_ANY")
 
 package reservant_mobile.ui.activities
@@ -269,7 +268,7 @@ fun EmployeeHomeActivity() {
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
                             icon = Icons.Outlined.Settings,
-                            onClick = { innerNavController.navigate(MainRoutes.Settings)}
+                            onClick = { innerNavController.navigate(MainRoutes.Settings) }
                         ),
                     )
 
@@ -328,8 +327,8 @@ fun EmployeeHomeActivity() {
 data class EmpMenuOption(
     val text: String,
     val background: Painter? = null,
-    val icon:ImageVector,
-    val onClick: ()->Unit = {}
+    val icon: ImageVector,
+    val onClick: () -> Unit = {}
 )
 
 @Composable
@@ -347,8 +346,8 @@ fun EmpMenuButton(
         Box(
             modifier = Modifier
                 .fillMaxSize(),
-        ){
-            if(option.background!= null){
+        ) {
+            if (option.background != null) {
                 Image(
                     modifier = Modifier
                         .fillMaxSize(),

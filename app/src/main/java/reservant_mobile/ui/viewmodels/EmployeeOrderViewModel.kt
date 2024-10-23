@@ -6,57 +6,141 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.services.IOrdersService
+import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
+import reservant_mobile.data.services.OrdersService
+import reservant_mobile.data.services.RestaurantMenuService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
+import java.time.LocalDateTime
 
 class EmployeeOrderViewModel(
     private val restaurantId: Int,
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val userService: IUserService = UserService(),
+    private val menuService: IRestaurantMenuService = RestaurantMenuService(),
+    private val ordersService: IOrdersService = OrdersService()
 ) : ReservantViewModel() {
 
-    // State for current orders
-    private val _currentOrders = MutableStateFlow<Flow<PagingData<OrderDTO>>?>(null)
-    val currentOrders: StateFlow<Flow<PagingData<OrderDTO>>?> = _currentOrders
+    private val visitCache = mutableMapOf<Int, VisitDTO>()
 
-    // State for past orders
-    private val _pastOrders = MutableStateFlow<Flow<PagingData<OrderDTO>>?>(null)
-    val pastOrders: StateFlow<Flow<PagingData<OrderDTO>>?> = _pastOrders
+    val currentVisits: Flow<PagingData<VisitDTO>> = flow {
+        val result = restaurantService.getVisits(
+            restaurantId = restaurantId,
+            dateStart = LocalDateTime.now(),
+            dateEnd = null,
+            orderBy = null
+        )
 
-    init {
-        fetchCurrentOrders()
-        fetchPastOrders()
+        if (!result.isError && result.value != null) {
+            emitAll(result.value.cachedIn(viewModelScope))
+        } else {
+            emit(PagingData.empty())
+        }
+    }.catch { exception ->
+        emit(PagingData.empty())
     }
 
-    // Fetch current (unfinished) orders
-    fun fetchCurrentOrders() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<OrderDTO>>?> = restaurantService.getRestaurantOrders(
-                restaurantId = restaurantId,
-                returnFinished = false,
-                orderBy = null
-            )
+    val pastVisits: Flow<PagingData<VisitDTO>> = flow {
+        val result = restaurantService.getVisits(
+            restaurantId = restaurantId,
+            dateStart = null,
+            dateEnd = LocalDateTime.now(),
+            orderBy = null
+        )
 
-            if (!result.isError) {
-                _currentOrders.value = result.value?.cachedIn(viewModelScope)
-            }
+        if (!result.isError && result.value != null) {
+            emitAll(result.value.cachedIn(viewModelScope))
+        } else {
+            emit(PagingData.empty())
+        }
+    }.catch { exception ->
+        emit(PagingData.empty())
+    }
+
+    private val _selectedVisitDetails = MutableStateFlow<VisitDetailsUIState?>(null)
+    val selectedVisitDetails: StateFlow<VisitDetailsUIState?> = _selectedVisitDetails.asStateFlow()
+
+    fun fetchVisitDetailsById(visitId: Int) {
+        val visit = visitCache[visitId] ?: return
+        fetchVisitDetails(visit)
+    }
+
+    fun cacheVisit(visit: VisitDTO) {
+        visit.visitId?.let {
+            visitCache[it] = visit
         }
     }
 
-    // Fetch past (finished) orders
-    fun fetchPastOrders() {
+    fun fetchVisitDetails(visit: VisitDTO) {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<OrderDTO>>?> = restaurantService.getRestaurantOrders(
-                restaurantId = restaurantId,
-                returnFinished = true,
-                orderBy = null
-            )
+            val visitDetails = mutableListOf<OrderDetails>()
+            val userSummary = userService.getUserSimpleInfo(visit.clientId ?: "")
+            val participants = visit.participantIds?.mapNotNull { userId ->
+                userService.getUserSimpleInfo(userId).value
+            }.orEmpty()
 
-            if (!result.isError) {
-                _pastOrders.value = result.value?.cachedIn(viewModelScope)
+            visit.orders?.forEach { order ->
+                val orderResult = ordersService.getOrder(order.orderId!!)
+                val fetchedOrder = orderResult.value
+
+                if (fetchedOrder != null) {
+                    val items = fetchedOrder.items?.mapNotNull { item ->
+                        val menuItem = menuService.getMenuItem(item.menuItemId).value
+                        menuItem?.let {
+                            OrderDetails.MenuItemDetails(
+                                name = it.name,
+                                price = it.price,
+                                amount = item.amount,
+                                status = item.status
+                            )
+                        }
+                    }.orEmpty()
+
+                    visitDetails.add(
+                        OrderDetails(
+                            orderId = fetchedOrder.orderId ?: 0,
+                            items = items
+                        )
+                    )
+                }
             }
+
+            _selectedVisitDetails.value = VisitDetailsUIState(
+                clientName = "${userSummary.value?.firstName} ${userSummary.value?.lastName}",
+                participants = participants.map { "${it.firstName} ${it.lastName}" },
+                orders = visitDetails,
+                totalCost = visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0,
+                tableId = visit.tableId ?: -1
+            )
         }
     }
+}
+
+data class VisitDetailsUIState(
+    val clientName: String,
+    val participants: List<String>,
+    val orders: List<OrderDetails>,
+    val totalCost: Double,
+    val tableId: Int
+)
+
+data class OrderDetails(
+    val orderId: Int,
+    val items: List<MenuItemDetails>
+) {
+    data class MenuItemDetails(
+        val name: String,
+        val price: Double,
+        val amount: Int,
+        val status: String?
+    )
 }
