@@ -3,7 +3,6 @@ package reservant_mobile.ui.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
@@ -14,7 +13,7 @@ import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
-import java.util.regex.Pattern
+import reservant_mobile.data.utils.getCountriesList
 
 class EmployeeViewModel(
     private val restaurantId: Int,
@@ -29,8 +28,13 @@ class EmployeeViewModel(
     val login: FormField = FormField(RestaurantEmployeeDTO::login.name)
     val firstName: FormField = FormField(RestaurantEmployeeDTO::firstName.name)
     val lastName: FormField = FormField(RestaurantEmployeeDTO::lastName.name)
+    val birthday: FormField = FormField(RestaurantEmployeeDTO::birthDate.name)
     val password: FormField = FormField(RestaurantEmployeeDTO::password.name)
     val phoneNum: FormField = FormField(RestaurantEmployeeDTO::phoneNumber.name)
+
+    var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
+
+    private var phoneNumberWithCountryCode: String = "+${mobileCountry!!.code}${phoneNum.value}"
 
     val id: FormField = FormField(RestaurantEmployeeDTO::employeeId.name)
     var isHallEmployee by mutableStateOf(false)
@@ -63,6 +67,7 @@ class EmployeeViewModel(
         login.value = ""
         firstName.value = ""
         lastName.value = ""
+        birthday.value = ""
         password.value = ""
         phoneNum.value = ""
         id.value = ""
@@ -88,32 +93,29 @@ class EmployeeViewModel(
         }
     }
 
-    //TODO prawdopodobnie dodać email i date urodzenia ale najpierw trzeba skonsultować z backndem
     suspend fun editEmployee(employee: RestaurantEmployeeDTO): Boolean {
         if (isEditInvalid()) {
             return false
         }
         val newEmployee = RestaurantEmployeeDTO(
-            login = login.value,
             firstName = firstName.value,
             lastName = lastName.value,
-            phoneNumber = phoneNum.value,
-            password = password.value
+            birthDate = birthday.value,
+            phoneNumber = phoneNum.value
         )
-        val response = restaurantService.editEmployee(employee.employeeId, newEmployee)
+        val response = employee.employeeId?.let { restaurantService.editEmployee(it, newEmployee) }
 
-        val position = if (response.value != null) {
-            RestaurantEmployeeDTO(
+        val position = if (response?.value != null) {
+            listOf(RestaurantEmployeeDTO(
                 employmentId = employee.employmentId,
                 isHallEmployee = isHallEmployee,
                 isBackdoorEmployee = isBackdoorEmployee
-            )
+            ))
         } else {
             return false
         }
 
-        //TODO brakuje końcówki w serwisie
-//        result = restaurantService.editRestaurant(restaurantId, position)
+        result = restaurantService.editEmployment(position)
         if (result.value) {
             viewModelScope.launch {
                 fetchEmployees()
@@ -133,6 +135,7 @@ class EmployeeViewModel(
             login = login.value,
             firstName = firstName.value,
             lastName = lastName.value,
+            birthDate = birthday.value,
             phoneNumber = phoneNum.value,
             password = password.value
         )
@@ -141,7 +144,6 @@ class EmployeeViewModel(
 
         val position = if (response.value != null) {
             RestaurantEmployeeDTO(
-                //TODO prawodopodobnie do zmiany na employeeId jak wejdzie zmiana na Backendzie
                 employeeId = response.value.userId,
                 isHallEmployee = isHallEmployee,
                 isBackdoorEmployee = isBackdoorEmployee
@@ -164,14 +166,15 @@ class EmployeeViewModel(
                 isFirstNameInvalid() ||
                 isLastNameInvalid() ||
                 isPhoneInvalid() ||
-                isPasswordInvalid()
+                isPasswordInvalid() ||
+                isBirthDateInvalid()
     }
 
     private fun isEditInvalid(): Boolean {
-        return isLoginInvalid() ||
-                isFirstNameInvalid() ||
+        return  isFirstNameInvalid() ||
                 isLastNameInvalid() ||
-                isPhoneInvalid()
+                isPhoneInvalid() ||
+                isBirthDateInvalid()
     }
 
     fun isLoginInvalid(): Boolean {
@@ -188,6 +191,11 @@ class EmployeeViewModel(
     fun isLastNameInvalid(): Boolean {
         return isInvalidWithRegex(Regex.NAME_REG, lastName.value) ||
                 getFieldError(result, lastName.name) != -1
+    }
+
+    fun isBirthDateInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.DATE_REG, birthday.value) ||
+                getFieldError(result, birthday.name) != -1
     }
 
     fun isPhoneInvalid(): Boolean {
@@ -210,6 +218,10 @@ class EmployeeViewModel(
 
     fun getLastNameError(): Int {
         return getFieldError(result, lastName.name)
+    }
+
+    fun getBirthDateError(): Int{
+        return getFieldError(result, birthday.name)
     }
 
     fun getPhoneError(): Int {

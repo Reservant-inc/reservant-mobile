@@ -63,6 +63,7 @@ interface IRestaurantService{
     suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?>
     suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
+    suspend fun editEmployment(empList: List<RestaurantEmployeeDTO>): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
     /***
      * Available order values : see GetRestaurantOrders class
@@ -253,6 +254,11 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun deleteEmployment(employmentId: Int): Result<Boolean> {
         val res = api.delete(Employments.Id(id = employmentId.toString()))
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
+    }
+
+    override suspend fun editEmployment(empList: List<RestaurantEmployeeDTO>): Result<Boolean> {
+        val res = api.put(Employments(), empList)
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 

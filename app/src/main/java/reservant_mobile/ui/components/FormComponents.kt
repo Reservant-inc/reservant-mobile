@@ -163,7 +163,7 @@ fun FormFileInput(
         beginValidation = false
     }
 
-    if (fileName == null && defaultValue.isNotBlank()){
+    if (fileName == null && defaultValue.isNotBlank()) {
         fileName = defaultValue
     }
 
@@ -240,17 +240,15 @@ fun FormFileInput(
 }
 
 
-
 @Composable
 fun MyDatePickerDialog(
+    modifier: Modifier = Modifier,
     onDateChange: (String) -> Unit,
     label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
     startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
     allowFutureDates: Boolean = false,
     startDate: String = (LocalDate.now().year - 28).toString() + "-06-15",
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp)
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp)
 ) {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -263,20 +261,18 @@ fun MyDatePickerDialog(
     ) {
         fun convertMillisToDate(millis: Long): String {
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            return try{
+            return try {
                 formatter.format(Date(millis))
-            }
-            catch (_: Exception){
+            } catch (_: Exception) {
                 ""
             }
         }
 
         fun convertDateToMillis(date: String): Long {
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            return try{
+            return try {
                 formatter.parse(date)?.time ?: 0L
-            }
-            catch (_: Exception){
+            } catch (_: Exception) {
                 0L
             }
         }
@@ -329,8 +325,10 @@ fun MyDatePickerDialog(
         onValueChange = { },
         label = label,
         readOnly = true,
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier,
+        shape = shape,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         interactionSource = remember { MutableInteractionSource() }
             .also { interactionSource ->
                 LaunchedEffect(interactionSource) {
