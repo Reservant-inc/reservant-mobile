@@ -1,9 +1,6 @@
 name: Android CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     types: [review_requested, closed]
     branches:
@@ -56,11 +53,14 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./notify.sh
+
     - name: Notify discord server
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCROD_WEBHOOK_URL }}
         ARTIFACT_ID: ${{github.run_id}}
-      run: chmod +x ./notify.sh && ./notify.sh 
+      run: ./notify.sh 
   
     
     
