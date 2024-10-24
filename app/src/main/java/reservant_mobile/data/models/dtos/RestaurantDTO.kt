@@ -29,4 +29,10 @@ data class RestaurantDTO (
     val location: LocationDTO? = null,
     val reservationDeposit:Double? = null,
     val tags:List<String> = emptyList(),
-)
+){
+    @Serializable
+    data class AvailableHours(
+        val from: String,
+        val until: String
+    )
+}

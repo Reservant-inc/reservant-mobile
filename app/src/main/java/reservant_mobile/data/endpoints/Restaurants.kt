@@ -60,5 +60,7 @@ class Restaurants(
         class Menus(val parent: Id)
         @Resource("menu-items")
         class MenuItems(val parent: Id)
+        @Resource("available-hours")
+        class AvailableHours(val parent: Id, val date: String? = null, val numberOfGuests: Int? = null)
     }
 }

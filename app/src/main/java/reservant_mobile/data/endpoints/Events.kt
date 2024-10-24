@@ -3,7 +3,18 @@ package reservant_mobile.data.endpoints
 import io.ktor.resources.Resource
 
 @Resource("/events")
-class Events {
+class Events(
+    val origLat: Double? = null,
+    val origLon: Double? = null,
+    val restaurantId: Int? = null,
+    val restaurantName: String? = null,
+    val name: String? = null,
+    val dateFrom: String? = null,
+    val dateUntil: String? = null,
+    val eventStatus: String? = null,
+    val page: Int? = null,
+    val perPage: Int? = null
+) {
     @Resource("{eventId}")
     class Id(val parent: Events = Events(), val eventId: String){
         @Resource("interested")
