@@ -13,7 +13,7 @@ fi
 CURRENT_DATE=$(TZ=Etc/GMT-2 date +"%Y-%m-%d %H:%M:%S")
 ROLE_ID="1174437656688607353"
 MSG="<@&$ROLE_ID>\n## Mobile apk build success on __ $CURRENT_DATE __"
-SUMMARY="Reservant mobile just released new build. The artifact is available at:"
+SUMMARY="Reservant mobile just released new build. The .apk file is available at (Artifacts section):"
 ARTIFACT_URL="https://github.com/Reservant-inc/reservant-mobile/actions/runs/$ARTIFACT_ID"
 
 curl -H "Content-Type: application/json" \
@@ -30,7 +30,3 @@ curl -H "Content-Type: application/json" \
   "$DISCORD_WEBHOOK_URL"
 
 echo "Summary sent to Discord webhook."
-
-
-echo "Log file sent to Discord webhook."
-
