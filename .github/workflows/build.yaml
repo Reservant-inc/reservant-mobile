@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+    types: [opened, closed]
     branches:
       - main
 
@@ -50,9 +51,13 @@ jobs:
       with:
           name: release-artifacts
           path: ${{ steps.releaseApk.outputs.apkfile }}
-    
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
     - name: Notify discord server
-      if: github.event.pull_request.merged == true
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCROD_WEBHOOK_URL }}
         ARTIFACT_ID: ${{github.run_id}}
