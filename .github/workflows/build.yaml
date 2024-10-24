@@ -52,9 +52,9 @@ jobs:
           path: ${{ steps.releaseApk.outputs.apkfile }}
     
     - name: Notify discord server
-      if: github.event.pull_request.merged
+      if: github.event.pull_request.merged == true
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCROD_WEBHOOK_URL }}
         ARTIFACT_ID: ${{github.run_id}}
-      run: ./notify.sh
+      run: chmod +x ./notify.sh && ./notify.sh 
     
