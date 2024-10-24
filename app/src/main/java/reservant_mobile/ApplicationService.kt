@@ -21,7 +21,6 @@ class ApplicationService: Application(), SingletonImageLoader.Factory {
             private set
     }
 
-    @OptIn(ExperimentalCoilApi::class)
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .diskCache {
