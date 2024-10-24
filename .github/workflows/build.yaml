@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Notify discord server
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-          ARTIFACT_ID: TEST
-        run: ./notify.sh
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+        ARTIFACT_ID: TEST
+      run: ./notify.sh
