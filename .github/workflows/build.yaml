@@ -38,8 +38,11 @@ jobs:
           GOOGLE_SERVICES_KEY: ${{ secrets.GOOGLE_SERVICES_KEY }}
       run: ./gradlew build
 
-    - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
+    - name: Build apk debug project (APK)
       run: ./gradlew assembleDebug
+    
+    - name: Build abb debug project (Bundle)
+      run: ./gradlew bundleDebug
 
     - name: Get release file aab path
       id: releaseAab
