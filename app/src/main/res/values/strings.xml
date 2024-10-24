@@ -232,6 +232,9 @@
     <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
+    <string name="error_threads_not_found">Not found any message threads</string>
+    <string name="empty_search">Type in search to see results</string>
+    <string name="error_users_not_found">Not found any users</string>
     <string name="label_event_status_future">Upcoming</string>
     <string name="label_event_status_nonJoinable">Non joinable</string>
     <string name="label_event_status_past">Past</string>

@@ -7,6 +7,7 @@ import androidx.paging.map
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.MessageDTO
@@ -19,14 +20,13 @@ import reservant_mobile.data.services.UserService
 
 class ChatViewModel(
     private val threadsService: IThreadsService = ThreadsService(),
+    private val threadId: Int
 ) : ReservantViewModel() {
 
-    // TODO: Replace with dynamic thread ID in the future
-    private val threadId: Any = 1
 
     // StateFlow to hold the paging data
-    private val _messagesFlow = MutableStateFlow<Flow<PagingData<MessageDTO>>?>(null)
-    val messagesFlow: StateFlow<Flow<PagingData<MessageDTO>>?> = _messagesFlow
+    private val _messagesFlow = MutableStateFlow<PagingData<MessageDTO>>(PagingData.empty())
+    val messagesFlow: StateFlow<PagingData<MessageDTO>> = _messagesFlow
 
     // State to hold participant information
     private val _participantsMap = mutableMapOf<String, UserDTO>()
@@ -66,11 +66,12 @@ class ChatViewModel(
 
             isLoading = false
 
-            if (!result.isError) {
-                _messagesFlow.value = result.value?.cachedIn(viewModelScope)
+            if (result.isError || result.value == null) {
+                throw Exception() //TODO error handling
             } else {
-                val errors = result.errors
-                // You can handle errors here, such as displaying a toast or logging
+                result.value.cachedIn(viewModelScope).collect{
+                    _messagesFlow.value = it
+                }
             }
         }
     }
@@ -90,7 +91,7 @@ class ChatViewModel(
 
     fun markMessagesAsRead() {
         viewModelScope.launch {
-            _messagesFlow.value?.collectLatest { pagingData ->
+            _messagesFlow.collectLatest { pagingData ->
                 pagingData.map { message ->
                     message.messageId?.let { messageId ->
                         val result: Result<MessageDTO?> = threadsService.markMessageAsRead(messageId)
