@@ -3,7 +3,6 @@ package reservant_mobile.data.services
 import android.graphics.Bitmap
 import coil3.imageLoader
 import coil3.request.ImageRequest
-import coil3.request.SuccessResult
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.example.reservant_mobile.R
@@ -25,6 +24,8 @@ enum class DataType(val dType: String) {
     PNG("image/png")
 }
 class FileService(): ServiceUtil() {
+    val context = ApplicationService.instance
+
 
      suspend fun sendFile(contentType: DataType, f: ByteArray): Result<FileUploadDTO?> {
         val content = MultiPartFormDataContent(
@@ -58,23 +59,31 @@ class FileService(): ServiceUtil() {
     }
 
     suspend fun getImage(imageFileName: String): Result<Bitmap?> {
-//        val res = getFile(imageFileName)
-
-        val context = ApplicationService.instance
         val loader = context.imageLoader
-//        val req = ImageRequest.Builder(context)
-//            .data("${api.backendUrl}/$imageFileName") // demo link
-//            .build()
+        var res: Result<Bitmap?> = Result(
+            isError = true,
+            value = null
+        )
         val request = ImageRequest.Builder(context)
             .data("${api.backendUrl}$imageFileName")
-            .allowHardware(false) // Disable hardware bitmaps.
+            .allowHardware(false)
+            .target(
+                onSuccess = { result ->
+                    res = Result(
+                        isError = false,
+                        value = result.toBitmap()
+                    )
+                },
+                onError = { _ ->
+                    res = Result(
+                        isError = true,
+                        value = null
+                    )
+                }
+            )
             .build()
-//        val disposable = loader.enqueue(request)
-        val drawable = (loader.execute(request) as SuccessResult).image.toBitmap()
-        val res: Result<Bitmap?> = Result(
-            isError = false,
-            value = drawable
-        )
+        loader.execute(request)
+
         return res
 
     }
