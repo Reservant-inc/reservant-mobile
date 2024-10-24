@@ -52,7 +52,6 @@ jobs:
           name: release-artifacts
           path: ${{ steps.releaseApk.outputs.apkfile }}
 
-jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
