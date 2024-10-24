@@ -37,7 +37,7 @@ class MenuManagementViewModel(
     var menuType = FormField(RestaurantMenuDTO::menuType.name)
     var dateFrom = FormField(RestaurantMenuDTO::dateFrom.name)
     var dateUntil = FormField(RestaurantMenuDTO::dateUntil.name)
-    var photo = FormField(RestaurantMenuDTO::photo.name)
+    //var photo = FormField(RestaurantMenuDTO::photo.name)
 
     var fetchResult: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value = null))
     var result by mutableStateOf(Result(isError = false, value = null))
@@ -58,13 +58,13 @@ class MenuManagementViewModel(
         }
     }
 
-    suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
+    /*suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
         val result = fileService.getImage(menu.photo)
         if (!result.isError){
             return result.value!!
         }
         return null
-    }
+    }*/
 
     private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO {
         return RestaurantMenuDTO(
@@ -75,7 +75,7 @@ class MenuManagementViewModel(
             menuType = menuType.value,
             dateFrom = dateFrom.value,
             dateUntil = dateUntil.value.ifEmpty { null },
-            photo = photo.value
+            //photo = photo.value
         )
     }
 
@@ -136,7 +136,7 @@ class MenuManagementViewModel(
         menuType.value = ""
         dateFrom.value = ""
         dateUntil.value = ""
-        photo.value = ""
+        //photo.value = ""
     }
 
     fun isNameInvalid(): Boolean{
@@ -151,7 +151,7 @@ class MenuManagementViewModel(
         return menuType.value.isBlank()
     }
 
-    fun photoErrors(context: Context): Int {
+    /*fun photoErrors(context: Context): Int {
         if (photo.value.isBlank()) return R.string.error_file_not_given
 
         if (!getFileName(context, photo.value).endsWith(".jpg", ignoreCase = true)) return R.string.error_wrong_file_format
@@ -163,6 +163,6 @@ class MenuManagementViewModel(
         if (photo.value.isBlank()) return -1
         if (isFileSizeInvalid(context, photo.value)) return R.string.error_registerRestaurant_invalid_file
         return -1
-    }
+    }*/
 
 }

@@ -1,8 +1,5 @@
 package reservant_mobile.ui.components
 
-import android.graphics.Bitmap
-import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,14 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.reservant_mobile.R
@@ -51,9 +46,6 @@ fun MenuPopup(
     hide: () -> Unit,
     onConfirm: () -> Unit,
     clear: () -> Unit,
-    onFilePicked: (Uri?) -> Unit,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
     name: FormField,
     isNameInvalid: Boolean = false,
     altName: FormField,
@@ -132,15 +124,6 @@ fun MenuPopup(
                     },
                     onDateChange = { dateUntil.value = it }
                 )
-                FormFileInput(
-                    label = stringResource(id = R.string.label_menu_photo),
-                    onFilePicked = onFilePicked,
-                    context = LocalContext.current,
-                    isError = fileErrors != -1 || fileTooLarge != -1,
-                    errorText = if (fileTooLarge != -1) stringResource(id = fileTooLarge, 1024)
-                    else if (fileErrors != -1) stringResource(id = fileErrors)
-                    else ""
-                )
 
             }
         },
@@ -176,17 +159,13 @@ fun MenuCard(
     menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
-    getPhoto: suspend () -> Bitmap?,
     menu: RestaurantMenuDTO,
-    onFilePicked: (Uri?) -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     clearFields: () -> Unit,
     onClick: () -> Unit,
     isFetching: Boolean = false,
     isSaving: Boolean = false,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
     isNameInvalid: Boolean = false,
     isAltNameInvalid: Boolean = false,
     isMenuTypeInvalid: Boolean = false
@@ -220,7 +199,6 @@ fun MenuCard(
                 hide = { showEditPopup.value = false },
                 onConfirm = onEditClick,
                 clear = clearFields,
-                onFilePicked = onFilePicked,
                 name = name,
                 altName = altName,
                 menuType = menuType,
@@ -228,8 +206,6 @@ fun MenuCard(
                 dateFrom = dateFrom,
                 dateUntil = dateUntil,
                 isSaving = isSaving,
-                fileTooLarge = fileTooLarge,
-                fileErrors = fileErrors,
                 isNameInvalid = isNameInvalid,
                 isAltNameInvalid = isAltNameInvalid,
                 isMenuTypeInvalid = isMenuTypeInvalid
@@ -253,114 +229,79 @@ fun MenuCard(
             .clickable(onClick = onClick)
             .then(loadingModifier)
     ) {
-        Column {
-            /*if (photo != null) {
-                Image(
-                    bitmap = photo,
-                    contentDescription = "${menu.name}_photo",
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                Image(
-                    painterResource(id = R.drawable.unknown_image),
-                    contentDescription = "placeholder_photo",
-                    modifier = Modifier
-                        .size(140.dp)
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                )
-            }*/
-            LoadedPhotoComponent (
-                photoModifier = Modifier.fillMaxWidth(),
-                placeholderModifier = Modifier
-                    .size(140.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally),
-                getPhoto = getPhoto
-            )
 
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
 
-
-            Box(
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
             ) {
 
-                Column(
+                val namePadding = when {
+                    menu.alternateName == null -> 8.dp
+                    else -> 2.dp
+                }
+
+                Text(
+                    text = menu.name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                ) {
+                        .padding(start = 8.dp, end = 8.dp, bottom = namePadding, top = 8.dp)
+                )
 
-                    val namePadding = when {
-                        menu.alternateName == null -> 8.dp
-                        else -> 2.dp
-                    }
-
+                menu.alternateName?.let {
                     Text(
-                        text = menu.name,
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                        text = it,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Light,
                         modifier = Modifier
-                            .padding(start = 8.dp, end = 8.dp, bottom = namePadding, top = 8.dp)
-                    )
-
-                    menu.alternateName?.let {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Light,
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                        )
-                    }
-
-                    menu.dateUntil?.let {
-                        Text(
-                            text = buildAnnotatedString {
-                                append(stringResource(id = R.string.label_limited_time))
-                                append(": ")
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                                append(it)
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                ) {
-                    val buttonModifier = Modifier
-                        .align(Alignment.Bottom)
-                        .size(50.dp)
-                        .padding(6.dp)
-
-                    SecondaryButton(
-                        modifier = buttonModifier,
-                        onClick = { showEditPopup.value = true },
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "EditMenuItem"
-                    )
-
-                    SecondaryButton(
-                        modifier = buttonModifier,
-                        onClick = { showConfirmDeletePopup.value = true },
-                        imageVector = Icons.Filled.DeleteForever,
-                        contentDescription = "delete"
+                            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                     )
                 }
 
-                /*Text(
-                    text = menu.menuType,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(8.dp)
-                )*/
-
+                menu.dateUntil?.let {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(id = R.string.label_limited_time))
+                            append(": ")
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                            append(it)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                    )
+                }
             }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+            ) {
+                val buttonModifier = Modifier
+                    .align(Alignment.Bottom)
+                    .size(50.dp)
+                    .padding(6.dp)
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = { showEditPopup.value = true },
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "EditMenuItem"
+                )
+
+                SecondaryButton(
+                    modifier = buttonModifier,
+                    onClick = { showConfirmDeletePopup.value = true },
+                    imageVector = Icons.Filled.DeleteForever,
+                    contentDescription = "delete"
+                )
+            }
+
         }
+
     }
 }
 
@@ -372,12 +313,9 @@ fun AddMenuButton(
     menuTypes: List<String>,
     dateFrom: FormField,
     dateUntil: FormField,
-    onFilePicked: (Uri?) -> Unit,
     clearFields: () -> Unit,
     addMenu: () -> Unit,
     isSaving: Boolean = false,
-    fileTooLarge: Int = -1,
-    fileErrors: Int = -1,
     isNameInvalid: Boolean = false,
     isAltNameInvalid: Boolean = false,
     isMenuTypeInvalid: Boolean = false,
@@ -390,9 +328,6 @@ fun AddMenuButton(
                 hide = { showAddDialog.value = false },
                 onConfirm = addMenu,
                 clear = clearFields,
-                onFilePicked = onFilePicked,
-                fileTooLarge = fileTooLarge,
-                fileErrors = fileErrors,
                 name = name,
                 altName = altName,
                 menuType = menuType,
@@ -429,4 +364,37 @@ fun MenuTypeButton(
     ) {
         Text(menuType)
     }
+}
+
+@Composable
+@Preview
+fun Preview(){
+    var name = FormField("name")
+    var altName = FormField("altName")
+    var menuType = FormField("menuType")
+    var menuTypes = FormField("menuTypes")
+    var dateFrom = FormField("dateFrom")
+    var dateUntil = FormField("dateUntil")
+
+
+
+    MenuCard(
+        name = name,
+        altName = altName,
+        menuType = menuType,
+        menuTypes = listOf(""),
+        dateFrom = dateFrom,
+        dateUntil = dateUntil,
+        menu = RestaurantMenuDTO(
+            name = "Menu jedzeniowe",
+            alternateName = "Food menu",
+            menuType = "",
+            dateFrom = "10.06",
+            dateUntil = "10.01"
+            //photo = ""
+        ),
+        onEditClick = { /*TODO*/ },
+        onDeleteClick = { /*TODO*/ },
+        clearFields = { /*TODO*/ },
+        onClick = { /*TODO*/ })
 }
