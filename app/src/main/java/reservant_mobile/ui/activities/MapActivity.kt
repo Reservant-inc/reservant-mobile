@@ -312,6 +312,7 @@ fun MapActivity(){
 
             if(showRestaurantFiltersSheet){
                 MessageSheet(
+                    height = 450.dp,
                     buttonLabelId = R.string.label_apply,
                     onDismiss = {showRestaurantFiltersSheet = false},
                     buttonOnClick = {
