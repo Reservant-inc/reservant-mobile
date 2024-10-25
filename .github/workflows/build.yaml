@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   pull_request:
-    types: [opened, edited, review_requested, closed]
+    types: [opened, synchronize, reopened, closed]
     branches:
       - main
 
