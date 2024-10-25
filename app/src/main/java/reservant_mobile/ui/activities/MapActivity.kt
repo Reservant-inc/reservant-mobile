@@ -439,10 +439,11 @@ fun MapActivity(){
                                 MyDatePickerDialog(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
-                                        .width(dialogWidth),
+                                        .width(dialogWidth)
+                                        .weight(1f),
                                     label = { Text(stringResource(id = R.string.label_date_from)) },
                                     startDate = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else LocalDate.now().toString(),
-                                    startStringValue = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    startStringValue = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else "",
                                     onDateChange = { date ->
                                         eventSelectedDateFrom = parseString(date)
                                     },
@@ -452,10 +453,11 @@ fun MapActivity(){
                                 MyDatePickerDialog(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
-                                        .width(dialogWidth),
+                                        .width(dialogWidth)
+                                        .weight(1f),
                                     label = { Text(stringResource(id = R.string.label_date_to)) },
                                     startDate = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else LocalDate.now().toString(),
-                                    startStringValue = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    startStringValue = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else "",
                                     onDateChange = { date ->
                                         eventSelectedDateUntil = parseString(date)
                                     },
