@@ -702,7 +702,6 @@ fun EventStatusRadioFilter(
       currentStatus = status
       onStatusSelected(status)
     }
-    val spaceBetween = 1.dp
 
     Column(
         modifier = Modifier.padding(10.dp),
@@ -713,7 +712,6 @@ fun EventStatusRadioFilter(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { selectStatus(null) }
-                .padding(vertical = spaceBetween / 2)
         ) {
             RadioButton(
                 selected = currentStatus == null,
@@ -729,7 +727,6 @@ fun EventStatusRadioFilter(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { selectStatus(status) }
-                    .padding(vertical = spaceBetween / 2)
             ) {
                 RadioButton(
                     selected = currentStatus == status,
