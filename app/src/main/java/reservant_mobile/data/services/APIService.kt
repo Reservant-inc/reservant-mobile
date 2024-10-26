@@ -23,6 +23,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.accept
+import io.ktor.client.request.get
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -41,7 +42,7 @@ class APIService{
 
     private val backendIp= "172.21.40.127"
     private val backendPort= 12038
-    private val backendUrl= "http://$backendIp:$backendPort"
+    val backendUrl= "http://$backendIp:$backendPort"
 
     private val localService = LocalDataService()
     private val client = HttpClient(CIO){
@@ -98,7 +99,16 @@ class APIService{
 
 
     }
-
+    suspend fun get(path: String): Result<HttpResponse?> {
+        return responseWrapper(
+            try {
+                getHttpClient().get(path)
+            } catch (e: Exception){
+                println("[GET ERROR]: "+e.message)
+                null
+            }
+        )
+    }
     suspend inline fun <reified T : Any> get(resource: T): Result<HttpResponse?> {
         return responseWrapper(
             try {

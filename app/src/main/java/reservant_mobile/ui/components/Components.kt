@@ -73,6 +73,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,6 +90,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -133,6 +135,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.utils.BottomNavItem
+import reservant_mobile.ui.activities.FilterOptionWithStars
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -150,6 +153,7 @@ fun ComboBox(
     errorText: String = "",
     formSent: Boolean = false
 ) {
+
     val onDismiss = { expanded.value = false }
     var beginValidation by remember { mutableStateOf(false) }
 
@@ -245,7 +249,6 @@ fun ButtonComponent(
         }
     }
 }
-
 
 
 @Composable
@@ -354,7 +357,7 @@ fun LogoWithReturn(
 fun ReturnButton(
     onReturnClick: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Button(
         onClick = onReturnClick,
         contentPadding = PaddingValues(2.dp),
@@ -377,7 +380,7 @@ fun ReturnButton(
 @Composable
 fun ShowErrorToast(context: Context, id: Int) {
 
-    fun showToast(context: Context, msg: String){
+    fun showToast(context: Context, msg: String) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -401,7 +404,7 @@ fun BottomNavigation(
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
     var outlineColor by remember { mutableStateOf(outlineVariant) }
 
-    if (isSystemInDarkTheme()){
+    if (isSystemInDarkTheme()) {
         outlineColor = MaterialTheme.colorScheme.outline
     }
 
@@ -414,12 +417,12 @@ fun BottomNavigation(
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.drawBehind {
-                drawLine(
-                    color = outlineColor,
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth = 1.5f
-                )
+                    drawLine(
+                        color = outlineColor,
+                        start = Offset(0f, 0f),
+                        end = Offset(size.width, 0f),
+                        strokeWidth = 1.5f
+                    )
                 }
             ) {
                 items.forEach { item ->
@@ -745,7 +748,7 @@ fun TagList(tags: List<String>, onRemoveTag: (String) -> Unit) {
         modifier = Modifier
             .padding(vertical = 8.dp)
     ) {
-        items(tags){ tag ->
+        items(tags) { tag ->
             TagItem(tag = tag, onRemove = { onRemoveTag(tag) })
         }
     }
@@ -761,7 +764,7 @@ fun TagItem(
         onClick = { onRemove() },
         label = { Text(tag) },
         trailingIcon = {
-            if(removable){
+            if (removable) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Remove tag"
@@ -808,7 +811,7 @@ fun FullscreenGallery(
                     }
                 }
 
-                if(bitmaps.isNotEmpty()){
+                if (bitmaps.isNotEmpty()) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
                         modifier = Modifier
@@ -835,8 +838,7 @@ fun FullscreenGallery(
                             }
                         }
                     }
-                }
-                else{
+                } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -879,101 +881,160 @@ fun IconButton(
 // TODO: verify colors and add vars
 @Composable
 fun SearchBarWithFilter(
+    modifier: Modifier = Modifier,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    onFilterSelected: (String?) -> Unit,
-    currentFilter: String?,
-    filterOptions: List<String>
+    onFilterSelected: ((String?) -> Unit)? = null, // Optional string filter
+    onFilterSelectedInt: ((Int?) -> Unit)? = null, // Optional int filter
+    currentFilter: String? = null, // Optional string filter
+    currentFilterInt: Int? = null, // Optional int filter
+    filterOptions: List<String>? = null, // Optional list for string filters
+    filterOptionsInt: List<Int>? = null, // Optional list for int filters
+    additionalButtonOnClick: (() -> Unit)? = null,
+    additionalButtonIcon: ImageVector? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
 
-    Column {
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 16.dp),
-                    singleLine = true,
-                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.label_search),
-                            color = Color.Gray,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(end = 4.dp)
-                        )
-                    }
-                )
-            }
-            Box {
-                IconButton(
-                    onClick = { expanded = true },
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
+            // Pole wyszukiwania
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                singleLine = true,
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.label_search),
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = stringResource(id = R.string.label_filters),
-                        tint = MaterialTheme.colorScheme.secondary
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
                     )
                 }
+            )
 
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = labelAll) },
-                        onClick = {
-                            onFilterSelected("")
-                            expanded = false
-                        }
+            // Ikona filtra
+            IconButton(
+                onClick = { expanded = true },
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = stringResource(id = R.string.label_filters),
+                    tint = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            // Dodatkowy przycisk, jeśli parametry zostały podane
+            if (additionalButtonOnClick != null && additionalButtonIcon != null) {
+                Button(
+                    onClick = additionalButtonOnClick,
+                    modifier = Modifier
+                        .height(56.dp),
+                    colors = ButtonColors(
+                        containerColor = FloatingActionButtonDefaults.containerColor,
+                        contentColor = contentColorFor(FloatingActionButtonDefaults.containerColor),
+                        disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor,
+                        disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor
                     )
-                    filterOptions.forEach { filter ->
-                        DropdownMenuItem(
-                            text = { Text(text = filter) },
-                            onClick = {
-                                onFilterSelected(if (filter == labelAll) "" else filter)
-                                expanded = false
-                            }
-                        )
-                    }
+                ) {
+//                    Text(text = additionalButtonLabel,
+//                        fontSize = 20.sp)
+                    Icon(
+                        imageVector = additionalButtonIcon,
+                        contentDescription = stringResource(id = R.string.label_add_review)
+                    )
                 }
             }
         }
 
+        // DropdownMenu dla opcji filtra
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = labelAll) },
+                onClick = {
+                    onFilterSelected?.invoke(null)
+                    onFilterSelectedInt?.invoke(null)
+                    expanded = false
+                }
+            )
+
+            // Opcje filtrowania dla stringów
+            filterOptions?.forEach { filter ->
+                DropdownMenuItem(
+                    text = { Text(text = filter) },
+                    onClick = {
+                        onFilterSelected?.invoke(filter)
+                        expanded = false
+                    }
+                )
+            }
+
+            // Opcje filtrowania dla int
+            filterOptionsInt?.forEach { filterInt ->
+                DropdownMenuItem(
+                    text = { FilterOptionWithStars(stars = filterInt) },
+                    onClick = {
+                        onFilterSelectedInt?.invoke(filterInt)
+                        expanded = false
+                    }
+                )
+            }
+        }
+
+        // Wyświetlanie aktualnego filtra (opcjonalnie)
         currentFilter?.let {
             if (it.isNotEmpty()) {
                 Text(
                     text = stringResource(id = R.string.label_current_filter, it),
-                    style = TextStyle(color = Color.Gray, fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+
+        currentFilterInt?.let {
+            if (it > 0) {
+                Text(
+                    text = stringResource(
+                        id = R.string.label_current_filter,
+                        "$it ${stringResource(id = R.string.label_stars)}"
+                    ),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun FloatingTabSwitch(
@@ -1075,7 +1136,7 @@ fun FloatingTabSwitch(
 @Composable
 fun ImageCard(
     image: Painter
-){
+) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
@@ -1093,7 +1154,7 @@ fun ImageCard(
 @Composable
 fun ImageCard(
     image: ImageBitmap
-){
+) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
@@ -1110,15 +1171,15 @@ fun ImageCard(
 
 @Composable
 fun MissingPage(
-    modifier:Modifier = Modifier.fillMaxSize(),
+    modifier: Modifier = Modifier.fillMaxSize(),
     errorStringId: Int? = null,
     errorString: String = "",
-){
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         Icon(
             modifier = Modifier
                 .height(100.dp)
@@ -1129,7 +1190,7 @@ fun MissingPage(
         )
 
         var stringValue = errorString
-        if(errorStringId != null){
+        if (errorStringId != null) {
             stringValue = stringResource(id = errorStringId)
         }
 
@@ -1191,7 +1252,7 @@ fun LoadedPhotoComponent(
     photoModifier: Modifier = Modifier,
     placeholderModifier: Modifier = Modifier,
     getPhoto: suspend () -> Bitmap?,
-){
+) {
     var isLoading by remember {
         mutableStateOf(true)
     }
@@ -1213,7 +1274,7 @@ fun LoadedPhotoComponent(
         }
 
         !isLoading -> {
-            if (bitmap != null){
+            if (bitmap != null) {
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = "loaded_photo",
@@ -1241,14 +1302,16 @@ fun MessageSheet(
     buttonLabelId: Int? = null,
     buttonLabel: String = "",
     buttonOnClick: () -> Unit = {}
-){
+) {
     val modalBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var buttonLabelValue by remember { mutableStateOf(buttonLabel) }
     val coroutineScope = rememberCoroutineScope()
-    val hideModalBottomSheet: () -> Unit = { coroutineScope.launch {
-        modalBottomSheetState.hide()
-        onDismiss()
-    } }
+    val hideModalBottomSheet: () -> Unit = {
+        coroutineScope.launch {
+            modalBottomSheetState.hide()
+            onDismiss()
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1265,12 +1328,11 @@ fun MessageSheet(
             ) {
                 content()
             }
-
-            if(buttonLabelId != null){
+            if (buttonLabelId != null) {
                 buttonLabelValue = stringResource(id = buttonLabelId)
             }
 
-            if(buttonLabelValue.isNotEmpty()){
+            if (buttonLabelValue.isNotEmpty()) {
                 ButtonComponent(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -1318,7 +1380,8 @@ fun LoadingScreenWithTimeout(
 fun RequestPermission(
     permission: PermissionStrings,
     onPermissionGranted: () -> Unit = {},
-    onPermissionDenied: () -> Unit = {}) {
+    onPermissionDenied: () -> Unit = {}
+) {
     val permissionState = rememberPermissionState(permission.string)
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -1326,8 +1389,7 @@ fun RequestPermission(
     ) { isGranted ->
         if (isGranted) {
             onPermissionGranted()
-        }
-        else{
+        } else {
             onPermissionDenied()
         }
     }

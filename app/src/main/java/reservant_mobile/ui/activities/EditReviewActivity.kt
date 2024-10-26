@@ -41,6 +41,24 @@ fun EditReviewActivity(reviewId: Int, restaurantId: Int, navController: NavHostC
     var contents by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 
+    // Fetch the review details when entering the activity
+    LaunchedEffect(Unit) {
+        reviewsViewModel.fetchReview(reviewId)
+    }
+
+    // Observe the review state and update stars/contents when it changes
+    val reviewState by reviewsViewModel.review.collectAsState()
+
+    // Update stars and contents when the review is fetched successfully
+    LaunchedEffect(reviewState) {
+        reviewState.value?.let { review ->
+            if (!reviewState.isError && review != null) {
+                stars = review.stars
+                contents = review.contents.orEmpty()
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(16.dp)

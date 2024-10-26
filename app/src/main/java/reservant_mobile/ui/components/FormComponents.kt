@@ -247,7 +247,10 @@ fun MyDatePickerDialog(
     label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
     startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
     allowFutureDates: Boolean = false,
-    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15"
+    startDate: String = (LocalDate.now().year - 28).toString() + "-06-15",
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp)
 ) {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -260,12 +263,22 @@ fun MyDatePickerDialog(
     ) {
         fun convertMillisToDate(millis: Long): String {
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            return formatter.format(Date(millis))
+            return try{
+                formatter.format(Date(millis))
+            }
+            catch (_: Exception){
+                ""
+            }
         }
 
         fun convertDateToMillis(date: String): Long {
             val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            return formatter.parse(date)?.time ?: 0L
+            return try{
+                formatter.parse(date)?.time ?: 0L
+            }
+            catch (_: Exception){
+                0L
+            }
         }
 
         val datePickerState = rememberDatePickerState(
@@ -317,9 +330,7 @@ fun MyDatePickerDialog(
         label = label,
         readOnly = true,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = modifier,
         interactionSource = remember { MutableInteractionSource() }
             .also { interactionSource ->
                 LaunchedEffect(interactionSource) {

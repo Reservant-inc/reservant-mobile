@@ -1,15 +1,18 @@
 package reservant_mobile.data.services
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.toBitmap
 import com.example.reservant_mobile.R
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.request.get
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import reservant_mobile.ApplicationService
 import reservant_mobile.data.endpoints.Uploads
 import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -20,7 +23,9 @@ enum class DataType(val dType: String) {
     JPG("image/jpeg"),
     PNG("image/png")
 }
-class FileService(private var api: APIService = APIService()) {
+class FileService(): ServiceUtil() {
+    val context = ApplicationService.instance
+
 
      suspend fun sendFile(contentType: DataType, f: ByteArray): Result<FileUploadDTO?> {
         val content = MultiPartFormDataContent(
@@ -49,35 +54,37 @@ class FileService(private var api: APIService = APIService()) {
     }
 
     suspend fun getFile(fileName: String): Result<ByteArray?> {
-        val client = api.getHttpClient()
-        val res = client.get(fileName)
-
-        if (res.status == HttpStatusCode.OK){
-            return try {
-                Result(isError = false, value = res.body())
-            }
-            catch (e: Exception){
-                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
-            }
-        }
-
-        return Result(isError = true, errors = mapOf(Pair("TOAST", R.string.error_unknown)), value = null)
+        val res = api.get(fileName)
+        return complexResultWrapper(res)
     }
 
     suspend fun getImage(imageFileName: String): Result<Bitmap?> {
-        val res = getFile(imageFileName)
+        val loader = context.imageLoader
+        var res: Result<Bitmap?> = Result(
+            isError = true,
+            value = null
+        )
+        val request = ImageRequest.Builder(context)
+            .data("${api.backendUrl}$imageFileName")
+            .allowHardware(false)
+            .target(
+                onSuccess = { result ->
+                    res = Result(
+                        isError = false,
+                        value = result.toBitmap()
+                    )
+                },
+                onError = { _ ->
+                    res = Result(
+                        isError = true,
+                        value = null
+                    )
+                }
+            )
+            .build()
+        loader.execute(request)
 
-        return when{
-            !res.isError -> Result(
-                isError = false,
-                value = BitmapFactory.decodeByteArray(res.value, 0, res.value!!.size)
-            )
-            else -> Result(
-                isError = true,
-                value = null,
-                errors = res.errors
-            )
-        }
+        return res
 
     }
 }

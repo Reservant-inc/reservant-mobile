@@ -15,6 +15,7 @@ import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 
 class ReviewsViewModel(
     private val restaurantId: Int,
@@ -23,6 +24,10 @@ class ReviewsViewModel(
 
     private val _reviewsFlow = MutableStateFlow<Flow<PagingData<ReviewDTO>>?>(null)
     val reviewsFlow: StateFlow<Flow<PagingData<ReviewDTO>>?> = _reviewsFlow
+
+    private val _review =
+        MutableStateFlow<Result<ReviewDTO?>>(Result(isError = false, value = null))
+    val review: StateFlow<Result<ReviewDTO?>> = _review
 
     var result: Result<ReviewDTO?> = Result(isError = false, value = null)
         private set
@@ -36,13 +41,27 @@ class ReviewsViewModel(
 
     fun fetchReviews() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<ReviewDTO>>?> = restaurantService.getRestaurantReviews(restaurantId)
+            val result: Result<Flow<PagingData<ReviewDTO>>?> =
+                restaurantService.getRestaurantReviews(restaurantId)
 
             if (!result.isError) {
                 _reviewsFlow.value = result.value?.cachedIn(viewModelScope)
             }
         }
     }
+
+    fun fetchReview(reviewId: Int) {
+        viewModelScope.launch {
+            val result: Result<ReviewDTO?> = restaurantService.getRestaurantReview(reviewId)
+
+            if (!result.isError) {
+                _review.value = result
+            } else {
+                _review.value = Result(isError = true, value = null)
+            }
+        }
+    }
+
 
     suspend fun addReview(stars: Int, contents: String) {
         isSaving = true // Ustawienie flagi isSaving na true przed rozpoczęciem zapisu
@@ -64,10 +83,40 @@ class ReviewsViewModel(
     }
 
     fun editReview(reviewId: Int, stars: Int, contents: String) {
-        // TODO: Implementacja edycji opinii
+        viewModelScope.launch {
+            isSaving = true
+
+            val updatedReview = ReviewDTO(
+                stars = stars,
+                contents = contents
+            )
+
+            val result = restaurantService.editRestaurantReview(reviewId, updatedReview)
+
+            this@ReviewsViewModel.result.isError = result.isError
+
+            if (!result.isError) {
+                fetchReviews()
+            }
+
+            isSaving = false
+        }
     }
 
+
     fun deleteReview(reviewId: Int) {
-        // TODO: Implementacja usuwania opinii
+        viewModelScope.launch {
+            isSaving = true
+
+            val result = restaurantService.deleteRestaurantReview(reviewId)
+
+            this@ReviewsViewModel.result.isError = result.isError
+
+            if (!result.isError) {
+                fetchReviews()
+            }
+
+            isSaving = false
+        }
     }
 }

@@ -1,3 +1,4 @@
+
 @file:Suppress("IMPLICIT_CAST_TO_ANY")
 
 package reservant_mobile.ui.activities
@@ -9,25 +10,24 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingBasket
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableBar
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
@@ -46,8 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +60,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.services.UserService
@@ -68,6 +71,7 @@ import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EmployeeRoutes
 import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
 
@@ -75,7 +79,6 @@ import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
 fun EmployeeHomeActivity() {
     val empHomeVM = viewModel<EmployeeHomeViewModel>()
     val innerNavController = rememberNavController()
-    val bottomBarState = remember { (mutableStateOf(false)) }
 
 
     val isSystemInDarkMode = isSystemInDarkTheme()
@@ -94,7 +97,7 @@ fun EmployeeHomeActivity() {
             bottomBar = {
                 BottomNavigation(
                     navController = innerNavController,
-                    bottomBarState = bottomBarState,
+                    bottomBarState = remember { (mutableStateOf(false)) },
                     items = items
                 )
             }
@@ -117,9 +120,6 @@ fun EmployeeHomeActivity() {
                 modifier = Modifier.padding(it)
             ) {
                 composable<EmployeeRoutes.SelectRestaurant> {
-                    LaunchedEffect(Unit) {
-                        bottomBarState.value = false
-                    }
 
                     val restaurants = empHomeVM.restaurants
 
@@ -237,17 +237,48 @@ fun EmployeeHomeActivity() {
                 }
 
                 composable<EmployeeRoutes.Home> {
-                    LaunchedEffect(Unit) {
-                        bottomBarState.value = true
-                    }
+                    val restaurant = empHomeVM.selectedRestaurant!!
+                    val options: List<EmpMenuOption> = listOf(
+                        EmpMenuOption(
+                            text = stringResource(id = R.string.label_orders),
+                            icon = Icons.Outlined.Book,
+                            background = painterResource(id = R.drawable.people_restaurant),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.ManageOrders(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
+                        ),
+                        EmpMenuOption(
+                            text = stringResource(id = R.string.label_restaurant_tables),
+                            icon = Icons.Outlined.TableBar,
+                            background = painterResource(id = R.drawable.table_cafe_town_restaurant)
+                        ),
+                        EmpMenuOption(
+                            text = stringResource(id = R.string.label_reservations),
+                            icon = Icons.Outlined.Inbox,
+                            background = painterResource(id = R.drawable.reservation_checklist)
+                        ),
+                        EmpMenuOption(
+                            text = stringResource(id = R.string.label_stock),
+                            icon = Icons.Outlined.ShoppingBasket,
+                            background = painterResource(id = R.drawable.wood_wine_store)
+                        ),
+                        EmpMenuOption(
+                            text = stringResource(id = R.string.label_settings),
+                            icon = Icons.Outlined.Settings,
+                            onClick = { innerNavController.navigate(MainRoutes.Settings)}
+                        ),
+                    )
 
-                    val restaurant = empHomeVM.selectedRestaurant
 
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .verticalScroll(rememberScrollState()),
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         if (restaurant != null)
@@ -259,77 +290,93 @@ fun EmployeeHomeActivity() {
                                     innerNavController.navigate(EmployeeRoutes.SelectRestaurant)
                                 }
                             )
-                        MenuButton(
-                            stringResource(id = R.string.label_orders),
-                            Icons.Outlined.Book
-                        )
-                        MenuButton(
-                            stringResource(id = R.string.label_restaurant_tables),
-                            Icons.Outlined.TableBar
-                        )
-                        MenuButton(
-                            stringResource(id = R.string.label_reservations),
-                            Icons.Outlined.Inbox
-                        )
-                        MenuButton(
-                            stringResource(id = R.string.label_stock),
-                            Icons.Outlined.ShoppingBasket
-                        )
-                        MenuButton(
-                            stringResource(id = R.string.label_orders),
-                            Icons.Outlined.Star
-                        )
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .heightIn(200.dp, 1000.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            columns = GridCells.Adaptive(minSize = 200.dp)
+                        ) {
+                            items(options.size) { optionIndex ->
+                                val option = options[optionIndex]
+                                EmpMenuButton(option)
+                            }
+                        }
                     }
-
                 }
                 composable<MainRoutes.Settings> {
                     SettingsActivity(
                         homeNavController = innerNavController,
-                        themeChange = { darkTheme = !darkTheme })
+                        themeChange = { darkTheme = !darkTheme },
+                        withBackButton = true
+                    )
                 }
                 composable<AuthRoutes.Landing> {
-                    LaunchedEffect(Unit) {
-                        bottomBarState.value = false
-                    }
                     LandingActivity()
+                }
+                composable<RestaurantRoutes.ManageOrders> {
+                    OrderManagementScreen(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId
+                    )
                 }
             }
         }
     }
 }
 
+data class EmpMenuOption(
+    val text: String,
+    val background: Painter? = null,
+    val icon:ImageVector,
+    val onClick: ()->Unit = {}
+)
+
 @Composable
-fun MenuButton(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit = {}
+fun EmpMenuButton(
+    option: EmpMenuOption
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
-            .fillMaxWidth()
-            .height(110.dp),
+            .padding(8.dp)
+            .size(190.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        onClick = onClick
+        onClick = option.onClick
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+        Box(
             modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxHeight()
-        ) {
-            Icon(
-                icon,
-                contentDescription = text,
-                modifier = Modifier.size(50.dp),
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = text,
-                fontSize = 25.sp,
-                color = MaterialTheme.colorScheme.background,
-            )
+                .fillMaxSize(),
+        ){
+            if(option.background!= null){
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    painter = option.background,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alpha = 0.25F
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = option.icon,
+                    contentDescription = option.text,
+                    modifier = Modifier.size(50.dp),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = option.text,
+                    fontSize = 25.sp,
+                    color = MaterialTheme.colorScheme.background,
+                )
+            }
         }
     }
 }

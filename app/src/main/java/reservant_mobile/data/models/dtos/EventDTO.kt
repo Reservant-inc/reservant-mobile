@@ -1,5 +1,6 @@
 package reservant_mobile.data.models.dtos
 
+import com.example.reservant_mobile.R
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,19 +12,31 @@ data class EventDTO (
     val maxPeople: Int? = null,
     val time: String,
     val mustJoinUntil: String,
+    val creator: Participant? = null,
     val creatorId: String? = null,
     val creatorFullName: String? = null,
-    val restaurantId: Int,
-    val restaurantName:String? = null,
+    val restaurant: RestaurantDTO? = null,
+    val restaurantId: Int? = null,
+//    val restaurantName:String? = null,
     val visitId: Int? = null,
-    val participants: List<Participants>? = null,
-    val numberInterested: Int? = null
+    val participants: List<Participant>? = null,
+    val distance: Double? = null,
+    val numberInterested: Int? = null,
+    val numberParticipants: Int? = null,
+    val isArchived: Boolean? = null,
 ){
     @Serializable
-    data class Participants(
+    data class Participant(
         val userId: String,
         val firstName: String,
         val lastName: String,
         val photo: String? = null
     )
+
+    @Serializable
+    enum class EventStatus(val stringId: Int){
+        Future(R.string.label_event_status_future),
+        NonJoinable(R.string.label_event_status_nonJoinable),
+        Past(R.string.label_event_status_past)
+    }
 }
