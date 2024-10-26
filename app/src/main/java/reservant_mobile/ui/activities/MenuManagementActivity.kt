@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,14 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -76,25 +71,22 @@ fun MenuManagementActivity(
                         viewmodel.isFetching -> repeat(3){
                             item{
                                 MenuCard(
-                                    isFetching = true,
                                     name = viewmodel.name,
                                     altName = viewmodel.alternateName,
                                     menuType = viewmodel.menuType,
+                                    menuTypes = emptyList(),
                                     dateFrom = viewmodel.dateFrom,
                                     dateUntil = viewmodel.dateUntil,
                                     menu = RestaurantMenuDTO(
                                         name = "",
                                         menuType = "",
                                         dateFrom = "",
-                                        photo = ""
                                     ),
                                     onEditClick = { },
                                     onDeleteClick = { },
-                                    onClick = { },
                                     clearFields = { },
-                                    onFilePicked = { },
-                                    menuTypes = emptyList(),
-                                    getPhoto = { null }
+                                    onClick = { },
+                                    isFetching = true
                                 )
                             }
                         }
@@ -127,7 +119,6 @@ fun MenuManagementActivity(
                                         }
                                     }
                                 },
-                                clearFields = viewmodel::clearFields,
                                 onClick = {
                                     if (menu.menuId != null) {
                                         navController.navigate(
@@ -136,11 +127,6 @@ fun MenuManagementActivity(
                                     }
 
                                 },
-                                onFilePicked = { file ->
-                                    viewmodel.photo.value = file?.toString() ?: ""
-                                },
-                                fileErrors = viewmodel.photoErrors(LocalContext.current),
-                                fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
                                 isSaving = viewmodel.isSaving,
                                 showConfirmDeletePopup = showConfirmDeletePopup,
                                 showEditPopup = showEditPopup,
@@ -148,7 +134,7 @@ fun MenuManagementActivity(
                                 isAltNameInvalid = viewmodel.isAltNameInvalid(),
                                 isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
                                 menuTypes = viewmodel.menuTypes,
-                                getPhoto = { viewmodel.getPhoto(menu) }
+                                clearFields = { viewmodel.clearFields() }
                             )
 
                             if (viewmodel.result.isError){
@@ -179,6 +165,12 @@ fun MenuManagementActivity(
                         dateFrom =  viewmodel.dateFrom,
                         dateUntil = viewmodel.dateUntil,
                         clearFields = viewmodel::clearFields,
+                        isSaving = viewmodel.isSaving,
+                        showAddDialog = showAddDialog,
+                        isNameInvalid = viewmodel.isNameInvalid(),
+                        isAltNameInvalid = viewmodel.isAltNameInvalid(),
+                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                        menuTypes = viewmodel.menuTypes,
                         addMenu = {
                             viewmodel.viewModelScope.launch {
                                 viewmodel.addMenu()
@@ -187,18 +179,7 @@ fun MenuManagementActivity(
                                 }
 
                             }
-                        },
-                        onFilePicked = { file ->
-                            viewmodel.photo.value = file?.toString() ?: ""
-                        },
-                        fileErrors = viewmodel.photoErrors(LocalContext.current),
-                        fileTooLarge = viewmodel.isPhotoTooLarge(LocalContext.current),
-                        isSaving = viewmodel.isSaving,
-                        showAddDialog = showAddDialog,
-                        isNameInvalid = viewmodel.isNameInvalid(),
-                        isAltNameInvalid = viewmodel.isAltNameInvalid(),
-                        isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
-                        menuTypes = viewmodel.menuTypes
+                        }
                     )
 
                     if (viewmodel.result.isError){
