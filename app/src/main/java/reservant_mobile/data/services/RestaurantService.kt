@@ -342,8 +342,8 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Visits(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                dateStart = dateStart.toString(),
-                dateEnd = dateEnd.toString(),
+                dateStart = dateStart?.toString(),
+                dateEnd = dateEnd?.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage
