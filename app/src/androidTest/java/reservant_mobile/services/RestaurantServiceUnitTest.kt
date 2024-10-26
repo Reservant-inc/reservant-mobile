@@ -21,7 +21,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantService = RestaurantService()
     private val restaurant = RestaurantDTO(
         name = "Test restaurant",
-        nip = "0224111111",
+        nip = "1060000062",
         restaurantType = "Restaurant",
         address = "Test address",
         city = "Test city",
@@ -34,7 +34,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
         location = LocationDTO(
             latitude = 51.0,
             longitude = 52.0
-        )
+        ),
+        maxReservationDuration = 30,
+        openingHours = listOf(
+            RestaurantDTO.AvailableHours(
+            from = "10:00:00",
+            until = "20:00:00"
+        ))
     )
     private val restaurantGroup = RestaurantGroupDTO(
         name = "Test group",
@@ -139,7 +145,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_employee_return_not_null()= runTest{
-        val id = ser.getEmployees().value!!.last().userId
+        val id = ser.getEmployees().value!!.first().userId
         assertThat(ser.getEmployee(id).value).isNotNull()
     }
 
