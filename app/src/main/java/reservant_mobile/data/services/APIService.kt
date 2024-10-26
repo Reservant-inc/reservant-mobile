@@ -42,7 +42,7 @@ class APIService{
 
     private val backendIp= "172.21.40.127"
     private val backendPort= 12038
-    private val backendUrl= "http://$backendIp:$backendPort"
+    val backendUrl= "http://$backendIp:$backendPort"
 
     private val localService = LocalDataService()
     private val client = HttpClient(CIO){

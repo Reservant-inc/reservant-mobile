@@ -15,6 +15,7 @@ import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.UnitOfMeasurement
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import java.time.LocalDateTime
 
 class RestaurantServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantService = RestaurantService()
@@ -252,6 +253,25 @@ class RestaurantServiceUnitTest: ServiceTest() {
             newAmount = 10.0,
             comment = "Test"
         ).value).isNotNull()
+    }
+
+    @Test
+    fun get_available_hours_return_not_null()= runTest{
+        val date = LocalDateTime.now()
+
+        assertThat(ser.getAvailableHours(
+            restaurantId = 1,
+            date = date
+        ).value).isNotNull()
+    }
+
+    @Test
+    fun get_ingredient_history_return_pagination()= runTest{
+        val items = ser.getIngredientHistory(1).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
 }

@@ -33,8 +33,14 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.LocationDTO
+import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.services.EventService
+import reservant_mobile.data.services.IEventService
+import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import java.time.LocalDate
 
 
 class MapViewModel : ReservantViewModel() {
@@ -44,7 +50,9 @@ class MapViewModel : ReservantViewModel() {
 
     var userPosition = GeoPoint(52.237049, 21.017532)
 
-    private val restaurantService = RestaurantService()
+    private val restaurantService:IRestaurantService = RestaurantService()
+    private val eventsService:IEventService = EventService()
+
 
     private val _restaurantsState = MutableStateFlow<PagingData<RestaurantOnMap>>(PagingData.empty())
     private val _eventsState = MutableStateFlow<PagingData<EventOnMap>>(PagingData.empty())
@@ -56,9 +64,15 @@ class MapViewModel : ReservantViewModel() {
 
     private lateinit var poiMarkers:RadiusMarkerClusterer
 
-    var search: String? = null
-    var selectedTags: List<String>? = null
-    var minRating: Int? = null
+    var restaurant_search: String? = null
+    var restaurant_selectedTags: List<String>? = null
+    var restaurant_minRating: Int? = null
+
+    var event_search: String? = null
+    var event_dateFrom: LocalDate? = null
+    var event_dateUntil: LocalDate? = null
+    var event_status: EventDTO.EventStatus? = null
+
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
         val mv = MapView(context).apply {
@@ -92,7 +106,7 @@ class MapViewModel : ReservantViewModel() {
         OsmMap.view = mv
         addUserMarker()
         getRestaurants(startPoint)
-        getEvents()
+        getEvents(startPoint)
 
         return OsmMap.view
     }
@@ -116,20 +130,22 @@ class MapViewModel : ReservantViewModel() {
     }
 
     fun refreshRestaurants(userLocation: GeoPoint) {
-//        _restaurantsState.value = PagingData.empty()
         getRestaurants(userLocation)
     }
 
+    fun refreshEvents(userLocation: GeoPoint) {
+        getEvents(userLocation)
+    }
 
-    fun getRestaurants(userLocation: GeoPoint){
+    private fun getRestaurants(userLocation: GeoPoint){
         viewModelScope.launch {
             try {
                 val res = restaurantService.getRestaurants(
                     origLat = userLocation.latitude,
                     origLon = userLocation.longitude,
-                    name = search,
-                    tags = selectedTags,
-                    minRating = minRating,
+                    name = restaurant_search,
+                    tags = restaurant_selectedTags,
+                    minRating = restaurant_minRating,
                 )
 
                 if(res.isError || res.value == null)
@@ -155,10 +171,18 @@ class MapViewModel : ReservantViewModel() {
 
     }
 
-    fun getEvents() {
+    private fun getEvents(userLocation: GeoPoint) {
         viewModelScope.launch {
             try {
-                val res = restaurantService.getRestaurantEvents(1)
+                val res = eventsService.getEvents(
+                    origLat = userLocation.latitude,
+                    origLon = userLocation.longitude,
+                    name = event_search,
+                    dateFrom = event_dateFrom,
+                    dateUntil = event_dateUntil,
+                    eventStatus = event_status,
+                    restaurantName = restaurant_search
+                )
                 if(res.isError || res.value == null)
                     throw Exception()
 
@@ -166,13 +190,13 @@ class MapViewModel : ReservantViewModel() {
                     _eventsState.value = pagingData.map { dto ->
                         EventOnMap(
                             eventId = dto.eventId!!,
-                            time = dto.time,
-                            creatorId = dto.creatorId!!,
-                            creatorFullName = dto.creatorFullName!!,
-                            restaurantId = dto.restaurantId,
-                            restaurantName = dto.restaurantName!!,
-                            participants = dto.participants?.size ?: 0,
-                            numberInterested = dto.numberInterested!!
+                            name = dto.name!!,
+                            time =  dto.time,
+                            creator = dto.creator!!,
+                            distance = dto.distance!!,
+                            restaurant = dto.restaurant!!,
+                            numberInterested = dto.numberInterested!!,
+                            numberParticipants = dto.numberParticipants!!
                         )
                     }
                 }
@@ -306,11 +330,11 @@ data class RestaurantOnMap(
 
 data class EventOnMap(
     val eventId: Int,
+    val name: String,
     val time: String,
-    val creatorId: String,
-    val creatorFullName: String,
-    val restaurantId: Int,
-    val restaurantName:String,
-    val participants: Int,
-    val numberInterested: Int
+    val creator: EventDTO.Participant,
+    val restaurant: RestaurantDTO,
+    val distance: Double,
+    val numberInterested: Int,
+    val numberParticipants: Int
 )
