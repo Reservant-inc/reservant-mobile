@@ -216,6 +216,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
+    fun add_delete_review_restaurant_response_return_not_null()= runTest{
+        val rev = ser.addRestaurantResponse(restaurantId, "Test restaurant response").value
+        assertThat(rev).isNotNull()
+        assertThat(ser.deleteRestaurantResponse(rev?.reviewId!!)).isNotNull()
+    }
+
+    @Test
     fun get_restaurant_visits_return_pagination()= runTest{
         val items = ser.getVisits(restaurantId).value
         val itemsSnapshot = items?.asSnapshot {

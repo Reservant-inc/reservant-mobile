@@ -78,7 +78,8 @@ interface IRestaurantService{
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
     suspend fun editRestaurantReview(reviewId: Any, review: ReviewDTO): Result<ReviewDTO?>
     suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean>
-
+    suspend fun addRestaurantResponse(reviewId: Any, response: String): Result<ReviewDTO?>
+    suspend fun deleteRestaurantResponse(reviewId: Any): Result<Boolean>
 
     /***
      * Available visitSorting values : see GetVisitsSort class
@@ -331,6 +332,23 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean> {
         val res = api.delete(Reviews.ReviewId(reviewId = reviewId.toString()))
         return booleanResultWrapper(res)
+    }
+
+    override suspend fun addRestaurantResponse(reviewId: Any, response: String): Result<ReviewDTO?> {
+        val body = mapOf(
+            "restaurantResponseText" to response
+        )
+        val res = api.put(Reviews.ReviewId.RestaurantResponse(
+            parent = Reviews.ReviewId(reviewId = reviewId.toString())
+        ), body)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun deleteRestaurantResponse(reviewId: Any): Result<Boolean> {
+        val res = api.delete(Reviews.ReviewId.RestaurantResponse(
+            parent = Reviews.ReviewId(reviewId = reviewId.toString())
+        ))
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
     }
 
     override suspend fun getVisits(
