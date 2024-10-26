@@ -150,13 +150,12 @@ fun ComboBox(
     options: List<String>,
     label: String,
     isError: Boolean = false,
-    errorText: String = ""
+    errorText: String = "",
+    formSent: Boolean = false
 ) {
 
     val onDismiss = { expanded.value = false }
-    var beginValidation by remember {
-        mutableStateOf(false)
-    }
+    var beginValidation by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded.value,
@@ -168,6 +167,7 @@ fun ComboBox(
         Column {
             OutlinedTextField(
                 modifier = modifier
+                    .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .menuAnchor(),
                 label = { Text(text = label) },
@@ -176,13 +176,12 @@ fun ComboBox(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
                 shape = RoundedCornerShape(8.dp),
-                isError = isError && beginValidation
+                isError = isError && (beginValidation || formSent)
             )
 
-            if (isError && beginValidation) Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error
-            )
+            if (isError && (beginValidation || formSent)) {
+                Text(text = errorText, color = MaterialTheme.colorScheme.error)
+            }
         }
 
         ExposedDropdownMenu(
@@ -439,7 +438,6 @@ fun BottomNavigation(
                             }
                         }
                     )
-
                 }
             }
         }
@@ -1330,7 +1328,6 @@ fun MessageSheet(
             ) {
                 content()
             }
-
             if (buttonLabelId != null) {
                 buttonLabelValue = stringResource(id = buttonLabelId)
             }
