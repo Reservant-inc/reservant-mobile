@@ -109,4 +109,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:$pagingVersion")
     implementation("androidx.paging:paging-testing:$pagingVersion")
 
+    // Image caching
+    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
+    implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.0-rc01")
 }
