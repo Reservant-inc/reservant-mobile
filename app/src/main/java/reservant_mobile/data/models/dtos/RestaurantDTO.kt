@@ -27,7 +27,7 @@ data class RestaurantDTO (
     val distanceFrom: Double? = null,
     val description:String = "",
     val location: LocationDTO? = null,
-    val maxReservationDuration: Int? = null,
+    val maxReservationDurationMinutes: Int? = null,
     val reservationDeposit:Double? = null,
     val tags:List<String> = emptyList(),
     val openingHours: List<AvailableHours>? = null,
