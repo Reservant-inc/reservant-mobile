@@ -291,9 +291,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             val event = eventsPagingItems[index]
                             if (event != null) {
                                 EventCard(
-                                    eventCreator = event.creatorFullName ?: "",
+                                    eventCreator = event.creator!!.firstName,
                                     eventDate = event.time,
-                                    eventLocation = event.restaurant!!.address ?: "",
+                                    eventLocation = event.restaurant!!.address,
                                     interestedCount = event.numberInterested ?: 0,
                                     takePartCount = event.participants?.size ?: 0
                                 )

@@ -27,12 +27,21 @@ data class RestaurantDTO (
     val distanceFrom: Double? = null,
     val description:String = "",
     val location: LocationDTO? = null,
+    val maxReservationDurationMinutes: Int? = null,
     val reservationDeposit:Double? = null,
     val tags:List<String> = emptyList(),
+    val openingHours: List<AvailableHours>? = null,
+    val isArchived: Boolean? = null
 ){
     @Serializable
     data class AvailableHours(
+        /***
+         * Time in 'HH:mm:ss' format
+         */
         val from: String,
+        /***
+         * Time in 'HH:mm:ss' format
+         */
         val until: String
     )
 }
