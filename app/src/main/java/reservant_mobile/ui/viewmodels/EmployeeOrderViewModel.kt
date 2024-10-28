@@ -120,8 +120,8 @@ class EmployeeOrderViewModel(
                 totalCost = visit.orders?.sumOf { it.cost ?: -1.0 } ?: -1.0,
                 tableId = visit.tableId ?: -1,
                 numberOfPeople = when {
-                    visit.participantIds?.isNotEmpty() == true && visit.numberOfGuests != null -> visit.numberOfGuests + visit.participantIds.size + 1
-                    visit.participantIds?.isNotEmpty() == true -> visit.participantIds.size + 1
+                    visit.participants?.isNotEmpty() == true && visit.numberOfGuests != null -> visit.numberOfGuests + visit.participants.size + 1
+                    visit.participants?.isNotEmpty() == true -> visit.participants.size + 1
                     visit.numberOfGuests != null -> visit.numberOfGuests + 1
                     else -> 1 },
                 tip = visit.tip ?: -1.0,
