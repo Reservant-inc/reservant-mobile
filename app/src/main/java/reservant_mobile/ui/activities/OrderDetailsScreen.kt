@@ -14,9 +14,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
+import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.OrderDetails
+import reservant_mobile.ui.viewmodels.VisitDetailsUIState
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun OrderDetailsScreen(
@@ -43,17 +47,15 @@ fun OrderDetailsScreen(
                 onReturnClick = onReturnClick
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            ClientInfoSection(
-                clientName = details.clientName,
-                tableId = details.tableId,
-                totalCost = details.totalCost
-            )
+            ClientInfoSection(details)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ParticipantsList(participants = details.participants)
+            if(details.participants.isNotEmpty()) {
+                ParticipantsList(participants = details.participants)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -76,35 +78,154 @@ fun OrderDetailsScreen(
 }
 
 @Composable
-fun ClientInfoSection(clientName: String, tableId: Int, totalCost: Double) {
+fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = stringResource(R.string.client_label, clientName),
+            text = stringResource(R.string.client_label, visitDetails.clientName),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.height(4.dp))
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Text(
+                    text = if (visitDetails.takeaway == true) stringResource(R.string.takeaway_label)
+                    else stringResource(R.string.table_label),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (visitDetails.takeaway == true) "" else " " + visitDetails.tableId.toString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Row {
+                Text(
+                    text = stringResource(R.string.number_of_people_label),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + visitDetails.numberOfPeople.toString(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Text(
+                    text = stringResource(R.string.date_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + formatDateTime(visitDetails.date, "dd.MMM.yyyy HH:mm"),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row {
+                Text(
+                    text = stringResource(R.string.end_time_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + formatDateTime(visitDetails.endTime, "dd.MMM.yyyy HH:mm"),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Text(
+                    text = stringResource(R.string.reservation_date_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + visitDetails.reservationDate,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row {
+                Text(
+                    text = stringResource(R.string.deposit_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + if (visitDetails.deposit == -1.0) stringResource(R.string.unknown) else "%.2f".format(visitDetails.deposit),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Text(
+                    text = stringResource(R.string.payment_time_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + formatDateTime(visitDetails.paymentTime, "dd-MM-yyyy HH:mm"),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row {
+                Text(
+                    text = stringResource(R.string.tip_label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text =  " " + if (visitDetails.tip == -1.0) stringResource(R.string.unknown) else "%.2f".format(visitDetails.tip),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.table_label, tableId),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Normal
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = stringResource(R.string.total_cost_label, "%.2f".format(totalCost)),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Normal
+            text = stringResource(R.string.total_cost_label, "%.2f".format(visitDetails.totalCost)),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
+
 
 @Composable
 fun ParticipantsList(participants: List<String>) {
