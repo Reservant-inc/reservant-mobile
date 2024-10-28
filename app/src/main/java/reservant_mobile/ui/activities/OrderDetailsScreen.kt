@@ -154,6 +154,11 @@ fun OrderCard(order: OrderDetails) {
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Text(
+                text = stringResource(R.string.order_total_label, order.cost),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             order.items.forEach { item ->
