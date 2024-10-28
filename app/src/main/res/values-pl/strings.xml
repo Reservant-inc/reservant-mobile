@@ -288,4 +288,5 @@
     <string name="unknown_date">Nieznana data</string>
     <string name="unknown_cost">Nieznany koszt</string>
     <string name="unknown_table">Nieznany stół</string>
+    <string name="order_total_label">Łącznie: %.2f zł</string>
 </resources>

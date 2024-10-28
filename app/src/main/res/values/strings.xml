@@ -297,4 +297,5 @@
     <string name="unknown_date">Unknown date</string>
     <string name="unknown_cost">Unknown cost</string>
     <string name="unknown_table">Unknown Table</string>
+    <string name="order_total_label">Total: %.2f zł</string>
 </resources>
