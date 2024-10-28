@@ -45,7 +45,7 @@ class EmployeeOrderViewModel(
         } else {
             emit(PagingData.empty())
         }
-    }.catch { exception ->
+    }.catch {
         emit(PagingData.empty())
     }
 
@@ -80,14 +80,11 @@ class EmployeeOrderViewModel(
         }
     }
 
-    fun fetchVisitDetails(visit: VisitDTO) {
+    private fun fetchVisitDetails(visit: VisitDTO) {
         viewModelScope.launch {
             val visitDetails = mutableListOf<OrderDetails>()
             val userSummary = userService.getUserSimpleInfo(visit.clientId ?: "")
-            val participants = visit.participantIds?.mapNotNull { userId ->
-                userService.getUserSimpleInfo(userId).value
-            }.orEmpty()
-
+            val participants = visit.participants
             visit.orders?.forEach { order ->
                 val orderResult = ordersService.getOrder(order.orderId!!)
                 val fetchedOrder = orderResult.value
@@ -118,13 +115,22 @@ class EmployeeOrderViewModel(
 
             _selectedVisitDetails.value = VisitDetailsUIState(
                 clientName = "${userSummary.value?.firstName} ${userSummary.value?.lastName}",
-                participants = participants.map { "${it.firstName} ${it.lastName}" },
+                participants = participants.takeIf { it!!.isNotEmpty() }?.map { "${it.firstName} ${it.lastName}" } ?: emptyList(),
                 orders = visitDetails,
                 totalCost = visit.orders?.sumOf { it.cost ?: -1.0 } ?: -1.0,
                 tableId = visit.tableId ?: -1,
-                numberOfPeople = (visit.participantIds?.let { visit.numberOfGuests?.plus(it.size) }
-                    ?: -1) + 1,
-                tip = visit.tip ?: -1.0
+                numberOfPeople = when {
+                    visit.participantIds?.isNotEmpty() == true && visit.numberOfGuests != null -> visit.numberOfGuests + visit.participantIds.size + 1
+                    visit.participantIds?.isNotEmpty() == true -> visit.participantIds.size + 1
+                    visit.numberOfGuests != null -> visit.numberOfGuests + 1
+                    else -> 1 },
+                tip = visit.tip ?: -1.0,
+                date = visit.date ?: "Unknown",
+                endTime = visit.endTime ?: "Unknown",
+                paymentTime = visit.paymentTime  ?: "Unknown",
+                deposit = visit.deposit ?: -1.0,
+                reservationDate = visit.reservationDate  ?: "Unknown",
+                takeaway = visit.takeaway
             )
         }
     }.catch { exception ->
@@ -197,7 +203,13 @@ data class VisitDetailsUIState(
     val totalCost: Double,
     val tableId: Int,
     val numberOfPeople: Int,
-    val tip: Double
+    val tip: Double,
+    val date: String,
+    val endTime: String,
+    val paymentTime: String,
+    val deposit: Double,
+    val reservationDate: String,
+    val takeaway: Boolean?,
 )
 
 data class OrderDetails(
