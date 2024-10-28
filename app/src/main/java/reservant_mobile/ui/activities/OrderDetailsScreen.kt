@@ -149,16 +149,22 @@ fun OrderCard(order: OrderDetails) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = stringResource(R.string.order_id_label, order.orderId),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = stringResource(R.string.order_total_label, order.cost),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.order_id_label, order.orderId),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = stringResource(R.string.order_total_label, order.cost),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             order.items.forEach { item ->
@@ -168,6 +174,7 @@ fun OrderCard(order: OrderDetails) {
         }
     }
 }
+
 
 @Composable
 fun DishCard(item: OrderDetails.MenuItemDetails) {
@@ -196,6 +203,10 @@ fun DishCard(item: OrderDetails.MenuItemDetails) {
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
+                    text = stringResource(R.string.price_each_label, item.price),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
                     text = stringResource(R.string.status_label, item.status ?: stringResource(R.string.unknown_status)),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -207,7 +218,7 @@ fun DishCard(item: OrderDetails.MenuItemDetails) {
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = stringResource(R.string.price_label, item.price),
+                    text = stringResource(R.string.price_label, item.cost),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )

@@ -100,16 +100,17 @@ class EmployeeOrderViewModel(
                                 name = it.name,
                                 price = it.price,
                                 amount = item.amount,
-                                status = item.status
+                                status = item.status,
+                                cost = item.cost ?: -1.0
                             )
                         }
                     }.orEmpty()
 
                     visitDetails.add(
                         OrderDetails(
-                            orderId = fetchedOrder.orderId ?: 0,
+                            orderId = fetchedOrder.orderId ?: -1,
                             items = items,
-                            cost = fetchedOrder.cost ?: 0.0
+                            cost = fetchedOrder.cost ?: -1.0
                         )
                     )
                 }
@@ -119,8 +120,11 @@ class EmployeeOrderViewModel(
                 clientName = "${userSummary.value?.firstName} ${userSummary.value?.lastName}",
                 participants = participants.map { "${it.firstName} ${it.lastName}" },
                 orders = visitDetails,
-                totalCost = visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0,
-                tableId = visit.tableId ?: -1
+                totalCost = visit.orders?.sumOf { it.cost ?: -1.0 } ?: -1.0,
+                tableId = visit.tableId ?: -1,
+                numberOfPeople = (visit.participantIds?.let { visit.numberOfGuests?.plus(it.size) }
+                    ?: -1) + 1,
+                tip = visit.tip ?: -1.0
             )
         }
     }.catch { exception ->
@@ -191,7 +195,9 @@ data class VisitDetailsUIState(
     val participants: List<String>,
     val orders: List<OrderDetails>,
     val totalCost: Double,
-    val tableId: Int
+    val tableId: Int,
+    val numberOfPeople: Int,
+    val tip: Double
 )
 
 data class OrderDetails(
@@ -203,6 +209,7 @@ data class OrderDetails(
         val name: String,
         val price: Double,
         val amount: Int,
-        val status: String?
+        val status: String?,
+        val cost: Double
     )
 }

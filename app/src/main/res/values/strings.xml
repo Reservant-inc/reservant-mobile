@@ -294,4 +294,5 @@
     <string name="unknown_cost">Unknown cost</string>
     <string name="unknown_table">Unknown Table</string>
     <string name="order_total_label">Total: %.2f zł</string>
+    <string name="price_each_label">Price per item: %.2f zł</string>
 </resources>
