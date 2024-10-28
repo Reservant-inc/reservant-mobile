@@ -36,4 +36,9 @@ data object RestaurantRoutes {
         val reviewId: Int,
         val restaurantId: Int
     )
+
+    @Serializable
+    data class Tables(
+        val restaurantId: Int
+    )
 }
