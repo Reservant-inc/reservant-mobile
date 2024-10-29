@@ -74,6 +74,7 @@ import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.NotificationService
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch

@@ -250,11 +250,11 @@
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
     <string name="restaurant_notification_channel_id" translatable="false">restaurant_notification_channel_id</string>
-    <string name="restaurant_notification_channel_name" translatable="false">restaurant_notif_channel</string>
+    <string name="restaurant_notification_channel_name">Restaurants</string>
     <string name="friends_notification_channel_id" translatable="false">friends_notification_channel_id</string>
-    <string name="friends_notification_channel_name" translatable="false">friends_notif_channel</string>
-    <string name="events_notification_channel_id" translatable="false">friends_notification_channel_id</string>
-    <string name="events_notification_channel_name" translatable="false">friends_notif_channel</string>
-    <string name="visits_notification_channel_id" translatable="false">friends_notification_channel_id</string>
-    <string name="visits_notification_channel_name" translatable="false">friends_notif_channel</string>
+    <string name="friends_notification_channel_name">Friends</string>
+    <string name="events_notification_channel_id" translatable="false">events_notification_channel_id</string>
+    <string name="events_notification_channel_name">Events</string>
+    <string name="visits_notification_channel_id" translatable="false">visits_notification_channel_id</string>
+    <string name="visits_notification_channel_name">Visits</string>
 </resources>
