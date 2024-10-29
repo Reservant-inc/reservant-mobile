@@ -1,7 +1,6 @@
 package reservant_mobile.ui.activities
 
 import android.Manifest
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
@@ -12,17 +11,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.example.reservant_mobile.R
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
@@ -47,7 +40,8 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             askNotificationPermission()
-            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val notificationHandler = NotificationHandler(applicationContext, getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+            notificationHandler.showBasicNotification()
 
              startPoint = if(LoginViewModel().refreshToken()) {
                  if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
