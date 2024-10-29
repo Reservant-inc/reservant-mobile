@@ -40,10 +40,8 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             askNotificationPermission()
-            val notificationHandler = NotificationHandler(applicationContext, getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-            notificationHandler.showBasicNotification()
 
-             startPoint = if(LoginViewModel().refreshToken()) {
+            startPoint = if(LoginViewModel().refreshToken()) {
                  if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
                      { EmployeeHomeActivity() }
                  }

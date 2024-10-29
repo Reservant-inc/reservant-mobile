@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -68,6 +69,7 @@ import androidx.navigation.toRoute
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
@@ -80,6 +82,7 @@ import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
@@ -99,6 +102,12 @@ fun MapActivity(){
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
+            val notificationHandler = NotificationHandler(LocalContext.current)
+
+            mapViewModel.viewModelScope.launch {
+                notificationHandler.awaitNotification()
+            }
+
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
