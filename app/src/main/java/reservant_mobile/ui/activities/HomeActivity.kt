@@ -44,7 +44,7 @@ fun HomeActivity() {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
-        BottomNavItem.Social,
+        BottomNavItem.Chats,
         BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
         BottomNavItem.Profile
     )
@@ -75,7 +75,7 @@ fun HomeActivity() {
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
                 }
-                composable<MainRoutes.Social> { 
+                composable<MainRoutes.ChatList> {
                     ChatListActivity()
                 }
                 composable<AuthRoutes.Landing>{

@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.ChatDTO
-import reservant_mobile.data.services.UserService
 
 @Composable
 fun UserCard(
@@ -63,7 +62,10 @@ fun UserCard(
                 getPhoto = getImage
             )
 
-            Column(Modifier.weight(0.8f).align(Alignment.CenterVertically)) {
+            Column(
+                Modifier
+                    .weight(0.8f)
+                    .align(Alignment.CenterVertically)) {
                 Text(
                     text = "$firstName $lastName",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
@@ -74,7 +76,12 @@ fun UserCard(
 }
 
 @Composable
-fun ChatListItem(chat: ChatDTO, onClick: () -> Unit) {
+fun ThreadListItem(
+    title: String,
+    userNames: String? = null,
+    onClick: () -> Unit,
+    getPhoto: suspend () -> Bitmap?,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,26 +89,32 @@ fun ChatListItem(chat: ChatDTO, onClick: () -> Unit) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_profile_placeholder),
-            contentDescription = "Settings Picture",
-            modifier = Modifier
+        LoadedPhotoComponent(
+            placeholderModifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primary),
+            photoModifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            placeholder = R.drawable.ic_profile_placeholder,
             contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = chat.userName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(text = chat.lastMessage, fontSize = 14.sp)
+        ) {
+            getPhoto()
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = chat.timeStamp,
+
+        Column(modifier = Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
+            Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            userNames?.let {
+                Text(text = userNames, fontSize = 14.sp)
+            }
+        }
+        /*Text(
+            text = thread.timeStamp,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        )*/
     }
     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 }

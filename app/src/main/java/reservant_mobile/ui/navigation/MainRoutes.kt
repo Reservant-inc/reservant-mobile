@@ -10,7 +10,7 @@ data object MainRoutes{
     object Settings
 
     @Serializable
-    object Social
+    object ChatList
 
 }
 
