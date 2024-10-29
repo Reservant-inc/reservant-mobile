@@ -9,26 +9,48 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
 import androidx.core.content.ContextCompat.getSystemService
 import com.example.reservant_mobile.R
+import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.services.UserService
 import kotlin.random.Random
 
-class NotificationHandler(
+class NotificationHandler (
     private val context: Context
 ) {
 
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
+    private val restaurantChannelId = getString(context, R.string.restaurant_notification_channel_id)
+    private val friendsChannelId = getString(context, R.string.friends_notification_channel_id)
+    private val eventsChannelId = getString(context, R.string.events_notification_channel_id)
+    private val visitsChannelId = getString(context, R.string.visits_notification_channel_id)
+
     init {
-        setupRestaurantChannel()
-        setupFriendsChannel()
-        setupEventsChannel()
-        setupVisitsChannel()
+
+        if (Roles.CUSTOMER in UserService.UserObject.roles){
+            setupFriendsChannel()
+            setupEventsChannel()
+            setupVisitsChannel()
+        }
+
+        val employeeRoles = listOf(
+            Roles.RESTAURANT_EMPLOYEE,
+            Roles.RESTAURANT_OWNER,
+            Roles.RESTAURANT_HALL_EMPLOYEE,
+            Roles.RESTAURANT_BACKDOORS_EMPLOYEE
+        )
+
+        if (UserService.UserObject.roles.any { employeeRoles.contains(it) }){
+            setupRestaurantChannel()
+        }
+
+
     }
 
     //handles these notification types:
     //NotificationRestaurantVerified, NotificationNewRestaurantReview
     private fun setupRestaurantChannel(){
         val notificationChannel = NotificationChannel(
-            getString(context, R.string.restaurant_notification_channel_id),
+            restaurantChannelId,
             getString(context, R.string.restaurant_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -40,7 +62,7 @@ class NotificationHandler(
     //NotificationNewFriendRequest, NotificationFriendRequestAccepted
     private fun setupFriendsChannel(){
         val notificationChannel = NotificationChannel(
-            getString(context, R.string.friends_notification_channel_id),
+            friendsChannelId,
             getString(context, R.string.friends_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -52,7 +74,7 @@ class NotificationHandler(
     //NotificationNewParticipationRequest, NotificationParticipationRequestResponse
     private fun setupEventsChannel(){
         val notificationChannel = NotificationChannel(
-            getString(context, R.string.events_notification_channel_id),
+            eventsChannelId,
             getString(context, R.string.events_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -64,7 +86,7 @@ class NotificationHandler(
     //NotificationVisitApprovedDeclined
     private fun setupVisitsChannel(){
         val notificationChannel = NotificationChannel(
-            getString(context, R.string.visits_notification_channel_id),
+            visitsChannelId,
             getString(context, R.string.visits_notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -73,16 +95,16 @@ class NotificationHandler(
     }
     
     fun showBasicNotification(){
-        val notification= NotificationCompat.Builder(context,"water_notification")
+        val notification = NotificationCompat.Builder(context, restaurantChannelId)
             .setContentTitle("Water Reminder")
             .setContentText("Time to drink a glass of water")
             .setSmallIcon(R.drawable.logo)
-            .setPriority(NotificationManager.IMPORTANCE_HIGH)
+            .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify(
-            Random.nextInt(),
+            Random.nextInt(), //TODO: save notification ID somewhere ???
             notification
         )
     }
