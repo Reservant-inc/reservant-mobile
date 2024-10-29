@@ -5,11 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -26,29 +25,47 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import reservant_mobile.data.utils.formatDateTime
+import com.example.reservant_mobile.R
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ChatViewModel
+import java.time.LocalDate
+import java.time.Period
 
 
 @Composable
-fun ChatActivity(navController: NavHostController, userName: String) {
-    val chatViewModel: ChatViewModel = viewModel()
-    val messagesFlow = chatViewModel.messagesFlow.collectAsState()
-    val participantsMap = chatViewModel.participantsMap
+fun ChatActivity(navController: NavHostController, threadId: Int, title: String) {
+    val chatViewModel: ChatViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                ChatViewModel(threadId = threadId) as T
+        }
+    )
+
+    val messages by rememberUpdatedState(chatViewModel.messagesFlow.collectAsLazyPagingItems())
+    val participantsMap by remember {
+        mutableStateOf(chatViewModel.participantsMap)
+    }
 
     var currentMessage by remember { mutableStateOf(TextFieldValue()) }
 
@@ -64,12 +81,10 @@ fun ChatActivity(navController: NavHostController, userName: String) {
 
         IconWithHeader(
             icon = Icons.AutoMirrored.Rounded.Chat,
-            text = userName,
+            text = title,
             showBackButton = true,
             onReturnClick = { navController.popBackStack() }
         )
-
-        val lazyPagingItems = messagesFlow.value?.collectAsLazyPagingItems()
 
         if (chatViewModel.isLoading){
             Box (
@@ -90,12 +105,32 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                     .weight(1f),
                 reverseLayout = true // Display the latest messages at the bottom
             ) {
-                lazyPagingItems?.let { pagingItems ->
-                    items(count = pagingItems.itemCount) { index ->
-                        val message = pagingItems[index]
-                        message?.let {
-                            val sender = participantsMap[message.authorId]
-                            val isSentByMe = message.authorId == chatViewModel.getCurrentUserId()
+
+                if (messages.loadState.refresh is LoadState.Loading){
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                } else if (messages.loadState.hasError || messages.itemCount < 1) {
+                    item {
+                        MissingPage(
+                            errorString = stringResource(
+                                id = R.string.error_threads_not_found
+                            )
+                        )
+                    }
+                } else {
+                    items(count = messages.itemCount) { index ->
+                        val message by remember {
+                            mutableStateOf(messages[index])
+                        }
+
+                        message?.let { message ->
+                            val sender by remember {
+                                mutableStateOf(participantsMap[message.authorId])
+                            }
+                            val isSentByMe by remember {
+                                mutableStateOf(message.authorId == chatViewModel.getCurrentUserId())
+                            }
 
                             Row(
                                 modifier = Modifier
@@ -103,35 +138,66 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                                     .padding(vertical = 4.dp),
                                 horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
                             ) {
+
                                 Column(
                                     horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
-                                    modifier = Modifier.widthIn(max = 300.dp)
+
                                 ) {
-                                    Text(
-                                        text = message.contents,
-                                        modifier = Modifier
-                                            .background(
-                                                if (isSentByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                                                shape = CircleShape
-                                            )
-                                            .padding(8.dp),
-                                        color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    message.dateSent?.let { date ->
-                                        val formattedDate = formatDateTime(date, "dd.MM.yyyy")
-                                        val formattedTime = formatDateTime(date, "HH:mm:ss")
+
+                                   Row(
+                                       modifier = Modifier
+                                           .padding(bottom = 4.dp)
+                                           .widthIn(max = 280.dp),
+                                       horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
+                                   ) {
+                                       if (!isSentByMe){
+                                           LoadedPhotoComponent(
+                                               placeholderModifier = Modifier
+                                                   .size(32.dp)
+                                                   .align(Alignment.Bottom)
+                                                   .clip(CircleShape),
+                                               photoModifier = Modifier
+                                                   .size(32.dp)
+                                                   .align(Alignment.Bottom)
+                                                   .clip(CircleShape),
+                                               placeholder = R.drawable.ic_profile_placeholder
+                                           ) {
+                                               sender?.photo?.let{
+                                                   chatViewModel.fetchPhoto(it)
+                                               }
+                                           }
+                                       }
+                                       Text(
+                                           text = message.contents,
+                                           modifier = Modifier
+                                               .padding(start = 4.dp)
+                                               .background(
+                                                   if (isSentByMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
+                                                   shape = RoundedCornerShape(32.dp)
+                                               )
+                                               .padding(horizontal = 16.dp, vertical = 8.dp),
+                                           color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+                                       )
+                                   }
+
+                                    if (!isSentByMe) {
                                         Text(
-                                            text = "$formattedDate $formattedTime",
+                                            text = "${stringResource(id = R.string.label_sent_by)}: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
+
+                                        message.dateSent.ShowDate()
                                     }
+
+                                    if (isSentByMe){
+                                        message.dateRead.ShowDate("${stringResource(id = R.string.label_read_at)}: ")
+
+                                        if (message.dateRead == null){
+                                            message.dateSent.ShowDate()
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -175,7 +241,7 @@ fun ChatActivity(navController: NavHostController, userName: String) {
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (currentMessage.text.isNotBlank() && lazyPagingItems != null) {
+                            if (currentMessage.text.isNotBlank()) {
                                 chatViewModel.createMessage(currentMessage.text)
                                 currentMessage = TextFieldValue()
                             }
@@ -193,3 +259,40 @@ fun ChatActivity(navController: NavHostController, userName: String) {
 }
 
 
+@Composable
+fun String?.ShowDate(prefix: String = ""){
+    this?.let {
+        val parsedDate by remember {
+            mutableStateOf(formatToDateTime(it))
+        }
+
+        val formattedDate by remember {
+            mutableStateOf(formatToDateTime(it, "dd.MM.yyyy"))
+        }
+        val formattedTime by remember {
+            mutableStateOf(formatToDateTime(it, "HH:mm"))
+        }
+
+        val isDateToday by remember {
+            mutableStateOf(
+                Period.between(LocalDate.now(), parsedDate.toLocalDate()).days == 0
+            )
+        }
+
+        if (isDateToday) {
+            Text(
+                text = "$prefix$formattedTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        } else {
+            Text(
+                text = "$prefix$formattedDate $formattedTime",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+
+
+}
