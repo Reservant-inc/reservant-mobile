@@ -118,30 +118,15 @@ fun ChatListActivity() {
 
                             thread?.let { thread ->
 
-                                //TODO: check if thread is group thread
-                                val isGroup by remember {
-                                    mutableStateOf(i==1)
-                                }
-
                                 val title by remember {
                                     mutableStateOf(
-                                        if (isGroup) {
-                                            thread.title ?: thread.participants!!.joinToString(separator = ", ") { it.firstName }
-                                        }
-                                        else {
-                                            thread.participants!![0].firstName
-                                        }
+                                        thread.title ?: thread.participants!!.joinToString(separator = ", ") { it.firstName }
                                     )
                                 }
 
                                 val usernames by remember {
                                     mutableStateOf(
-                                        if (isGroup) {
-                                            thread.participants!!.joinToString(separator = ", ") { it.firstName }
-                                        }
-                                        else {
-                                            null
-                                        }
+                                        thread.participants!!.joinToString(separator = ", ") { it.firstName }
                                     )
                                 }
 
