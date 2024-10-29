@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,14 +47,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             askNotificationPermission()
-
-            val notificationChannel = NotificationChannel(
-                "water_notification",
-                "Water",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
              startPoint = if(LoginViewModel().refreshToken()) {
                  if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
@@ -74,14 +68,6 @@ class MainActivity : ComponentActivity() {
                     RequestPermission(
                         permission = PermissionStrings.NOTIFICATIONS,
                     )
-
-                    val waterNotificationService by remember {
-                        mutableStateOf(NotificationHandler(applicationContext))
-                    }
-
-                    LaunchedEffect(key1 = Unit) {
-                        waterNotificationService.showBasicNotification()
-                    }
 
                 }
             }
