@@ -1,15 +1,19 @@
 package reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -33,6 +37,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -46,6 +53,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ChatViewModel
 import java.time.LocalDate
@@ -84,8 +92,6 @@ fun ChatActivity(navController: NavHostController, threadId: Int, title: String)
             showBackButton = true,
             onReturnClick = { navController.popBackStack() }
         )
-
-
 
         if (chatViewModel.isLoading){
             Box (
@@ -139,21 +145,47 @@ fun ChatActivity(navController: NavHostController, threadId: Int, title: String)
                                     .padding(vertical = 4.dp),
                                 horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
                             ) {
+
                                 Column(
                                     horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start,
-                                    modifier = Modifier.widthIn(max = 300.dp)
+
                                 ) {
-                                    Text(
-                                        text = message.contents,
-                                        modifier = Modifier
-                                            .background(
-                                                if (isSentByMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
-                                                shape = CircleShape
-                                            )
-                                            .padding(8.dp),
-                                        color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                   Row(
+                                       modifier = Modifier
+                                           .padding(bottom = 4.dp)
+                                           .widthIn(max = 280.dp),
+                                       horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
+                                   ) {
+                                       if (!isSentByMe){
+                                           LoadedPhotoComponent(
+                                               placeholderModifier = Modifier
+                                                   .size(32.dp)
+                                                   .align(Alignment.Bottom)
+                                                   .clip(CircleShape),
+                                               photoModifier = Modifier
+                                                   .size(32.dp)
+                                                   .align(Alignment.Bottom)
+                                                   .clip(CircleShape),
+                                               placeholder = R.drawable.ic_profile_placeholder
+                                           ) {
+                                               sender?.photo?.let{
+                                                   chatViewModel.fetchPhoto(it)
+                                               }
+                                           }
+                                       }
+                                       Text(
+                                           text = message.contents,
+                                           modifier = Modifier
+                                               .padding(start = 4.dp)
+                                               .background(
+                                                   if (isSentByMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
+                                                   shape = RoundedCornerShape(32.dp)
+                                               )
+                                               .padding(horizontal = 16.dp, vertical = 8.dp),
+                                           color = if (isSentByMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary
+                                       )
+                                   }
 
                                     if (!isSentByMe) {
                                         Text(

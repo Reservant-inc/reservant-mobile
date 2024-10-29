@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.models.dtos.MessageDTO
 import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
@@ -20,6 +22,7 @@ import reservant_mobile.data.services.UserService
 
 class ChatViewModel(
     private val threadsService: IThreadsService = ThreadsService(),
+    private val userService: UserService = UserService(),
     private val threadId: Int
 ) : ReservantViewModel() {
 
@@ -48,8 +51,19 @@ class ChatViewModel(
 
             if (!result.isError) {
                 result.value?.participants?.forEach { participant ->
+
                     participant.userId?.let { userId ->
-                        _participantsMap[userId] = participant
+                        val res = userService.getUserSimpleInfo(userId)
+
+                        if (!res.isError && res.value != null){
+                            _participantsMap[userId] = UserDTO(
+                                userId = userId,
+                                firstName = res.value.firstName ?: "",
+                                lastName = res.value.lastName ?: "",
+                                photo = res.value.photo
+                            )
+                        }
+
                     }
                 }
                 fetchMessages()
@@ -86,6 +100,16 @@ class ChatViewModel(
                 val errors = result.errors
                 // You can handle errors here, such as displaying a toast or logging
             }
+        }
+    }
+
+    suspend fun fetchPhoto(photo: String): Bitmap? {
+        val result = fileService.getImage(photo)
+
+        return if (!result.isError) {
+            result.value
+        } else {
+            null
         }
     }
 
