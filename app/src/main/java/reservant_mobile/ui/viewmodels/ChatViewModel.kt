@@ -103,16 +103,6 @@ class ChatViewModel(
         }
     }
 
-    suspend fun fetchPhoto(photo: String): Bitmap? {
-        val result = fileService.getImage(photo)
-
-        return if (!result.isError) {
-            result.value
-        } else {
-            null
-        }
-    }
-
     fun markMessagesAsRead() {
         viewModelScope.launch {
             _messagesFlow.collectLatest { pagingData ->

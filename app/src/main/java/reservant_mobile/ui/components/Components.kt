@@ -1251,6 +1251,7 @@ fun FilterOption(status: String, onFilterSelected: (String) -> Unit) {
 fun LoadedPhotoComponent(
     photoModifier: Modifier = Modifier,
     placeholderModifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
     placeholder: Int = R.drawable.unknown_image,
     getPhoto: suspend () -> Bitmap?,
 ) {
@@ -1279,13 +1280,15 @@ fun LoadedPhotoComponent(
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = "loaded_photo",
-                    modifier = photoModifier
+                    modifier = photoModifier,
+                    contentScale = contentScale
                 )
             } else {
                 Image(
                     painterResource(placeholder),
                     contentDescription = "placeholder_photo",
-                    modifier = placeholderModifier
+                    modifier = placeholderModifier,
+                    contentScale = contentScale
                 )
             }
         }

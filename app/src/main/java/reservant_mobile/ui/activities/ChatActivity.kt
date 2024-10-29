@@ -189,7 +189,7 @@ fun ChatActivity(navController: NavHostController, threadId: Int, title: String)
 
                                     if (!isSentByMe) {
                                         Text(
-                                            text = "Sent by: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
+                                            text = "${stringResource(id = R.string.label_sent_by)}: ${sender?.firstName ?: "Unknown"} ${sender?.lastName ?: "Unknown"}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
@@ -198,7 +198,7 @@ fun ChatActivity(navController: NavHostController, threadId: Int, title: String)
                                     }
 
                                     if (isSentByMe){
-                                        message.dateRead.ShowDate("Read at: ")
+                                        message.dateRead.ShowDate("${stringResource(id = R.string.label_read_at)}: ")
 
                                         if (message.dateRead == null){
                                             message.dateSent.ShowDate()

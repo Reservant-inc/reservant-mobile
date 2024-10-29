@@ -138,7 +138,13 @@ fun ChatListActivity() {
                                     userNames = usernames,
                                     onClick = {
                                         nav.navigate(UserRoutes.Chat(threadId = thread.threadId!!, threadTitle = title))
+                                    },
+                                    getPhoto = {
+                                        thread.participants?.get(1)?.photo?.let{
+                                            viewmodel.fetchPhoto(it)
+                                        }
                                     }
+
                                 )
                             }
                         }

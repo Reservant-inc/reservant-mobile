@@ -247,4 +247,6 @@
     <string name="error_threads_not_found">Nie znaleziono żadnych wątków wiadomości</string>
     <string name="empty_search">Wpisz w wyszukiwarkę żeby zobaczyć użytkowników</string>
     <string name="error_users_not_found">Nie znaleziono żadnego użytkownika</string>
+    <string name="label_sent_by">Nadawca</string>
+    <string name="label_read_at">Przeczytano o</string>
 </resources>

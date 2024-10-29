@@ -62,7 +62,10 @@ fun UserCard(
                 getPhoto = getImage
             )
 
-            Column(Modifier.weight(0.8f).align(Alignment.CenterVertically)) {
+            Column(
+                Modifier
+                    .weight(0.8f)
+                    .align(Alignment.CenterVertically)) {
                 Text(
                     text = "$firstName $lastName",
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
@@ -76,7 +79,8 @@ fun UserCard(
 fun ThreadListItem(
     title: String,
     userNames: String? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    getPhoto: suspend () -> Bitmap?,
 ) {
     Row(
         modifier = Modifier
@@ -85,23 +89,27 @@ fun ThreadListItem(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_profile_placeholder),
-            contentDescription = "Settings Picture",
-            modifier = Modifier
+        LoadedPhotoComponent(
+            placeholderModifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primary),
+            photoModifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            placeholder = R.drawable.ic_profile_placeholder,
             contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
+        ) {
+            getPhoto()
+        }
+
+        Column(modifier = Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
             Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             userNames?.let {
                 Text(text = userNames, fontSize = 14.sp)
             }
         }
-        Spacer(modifier = Modifier.width(8.dp))
         /*Text(
             text = thread.timeStamp,
             fontSize = 12.sp,

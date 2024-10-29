@@ -252,4 +252,6 @@
     <string name="error_threads_not_found">Not found any message threads</string>
     <string name="empty_search">Type in search to see results</string>
     <string name="error_users_not_found">Not found any users</string>
+    <string name="label_sent_by">Sent by</string>
+    <string name="label_read_at">Read at</string>
 </resources>
