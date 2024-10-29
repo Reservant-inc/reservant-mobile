@@ -24,14 +24,7 @@ fun formatDateTime(dateString: String, pattern: String): String {
 
 fun formatDateTime(dateString: String): LocalDateTime {
     return try {
-        val formatter = DateTimeFormatterBuilder()
-            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-            .optionalStart()
-            .appendFraction(ChronoField.NANO_OF_SECOND, 0, 7, true)
-            .optionalEnd()
-            .toFormatter(Locale.getDefault())
-
-        return LocalDateTime.parse(dateString, formatter)
+        return LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
     } catch (e: Exception) {
         LocalDateTime.now()
     }
