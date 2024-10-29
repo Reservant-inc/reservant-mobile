@@ -53,7 +53,7 @@ import java.time.Period
 
 
 @Composable
-fun ChatActivity(navController: NavHostController, threadId: Int) {
+fun ChatActivity(navController: NavHostController, threadId: Int, title: String) {
     val chatViewModel: ChatViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -80,7 +80,7 @@ fun ChatActivity(navController: NavHostController, threadId: Int) {
 
         IconWithHeader(
             icon = Icons.AutoMirrored.Rounded.Chat,
-            text = "Thread",
+            text = title,
             showBackButton = true,
             onReturnClick = { navController.popBackStack() }
         )

@@ -9,7 +9,8 @@ data object UserRoutes {
 
     @Serializable
     data class Chat(
-        val threadId: Int
+        val threadId: Int,
+        val threadTitle: String
     )
 
     @Serializable

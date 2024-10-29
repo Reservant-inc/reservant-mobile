@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -136,7 +137,7 @@ fun ChatListActivity() {
                                     title = title,
                                     userNames = usernames,
                                     onClick = {
-                                        nav.navigate(UserRoutes.Chat(threadId = thread.threadId!!))
+                                        nav.navigate(UserRoutes.Chat(threadId = thread.threadId!!, threadTitle = title))
                                     }
                                 )
                             }
@@ -164,6 +165,7 @@ fun ChatListActivity() {
             ChatActivity(
                 navController = nav,
                 threadId = it.toRoute<UserRoutes.Chat>().threadId,
+                title = it.toRoute<UserRoutes.Chat>().threadTitle
             )
         }
         composable<UserRoutes.FindFriends> {
