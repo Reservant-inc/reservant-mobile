@@ -25,4 +25,7 @@ data object UserRoutes {
 
     @Serializable
     object Orders
+
+    @Serializable
+    object FindFriends
 }

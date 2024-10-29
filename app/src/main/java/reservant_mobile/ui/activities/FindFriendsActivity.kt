@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.PersonPin
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,13 +35,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.serialization.generateRouteWithArgs
 import androidx.navigation.toRoute
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.UserCard
@@ -50,7 +48,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.SocialViewModel
 
 @Composable
-fun SocialActivity(navController: NavHostController){
+fun FindFriendsActivity(navController: NavHostController){
     val viewmodel = viewModel<SocialViewModel>()
     val users by rememberUpdatedState(viewmodel.users.collectAsLazyPagingItems())
 
@@ -58,9 +56,9 @@ fun SocialActivity(navController: NavHostController){
 
     NavHost(
         navController = innerNavController,
-        startDestination = MainRoutes.Social
+        startDestination = UserRoutes.FindFriends
     ){
-        composable<MainRoutes.Social> {
+        composable<UserRoutes.FindFriends> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -80,8 +78,8 @@ fun SocialActivity(navController: NavHostController){
                     
                     item {
                         IconWithHeader(
-                            icon = Icons.Rounded.PersonPin,
-                            text = stringResource(R.string.label_social),
+                            icon = Icons.Rounded.PersonAdd,
+                            text = stringResource(R.string.label_find_friends),
                             showBackButton = true,
                             onReturnClick = { navController.popBackStack() }
                         )

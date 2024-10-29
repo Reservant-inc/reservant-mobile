@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Chat
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.endpoints.User
 import reservant_mobile.ui.components.ThreadListItem
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
@@ -151,9 +153,9 @@ fun ChatListActivity() {
             ) {
                 MyFloatingActionButton(
                     onClick = {
-                        nav.navigate(MainRoutes.Social)
+                        nav.navigate(UserRoutes.FindFriends)
                     },
-                    icon = Icons.Rounded.Search
+                    icon = Icons.Rounded.PersonAdd
                 )
             }
 
@@ -164,8 +166,8 @@ fun ChatListActivity() {
                 threadId = it.toRoute<UserRoutes.Chat>().threadId,
             )
         }
-        composable<MainRoutes.Social> {
-            SocialActivity(navController = nav)
+        composable<UserRoutes.FindFriends> {
+            FindFriendsActivity(navController = nav)
         }
     }
 }
