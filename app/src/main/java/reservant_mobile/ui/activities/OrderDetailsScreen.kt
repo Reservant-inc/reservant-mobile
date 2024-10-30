@@ -51,7 +51,7 @@ fun OrderDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if(details.participants.isNotEmpty()) {
+            if (details.participants.isNotEmpty()) {
                 ParticipantsList(participants = details.participants)
             }
 
@@ -72,7 +72,10 @@ fun OrderDetailsScreen(
             }
         }
     } ?: run {
-        Text(text = stringResource(R.string.loading_order_details), modifier = Modifier.padding(16.dp))
+        Text(
+            text = stringResource(R.string.loading_order_details),
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 
@@ -94,9 +97,19 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
         // Wyświetlanie zakresu daty (data - dataDo lub godzina - godzinaDo)
         val formattedDateRange = if (visitDetails.date == "Today") {
-            "${formatDateTime(visitDetails.date, "HH:mm")} - ${formatDateTime(visitDetails.endTime, "HH:mm")}"
+            "${formatDateTime(visitDetails.date, "HH:mm")} - ${
+                formatDateTime(
+                    visitDetails.endTime,
+                    "HH:mm"
+                )
+            }"
         } else {
-            "${formatDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${formatDateTime(visitDetails.endTime, "HH:mm")}"
+            "${formatDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${
+                formatDateTime(
+                    visitDetails.endTime,
+                    "HH:mm"
+                )
+            }"
         }
         Text(
             text = formattedDateRange,
@@ -142,27 +155,38 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Wyświetlanie daty rezerwacji tylko wtedy, gdy istnieje
-            if (visitDetails.reservationDate != "Unknown") {
-                val formattedReservationDate = if (visitDetails.reservationDate == "Today") {
-                    formatDateTime(visitDetails.reservationDate, "HH:mm")
-                } else {
-                    formatDateTime(visitDetails.reservationDate, "dd.MM.yyyy HH:mm")
+            Row {
+                // Wyświetlanie daty rezerwacji tylko wtedy, gdy istnieje
+                if (visitDetails.reservationDate != "Unknown") {
+                    val formattedReservationDate = if (visitDetails.reservationDate == "Today") {
+                        formatDateTime(visitDetails.reservationDate, "HH:mm")
+                    } else {
+                        formatDateTime(visitDetails.reservationDate, "dd.MM.yyyy HH:mm")
+                    }
+                    Text(
+                        text = stringResource(R.string.reservation_date_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " " + formattedReservationDate,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
-                Text(
-                    text = stringResource(R.string.reservation_date_label) + " " + formattedReservationDate,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
             }
-
-            // Wyświetlanie depozytu, jeśli jest różny od -1.0
-            if (visitDetails.deposit != -1.0) {
-                Text(
-                    text = stringResource(R.string.deposit_label) + " " + "%.2f".format(visitDetails.deposit) + " zł",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
+            Row {
+                // Wyświetlanie depozytu, jeśli jest różny od -1.0
+                if (visitDetails.deposit != -1.0) {
+                    Text(
+                        text = stringResource(R.string.deposit_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " " + "%.2f".format(visitDetails.deposit) + " zł",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
 
@@ -172,28 +196,38 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Wyświetlanie godziny płatności, jeśli istnieje
-            if (visitDetails.paymentTime != "Unknown") {
-                val formattedPaymentTime = if (visitDetails.paymentTime == "Today") {
-                    formatDateTime(visitDetails.paymentTime, "HH:mm")
-                } else {
-                    formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
+            Row {
+                // Wyświetlanie godziny płatności, jeśli istnieje
+                if (visitDetails.paymentTime != "Unknown") {
+                    val formattedPaymentTime = if (visitDetails.paymentTime == "Today") {
+                        formatDateTime(visitDetails.paymentTime, "HH:mm")
+                    } else {
+                        formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
+                    }
+                    Text(
+                        text = stringResource(R.string.payment_time_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " " + formattedPaymentTime,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
-                Text(
-                    text = stringResource(R.string.payment_time_label) + " " + formattedPaymentTime,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
             }
-
-
-            // Wyświetlanie napiwku, jeśli jest różny od -1.0
-            if (visitDetails.tip != -1.0) {
-                Text(
-                    text = stringResource(R.string.tip_label) + " " + "%.2f".format(visitDetails.tip) + " zł",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
+            Row {
+                // Wyświetlanie napiwku, jeśli jest różny od -1.0
+                if (visitDetails.tip != -1.0) {
+                    Text(
+                        text = stringResource(R.string.tip_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " " + "%.2f".format(visitDetails.tip) + " zł",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
 
@@ -208,7 +242,6 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
         )
     }
 }
-
 
 
 @Composable
@@ -312,7 +345,10 @@ fun DishCard(item: OrderDetails.MenuItemDetails) {
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = stringResource(R.string.status_label, item.status ?: stringResource(R.string.unknown_status)),
+                    text = stringResource(
+                        R.string.status_label,
+                        item.status ?: stringResource(R.string.unknown_status)
+                    ),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
