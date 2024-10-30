@@ -16,9 +16,14 @@ import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.OrderDetails
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import kotlin.time.Duration
 
 @Composable
 fun OrderDetailsScreen(
@@ -72,10 +77,7 @@ fun OrderDetailsScreen(
             }
         }
     } ?: run {
-        Text(
-            text = stringResource(R.string.loading_order_details),
-            modifier = Modifier.padding(16.dp)
-        )
+        LoadingScreenWithTimeout(Duration.parse("10s"), stringResource(R.string.error_orders))
     }
 }
 
@@ -95,8 +97,12 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Wyświetlanie zakresu daty (data - dataDo lub godzina - godzinaDo)
-        val formattedDateRange = if (visitDetails.date == "Today") {
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val visitDateTime = LocalDateTime.parse(visitDetails.date, formatter)
+
+        val isToday = visitDateTime.toLocalDate().isEqual(LocalDate.now())
+
+        val formattedDateRange = if (isToday) {
             "${formatDateTime(visitDetails.date, "HH:mm")} - ${
                 formatDateTime(
                     visitDetails.endTime,
@@ -155,25 +161,29 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
-                // Wyświetlanie daty rezerwacji tylko wtedy, gdy istnieje
-                if (visitDetails.reservationDate != "Unknown") {
-                    val formattedReservationDate = if (visitDetails.reservationDate == "Today") {
-                        formatDateTime(visitDetails.reservationDate, "HH:mm")
-                    } else {
-                        formatDateTime(visitDetails.reservationDate, "dd.MM.yyyy HH:mm")
+            if (visitDetails.reservationDate != "Unknown") {
+                val reservationFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+                val reservationDate =
+                    LocalDate.parse(visitDetails.reservationDate, reservationFormatter)
+
+                val isReservationToday = reservationDate.isEqual(LocalDate.now())
+
+                Row {
+                    if (!isReservationToday) {
+                        Text(
+                            text = stringResource(R.string.reservation_date_label),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = " " + visitDetails.reservationDate,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
-                    Text(
-                        text = stringResource(R.string.reservation_date_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = " " + formattedReservationDate,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
                 }
             }
+
             Row {
                 // Wyświetlanie depozytu, jeśli jest różny od -1.0
                 if (visitDetails.deposit != -1.0) {
@@ -197,20 +207,23 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                // Wyświetlanie godziny płatności, jeśli istnieje
                 if (visitDetails.paymentTime != "Unknown") {
-                    val formattedPaymentTime = if (visitDetails.paymentTime == "Today") {
-                        formatDateTime(visitDetails.paymentTime, "HH:mm")
-                    } else {
-                        formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
-                    }
+                    val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                    val paymentDateTime = LocalDateTime.parse(visitDetails.paymentTime, dateTimeFormatter)
+
+                    val isPaymentToday = paymentDateTime.toLocalDate().isEqual(LocalDate.now())
                     Text(
                         text = stringResource(R.string.payment_time_label),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
+
                     Text(
-                        text = " " + formattedPaymentTime,
+                        text = if (isPaymentToday) {
+                            " " + formatDateTime(visitDetails.paymentTime, "HH:mm")
+                        } else {
+                            " " + formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
+                        },
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
