@@ -328,7 +328,6 @@ fun OrderCard(order: OrderDetails) {
     }
 }
 
-
 @Composable
 fun DishCard(item: OrderDetails.MenuItemDetails) {
     Card(
