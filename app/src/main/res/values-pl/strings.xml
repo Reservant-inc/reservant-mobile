@@ -268,4 +268,6 @@
     <string name="label_available_restaurants">Dostępne restauracje:</string>
     <string name="label_event_start_date">Data rozpoczęcia wydarzenia</string>
     <string name="label_event_must_join_until">Należy dołączyć przed</string>
+    <string name="error_field_required">To pole jest wymagane</string>
+    <string name="error_invalid_number">Nieprawidłowa liczba</string>
 </resources>
