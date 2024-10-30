@@ -277,8 +277,8 @@ fun MapActivity(){
                                 )
                             )
                         } else {
-                            LazyColumn(
-                                Modifier
+                            Box(
+                                modifier = Modifier
                                     .fillMaxSize()
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -295,15 +295,16 @@ fun MapActivity(){
                                         eventName = item.name
                                     )
                                 }
+                                MyFloatingActionButton(
+                                    onClick = {
+                                        navController.navigate(EventRoutes.AddEvent)
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                )
                             }
-                            MyFloatingActionButton(
-                                onClick = {
-                                    navController.navigate(EventRoutes.AddEvent)
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(16.dp)
-                            )
+
                         }
                     }
                 }

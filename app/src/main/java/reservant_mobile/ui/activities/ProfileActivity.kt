@@ -1,34 +1,13 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cake
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -156,7 +135,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "5,00", // TODO: zmienna z oceną użytkownika z backu
+                                        text = "5,00", // TODO: Replace with actual user rating
                                         color = Color.Gray
                                     )
                                 }
@@ -222,7 +201,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         }
 
                                         null -> {
-                                            // Obsługa przypadku null, jeśli konieczne
+                                            // Handle null case if necessary
                                         }
                                     }
 
@@ -244,140 +223,122 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             }
                         }
                     }
-                    OutlinedTextField(
-                        value = "",
-                        onValueChange = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp),
-                        placeholder = {
-                            Text(
-                                stringResource(R.string.label_search)
-                            )
-                        },
-                        trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                        singleLine = true
-                    )
 
-                    if(profileViewModel.isCurrentUser){
-                        FloatingTabSwitch(pages = listOf(
-                            stringResource(R.string.label_visits) to { VisitsTab() },
-                            stringResource(R.string.label_orders) to { OrdersTab() },
-                            stringResource(R.string.label_chats) to { ChatsTab() },
-                            stringResource(R.string.label_friends) to { FriendsTab() },
-                        ))
-                    } else {
-                        Column {
-                            Text(
-                                text = stringResource(R.string.label_events),
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .align(alignment = Alignment.CenterHorizontally)
-                            )
-                            EventsContent()
-                        }
+                    else -> {
+                        MissingPage()
                     }
                 }
             }
 
-            if (profileViewModel.profileUser != null) {
-                if (profileViewModel.isCurrentUser) {
-                    item {
-                        FloatingTabSwitch(
-                            pages = listOf(
-                                stringResource(R.string.label_visits) to { VisitsTab() },
-                                stringResource(R.string.label_orders) to { OrdersTab() },
-                                stringResource(R.string.label_chats) to { ChatsTab() },
-                                stringResource(R.string.label_friends) to { FriendsTab() },
-                            )
+            item {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = { },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp),
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.label_search)
                         )
+                    },
+                    trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    singleLine = true
+                )
+            }
+
+            if (profileViewModel.isCurrentUser) {
+                item {
+                    FloatingTabSwitch(
+                        pages = listOf(
+                            stringResource(R.string.label_visits) to { VisitsTab() },
+                            stringResource(R.string.label_orders) to { OrdersTab() },
+                            stringResource(R.string.label_chats) to { ChatsTab() },
+                            stringResource(R.string.label_friends) to { FriendsTab() },
+                        )
+                    )
+                }
+            } else {
+                item {
+                    Text(
+                        text = stringResource(R.string.label_events),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(16.dp)
+                    )
+                }
+
+                if (eventsPagingItems == null) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 } else {
-                    item {
-                        Text(
-                            text = stringResource(R.string.label_events),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(16.dp)
-                            //.align(alignment = Alignment.CenterHorizontally)
-                        )
+                    items(eventsPagingItems.itemCount) { index ->
+                        val event = eventsPagingItems[index]
+                        if (event != null) {
+                            EventCard(
+                                eventCreator = event.creator!!.firstName,
+                                eventDate = event.time,
+                                eventLocation = event.restaurant!!.address,
+                                interestedCount = event.numberInterested ?: 0,
+                                takePartCount = event.participants?.size ?: 0
+                            )
+                        }
                     }
 
-                    if (eventsPagingItems == null) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+                    eventsPagingItems.apply {
+                        when {
+                            loadState.refresh is androidx.paging.LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
                             }
-                        }
-                    } else {
-                        items(eventsPagingItems.itemCount) { index ->
-                            val event = eventsPagingItems[index]
-                            if (event != null) {
-                                EventCard(
-                                    eventCreator = event.creator!!.firstName,
-                                    eventDate = event.time,
-                                    eventLocation = event.restaurant!!.address,
-                                    interestedCount = event.numberInterested ?: 0,
-                                    takePartCount = event.participants?.size ?: 0
-                                )
+                            loadState.append is androidx.paging.LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
                             }
-                        }
-
-                        eventsPagingItems.apply {
-                            when {
-                                loadState.refresh is androidx.paging.LoadState.Loading -> {
-                                    item {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator()
-                                        }
-                                    }
+                            loadState.refresh is androidx.paging.LoadState.Error -> {
+                                val e = eventsPagingItems.loadState.refresh as androidx.paging.LoadState.Error
+                                item {
+                                    Text(
+                                        text = stringResource(R.string.error_loading_events),
+                                        color = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                 }
-                                loadState.append is androidx.paging.LoadState.Loading -> {
-                                    item {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator()
-                                        }
-                                    }
-                                }
-                                loadState.refresh is androidx.paging.LoadState.Error -> {
-                                    val e = eventsPagingItems.loadState.refresh as androidx.paging.LoadState.Error
-                                    item {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_events),
-                                            color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
-                                loadState.append is androidx.paging.LoadState.Error -> {
-                                    val e = eventsPagingItems.loadState.append as androidx.paging.LoadState.Error
-                                    item {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_more_events),
-                                            color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
+                            }
+                            loadState.append is androidx.paging.LoadState.Error -> {
+                                val e = eventsPagingItems.loadState.append as androidx.paging.LoadState.Error
+                                item {
+                                    Text(
+                                        text = stringResource(R.string.error_loading_more_events),
+                                        color = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
                                 }
                             }
                         }
@@ -390,22 +351,22 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
 @Composable
 fun VisitsTab() {
-    // Visits
+    // Visits content
 }
 
 @Composable
 fun OrdersTab() {
-    // Orders
+    // Orders content
 }
 
 @Composable
 fun ChatsTab() {
-    // Chats
+    // Chats content
 }
 
 @Composable
 fun FriendsTab() {
-    // Friends
+    // Friends content
 }
 
 data class Chat(val userName: String, val message: String)

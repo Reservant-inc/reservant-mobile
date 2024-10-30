@@ -15,7 +15,6 @@ data class EventDTO (
     val mustJoinUntil: String,
     val creator: Participant? = null,
     val restaurant: RestaurantDTO? = null,
-    val restaurantId: Int? = null,
     val creatorId: String? = null,
     val creatorFullName: String? = null,
     val restaurantId: Int? = null,
