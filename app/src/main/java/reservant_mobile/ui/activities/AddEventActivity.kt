@@ -7,13 +7,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,7 +32,6 @@ import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.viewmodels.AddEventViewModel
-import androidx.compose.runtime.setValue
 import java.time.LocalDate
 
 @Composable
@@ -43,6 +47,8 @@ fun AddEventActivity(navController: NavHostController) {
     var mustJoinUntil by remember { mutableStateOf("") }
     var maxPeople by remember { mutableStateOf("") }
     var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
+
+    var formSent by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -71,6 +77,8 @@ fun AddEventActivity(navController: NavHostController) {
                 inputText = eventName,
                 onValueChange = { eventName = it },
                 label = stringResource(id = R.string.label_event_name),
+                isError = eventName.isBlank() && formSent,
+                errorText = stringResource(id = R.string.error_field_required),
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -80,34 +88,54 @@ fun AddEventActivity(navController: NavHostController) {
                 inputText = description,
                 onValueChange = { description = it },
                 label = stringResource(id = R.string.label_event_description),
+                isError = description.isBlank() && formSent,
+                errorText = stringResource(id = R.string.error_field_required),
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
         item {
-            MyDatePickerDialog(
-                label = {
-                    Text(stringResource(R.string.label_event_start_date))
-                },
-                onDateChange = {
-                    time = it
-                },
-                allowFutureDates = true,
-                startDate = LocalDate.now().toString() // TODO: better startDate (hours), move text() to MyDatePicker
-
-            )
+            Column {
+                MyDatePickerDialog(
+                    label = {
+                        Text(stringResource(R.string.label_event_start_date))
+                    },
+                    onDateChange = {
+                        time = it
+                    },
+                    allowFutureDates = true,
+                    startDate = LocalDate.now().toString()
+                )
+                if (time.isBlank() && formSent) {
+                    Text(
+                        text = stringResource(id = R.string.error_field_required),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
         }
 
         item {
-            MyDatePickerDialog(
-                label = {
-                    Text(stringResource(R.string.label_event_must_join_until))},
-                onDateChange = {
-                    mustJoinUntil = it
-                },
-                allowFutureDates = true,
-                startDate = LocalDate.now().toString() // TODO: better startDate (hours), move text() to MyDatePicker
-            )
+            Column {
+                MyDatePickerDialog(
+                    label = {
+                        Text(stringResource(R.string.label_event_must_join_until))
+                    },
+                    onDateChange = {
+                        mustJoinUntil = it
+                    },
+                    allowFutureDates = true,
+                    startDate = LocalDate.now().toString()
+                )
+                if (mustJoinUntil.isBlank() && formSent) {
+                    Text(
+                        text = stringResource(id = R.string.error_field_required),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
         }
 
         item {
@@ -115,6 +143,8 @@ fun AddEventActivity(navController: NavHostController) {
                 inputText = maxPeople,
                 onValueChange = { maxPeople = it },
                 label = stringResource(id = R.string.label_event_max_people),
+                isError = (maxPeople.isBlank() || maxPeople.toIntOrNull() == null) && formSent,
+                errorText = stringResource(id = R.string.error_invalid_number),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
@@ -125,6 +155,7 @@ fun AddEventActivity(navController: NavHostController) {
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 label = { Text(stringResource(id = R.string.label_search_restaurants)) },
+                trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -165,19 +196,39 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             selectedRestaurant?.let {
-                Text(
-                    text = stringResource(id = R.string.label_selected_restaurant) + " "+it.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(vertical = 8.dp)
-                )
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.label_selected_restaurant) + " " + it.name,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    IconButton(
+                        onClick = { selectedRestaurant = null },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(id = R.string.label_delete),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         }
 
         item {
             ButtonComponent(
                 onClick = {
-                    if (eventName.isNotBlank() && description.isNotBlank()) {
-                        val maxPeopleInt = maxPeople.toIntOrNull()
+                    formSent = true
+                    val maxPeopleInt = maxPeople.toIntOrNull()
+                    if (eventName.isNotBlank() &&
+                        description.isNotBlank() &&
+                        time.isNotBlank() &&
+                        mustJoinUntil.isNotBlank() &&
+                        maxPeopleInt != null
+                    ) {
                         val newEvent = EventDTO(
                             name = eventName,
                             description = description,
