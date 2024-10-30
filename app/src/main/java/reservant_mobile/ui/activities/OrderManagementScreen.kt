@@ -230,7 +230,7 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController) {
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.table_label, tableId), style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(R.string.table_label) + " " + tableId, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
