@@ -258,6 +258,7 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 }
 
 
+
 @Composable
 fun ParticipantsList(participants: List<String>) {
     Text(
