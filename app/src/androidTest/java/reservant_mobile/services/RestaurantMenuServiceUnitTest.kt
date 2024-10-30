@@ -26,8 +26,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
             name = "Test Menu",
             alternateName = "Testovací menu",
             menuType = "Food",
-            dateFrom = "2020-02-20",
-            photo = "test-jd.png"
+            dateFrom = "2020-02-20"
         )
 
         menuItem = RestaurantMenuItemDTO(

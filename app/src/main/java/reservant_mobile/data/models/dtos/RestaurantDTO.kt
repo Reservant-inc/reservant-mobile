@@ -38,10 +38,10 @@ data class RestaurantDTO (
         /***
          * Time in 'HH:mm:ss' format
          */
-        val from: String,
+        val from: String? = null,
         /***
          * Time in 'HH:mm:ss' format
          */
-        val until: String
+        val until: String? = null
     )
 }
