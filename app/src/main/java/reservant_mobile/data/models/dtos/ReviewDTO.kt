@@ -13,6 +13,10 @@ data class ReviewDTO(
      * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
      */
     val createdAt: String? = null,
+    /***
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
+     */
+    val dateEdited: String? = null,
     val contents: String,
     /***
      * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format

@@ -79,7 +79,8 @@ interface IRestaurantService{
     suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
     suspend fun editRestaurantReview(reviewId: Any, review: ReviewDTO): Result<ReviewDTO?>
     suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean>
-
+    suspend fun addRestaurantResponse(reviewId: Any, response: String): Result<ReviewDTO?>
+    suspend fun deleteRestaurantResponse(reviewId: Any): Result<Boolean>
 
     /***
      * Available visitSorting values : see GetVisitsSort class
@@ -339,6 +340,23 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return booleanResultWrapper(res)
     }
 
+    override suspend fun addRestaurantResponse(reviewId: Any, response: String): Result<ReviewDTO?> {
+        val body = mapOf(
+            "restaurantResponseText" to response
+        )
+        val res = api.put(Reviews.ReviewId.RestaurantResponse(
+            parent = Reviews.ReviewId(reviewId = reviewId.toString())
+        ), body)
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun deleteRestaurantResponse(reviewId: Any): Result<Boolean> {
+        val res = api.delete(Reviews.ReviewId.RestaurantResponse(
+            parent = Reviews.ReviewId(reviewId = reviewId.toString())
+        ))
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
+    }
+
     override suspend fun getVisits(
         restaurantId: Any,
         dateStart: LocalDateTime?,
@@ -348,8 +366,8 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Visits(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                dateStart = dateStart.toString(),
-                dateEnd = dateEnd.toString(),
+                dateStart = dateStart?.toString(),
+                dateEnd = dateEnd?.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage

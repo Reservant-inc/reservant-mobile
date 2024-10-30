@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RestaurantEmployeeDTO(
     val userId: String? = null,
-    val restaurantId: String? = null,
     val login: String? = null,
+    val restaurant: RestaurantDTO? = null,
     val email: String? = null,
     val firstName: String? = null,
     val lastName: String? = null,

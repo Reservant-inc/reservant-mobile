@@ -26,11 +26,11 @@ sealed class BottomNavItem(
             R.string.label_home
         )
 
-    data object Social :
+    data object Chats :
         BottomNavItem(
-            MainRoutes.Social,
+            MainRoutes.ChatList,
             Icons.Filled.PersonPin,
-            R.string.label_social
+            R.string.label_chats
         )
 
     data object Management :

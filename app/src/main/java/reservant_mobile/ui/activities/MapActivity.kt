@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -68,10 +69,12 @@ import androidx.navigation.toRoute
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.NotificationService
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -80,6 +83,7 @@ import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
@@ -99,6 +103,12 @@ fun MapActivity(){
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
+            val notificationHandler = NotificationHandler(LocalContext.current)
+
+            mapViewModel.viewModelScope.launch {
+                notificationHandler.awaitNotification()
+            }
+
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
@@ -312,6 +322,7 @@ fun MapActivity(){
 
             if(showRestaurantFiltersSheet){
                 MessageSheet(
+                    height = 450.dp,
                     buttonLabelId = R.string.label_apply,
                     onDismiss = {showRestaurantFiltersSheet = false},
                     buttonOnClick = {
@@ -439,10 +450,11 @@ fun MapActivity(){
                                 MyDatePickerDialog(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
-                                        .width(dialogWidth),
+                                        .width(dialogWidth)
+                                        .weight(1f),
                                     label = { Text(stringResource(id = R.string.label_date_from)) },
-                                    startDate = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else LocalDate.now().toString(),
-                                    startStringValue = if(eventSelectedDateFrom != null) eventSelectedDateFrom.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    startDate = (eventSelectedDateFrom ?: LocalDate.now()).toString(),
+                                    startStringValue = (eventSelectedDateFrom ?: "").toString(),
                                     onDateChange = { date ->
                                         eventSelectedDateFrom = parseString(date)
                                     },
@@ -452,10 +464,11 @@ fun MapActivity(){
                                 MyDatePickerDialog(
                                     modifier = Modifier
                                         .padding(vertical = 4.dp)
-                                        .width(dialogWidth),
+                                        .width(dialogWidth)
+                                        .weight(1f),
                                     label = { Text(stringResource(id = R.string.label_date_to)) },
-                                    startDate = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else LocalDate.now().toString(),
-                                    startStringValue = if(eventSelectedDateUntil != null) eventSelectedDateUntil.toString() else stringResource(id = R.string.label_register_birthday_dialog),
+                                    startDate = (eventSelectedDateUntil ?: LocalDate.now()).toString(),
+                                    startStringValue = (eventSelectedDateUntil ?: "").toString(),
                                     onDateChange = { date ->
                                         eventSelectedDateUntil = parseString(date)
                                     },
@@ -700,18 +713,16 @@ fun EventStatusRadioFilter(
       currentStatus = status
       onStatusSelected(status)
     }
-    val spaceBetween = 1.dp
 
     Column(
-        modifier = Modifier.padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.padding(8.dp),
+        //verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { selectStatus(null) }
-                .padding(vertical = spaceBetween / 2)
         ) {
             RadioButton(
                 selected = currentStatus == null,
@@ -727,7 +738,6 @@ fun EventStatusRadioFilter(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { selectStatus(status) }
-                    .padding(vertical = spaceBetween / 2)
             ) {
                 RadioButton(
                     selected = currentStatus == status,

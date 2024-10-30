@@ -5,5 +5,8 @@ import io.ktor.resources.Resource
 @Resource("/reviews")
 class Reviews {
     @Resource("{reviewId}")
-    class ReviewId(val parent: Reviews = Reviews(), val reviewId: String)
+    class ReviewId(val parent: Reviews = Reviews(), val reviewId: String){
+        @Resource("restaurant-response")
+        class RestaurantResponse(val parent: ReviewId)
+    }
 }

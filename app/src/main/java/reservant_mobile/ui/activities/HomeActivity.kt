@@ -1,6 +1,8 @@
 package reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import androidx.activity.ComponentActivity.NOTIFICATION_SERVICE
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +23,7 @@ import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
+import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
@@ -31,8 +36,6 @@ import reservant_mobile.ui.theme.AppTheme
 fun HomeActivity() {
     val innerNavController = rememberNavController()
     val bottomBarState = remember { (mutableStateOf(true)) }
-
-
     val isSystemInDarkMode = isSystemInDarkTheme()
 
     var darkTheme by remember {
@@ -41,7 +44,7 @@ fun HomeActivity() {
 
     val items = listOfNotNull(
         BottomNavItem.Home,
-        BottomNavItem.Social,
+        BottomNavItem.Chats,
         BottomNavItem.Management.takeIf { Roles.RESTAURANT_OWNER in UserService.UserObject.roles },
         BottomNavItem.Profile
     )
@@ -72,7 +75,7 @@ fun HomeActivity() {
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
                 }
-                composable<MainRoutes.Social> { 
+                composable<MainRoutes.ChatList> {
                     ChatListActivity()
                 }
                 composable<AuthRoutes.Landing>{
