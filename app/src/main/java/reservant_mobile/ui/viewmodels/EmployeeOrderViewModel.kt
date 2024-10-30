@@ -107,7 +107,8 @@ class EmployeeOrderViewModel(
                         OrderDetails(
                             orderId = fetchedOrder.orderId ?: -1,
                             items = items,
-                            cost = fetchedOrder.cost ?: -1.0
+                            cost = fetchedOrder.cost ?: -1.0,
+                            status = fetchedOrder.status.toString()
                         )
                     )
                 }
@@ -215,6 +216,7 @@ data class VisitDetailsUIState(
 data class OrderDetails(
     val orderId: Int,
     val items: List<MenuItemDetails>,
+    val status: String,
     val cost: Double
 ) {
     data class MenuItemDetails(

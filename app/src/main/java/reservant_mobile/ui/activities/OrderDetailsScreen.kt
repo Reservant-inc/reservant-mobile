@@ -209,7 +209,8 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             Row {
                 if (visitDetails.paymentTime != "Unknown") {
                     val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-                    val paymentDateTime = LocalDateTime.parse(visitDetails.paymentTime, dateTimeFormatter)
+                    val paymentDateTime =
+                        LocalDateTime.parse(visitDetails.paymentTime, dateTimeFormatter)
 
                     val isPaymentToday = paymentDateTime.toLocalDate().isEqual(LocalDate.now())
                     Text(
@@ -305,8 +306,9 @@ fun OrderCard(order: OrderDetails) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(R.string.order_id_label, order.orderId),
+                    text = order.status,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -326,54 +328,48 @@ fun OrderCard(order: OrderDetails) {
     }
 }
 
-
 @Composable
 fun DishCard(item: OrderDetails.MenuItemDetails) {
     Card(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         elevation = CardDefaults.cardElevation(1.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Text(
-                    text = stringResource(R.string.quantity_label, item.amount),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = stringResource(R.string.price_each_label, item.price),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = stringResource(
-                        R.string.status_label,
-                        item.status ?: stringResource(R.string.unknown_status)
-                    ),
-                    style = MaterialTheme.typography.bodySmall
+                    text = item.status ?: stringResource(R.string.unknown_status),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Column(
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = stringResource(R.string.price_label, item.cost),
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "${item.amount} x ${stringResource(R.string.price_label, item.cost)}",
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -383,10 +379,12 @@ fun DishCard(item: OrderDetails.MenuItemDetails) {
                     onClick = {
                         // Logika zmiany statusu zamówienia (do zaimplementowania)
                     },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Text(text = stringResource(R.string.change_status_button))
+                    Text(
+                        text = stringResource(R.string.change_status_button),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
