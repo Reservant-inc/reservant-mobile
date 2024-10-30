@@ -27,7 +27,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +54,7 @@ import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.getFlagEmojiFor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -355,6 +360,27 @@ fun MyDatePickerDialog(
     }
 
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTimePickerDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val currentTime = Calendar.getInstance()
+
+    val timePickerState = rememberTimePickerState(
+        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+        initialMinute = currentTime.get(Calendar.MINUTE),
+        is24Hour = true,
+    )
+
+    Column {
+        TimeInput(
+            state = timePickerState,
+        )
+    }
 }
 
 @Composable

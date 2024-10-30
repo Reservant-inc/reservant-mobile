@@ -31,9 +31,11 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.viewmodels.AddEventViewModel
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventActivity(navController: NavHostController) {
     val addEventViewModel: AddEventViewModel = viewModel()
@@ -96,22 +98,44 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             Column {
-                MyDatePickerDialog(
-                    label = {
-                        Text(stringResource(R.string.label_event_start_date))
-                    },
-                    onDateChange = {
-                        time = it
-                    },
-                    allowFutureDates = true,
-                    startDate = LocalDate.now().toString()
-                )
-                if (time.isBlank() && formSent) {
-                    Text(
-                        text = stringResource(id = R.string.error_field_required),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Column(modifier = Modifier.weight(0.7f)) {
+                        MyDatePickerDialog(
+                            label = {
+                                Text(stringResource(R.string.label_event_start_date))
+                            },
+                            onDateChange = {
+                                // TODO date change
+                            },
+                            allowFutureDates = true,
+                            startDate = LocalDate.now().toString()
+                        )
+//                        if (date.isBlank() && formSent) {
+//                            Text(
+//                                text = stringResource(id = R.string.error_field_required),
+//                                color = MaterialTheme.colorScheme.error,
+//                                modifier = Modifier.padding(start = 16.dp)
+//                            )
+//                        }
+                    }
+                    Column(modifier = Modifier.weight(0.3f)) {
+                        MyTimePickerDialog(
+                            onConfirm = {
+                                //time = it
+                            },
+                            onDismiss = { /* Implementacja */ }
+                        )
+//                        if (time.isBlank() && formSent) {
+//                            Text(
+//                                text = stringResource(id = R.string.error_field_required),
+//                                color = MaterialTheme.colorScheme.error,
+//                                modifier = Modifier.padding(start = 16.dp)
+//                            )
+//                        }
+                    }
                 }
             }
         }
