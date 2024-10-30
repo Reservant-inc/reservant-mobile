@@ -35,11 +35,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
             latitude = 51.0,
             longitude = 52.0
         ),
-        maxReservationDuration = 30,
+        maxReservationDurationMinutes = 30,
         openingHours = listOf(
             RestaurantDTO.AvailableHours(
-            from = "10:00:00",
-            until = "20:00:00"
+            from = "10:00",
+            until = "20:00"
         ))
     )
     private val restaurantGroup = RestaurantGroupDTO(
