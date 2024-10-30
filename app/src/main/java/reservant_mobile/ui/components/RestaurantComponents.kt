@@ -135,7 +135,8 @@ fun EventCard(
     eventDate: String,
     eventLocation: String,
     interestedCount: Int,
-    takePartCount: Int
+    takePartCount: Int,
+    eventName: String? = null
 ) {
     val date = formatDateTime(eventDate, "dd MMMM yyyy")
     val time = formatDateTime(eventDate, "HH:mm")
@@ -159,6 +160,7 @@ fun EventCard(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.restaurant_photo),
+                        contentScale = ContentScale.Crop,
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .fillMaxSize()

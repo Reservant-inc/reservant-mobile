@@ -292,6 +292,7 @@ fun MapActivity(){
                                         eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                         interestedCount = item.numberInterested,
                                         takePartCount = item.participants
+                                        eventName = item.name
                                     )
                                 }
                             }
