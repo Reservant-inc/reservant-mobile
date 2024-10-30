@@ -136,7 +136,8 @@ fun EventCard(
     eventLocation: String,
     interestedCount: Int,
     takePartCount: Int,
-    eventName: String? = null
+    eventName: String? = null,
+    distance: Double? = null
 ) {
     val date = formatToDateTime(eventDate, "dd MMMM yyyy")
     val time = formatToDateTime(eventDate, "HH:mm")
@@ -179,7 +180,7 @@ fun EventCard(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 Text(
-                    text = eventLocation,
+                    text = eventLocation + if(distance != null) " | $distance" else "",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
