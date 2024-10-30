@@ -19,8 +19,6 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.OrderDetails
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun OrderDetailsScreen(
@@ -64,6 +62,7 @@ fun OrderDetailsScreen(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(8.dp))
 
             LazyColumn {
                 items(details.orders.size) { index ->
@@ -84,8 +83,23 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
+        // Wyświetlanie klienta
         Text(
             text = stringResource(R.string.client_label, visitDetails.clientName),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Wyświetlanie zakresu daty (data - dataDo lub godzina - godzinaDo)
+        val formattedDateRange = if (visitDetails.date == "Today") {
+            "${formatDateTime(visitDetails.date, "HH:mm")} - ${formatDateTime(visitDetails.endTime, "HH:mm")}"
+        } else {
+            "${formatDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${formatDateTime(visitDetails.endTime, "HH:mm")}"
+        }
+        Text(
+            text = formattedDateRange,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -116,7 +130,7 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text =  " " + visitDetails.numberOfPeople.toString(),
+                    text = " " + visitDetails.numberOfPeople.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -128,58 +142,26 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
+            // Wyświetlanie daty rezerwacji tylko wtedy, gdy istnieje
+            if (visitDetails.reservationDate != "Unknown") {
+                val formattedReservationDate = if (visitDetails.reservationDate == "Today") {
+                    formatDateTime(visitDetails.reservationDate, "HH:mm")
+                } else {
+                    formatDateTime(visitDetails.reservationDate, "dd.MM.yyyy HH:mm")
+                }
                 Text(
-                    text = stringResource(R.string.date_label),
+                    text = stringResource(R.string.reservation_date_label) + " " + formattedReservationDate,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + formatDateTime(visitDetails.date, "dd.MMM.yyyy HH:mm"),
-                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Row {
+            // Wyświetlanie depozytu, jeśli jest różny od -1.0
+            if (visitDetails.deposit != -1.0) {
                 Text(
-                    text = stringResource(R.string.end_time_label),
+                    text = stringResource(R.string.deposit_label) + " " + "%.2f".format(visitDetails.deposit) + " zł",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + formatDateTime(visitDetails.endTime, "dd.MMM.yyyy HH:mm"),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row {
-                Text(
-                    text = stringResource(R.string.reservation_date_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + visitDetails.reservationDate,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            Row {
-                Text(
-                    text = stringResource(R.string.deposit_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + if (visitDetails.deposit == -1.0) stringResource(R.string.unknown) else "%.2f".format(visitDetails.deposit),
-                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -190,33 +172,34 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
+            // Wyświetlanie godziny płatności, jeśli istnieje
+            if (visitDetails.paymentTime != "Unknown") {
+                val formattedPaymentTime = if (visitDetails.paymentTime == "Today") {
+                    formatDateTime(visitDetails.paymentTime, "HH:mm")
+                } else {
+                    formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
+                }
                 Text(
-                    text = stringResource(R.string.payment_time_label),
+                    text = stringResource(R.string.payment_time_label) + " " + formattedPaymentTime,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + formatDateTime(visitDetails.paymentTime, "dd-MM-yyyy HH:mm"),
-                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Row {
+
+            // Wyświetlanie napiwku, jeśli jest różny od -1.0
+            if (visitDetails.tip != -1.0) {
                 Text(
-                    text = stringResource(R.string.tip_label),
+                    text = stringResource(R.string.tip_label) + " " + "%.2f".format(visitDetails.tip) + " zł",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text =  " " + if (visitDetails.tip == -1.0) stringResource(R.string.unknown) else "%.2f".format(visitDetails.tip),
-                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Wyświetlanie całkowitego kosztu
         Text(
             text = stringResource(R.string.total_cost_label, "%.2f".format(visitDetails.totalCost)),
             style = MaterialTheme.typography.headlineSmall,
@@ -227,6 +210,7 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 }
 
 
+
 @Composable
 fun ParticipantsList(participants: List<String>) {
     Text(
@@ -234,7 +218,7 @@ fun ParticipantsList(participants: List<String>) {
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
-
+    Spacer(modifier = Modifier.height(8.dp))
     LazyColumn {
         items(participants.size) { index ->
             ParticipantCard(participantName = participants[index])
