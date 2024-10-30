@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
@@ -31,11 +34,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.NotificationHandler
+import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
@@ -51,10 +57,14 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
 
         NavHost(navController = navController, startDestination = MainRoutes.Settings){
             composable<MainRoutes.Settings> {
+
+                val notificationHandler = NotificationHandler(LocalContext.current)
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
                     Spacer(modifier = Modifier.padding(top = 8.dp))
 
@@ -118,7 +128,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     UnderlinedItem(
                         icon = Icons.Filled.Settings,
                         text = stringResource(id = R.string.label_app_settings),
-                        onClick = { /* Navigate to App Settings */ }
+                        onClick = {
+                            notificationHandler.showBasicNotification("TEST NOTIFICATION", "TEST")
+                        }
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)

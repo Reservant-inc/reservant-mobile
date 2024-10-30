@@ -249,6 +249,14 @@
     <string name="label_event_status_past">Past</string>
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
+    <string name="restaurant_notification_channel_id" translatable="false">restaurant_notification_channel_id</string>
+    <string name="restaurant_notification_channel_name">Restaurants</string>
+    <string name="friends_notification_channel_id" translatable="false">friends_notification_channel_id</string>
+    <string name="friends_notification_channel_name">Friends</string>
+    <string name="events_notification_channel_id" translatable="false">events_notification_channel_id</string>
+    <string name="events_notification_channel_name">Events</string>
+    <string name="visits_notification_channel_id" translatable="false">visits_notification_channel_id</string>
+    <string name="visits_notification_channel_name">Visits</string>
     <string name="error_threads_not_found">Not found any message threads</string>
     <string name="empty_search">Type in search to see results</string>
     <string name="error_users_not_found">Not found any users</string>
