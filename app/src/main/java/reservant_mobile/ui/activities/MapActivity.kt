@@ -275,34 +275,40 @@ fun MapActivity(){
                                 )
                             )
                         } else {
-                            LazyColumn(
-                                Modifier
+                            Box(
+                                modifier = Modifier
                                     .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                items(events.itemCount) { index ->
-                                    val item = events[index]
-                                    if(item != null){
-                                        EventCard(
-                                            eventCreator = item.creatorFullName,
-                                            eventDate = item.time,
-                                            eventLocation = item.restaurantName,
-                                            interestedCount = item.numberInterested,
-                                            takePartCount = item.participants,
-                                            eventName = item.name
-                                        )
+                            ){
+                                LazyColumn(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    items(events.itemCount) { index ->
+                                        val item = events[index]
+                                        if(item != null){
+                                            EventCard(
+                                                eventCreator = item.creator.firstName,
+                                                eventDate = item.time,
+                                                eventLocation = item.restaurant.name,
+                                                interestedCount = item.numberInterested,
+                                                takePartCount = item.numberParticipants,
+                                                eventName = item.name
+                                            )
+                                        }
                                     }
                                 }
+                                MyFloatingActionButton(
+                                    onClick = {
+                                        navController.navigate(EventRoutes.AddEvent)
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                )
                             }
-                            MyFloatingActionButton(
-                                onClick = {
-                                    navController.navigate(EventRoutes.AddEvent)
-                                },
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(16.dp)
-                            )
+
                         }
                     }
                 }

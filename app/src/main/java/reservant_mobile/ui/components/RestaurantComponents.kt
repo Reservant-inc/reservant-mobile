@@ -41,7 +41,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.utils.formatToDateTime
 
 @Composable
 fun RestaurantCard(
@@ -138,8 +138,8 @@ fun EventCard(
     takePartCount: Int,
     eventName: String? = null
 ) {
-    val date = formatDateTime(eventDate, "dd MMMM yyyy")
-    val time = formatDateTime(eventDate, "HH:mm")
+    val date = formatToDateTime(eventDate, "dd MMMM yyyy")
+    val time = formatToDateTime(eventDate, "HH:mm")
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -172,9 +172,15 @@ fun EventCard(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+                if(eventName != null)
+                    Text(
+                        text = eventName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 Text(
                     text = eventLocation,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
