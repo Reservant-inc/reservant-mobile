@@ -281,16 +281,18 @@ fun MapActivity(){
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                            items(events.itemCount) { index ->
-                                val item = events[index]
-                                if(item != null){
-                                    EventCard(
-                                        eventCreator = item.creatorFullName,
-                                        eventDate = item.time,
-                                        eventLocation = item.restaurantName,
-                                        interestedCount = item.numberInterested,
-                                        takePartCount = item.participants
-                                    )
+                                items(events.itemCount) { index ->
+                                    val item = events[index]
+                                    if(item != null){
+                                        EventCard(
+                                            eventCreator = item.creatorFullName,
+                                            eventDate = item.time,
+                                            eventLocation = item.restaurantName,
+                                            interestedCount = item.numberInterested,
+                                            takePartCount = item.participants,
+                                            eventName = item.name
+                                        )
+                                    }
                                 }
                             }
                             MyFloatingActionButton(

@@ -339,4 +339,9 @@ data class EventOnMap(
     val distance: Double,
     val numberInterested: Int,
     val numberParticipants: Int
+    val creatorId: String,
+    val creatorFullName: String,
+    val restaurantId: Int,
+    val restaurantName:String,
+    val participants: Int,
 )
