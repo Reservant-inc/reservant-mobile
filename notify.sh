@@ -21,7 +21,7 @@ curl -H "Content-Type: application/json" \
   -d '{
     "content": "'"${MSG}"'",
     "embeds": [{
-      "title": "Frontend Test Summary",
+      "title": "RESERVANT MOBILE APP NEW BUILD",
       "description": "'"${SUMMARY}"'",
       "color": 15924992
     }]
