@@ -10,6 +10,7 @@ import reservant_mobile.data.endpoints.Events
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetEventsStatus
 import java.time.LocalDate
 
 interface IEventService{
@@ -20,7 +21,7 @@ interface IEventService{
                           name: String? = null,
                           dateFrom: LocalDate? = null,
                           dateUntil: LocalDate? = null,
-                          eventStatus: EventDTO.EventStatus? = null): Result<Flow<PagingData<EventDTO>>?>
+                          eventStatus: GetEventsStatus? = null): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>
     suspend fun getEvent(eventId: Any): Result<EventDTO?>
     suspend fun updateEvent(eventId: Any, event:EventDTO): Result<EventDTO?>
@@ -42,7 +43,7 @@ class EventService(): ServiceUtil(), IEventService{
         name: String?,
         dateFrom: LocalDate?,
         dateUntil: LocalDate?,
-        eventStatus: EventDTO.EventStatus?
+        eventStatus: GetEventsStatus?
     ): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Events(

@@ -41,6 +41,7 @@ import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.utils.GetEventsStatus
 import reservant_mobile.ui.components.NotificationHandler
 import java.time.LocalDate
 
@@ -73,7 +74,7 @@ class MapViewModel : ReservantViewModel() {
     var event_search: String? = null
     var event_dateFrom: LocalDate? = null
     var event_dateUntil: LocalDate? = null
-    var event_status: EventDTO.EventStatus? = null
+    var event_status: GetEventsStatus? = null
 
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
@@ -191,14 +192,14 @@ class MapViewModel : ReservantViewModel() {
                 res.value.cachedIn(viewModelScope).collect { pagingData ->
                     _eventsState.value = pagingData.map { dto ->
                         EventOnMap(
-                            eventId = dto.eventId!!,
-                            name = dto.name!!,
+                            eventId = dto.eventId?: 0,
+                            name = dto.name?: "",
                             time =  dto.time,
-                            creator = dto.creator!!,
-                            distance = dto.distance!!,
-                            restaurant = dto.restaurant!!,
-                            numberInterested = dto.numberInterested!!,
-                            numberParticipants = dto.numberParticipants!!
+                            creator = dto.creator,
+                            distance = dto.distance,
+                            restaurant = dto.restaurant,
+                            numberInterested = dto.numberInterested?:0,
+                            numberParticipants = dto.numberParticipants?:0
                         )
                     }
                 }
@@ -334,9 +335,9 @@ data class EventOnMap(
     val eventId: Int,
     val name: String,
     val time: String,
-    val creator: EventDTO.Participant,
-    val restaurant: RestaurantDTO,
-    val distance: Double,
+    val creator: EventDTO.Participant?,
+    val restaurant: RestaurantDTO?,
+    val distance: Double?,
     val numberInterested: Int,
     val numberParticipants: Int
 )

@@ -35,3 +35,9 @@ enum class GetUserEventsCategory(val stringId: Int){
     ParticipateIn(R.string.label_event_category_participated),
     InterestedIn(R.string.label_event_category_interested)
 }
+
+enum class GetEventsStatus(val stringId: Int){
+    Future(R.string.label_event_status_future),
+    NonJoinable(R.string.label_event_status_nonJoinable),
+    Past(R.string.label_event_status_past)
+}

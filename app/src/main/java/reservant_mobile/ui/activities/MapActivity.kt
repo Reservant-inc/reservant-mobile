@@ -75,6 +75,7 @@ import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.services.NotificationService
+import reservant_mobile.data.utils.GetEventsStatus
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -123,7 +124,7 @@ fun MapActivity(){
 
             //events fiters
             var eventSearchQuery by remember { mutableStateOf("") }
-            var selectedEventStatus: EventDTO.EventStatus? by remember { mutableStateOf(null) }
+            var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
@@ -285,7 +286,7 @@ fun MapActivity(){
                                         EventCard(
                                             eventCreator = item.name,
                                             eventDate = item.time,
-                                            eventLocation = item.restaurant.address,
+                                            eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                             interestedCount = item.numberInterested,
                                             takePartCount = item.numberParticipants
                                         )
@@ -705,11 +706,11 @@ fun StarRatingFilter(
 
 @Composable
 fun EventStatusRadioFilter(
-    selectedStatus: EventDTO.EventStatus?,
-    onStatusSelected: (EventDTO.EventStatus?) -> Unit
+    selectedStatus: GetEventsStatus?,
+    onStatusSelected: (GetEventsStatus?) -> Unit
 ) {
     var currentStatus by remember { mutableStateOf(selectedStatus) }
-    val selectStatus = {status:EventDTO.EventStatus? ->
+    val selectStatus = {status:GetEventsStatus? ->
       currentStatus = status
       onStatusSelected(status)
     }
@@ -732,7 +733,7 @@ fun EventStatusRadioFilter(
             Text(text = stringResource(id = R.string.label_all))
         }
 
-        EventDTO.EventStatus.entries.forEach { status ->
+        GetEventsStatus.entries.forEach { status ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
