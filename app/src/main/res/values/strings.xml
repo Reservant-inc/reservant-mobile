@@ -271,8 +271,8 @@
     <string name="error_add_event_failed">Adding event failed</string>
     <string name="error_fill_all_fields">Fill all fields</string>
     <string name="label_available_restaurants">Available restaurants:</string>
-    <string name="label_event_start_date">Event start date</string>
-    <string name="label_event_must_join_until">Must join until</string>
+    <string name="label_start_date">Start date</string>
+    <string name="label_event_join_until">Join until</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_invalid_number">Invalid number</string>
 </resources>
