@@ -367,6 +367,7 @@ fun MyDatePickerDialog(
 fun MyTimePickerDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val currentTime = Calendar.getInstance()
 
@@ -378,6 +379,7 @@ fun MyTimePickerDialog(
 
     Column {
         TimeInput(
+            modifier = modifier,
             state = timePickerState,
         )
     }
