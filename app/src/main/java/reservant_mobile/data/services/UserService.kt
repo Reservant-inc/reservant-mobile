@@ -26,7 +26,11 @@ import reservant_mobile.data.models.dtos.UserSettingsDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetUserEventsCategory
+import reservant_mobile.data.utils.GetUserEventsSort
 import reservant_mobile.data.utils.GetUsersFilter
+import reservant_mobile.data.utils.GetVisitsSort
+import java.time.LocalDateTime
 
 
 interface IUserService{
@@ -48,8 +52,12 @@ interface IUserService{
     suspend fun editUserInfo(user: UserDTO): Result<UserDTO?>
     suspend fun getUserVisits(): Result<Flow<PagingData<VisitDTO>>?>
     suspend fun getUserVisitHistory(): Result<Flow<PagingData<VisitDTO>>?>
-    suspend fun getUserCreatedEvents(): Result<List<EventDTO>?>
-    suspend fun getUserInterestedEvents(): Result<Flow<PagingData<EventDTO>>?>
+    suspend fun getUserEvents(
+        dateFrom: LocalDateTime? = null,
+        dateUntil: LocalDateTime? = null,
+        orderBy: GetUserEventsSort? = null,
+        category: GetUserEventsCategory? = null
+    ): Result<Flow<PagingData<EventDTO>>?>
     suspend fun getUserThreads(): Result<Flow<PagingData<ThreadDTO>>?>
     suspend fun getUserEmployments(returnTerminated: Boolean? = null): Result<List<EmploymentDTO>?>
     suspend fun addMoneyToWallet(money: MoneyDTO): Result<Boolean>
@@ -228,14 +236,13 @@ class UserService(): ServiceUtil(), IUserService {
         return pagingResultWrapper(sps)
     }
 
-    override suspend fun getUserCreatedEvents(): Result<List<EventDTO>?> {
-        val res = api.get(User.EventsCreated())
-        return complexResultWrapper(res)
-    }
-
-    override suspend fun getUserInterestedEvents(): Result<Flow<PagingData<EventDTO>>?> {
+    override suspend fun getUserEvents(dateFrom: LocalDateTime?, dateUntil: LocalDateTime?, orderBy: GetUserEventsSort?, category: GetUserEventsCategory?): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            User.EventsInterestedIn(
+            User.Events(
+                dateFrom = dateFrom?.toString(),
+                dateUntil = dateUntil?.toString(),
+                order = orderBy?.name,
+                category = category?.name,
                 page = page,
                 perPage = perPage
             )
