@@ -35,7 +35,6 @@ import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.viewmodels.AddEventViewModel
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventActivity(navController: NavHostController) {
     val addEventViewModel: AddEventViewModel = viewModel()
@@ -45,8 +44,12 @@ fun AddEventActivity(navController: NavHostController) {
     var searchQuery by remember { mutableStateOf("") }
     var eventName by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-    var mustJoinUntil by remember { mutableStateOf("") }
+
+    var eventDate by remember { mutableStateOf("") }
+    var eventTime by remember { mutableStateOf("") }
+    var mustJoinDate by remember { mutableStateOf("") }
+    var mustJoinTime by remember { mutableStateOf("") }
+
     var maxPeople by remember { mutableStateOf("") }
     var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
 
@@ -102,39 +105,41 @@ fun AddEventActivity(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(modifier = Modifier.weight(0.7f)) {
+                    // 75% szerokosci
+                    Column(modifier = Modifier.weight(0.75f)) {
                         MyDatePickerDialog(
                             label = {
                                 Text(stringResource(R.string.label_event_start_date))
                             },
                             onDateChange = {
-                                // TODO date change
+                                eventDate = it
                             },
                             allowFutureDates = true,
                             startDate = LocalDate.now().toString()
                         )
-//                        if (date.isBlank() && formSent) {
-//                            Text(
-//                                text = stringResource(id = R.string.error_field_required),
-//                                color = MaterialTheme.colorScheme.error,
-//                                modifier = Modifier.padding(start = 16.dp)
-//                            )
-//                        }
+                        if (eventDate.isBlank() && formSent) {
+                            Text(
+                                text = stringResource(id = R.string.error_field_required),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
                     }
-                    Column(modifier = Modifier.weight(0.3f)) {
+                    // 25% szerokosci
+                    Column(modifier = Modifier.weight(0.25f)) {
                         MyTimePickerDialog(
                             onConfirm = {
-                                //time = it
+                                //eventTime = it
                             },
                             onDismiss = { /* Implementacja */ }
                         )
-//                        if (time.isBlank() && formSent) {
-//                            Text(
-//                                text = stringResource(id = R.string.error_field_required),
-//                                color = MaterialTheme.colorScheme.error,
-//                                modifier = Modifier.padding(start = 16.dp)
-//                            )
-//                        }
+                        if (eventTime.isBlank() && formSent) {
+                            Text(
+                                text = stringResource(id = R.string.error_field_required),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -142,22 +147,46 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             Column {
-                MyDatePickerDialog(
-                    label = {
-                        Text(stringResource(R.string.label_event_must_join_until))
-                    },
-                    onDateChange = {
-                        mustJoinUntil = it
-                    },
-                    allowFutureDates = true,
-                    startDate = LocalDate.now().toString()
-                )
-                if (mustJoinUntil.isBlank() && formSent) {
-                    Text(
-                        text = stringResource(id = R.string.error_field_required),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // 75% szerokosci
+                    Column(modifier = Modifier.weight(0.75f)) {
+                        MyDatePickerDialog(
+                            label = {
+                                Text(stringResource(R.string.label_event_must_join_until))
+                            },
+                            onDateChange = {
+                                mustJoinDate = it
+                            },
+                            allowFutureDates = true,
+                            startDate = LocalDate.now().toString()
+                        )
+                        if (mustJoinDate.isBlank() && formSent) {
+                            Text(
+                                text = stringResource(id = R.string.error_field_required),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                    // 25% szerokosci
+                    Column(modifier = Modifier.weight(0.25f)) {
+                        MyTimePickerDialog(
+                            onConfirm = {
+                                //mustJoinTime = it
+                            },
+                            onDismiss = { /* Implementacja */ }
+                        )
+                        if (mustJoinTime.isBlank() && formSent) {
+                            Text(
+                                text = stringResource(id = R.string.error_field_required),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -249,10 +278,15 @@ fun AddEventActivity(navController: NavHostController) {
                     val maxPeopleInt = maxPeople.toIntOrNull()
                     if (eventName.isNotBlank() &&
                         description.isNotBlank() &&
-                        time.isNotBlank() &&
-                        mustJoinUntil.isNotBlank() &&
+                        eventDate.isNotBlank() &&
+                        eventTime.isNotBlank() &&
+                        mustJoinDate.isNotBlank() &&
+                        mustJoinTime.isNotBlank() &&
                         maxPeopleInt != null
                     ) {
+                        val time = "${eventDate}T${eventTime}"
+                        val mustJoinUntil = "${mustJoinDate}T${mustJoinTime}"
+
                         val newEvent = EventDTO(
                             name = eventName,
                             description = description,
