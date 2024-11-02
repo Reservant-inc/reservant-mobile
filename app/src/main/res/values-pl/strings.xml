@@ -253,4 +253,7 @@
     <string name="error_users_not_found">Nie znaleziono żadnego użytkownika</string>
     <string name="label_sent_by">Nadawca</string>
     <string name="label_read_at">Przeczytano o</string>
+    <string name="label_event_category_created">Stworzone przez</string>
+    <string name="label_event_category_participated">Wzięty udział</string>
+    <string name="label_event_category_interested">Zainteresowane</string>
 </resources>
