@@ -106,7 +106,7 @@ class EventService(): ServiceUtil(), IEventService{
             parent = Events.Id(eventId=eventId.toString()),
             userId = userId
         ),"")
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     @OptIn(InternalSerializationApi::class)
