@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -102,14 +103,12 @@ fun AddEventActivity(navController: NavHostController) {
         item {
             Column {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    // 75% szerokosci
-                    Column(modifier = Modifier.weight(0.75f)) {
+                    Column(modifier = Modifier.weight(0.4f)) {
                         MyDatePickerDialog(
                             label = {
-                                Text(stringResource(R.string.label_event_start_date))
+                                Text(stringResource(R.string.label_start_date))
                             },
                             onDateChange = {
                                 eventDate = it
@@ -125,13 +124,15 @@ fun AddEventActivity(navController: NavHostController) {
                             )
                         }
                     }
-                    // 25% szerokosci
-                    Column(modifier = Modifier.weight(0.25f)) {
+                    Column(modifier = Modifier.weight(0.6f)) {
                         MyTimePickerDialog(
                             onConfirm = {
                                 //eventTime = it
                             },
-                            onDismiss = { /* Implementacja */ }
+                            onDismiss = { /* Implementacja */ },
+                            modifier = Modifier
+                                .scale(0.7f)
+                                .padding(top = 4.dp)
                         )
                         if (eventTime.isBlank() && formSent) {
                             Text(
@@ -151,11 +152,10 @@ fun AddEventActivity(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // 75% szerokosci
-                    Column(modifier = Modifier.weight(0.75f)) {
+                    Column(modifier = Modifier.weight(0.4f)) {
                         MyDatePickerDialog(
                             label = {
-                                Text(stringResource(R.string.label_event_must_join_until))
+                                Text(stringResource(R.string.label_event_join_until))
                             },
                             onDateChange = {
                                 mustJoinDate = it
@@ -171,13 +171,15 @@ fun AddEventActivity(navController: NavHostController) {
                             )
                         }
                     }
-                    // 25% szerokosci
-                    Column(modifier = Modifier.weight(0.25f)) {
+                    Column(modifier = Modifier.weight(0.6f)) {
                         MyTimePickerDialog(
                             onConfirm = {
                                 //mustJoinTime = it
                             },
-                            onDismiss = { /* Implementacja */ }
+                            onDismiss = { /* Implementacja */ },
+                            modifier = Modifier
+                                .scale(0.7f)
+                                //.padding(top = 8.dp)
                         )
                         if (mustJoinTime.isBlank() && formSent) {
                             Text(
