@@ -34,6 +34,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -365,7 +366,7 @@ fun MapActivity(){
                                     onRatingSelected = { rating -> restaurantSelectedRating = rating }
                                 )
 
-                                Spacer(modifier = Modifier.height(25.dp))
+                                HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                                 Text(
                                     text = stringResource(id = R.string.label_search_filter_tags),
@@ -407,6 +408,7 @@ fun MapActivity(){
             if(showEventFiltersSheet){
                 MessageSheet(
                     buttonLabelId = R.string.label_apply,
+                    height = 500.dp,
                     onDismiss = {showEventFiltersSheet = false},
                     buttonOnClick = {
                         mapViewModel.event_status = selectedEventStatus
@@ -432,7 +434,7 @@ fun MapActivity(){
                                 onStatusSelected = {status -> selectedEventStatus = status}
                             )
 
-                            Spacer(modifier = Modifier.height(25.dp))
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                             Text(
                                 text = stringResource(id = R.string.label_search_filter_date_range),
@@ -482,6 +484,9 @@ fun MapActivity(){
                                     allowFutureDates = true
                                 )
                             }
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
+
+                            SwitchWithLabel(
                                 label = stringResource(id = R.string.label_with_friends_only),
                                 checked = eventSelectedFriendsOnly?: false,
                                 onCheckedChange = {
