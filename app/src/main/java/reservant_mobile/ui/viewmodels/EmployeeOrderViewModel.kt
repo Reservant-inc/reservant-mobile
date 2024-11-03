@@ -91,14 +91,14 @@ class EmployeeOrderViewModel(
 
                 if (fetchedOrder != null) {
                     val items = fetchedOrder.items?.mapNotNull { item ->
-                        val menuItem = menuService.getMenuItem(item.menuItemId).value
+                        val menuItem = item.menuItemId?.let { menuService.getMenuItem(it).value }
                         menuItem?.let {
                             OrderDetails.MenuItemDetails(
                                 name = it.name,
                                 price = it.price,
                                 amount = item.amount,
                                 status = item.status,
-                                cost = item.cost ?: -1.0
+                                cost = item.totalCost ?: -1.0
                             )
                         }
                     }.orEmpty()
@@ -134,66 +134,7 @@ class EmployeeOrderViewModel(
                 takeaway = visit.takeaway
             )
         }
-    }.catch { exception ->
-        emit(PagingData.empty())
-    }
 
-    private val _selectedVisitDetails = MutableStateFlow<VisitDetailsUIState?>(null)
-    val selectedVisitDetails: StateFlow<VisitDetailsUIState?> = _selectedVisitDetails.asStateFlow()
-
-    fun fetchVisitDetailsById(visitId: Int) {
-        val visit = visitCache[visitId] ?: return
-        fetchVisitDetails(visit)
-    }
-
-    fun cacheVisit(visit: VisitDTO) {
-        visit.visitId?.let {
-            visitCache[it] = visit
-        }
-    }
-
-    fun fetchVisitDetails(visit: VisitDTO) {
-        viewModelScope.launch {
-            val visitDetails = mutableListOf<OrderDetails>()
-            val userSummary = userService.getUserSimpleInfo(visit.clientId ?: "")
-            val participants = visit.participantIds?.mapNotNull { userId ->
-                userService.getUserSimpleInfo(userId).value
-            }.orEmpty()
-
-            visit.orders?.forEach { order ->
-                val orderResult = ordersService.getOrder(order.orderId!!)
-                val fetchedOrder = orderResult.value
-
-                if (fetchedOrder != null) {
-                    val items = fetchedOrder.items?.mapNotNull { item ->
-                        val menuItem = menuService.getMenuItem(item.menuItemId).value
-                        menuItem?.let {
-                            OrderDetails.MenuItemDetails(
-                                name = it.name,
-                                price = it.price,
-                                amount = item.amount,
-                                status = item.status
-                            )
-                        }
-                    }.orEmpty()
-
-                    visitDetails.add(
-                        OrderDetails(
-                            orderId = fetchedOrder.orderId ?: 0,
-                            items = items
-                        )
-                    )
-                }
-            }
-
-            _selectedVisitDetails.value = VisitDetailsUIState(
-                clientName = "${userSummary.value?.firstName} ${userSummary.value?.lastName}",
-                participants = participants.map { "${it.firstName} ${it.lastName}" },
-                orders = visitDetails,
-                totalCost = visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0,
-                tableId = visit.tableId ?: -1
-            )
-        }
     }
 }
 
