@@ -1,5 +1,6 @@
 package reservant_mobile.ui.components
 
+import android.app.TimePickerDialog
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,6 +25,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
@@ -39,8 +41,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -365,8 +371,7 @@ fun MyDatePickerDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyTimePickerDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    onTimeSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentTime = Calendar.getInstance()
@@ -377,10 +382,30 @@ fun MyTimePickerDialog(
         is24Hour = true,
     )
 
-    Column {
+    val focusRequester = remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
+
+    val hour = timePickerState.hour
+    val minute = timePickerState.minute
+
+    val selectedTime = String.format("%02d:%02d", hour, minute)
+
+    LaunchedEffect(hour, minute) {
+        onTimeSelected(selectedTime)
+    }
+
+    Column(modifier = modifier) {
         TimeInput(
-            modifier = modifier,
             state = timePickerState,
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .focusProperties {
+                    canFocus = isFocused
+                }
+                .clickable {
+                    isFocused = true
+                    focusRequester.requestFocus()
+                }
         )
     }
 }
