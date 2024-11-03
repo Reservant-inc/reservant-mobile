@@ -21,6 +21,7 @@ interface IEventService{
                           name: String? = null,
                           dateFrom: LocalDate? = null,
                           dateUntil: LocalDate? = null,
+                          friendsOnly: Boolean? = null,
                           eventStatus: GetEventsStatus? = null): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>
     suspend fun getEvent(eventId: Any): Result<EventDTO?>
@@ -43,6 +44,7 @@ class EventService(): ServiceUtil(), IEventService{
         name: String?,
         dateFrom: LocalDate?,
         dateUntil: LocalDate?,
+        friendsOnly: Boolean?,
         eventStatus: GetEventsStatus?
     ): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
@@ -54,6 +56,7 @@ class EventService(): ServiceUtil(), IEventService{
                 name = name,
                 dateFrom = dateFrom?.toString(),
                 dateUntil = dateUntil?.toString(),
+                friendsOnly = friendsOnly,
                 eventStatus = eventStatus?.toString(),
                 page = page,
                 perPage = perPage
