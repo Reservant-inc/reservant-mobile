@@ -269,7 +269,10 @@ fun MapActivity(){
                         if(events.loadState.refresh is LoadState.Loading){
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                         }
-                        else if (events.itemCount < 1 || events.loadState.hasError){
+                        // TODO: revert comment
+                        else if (false
+                            //events.itemCount < 1 || events.loadState.hasError
+                            ){
                             MissingPage(
                                 errorString = stringResource(
                                     id = R.string.message_not_found_any,
