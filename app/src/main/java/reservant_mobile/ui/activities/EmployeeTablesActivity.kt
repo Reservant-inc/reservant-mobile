@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,7 +80,11 @@ fun EmployeeTablesActivity(
 @Composable
 fun TableCard(table: TableDTO) {
     Card(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier.padding(4.dp)
+            .then(
+                if (/**table.status**/"Available" == "Occupied") Modifier.clickable { /**TODO**/ }
+                else Modifier
+            ),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = when ( /**table.status**/ "Available") { //TODO
@@ -96,9 +101,7 @@ fun TableCard(table: TableDTO) {
             Image(
                 modifier = Modifier
                     .fillMaxSize(),
-                painter = if (
-                /**table.status**/
-                    "Available" == "Available") {
+                painter = if (/**table.status**/ "Available" == "Available") {
                     painterResource(id = R.drawable.table_available)
                 } else {
                     painterResource(id = R.drawable.table_occupied)
