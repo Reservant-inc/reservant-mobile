@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
@@ -103,15 +103,15 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
         val isToday = visitDateTime.toLocalDate().isEqual(LocalDate.now())
 
         val formattedDateRange = if (isToday) {
-            "${formatDateTime(visitDetails.date, "HH:mm")} - ${
-                formatDateTime(
+            "${formatToDateTime(visitDetails.date, "HH:mm")} - ${
+                formatToDateTime(
                     visitDetails.endTime,
                     "HH:mm"
                 )
             }"
         } else {
-            "${formatDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${
-                formatDateTime(
+            "${formatToDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${
+                formatToDateTime(
                     visitDetails.endTime,
                     "HH:mm"
                 )
@@ -221,9 +221,9 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
                     Text(
                         text = if (isPaymentToday) {
-                            " " + formatDateTime(visitDetails.paymentTime, "HH:mm")
+                            " " + formatToDateTime(visitDetails.paymentTime, "HH:mm")
                         } else {
-                            " " + formatDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
+                            " " + formatToDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
                         },
                         style = MaterialTheme.typography.bodyMedium
                     )

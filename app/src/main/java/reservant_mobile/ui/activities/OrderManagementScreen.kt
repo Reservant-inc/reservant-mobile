@@ -30,7 +30,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.LazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -181,7 +181,7 @@ fun OrderList(visits: LazyPagingItems<VisitDTO>?, homeNavController: NavHostCont
 
 @Composable
 fun VisitCard(visit: VisitDTO, homeNavController: NavHostController) {
-    val formattedDate = visit.date?.let { formatDateTime(it, "HH:mm") }
+    val formattedDate = visit.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
     val clientId = "Pracownik - brakuje w Backu"
