@@ -15,20 +15,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
-import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
@@ -42,25 +40,10 @@ fun AddEventActivity(navController: NavHostController) {
     val restaurantsFlow by addEventViewModel.restaurantsFlow.collectAsState()
     val restaurants = restaurantsFlow?.collectAsLazyPagingItems()
 
-    var searchQuery by remember { mutableStateOf("") }
-    var eventName by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-
-    var eventDate by remember { mutableStateOf("") }
-    var eventTime by remember { mutableStateOf("") }
-    var mustJoinDate by remember { mutableStateOf("") }
-    var mustJoinTime by remember { mutableStateOf("") }
-
-    var maxPeople by remember { mutableStateOf("") }
-    var selectedRestaurant by remember { mutableStateOf<RestaurantDTO?>(null) }
-
-    var formSent by remember { mutableStateOf(false) }
+    val searchQuery by addEventViewModel.searchQuery.collectAsState()
 
     val context = LocalContext.current
 
-    LaunchedEffect(searchQuery) {
-        addEventViewModel.searchQuery.value = searchQuery
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -80,10 +63,10 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             FormInput(
-                inputText = eventName,
-                onValueChange = { eventName = it },
+                inputText = addEventViewModel.eventName,
+                onValueChange = { addEventViewModel.eventName = it },
                 label = stringResource(id = R.string.label_event_name),
-                isError = eventName.isBlank() && formSent,
+                isError = addEventViewModel.eventName.isBlank() && addEventViewModel.formSent,
                 errorText = stringResource(id = R.string.error_field_required),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -91,12 +74,23 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             FormInput(
-                inputText = description,
-                onValueChange = { description = it },
+                inputText = addEventViewModel.description,
+                onValueChange = { addEventViewModel.description = it },
                 label = stringResource(id = R.string.label_event_description),
-                isError = description.isBlank() && formSent,
+                isError = addEventViewModel.description.isBlank() && addEventViewModel.formSent,
                 errorText = stringResource(id = R.string.error_field_required),
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            FormFileInput(
+                label = stringResource(id = R.string.label_photo),
+                onFilePicked = { file ->
+                               addEventViewModel.photo = file.toString()
+                },
+                context = context,
+                isError = addEventViewModel.photo.isBlank() && addEventViewModel.formSent
             )
         }
 
@@ -105,18 +99,18 @@ fun AddEventActivity(navController: NavHostController) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.weight(0.4f)) {
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = {
                                 Text(stringResource(R.string.label_start_date))
                             },
                             onDateChange = {
-                                eventDate = it
+                                addEventViewModel.eventDate = it
                             },
                             allowFutureDates = true,
                             startDate = LocalDate.now().toString()
                         )
-                        if (eventDate.isBlank() && formSent) {
+                        if (addEventViewModel.eventDate.isBlank() && addEventViewModel.formSent) {
                             Text(
                                 text = stringResource(id = R.string.error_field_required),
                                 color = MaterialTheme.colorScheme.error,
@@ -124,23 +118,14 @@ fun AddEventActivity(navController: NavHostController) {
                             )
                         }
                     }
-                    Column(modifier = Modifier.weight(0.6f)) {
+                    Column(modifier = Modifier.weight(0.55f)) {
                         MyTimePickerDialog(
-                            onConfirm = {
-                                //eventTime = it
+                            onTimeSelected = { selectedTime ->
+                                addEventViewModel.eventTime = selectedTime
                             },
-                            onDismiss = { /* Implementacja */ },
                             modifier = Modifier
                                 .scale(0.7f)
-                                .padding(top = 4.dp)
                         )
-                        if (eventTime.isBlank() && formSent) {
-                            Text(
-                                text = stringResource(id = R.string.error_field_required),
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
                     }
                 }
             }
@@ -149,21 +134,20 @@ fun AddEventActivity(navController: NavHostController) {
         item {
             Column {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.weight(0.4f)) {
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = {
                                 Text(stringResource(R.string.label_event_join_until))
                             },
                             onDateChange = {
-                                mustJoinDate = it
+                                addEventViewModel.mustJoinDate = it
                             },
                             allowFutureDates = true,
                             startDate = LocalDate.now().toString()
                         )
-                        if (mustJoinDate.isBlank() && formSent) {
+                        if (addEventViewModel.mustJoinDate.isBlank() && addEventViewModel.formSent) {
                             Text(
                                 text = stringResource(id = R.string.error_field_required),
                                 color = MaterialTheme.colorScheme.error,
@@ -171,23 +155,14 @@ fun AddEventActivity(navController: NavHostController) {
                             )
                         }
                     }
-                    Column(modifier = Modifier.weight(0.6f)) {
+                    Column(modifier = Modifier.weight(0.55f)) {
                         MyTimePickerDialog(
-                            onConfirm = {
-                                //mustJoinTime = it
+                            onTimeSelected = { selectedTime ->
+                                addEventViewModel.mustJoinTime = selectedTime
                             },
-                            onDismiss = { /* Implementacja */ },
                             modifier = Modifier
                                 .scale(0.7f)
-                                //.padding(top = 8.dp)
                         )
-                        if (mustJoinTime.isBlank() && formSent) {
-                            Text(
-                                text = stringResource(id = R.string.error_field_required),
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
                     }
                 }
             }
@@ -195,10 +170,10 @@ fun AddEventActivity(navController: NavHostController) {
 
         item {
             FormInput(
-                inputText = maxPeople,
-                onValueChange = { maxPeople = it },
+                inputText = addEventViewModel.maxPeople,
+                onValueChange = { addEventViewModel.maxPeople = it },
                 label = stringResource(id = R.string.label_event_max_people),
-                isError = (maxPeople.isBlank() || maxPeople.toIntOrNull() == null) && formSent,
+                isError = (addEventViewModel.maxPeople.isBlank() || addEventViewModel.maxPeople.toIntOrNull() == null) && addEventViewModel.formSent,
                 errorText = stringResource(id = R.string.error_invalid_number),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
@@ -208,7 +183,7 @@ fun AddEventActivity(navController: NavHostController) {
         item {
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { addEventViewModel.searchQuery.value = it },
                 label = { Text(stringResource(id = R.string.label_search_restaurants)) },
                 trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
@@ -237,7 +212,7 @@ fun AddEventActivity(navController: NavHostController) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedRestaurant = restaurant
+                                        addEventViewModel.selectedRestaurant = restaurant
                                     }
                                     .padding(8.dp)
                             )
@@ -250,7 +225,7 @@ fun AddEventActivity(navController: NavHostController) {
         }
 
         item {
-            selectedRestaurant?.let {
+            addEventViewModel.selectedRestaurant?.let {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -260,7 +235,7 @@ fun AddEventActivity(navController: NavHostController) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                     IconButton(
-                        onClick = { selectedRestaurant = null },
+                        onClick = { addEventViewModel.selectedRestaurant = null },
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
@@ -276,35 +251,16 @@ fun AddEventActivity(navController: NavHostController) {
         item {
             ButtonComponent(
                 onClick = {
-                    formSent = true
-                    val maxPeopleInt = maxPeople.toIntOrNull()
-                    if (eventName.isNotBlank() &&
-                        description.isNotBlank() &&
-                        eventDate.isNotBlank() &&
-                        eventTime.isNotBlank() &&
-                        mustJoinDate.isNotBlank() &&
-                        mustJoinTime.isNotBlank() &&
-                        maxPeopleInt != null
-                    ) {
-                        val time = "${eventDate}T${eventTime}"
-                        val mustJoinUntil = "${mustJoinDate}T${mustJoinTime}"
-
-                        val newEvent = EventDTO(
-                            name = eventName,
-                            description = description,
-                            time = time,
-                            mustJoinUntil = mustJoinUntil,
-                            maxPeople = maxPeopleInt,
-                            restaurantId = selectedRestaurant?.restaurantId
-                        )
-                        addEventViewModel.addEvent(newEvent)
-                        if (addEventViewModel.result.isError) {
+                    addEventViewModel.formSent = true
+                    addEventViewModel.addEvent()
+                    if (addEventViewModel.result.isError) {
+                        if (addEventViewModel.isFormValid()) {
                             Toast.makeText(context, R.string.error_add_event_failed, Toast.LENGTH_LONG).show()
                         } else {
-                            navController.popBackStack()
+                            Toast.makeText(context, R.string.error_fill_all_fields, Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        Toast.makeText(context, R.string.error_fill_all_fields, Toast.LENGTH_LONG).show()
+                        navController.popBackStack()
                     }
                 },
                 label = stringResource(id = R.string.label_add_event),
