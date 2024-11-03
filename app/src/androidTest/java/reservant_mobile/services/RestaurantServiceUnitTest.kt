@@ -157,7 +157,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun create_add_and_remove_employee_from_restaurant()= runTest{
         val emp = ser.createEmployee(restaurantEmployee).value
-        val empCopy = emp!!.copy(isHallEmployee = true)
+        val empCopy = listOf(emp!!.copy(isHallEmployee = true))
         assertThat(empCopy).isNotNull()
         assertThat(ser.addEmployeeToRestaurant(restaurantId, empCopy).value).isTrue()
         val empId = ser.getEmployees(restaurantId).value!!.last().employmentId
