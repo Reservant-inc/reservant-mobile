@@ -126,6 +126,7 @@ fun MapActivity(){
             var eventSearchQuery by remember { mutableStateOf("") }
             var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
+            var eventSelectedFriendsOnly: LocalDate? by remember { mutableStateOf(null) }
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
 

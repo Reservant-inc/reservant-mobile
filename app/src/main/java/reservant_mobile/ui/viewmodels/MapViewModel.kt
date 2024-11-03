@@ -75,6 +75,8 @@ class MapViewModel : ReservantViewModel() {
     var event_dateFrom: LocalDate? = null
     var event_dateUntil: LocalDate? = null
     var event_status: GetEventsStatus? = null
+    var event_friendsOnly: Boolean? = null
+
 
 
     fun initMapView(context: Context, startPoint: GeoPoint): MapView{
@@ -184,6 +186,7 @@ class MapViewModel : ReservantViewModel() {
                     dateFrom = event_dateFrom,
                     dateUntil = event_dateUntil,
                     eventStatus = event_status,
+                    friendsOnly = event_friendsOnly,
                     restaurantName = restaurant_search
                 )
                 if(res.isError || res.value == null)
