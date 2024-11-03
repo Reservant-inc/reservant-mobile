@@ -20,10 +20,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormFileInput
@@ -252,7 +254,9 @@ fun AddEventActivity(navController: NavHostController) {
             ButtonComponent(
                 onClick = {
                     addEventViewModel.formSent = true
-                    addEventViewModel.addEvent()
+                    addEventViewModel.viewModelScope.launch {
+                        addEventViewModel.addEvent(context)
+                    }
                     if (addEventViewModel.result.isError) {
                         if (addEventViewModel.isFormValid()) {
                             Toast.makeText(context, R.string.error_add_event_failed, Toast.LENGTH_LONG).show()
