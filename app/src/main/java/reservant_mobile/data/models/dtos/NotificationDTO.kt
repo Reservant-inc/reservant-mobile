@@ -109,6 +109,26 @@ data class VisitApprovedDeclinedDetails(
     val date: String
 ) : NotificationDetails
 
+@Serializable
+data class NotificationNewMessage(
+    val messageId : Int,
+    val threadId : Int,
+    val threadTitle : String,
+    val authorId : String,
+    val authorName : String,
+    val contents : String
+)
+
+@Serializable
+data class NotificationNewReservation(
+    val restaurantId : Int,
+    val restaurantName : String,
+    val date : String,
+    val endTime : String,
+    val numberOfPeople : Int,
+    val takeaway : Boolean
+)
+
 
 inline fun <reified T> Map<String, Any>.toObject(): T {
     val jsonElement = JsonObject(this.mapValues { Json.encodeToJsonElement(it.value) })
