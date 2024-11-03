@@ -1,7 +1,9 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -78,32 +82,54 @@ fun TableCard(table: TableDTO) {
         modifier = Modifier.padding(4.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = when (/**table.status**/"Available") { //TODO
+            containerColor = when ( /**table.status**/ "Available") { //TODO
                 "Available" -> Color(0xFFDFFFD6) // Light green for available
                 "Occupied" -> Color(0xFFFFD6D6) // Light red for occupied
                 else -> Color.LightGray // Default color for other statuses
             }
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
         ) {
-            Text(
-                text = stringResource(id = R.string.table_label, table.tableId),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+            Image(
+                modifier = Modifier
+                    .fillMaxSize(),
+                painter = if (
+                /**table.status**/
+                    "Available" == "Available") {
+                    painterResource(id = R.drawable.table_available)
+                } else {
+                    painterResource(id = R.drawable.table_occupied)
+                },
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alpha = 0.25F
             )
-            Text(
-                text = stringResource(id = R.string.seats_label, table.capacity),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = stringResource(
-                    id = if (/**table.status**/"Available" == "Available") R.string.available_label else R.string.occupied_label //TODO
-                ),
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.table_label, table.tableId),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(id = R.string.seats_label, table.capacity),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = stringResource(
+                        id = if (
+                        /**table.status**/
+                            "Available" == "Available") R.string.available_label else R.string.occupied_label //TODO
+                    ),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
+
