@@ -14,14 +14,19 @@ class User {
     @Resource("visit-history")
     class VisitHistory(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
 
-    @Resource("events-created")
-    class EventsCreated(val parent: User = User())
-
     @Resource("{employeeId}")
     class EmployeeId(val parent: User = User(), val employeeId: String)
 
-    @Resource("events-interested-in")
-    class EventsInterestedIn(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)
+    @Resource("events")
+    class Events(
+        val parent: User = User(),
+        val page: Int? = null,
+        val perPage: Int? = null,
+        val dateFrom: String? = null,
+        val dateUntil: String? = null,
+        val category: String? = null,
+        val order: String? = null
+    )
 
     @Resource("threads")
     class Threads(val parent: User = User(), val page: Int? = null, val perPage: Int? = null)

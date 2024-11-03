@@ -32,11 +32,15 @@ import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -75,6 +79,7 @@ import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.services.NotificationService
+import reservant_mobile.data.utils.GetEventsStatus
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -89,6 +94,7 @@ import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
+import reservant_mobile.ui.components.SwitchWithLabel
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -123,8 +129,9 @@ fun MapActivity(){
 
             //events fiters
             var eventSearchQuery by remember { mutableStateOf("") }
-            var selectedEventStatus: EventDTO.EventStatus? by remember { mutableStateOf(null) }
+            var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
+            var eventSelectedFriendsOnly: Boolean? by remember { mutableStateOf(null) }
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
 
@@ -184,6 +191,7 @@ fun MapActivity(){
                             }
                         }
 
+                        // ### PAGINATION EXAMPLE ###
                         if (restaurants.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
                         } else if(restaurants.itemCount < 1 || restaurants.loadState.hasError){
@@ -202,11 +210,7 @@ fun MapActivity(){
                                     if (item != null) {
                                         RestaurantCard(
                                             onClick = {
-                                                navController.navigate(
-                                                    RestaurantRoutes.Details(
-                                                        restaurantId = item.restaurantId
-                                                    )
-                                                )
+                                                navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
                                             },
                                             name = item.name,
                                             location = item.address,
@@ -218,13 +222,11 @@ fun MapActivity(){
                                             showRestaurantBottomSheet = true
                                             true
                                         }
-
                                     }
-
                                 }
                             }
-
                         }
+                        // ##########################
                     }
                 },
                 stringResource(id = R.string.label_events) to {
@@ -285,7 +287,7 @@ fun MapActivity(){
                                         EventCard(
                                             eventCreator = item.name,
                                             eventDate = item.time,
-                                            eventLocation = item.restaurant.address,
+                                            eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                             interestedCount = item.numberInterested,
                                             takePartCount = item.numberParticipants
                                         )
@@ -359,7 +361,7 @@ fun MapActivity(){
                                     onRatingSelected = { rating -> restaurantSelectedRating = rating }
                                 )
 
-                                Spacer(modifier = Modifier.height(25.dp))
+                                HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                                 Text(
                                     text = stringResource(id = R.string.label_search_filter_tags),
@@ -401,11 +403,13 @@ fun MapActivity(){
             if(showEventFiltersSheet){
                 MessageSheet(
                     buttonLabelId = R.string.label_apply,
+                    height = 500.dp,
                     onDismiss = {showEventFiltersSheet = false},
                     buttonOnClick = {
                         mapViewModel.event_status = selectedEventStatus
                         mapViewModel.event_dateFrom = eventSelectedDateFrom
                         mapViewModel.event_dateUntil = eventSelectedDateUntil
+                        mapViewModel.event_friendsOnly = eventSelectedFriendsOnly
 
                         mapViewModel.refreshEvents(userLocation = startPoint)
                     },
@@ -425,7 +429,7 @@ fun MapActivity(){
                                 onStatusSelected = {status -> selectedEventStatus = status}
                             )
 
-                            Spacer(modifier = Modifier.height(25.dp))
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                             Text(
                                 text = stringResource(id = R.string.label_search_filter_date_range),
@@ -475,6 +479,15 @@ fun MapActivity(){
                                     allowFutureDates = true
                                 )
                             }
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
+
+                            SwitchWithLabel(
+                                label = stringResource(id = R.string.label_with_friends_only),
+                                checked = eventSelectedFriendsOnly?: false,
+                                onCheckedChange = {
+                                    eventSelectedFriendsOnly = it
+                                }
+                            )
                         }
                     }
                 )
@@ -705,47 +718,55 @@ fun StarRatingFilter(
 
 @Composable
 fun EventStatusRadioFilter(
-    selectedStatus: EventDTO.EventStatus?,
-    onStatusSelected: (EventDTO.EventStatus?) -> Unit
+    selectedStatus: GetEventsStatus?,
+    onStatusSelected: (GetEventsStatus?) -> Unit
 ) {
     var currentStatus by remember { mutableStateOf(selectedStatus) }
-    val selectStatus = {status:EventDTO.EventStatus? ->
+    val selectStatus = {status:GetEventsStatus? ->
       currentStatus = status
       onStatusSelected(status)
     }
 
-    Column(
-        modifier = Modifier.padding(8.dp),
-        //verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { selectStatus(null) }
-        ) {
-            RadioButton(
-                selected = currentStatus == null,
-                onClick = { selectStatus(null) }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(id = R.string.label_all))
-        }
-
-        EventDTO.EventStatus.entries.forEach { status ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { selectStatus(status) }
-            ) {
-                RadioButton(
-                    selected = currentStatus == status,
-                    onClick = { selectStatus(status) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(id = status.stringId))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    )  {
+        EventStatusChip(
+            text = stringResource(id = R.string.label_all),
+            isSelected = currentStatus == null,
+            onSelectionChanged = {
+                selectStatus(null)
             }
+        )
+
+        GetEventsStatus.entries.forEach { status ->
+            EventStatusChip(
+                text = stringResource(id = status.stringId),
+                isSelected = currentStatus == status,
+                onSelectionChanged = {
+                    selectStatus(status)
+                }
+            )
         }
     }
+}
+
+@Composable
+fun EventStatusChip(text: String, isSelected: Boolean, onSelectionChanged: (Boolean) -> Unit) {
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val notSelectedColor = MaterialTheme.colorScheme.background
+
+    FilterChip(
+        selected = isSelected,
+        onClick = { onSelectionChanged(!isSelected) },
+        label = {
+            Text(text = text)
+        },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = selectedColor,  // Change to your preferred selected color
+            containerColor = notSelectedColor,         // Change to your preferred unselected color
+        )
+    )
 }

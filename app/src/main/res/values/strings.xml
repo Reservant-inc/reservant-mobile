@@ -262,4 +262,8 @@
     <string name="error_users_not_found">Not found any users</string>
     <string name="label_sent_by">Sent by</string>
     <string name="label_read_at">Read at</string>
+    <string name="label_event_category_created">Created by</string>
+    <string name="label_event_category_participated">Participated in</string>
+    <string name="label_event_category_interested">Interested in</string>
+    <string name="label_with_friends_only">With friends only</string>
 </resources>

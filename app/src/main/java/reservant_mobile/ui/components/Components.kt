@@ -85,6 +85,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
@@ -1402,5 +1403,31 @@ fun RequestPermission(
         if (permission.string.isNotEmpty() && !permissionState.status.isGranted) {
             requestPermissionLauncher.launch(permission.string)
         }
+    }
+}
+
+@Composable
+fun SwitchWithLabel(
+    label: String,
+    checked: Boolean,
+    onCheckedChange:  ((Boolean) -> Unit)?
+) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
     }
 }

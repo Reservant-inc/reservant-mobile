@@ -9,6 +9,7 @@ import org.junit.Test
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.UserSettingsDTO
+import reservant_mobile.data.utils.GetUserEventsCategory
 import kotlin.random.Random
 
 class UserServiceUnitTest: ServiceTest(){
@@ -86,13 +87,35 @@ class UserServiceUnitTest: ServiceTest(){
     }
 
     @Test
-    fun get_created_events_return_not_null()= runTest{
-        assertThat(userService.getUserCreatedEvents().value).isNotNull()
+    fun get_events_return_pagination()= runTest{
+        val items = userService.getUserEvents().value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun get_created_events_return_pagination()= runTest{
+        val items = userService.getUserEvents(category = GetUserEventsCategory.CreatedBy).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test
     fun get_interested_events_return_pagination()= runTest{
-        val items = userService.getUserInterestedEvents().value
+        val items = userService.getUserEvents(category = GetUserEventsCategory.InterestedIn).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun get_participated_events_return_pagination()= runTest{
+        val items = userService.getUserEvents(category = GetUserEventsCategory.ParticipateIn).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }

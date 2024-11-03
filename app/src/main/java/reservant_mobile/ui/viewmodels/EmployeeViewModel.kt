@@ -152,7 +152,7 @@ class EmployeeViewModel(
             return false
         }
 
-        result = restaurantService.addEmployeeToRestaurant(restaurantId, position)
+        result = restaurantService.addEmployeeToRestaurant(restaurantId, listOf(position))
         if (result.value) {
             viewModelScope.launch {
                 fetchEmployees()

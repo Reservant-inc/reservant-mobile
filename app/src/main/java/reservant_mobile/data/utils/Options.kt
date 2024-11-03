@@ -1,5 +1,7 @@
 package reservant_mobile.data.utils
 
+import com.example.reservant_mobile.R
+
 enum class GetUsersFilter{
     NoFilter, FriendsOnly, StrangersOnly;
 }
@@ -22,4 +24,20 @@ enum class GetIngredientsSort{
 
 enum class GetDeliveriesSort{
     OrderTimeAsc, OrderTimeDesc, DeliveredTimeAsc, DeliveredTimeDesc
+}
+
+enum class GetUserEventsSort{
+    DateCreatedAsc, DateCreatedDesc, DateAsc, DateDesc
+}
+
+enum class GetUserEventsCategory(val stringId: Int){
+    CreatedBy(R.string.label_event_category_created),
+    ParticipateIn(R.string.label_event_category_participated),
+    InterestedIn(R.string.label_event_category_interested)
+}
+
+enum class GetEventsStatus(val stringId: Int){
+    Future(R.string.label_event_status_future),
+    NonJoinable(R.string.label_event_status_nonJoinable),
+    Past(R.string.label_event_status_past)
 }
