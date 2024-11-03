@@ -122,7 +122,10 @@ fun EventsContent() {
                 eventDate = "Saturday, 2024-06-22",
                 eventLocation = "John's Doe - Warsaw",
                 interestedCount = 20,
-                takePartCount = 45
+                takePartCount = 45,
+                onClick = {
+
+                }
             )
             Modifier.padding(bottom = 16.dp)
         }
@@ -135,14 +138,16 @@ fun EventCard(
     eventDate: String,
     eventLocation: String,
     interestedCount: Int,
-    takePartCount: Int
+    takePartCount: Int,
+    onClick: () -> Unit
 ) {
     val date = formatToDateTime(eventDate, "dd MMMM yyyy")
     val time = formatToDateTime(eventDate, "HH:mm")
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Box(
