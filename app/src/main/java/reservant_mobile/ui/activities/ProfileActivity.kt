@@ -295,7 +295,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     eventDate = event.time,
                                     eventLocation = event.restaurant!!.address,
                                     interestedCount = event.numberInterested ?: 0,
-                                    takePartCount = event.participants?.size ?: 0
+                                    takePartCount = event.participants?.size ?: 0,
+                                    onClick = {}
                                 )
                             }
                         }
