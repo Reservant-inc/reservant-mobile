@@ -191,6 +191,7 @@ fun MapActivity(){
                             }
                         }
 
+                        // ### PAGINATION EXAMPLE ###
                         if (restaurants.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
                         } else if(restaurants.itemCount < 1 || restaurants.loadState.hasError){
@@ -209,11 +210,7 @@ fun MapActivity(){
                                     if (item != null) {
                                         RestaurantCard(
                                             onClick = {
-                                                navController.navigate(
-                                                    RestaurantRoutes.Details(
-                                                        restaurantId = item.restaurantId
-                                                    )
-                                                )
+                                                navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
                                             },
                                             name = item.name,
                                             location = item.address,
@@ -225,13 +222,11 @@ fun MapActivity(){
                                             showRestaurantBottomSheet = true
                                             true
                                         }
-
                                     }
-
                                 }
                             }
-
                         }
+                        // ##########################
                     }
                 },
                 stringResource(id = R.string.label_events) to {
