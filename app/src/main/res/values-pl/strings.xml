@@ -256,4 +256,5 @@
     <string name="label_event_category_created">Stworzone przez</string>
     <string name="label_event_category_participated">Wzięty udział</string>
     <string name="label_event_category_interested">Zainteresowane</string>
+    <string name="label_with_friends_only">Tylko ze znajomymi</string>
 </resources>

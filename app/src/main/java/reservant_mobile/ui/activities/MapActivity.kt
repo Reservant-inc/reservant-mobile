@@ -39,6 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -92,6 +93,7 @@ import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
+import reservant_mobile.ui.components.SwitchWithLabel
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -128,7 +130,7 @@ fun MapActivity(){
             var eventSearchQuery by remember { mutableStateOf("") }
             var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
-            var eventSelectedFriendsOnly: LocalDate? by remember { mutableStateOf(null) }
+            var eventSelectedFriendsOnly: Boolean? by remember { mutableStateOf(null) }
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
 
@@ -410,6 +412,7 @@ fun MapActivity(){
                         mapViewModel.event_status = selectedEventStatus
                         mapViewModel.event_dateFrom = eventSelectedDateFrom
                         mapViewModel.event_dateUntil = eventSelectedDateUntil
+                        mapViewModel.event_friendsOnly = eventSelectedFriendsOnly
 
                         mapViewModel.refreshEvents(userLocation = startPoint)
                     },
@@ -479,6 +482,12 @@ fun MapActivity(){
                                     allowFutureDates = true
                                 )
                             }
+                                label = stringResource(id = R.string.label_with_friends_only),
+                                checked = eventSelectedFriendsOnly?: false,
+                                onCheckedChange = {
+                                    eventSelectedFriendsOnly = it
+                                }
+                            )
                         }
                     }
                 )
