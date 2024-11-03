@@ -31,12 +31,12 @@ fun EventDetailActivity(
     navController: NavHostController,
     eventId: Int
 ) {
-    // Mock data for demonstration purposes
+
     val event = remember { mutableStateOf(mockEventData()) }
 
     val isOwner = true
 
-    // UI state
+
     Scaffold(
         topBar = {
             IconWithHeader(
@@ -71,7 +71,6 @@ fun EventDetailActivity(
                 )
             }
 
-            // Event information
             item {
                 Text(
                     text = "Event Information",
@@ -90,7 +89,6 @@ fun EventDetailActivity(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Owner-specific actions
             if (isOwner) {
                 item {
                     Button(
@@ -140,7 +138,6 @@ fun EventDetailActivity(
                 }
             }
 
-            // List of participants
             item {
                 Text(text = "Participants", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -166,7 +163,6 @@ fun mockEventData(): EventDTO {
             name = "Sample Restaurant",
             address = "123 Sample Street",
             city = "Sample City"
-            // ... other fields as needed
         ),
         participants = listOf(
             EventDTO.Participant(userId = "1", firstName = "Alice", lastName = "Smith"),
@@ -175,7 +171,6 @@ fun mockEventData(): EventDTO {
     )
 }
 
-// Placeholder for UserListItem composable
 @Composable
 fun UserListItem(user: EventDTO.Participant) {
     Row(
