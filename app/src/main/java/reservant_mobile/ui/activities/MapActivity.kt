@@ -32,6 +32,8 @@ import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -716,38 +718,46 @@ fun EventStatusRadioFilter(
       onStatusSelected(status)
     }
 
-    Column(
-        modifier = Modifier.padding(8.dp),
-        //verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { selectStatus(null) }
-        ) {
-            RadioButton(
-                selected = currentStatus == null,
-                onClick = { selectStatus(null) }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(id = R.string.label_all))
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    )  {
+        EventStatusChip(
+            text = stringResource(id = R.string.label_all),
+            isSelected = currentStatus == null,
+            onSelectionChanged = {
+                selectStatus(null)
+            }
+        )
 
         GetEventsStatus.entries.forEach { status ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { selectStatus(status) }
-            ) {
-                RadioButton(
-                    selected = currentStatus == status,
-                    onClick = { selectStatus(status) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(id = status.stringId))
-            }
+            EventStatusChip(
+                text = stringResource(id = status.stringId),
+                isSelected = currentStatus == status,
+                onSelectionChanged = {
+                    selectStatus(status)
+                }
+            )
         }
     }
+}
+
+@Composable
+fun EventStatusChip(text: String, isSelected: Boolean, onSelectionChanged: (Boolean) -> Unit) {
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val notSelectedColor = MaterialTheme.colorScheme.background
+
+    FilterChip(
+        selected = isSelected,
+        onClick = { onSelectionChanged(!isSelected) },
+        label = {
+            Text(text = text)
+        },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = selectedColor,  // Change to your preferred selected color
+            containerColor = notSelectedColor,         // Change to your preferred unselected color
+        )
+    )
 }
