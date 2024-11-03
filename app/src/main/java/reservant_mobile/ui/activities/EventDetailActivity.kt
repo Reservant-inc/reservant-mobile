@@ -112,7 +112,6 @@ fun EventDetailActivity(
             if (isOwner) {
                 item {
                     Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 items(joinRequests) { user ->
                     Row(
@@ -121,7 +120,11 @@ fun EventDetailActivity(
                             .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "${user.firstName} ${user.lastName}", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            text = "${user.firstName} ${user.lastName}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
                         Row {
                             IconButton(onClick = { /* Approve user */ }) {
                                 Icon(Icons.Default.Check, contentDescription = "Approve")
