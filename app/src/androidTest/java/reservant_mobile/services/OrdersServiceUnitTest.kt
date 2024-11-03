@@ -25,11 +25,8 @@ class OrdersServiceUnitTest: ServiceTest(){
             note = "Test note",
             items = listOf(
                 OrderDTO.OrderItemDTO(
-                menuItemId = 2,
-                amount = 1),
-                OrderDTO.OrderItemDTO(
-                    menuItemId = 2,
-                    amount = 2),
+                menuItemId = 1,
+                amount = 1)
             )
         )
     }
@@ -39,11 +36,13 @@ class OrdersServiceUnitTest: ServiceTest(){
         assertThat(ser.getOrder(orderId).value).isNotNull()
     }
 
+//    todo: does not work as JD
     @Test
     fun cancel_order_return_true()= runTest{
-        assertThat(ser.cancelOrder(orderId).value).isNotNull()
+        assertThat(ser.cancelOrder(orderId).value).isTrue()
     }
 
+//    todo: does not work as JD
     @Test
     fun create_order_return_not_null()= runTest{
         assertThat(ser.createOrder(order).value).isNotNull()
