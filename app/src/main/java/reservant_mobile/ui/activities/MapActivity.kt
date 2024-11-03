@@ -266,7 +266,10 @@ fun MapActivity(){
                         if(events.loadState.refresh is LoadState.Loading){
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                         }
-                        else if (events.itemCount < 1 || events.loadState.hasError){
+                        // TODO: revert comment
+                        else if (false
+                            //events.itemCount < 1 || events.loadState.hasError
+                            ){
                             MissingPage(
                                 errorString = stringResource(
                                     id = R.string.message_not_found_any,
@@ -284,6 +287,17 @@ fun MapActivity(){
                                         .background(MaterialTheme.colorScheme.surfaceVariant),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
+                                    item {
+                                        EventCard(
+                                            eventCreator = "doe joe",
+                                            eventDate = "test time111",
+                                            eventLocation = "test location",
+                                            interestedCount = 1,
+                                            takePartCount = 2,
+                                            eventName = "Event name"
+                                        )
+                                    }
+
                                     items(events.itemCount) { index ->
                                         val item = events[index]
                                         if(item != null){
