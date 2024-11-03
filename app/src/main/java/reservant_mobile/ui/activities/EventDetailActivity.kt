@@ -144,7 +144,7 @@ fun EventDetailActivity(
             }
             items(event.value.participants ?: emptyList()) { participant ->
                 UserListItem(user = participant)
-                Divider()
+                HorizontalDivider()
             }
         }
     }
@@ -185,6 +185,5 @@ fun UserListItem(user: EventDTO.Participant) {
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
-
     }
 }
