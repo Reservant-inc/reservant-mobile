@@ -36,7 +36,16 @@ class Restaurants(
          * Available visitSorting values : DateAsc, DateDesc
          */
         @Resource("visits")
-        class Visits(val parent: Id, val dateStart: String? = null, val dateEnd: String? = null, val visitSorting: String? = null, val page: Int? = null, val perPage: Int? = null)
+        class Visits(
+            val parent: Id,
+            val dateStart: String? = null,
+            val dateEnd: String? = null,
+            val tableId: Id? = null,
+            val hasOrders: Boolean? = null,
+            val isTakeaway: Boolean? = null,
+            val visitSorting: String? = null,
+            val page: Int? = null,
+            val perPage: Int? = null)
 
         /***
          * Available order values : NameAsc, NameDesc, AmountAsc, AmountDesc

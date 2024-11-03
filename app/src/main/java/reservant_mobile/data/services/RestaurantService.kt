@@ -13,6 +13,7 @@ import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
+import reservant_mobile.data.endpoints.Restaurants.Id
 import reservant_mobile.data.endpoints.Reviews
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
@@ -88,6 +89,9 @@ interface IRestaurantService{
     suspend fun getVisits(restaurantId: Any,
                           dateStart: LocalDateTime? = null,
                           dateEnd: LocalDateTime? = null,
+                          tableId: Id? = null,
+                          hasOrders: Boolean? = null,
+                          isTakeaway: Boolean? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
@@ -361,6 +365,9 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         restaurantId: Any,
         dateStart: LocalDateTime?,
         dateEnd: LocalDateTime?,
+        tableId: Id?,
+        hasOrders: Boolean?,
+        isTakeaway: Boolean?,
         orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
@@ -368,6 +375,9 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 dateStart = dateStart?.toString(),
                 dateEnd = dateEnd?.toString(),
+                tableId = tableId,
+                hasOrders = hasOrders,
+                isTakeaway = isTakeaway,
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage
