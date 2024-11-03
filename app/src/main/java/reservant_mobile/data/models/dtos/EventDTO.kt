@@ -20,10 +20,11 @@ data class EventDTO (
     val restaurantName:String? = null,
     val visitId: Int? = null,
     val participants: List<Participant>? = null,
-    val distance: Double? = null,
+    val distanceFrom: Double? = null,
     val numberInterested: Int? = null,
     val numberParticipants: Int? = null,
     val isArchived: Boolean? = null,
+    val photo: String? = null
 ){
     @Serializable
     data class Participant(
