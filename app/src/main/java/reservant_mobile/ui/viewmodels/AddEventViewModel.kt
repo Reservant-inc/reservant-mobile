@@ -1,6 +1,6 @@
-// AddEventViewModel.kt
 package reservant_mobile.ui.viewmodels
 
+import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +26,17 @@ class AddEventViewModel(
 
     val searchQuery = MutableStateFlow("")
 
+    var eventName by  mutableStateOf("")
+    var description by mutableStateOf("")
+    var eventDate by mutableStateOf("")
+    var eventTime by mutableStateOf("")
+    var mustJoinDate by mutableStateOf("")
+    var mustJoinTime by mutableStateOf("")
+    var maxPeople by mutableStateOf("")
+    var photo by mutableStateOf("")
+    var selectedRestaurant by mutableStateOf<RestaurantDTO?>(null)
+    var formSent by mutableStateOf(false)
+
     var result: Result<EventDTO?> = Result(isError = false, value = null)
         private set
 
@@ -50,12 +61,41 @@ class AddEventViewModel(
         }
     }
 
-    fun addEvent(event: EventDTO) {
+    fun addEvent() {
         isSaving.value = true
-        viewModelScope.launch {
-            val result = eventService.addEvent(event)
-            this@AddEventViewModel.result = result
+        if (isFormValid()) {
+            val maxPeopleInt = maxPeople.toIntOrNull()
+            val time = "${eventDate}T${eventTime}"
+            val mustJoinUntil = "${mustJoinDate}T${mustJoinTime}"
+
+            val newEvent = EventDTO(
+                name = eventName,
+                description = description,
+                time = time,
+                mustJoinUntil = mustJoinUntil,
+                maxPeople = maxPeopleInt!!,
+                restaurantId = selectedRestaurant?.restaurantId
+             )
+            viewModelScope.launch {
+                val result = eventService.addEvent(newEvent)
+                this@AddEventViewModel.result = result
+                isSaving.value = false
+            }
+        } else {
+            result = Result(isError = true, value = null)
             isSaving.value = false
         }
+    }
+
+    fun isFormValid(): Boolean {
+        val maxPeopleInt = maxPeople.toIntOrNull()
+        return eventName.isNotBlank() &&
+                description.isNotBlank() &&
+                eventDate.isNotBlank() &&
+                eventTime.isNotBlank() &&
+                mustJoinDate.isNotBlank() &&
+                mustJoinTime.isNotBlank() &&
+                photo.isNotBlank() &&
+                maxPeopleInt != null
     }
 }
