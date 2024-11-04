@@ -80,7 +80,6 @@ import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.utils.GetEventsStatus
-import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -107,10 +106,10 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun MapActivity(){
+fun MapActivity() {
 
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
+    NavHost(navController = navController, startDestination = RestaurantRoutes.Map) {
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
             val notificationHandler = NotificationHandler(LocalContext.current)
@@ -121,17 +120,17 @@ fun MapActivity(){
 
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
-            val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
-            val events by rememberUpdatedState(newValue = mapViewModel.events.collectAsLazyPagingItems())
-            var mv:MapView? by remember { mutableStateOf(null) }
+            val restaurants = mapViewModel.restaurants.collectAsLazyPagingItems()
+            val events = mapViewModel.events.collectAsLazyPagingItems()
+            var mv: MapView? by remember { mutableStateOf(null) }
 
-            // restaurant filters
+            // Restaurant filters
             var restaurantSearchQuery by remember { mutableStateOf("") }
             val restaurantSelectedTags = remember { mutableStateListOf<String>() }
             var restaurantSelectedRating by remember { mutableIntStateOf(0) }
             var showRestaurantFiltersSheet by remember { mutableStateOf(false) }
 
-            //events fiters
+            // Event filters
             var eventSearchQuery by remember { mutableStateOf("") }
             var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
@@ -139,7 +138,7 @@ fun MapActivity(){
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
 
-            val startPoint by remember { mutableStateOf(mapViewModel.userPosition) }
+            val startPoint = mapViewModel.userPosition
 
             RequestPermission(
                 permission = PermissionStrings.LOCATION,
@@ -150,11 +149,10 @@ fun MapActivity(){
                 mv = mapViewModel.initMapView(context, startPoint)
             }
             if (showRestaurantBottomSheet) {
-                RestaurantDetailPreview(navController, showRestaurantId) {
-                    showRestaurantBottomSheet = false
-                }
+                // RestaurantDetailPreview(navController, showRestaurantId) {
+                //     showRestaurantBottomSheet = false
+                // }
             }
-
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
                 stringResource(id = R.string.label_restaurants) to {
@@ -166,8 +164,6 @@ fun MapActivity(){
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-
                             TextField(
                                 value = restaurantSearchQuery,
                                 onValueChange = {
@@ -181,7 +177,6 @@ fun MapActivity(){
                                 modifier = Modifier
                                     .padding(vertical = 4.dp),
                                 shape = RoundedCornerShape(20.dp),
-
                             )
                             Spacer(modifier = Modifier.width(16.dp))
 
@@ -198,7 +193,7 @@ fun MapActivity(){
                         // ### PAGINATION EXAMPLE ###
                         if (restaurants.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
-                        } else if(restaurants.itemCount < 1 || restaurants.loadState.hasError){
+                        } else if (restaurants.itemCount < 1 || restaurants.loadState.append is LoadState.Error) {
                             MissingPage(
                                 errorString = stringResource(id = R.string.label_no_restaurants_found)
                             )
@@ -253,7 +248,8 @@ fun MapActivity(){
                                 placeholder = { Text(text = stringResource(id = R.string.label_search)) },
                                 modifier = Modifier
                                     .padding(vertical = 4.dp),
-                                shape = RoundedCornerShape(20.dp))
+                                shape = RoundedCornerShape(20.dp)
+                            )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             IconButton(
@@ -266,13 +262,9 @@ fun MapActivity(){
                             }
                         }
 
-                        if(events.loadState.refresh is LoadState.Loading){
+                        if (events.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
-                        }
-                        // TODO: revert comment
-                        else if (false
-                            //events.itemCount < 1 || events.loadState.hasError
-                            ){
+                        } else if (events.itemCount < 1 || events.loadState.append is LoadState.Error) {
                             MissingPage(
                                 errorString = stringResource(
                                     id = R.string.message_not_found_any,
@@ -283,21 +275,39 @@ fun MapActivity(){
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                             ) {
-                            items(events.itemCount) { index ->
-                                val item = events[index]
-                                if(item != null){
-                                    EventCard(
-                                        eventCreator = item.creatorFullName,
-                                        eventDate = "$time | $day",
-                                        eventLocation = if (item.restaurant != null) item.restaurant.address else "",
-                                        interestedCount = item.numberInterested,
-                                        takePartCount = item.participants
-                                        eventName = item.name
-                                    )
+                                LazyColumn(
+                                    Modifier
+                                        .fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    // TODO: remove dummy item
+                                    item {
+                                        EventCard(
+                                            eventCreator = "dummy joe",
+                                            eventDate = "test time111",
+                                            eventLocation = "test location",
+                                            interestedCount = 1,
+                                            takePartCount = 2,
+                                            eventName = "Dummy Event - delete me if other event works"
+                                        )
+                                    }
+                                    items(events.itemCount) { index ->
+                                        val item = events[index]
+                                        if (item != null) {
+                                            EventCard(
+                                                eventCreator = item.creator!!.firstName + item.creator.lastName,
+                                                eventDate = item.time ?: "",
+                                                eventLocation = item.restaurant?.address ?: "",
+                                                interestedCount = item.numberInterested,
+                                                takePartCount = item.numberParticipants,
+                                                eventName = item.name ?: ""
+                                            )
+                                        }
+                                    }
                                 }
+
                                 MyFloatingActionButton(
                                     onClick = {
                                         navController.navigate(EventRoutes.AddEvent)
@@ -307,7 +317,6 @@ fun MapActivity(){
                                         .padding(16.dp)
                                 )
                             }
-
                         }
                     }
                 }
@@ -320,18 +329,20 @@ fun MapActivity(){
                 sheetContent = {
                     Box(
                         modifier = Modifier.fillMaxSize()
-                    ){
-
+                    ) {
                         FloatingTabSwitch(
                             pages = pages,
-                            color = MaterialTheme.colorScheme.surface)
+                            color = MaterialTheme.colorScheme.surface
+                        )
                     }
                 },
-                content = { innerPadding -> OsmMapView(mv, startPoint,
-                    Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize()
-                )
+                content = { innerPadding ->
+                    OsmMapView(
+                        mv, startPoint,
+                        Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    )
                 },
                 contentColor = MaterialTheme.colorScheme.surface
             )
