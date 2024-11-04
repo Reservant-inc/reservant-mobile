@@ -13,7 +13,6 @@ import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
-import reservant_mobile.data.endpoints.Restaurants.Id
 import reservant_mobile.data.endpoints.Reviews
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
@@ -89,7 +88,7 @@ interface IRestaurantService{
     suspend fun getVisits(restaurantId: Any,
                           dateStart: LocalDateTime? = null,
                           dateEnd: LocalDateTime? = null,
-                          tableId: Id? = null,
+                          tableId: Int? = null,
                           hasOrders: Boolean? = null,
                           isTakeaway: Boolean? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
@@ -120,7 +119,7 @@ interface IRestaurantService{
 }
 
 @OptIn(InternalSerializationApi::class)
-class RestaurantService : ServiceUtil(), IRestaurantService {
+class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun registerRestaurant(restaurant: RestaurantDTO): Result<RestaurantDTO?> {
         val res = api.post(MyRestaurants(), restaurant)
@@ -166,7 +165,7 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
     }
 
     override suspend fun getRestaurant(id: Any): Result<RestaurantDTO?> {
-        val res = api.get(Id(restaurantId = id.toString()))
+        val res = api.get(Restaurants.Id(restaurantId = id.toString()))
         return complexResultWrapper(res)
     }
 
@@ -279,8 +278,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
     ): Result<Flow<PagingData<OrderDTO>>?> {
         val call: suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
             api.get(
-                Id.Orders(
-                    parent = Id(restaurantId = restaurantId.toString()),
+                Restaurants.Id.Orders(
+                    parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                     returnFinished = returnFinished,
                     page = page,
                     perPage = perPage,
@@ -295,8 +294,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
 
     override suspend fun getRestaurantEvents(restaurantId: Any): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Id.Events(
-                parent = Id(restaurantId = restaurantId.toString()),
+            Restaurants.Id.Events(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 page = page,
                 perPage = perPage
             ))}
@@ -306,10 +305,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
     }
 
     override suspend fun addRestaurantReview(restaurantId: Any, review: ReviewDTO): Result<ReviewDTO?> {
-        val res = api.post(
-            Id.Reviews(
-            parent = Id(restaurantId = restaurantId.toString())
-            ),
+        val res = api.post(Restaurants.Id.Reviews(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString())),
             review
         )
         return complexResultWrapper(res)
@@ -322,8 +319,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
 
     override suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort?): Result<Flow<PagingData<ReviewDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Id.Reviews(
-                parent = Id(restaurantId = restaurantId.toString()),
+            Restaurants.Id.Reviews(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 orderBy = orderBy?.toString(),
                 page = page,
                 perPage = perPage
@@ -367,14 +364,14 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
         restaurantId: Any,
         dateStart: LocalDateTime?,
         dateEnd: LocalDateTime?,
-        tableId: Id?,
+        tableId: Int?,
         hasOrders: Boolean?,
         isTakeaway: Boolean?,
         orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Id.Visits(
-                parent = Id(restaurantId = restaurantId.toString()),
+            Restaurants.Id.Visits(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 dateStart = dateStart?.toString(),
                 dateEnd = dateEnd?.toString(),
                 tableId = tableId,
@@ -394,8 +391,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
         orderBy: GetIngredientsSort?
     ): Result<Flow<PagingData<IngredientDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Id.Ingredients(
-                parent = Id(restaurantId = restaurantId.toString()),
+            Restaurants.Id.Ingredients(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 orderBy = orderBy?.toString(),
                 page = page,
                 perPage = perPage
@@ -413,8 +410,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
         orderBy: GetDeliveriesSort?
     ): Result<Flow<PagingData<DeliveryDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
-            Id.Deliveries(
-                parent = Id(restaurantId = restaurantId.toString()),
+            Restaurants.Id.Deliveries(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 returnDelivered = returnDelivered,
                 userId = userId,
                 userName = userName,
@@ -458,9 +455,8 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
         date: LocalDateTime?,
         numberOfGuests: Int?
     ): Result<List<RestaurantDTO.AvailableHours>?> {
-        val res  = api.get(
-            Id.AvailableHours(
-            parent = Id(restaurantId = restaurantId.toString()),
+        val res  = api.get(Restaurants.Id.AvailableHours(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString()),
             date = date.toString(),
             numberOfGuests = numberOfGuests
         ))
