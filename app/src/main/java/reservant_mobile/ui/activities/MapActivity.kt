@@ -77,10 +77,7 @@ import kotlinx.coroutines.launch
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
-import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.utils.GetEventsStatus
-import reservant_mobile.data.utils.formatDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -304,9 +301,9 @@ fun MapActivity(){
                                         val item = events[index]
                                         if(item != null){
                                             EventCard(
-                                                eventCreator = item.creator.firstName,
+                                                eventCreator = item.creator!!.firstName,
                                                 eventDate = item.time,
-                                                eventLocation = item.restaurant.name,
+                                                eventLocation = item.restaurant!!.name,
                                                 interestedCount = item.numberInterested,
                                                 takePartCount = item.numberParticipants,
                                                 eventName = item.name
