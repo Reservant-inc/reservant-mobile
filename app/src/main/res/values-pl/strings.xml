@@ -270,5 +270,5 @@
     <string name="label_event_join_until">Dołączyć przed</string>
     <string name="error_field_required">To pole jest wymagane</string>
     <string name="error_invalid_number">Nieprawidłowa liczba</string>
-    <string name="label_photo">Zdjęcie</string>
+    <string name="label_event_photo">Zdjęcie wydarzenia</string>
 </resources>
