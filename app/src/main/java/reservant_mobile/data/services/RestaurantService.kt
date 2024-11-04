@@ -13,7 +13,6 @@ import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
-import reservant_mobile.data.endpoints.Restaurants.Id
 import reservant_mobile.data.endpoints.Reviews
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
@@ -89,7 +88,7 @@ interface IRestaurantService{
     suspend fun getVisits(restaurantId: Any,
                           dateStart: LocalDateTime? = null,
                           dateEnd: LocalDateTime? = null,
-                          tableId: Id? = null,
+                          tableId: Int? = null,
                           hasOrders: Boolean? = null,
                           isTakeaway: Boolean? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
@@ -367,7 +366,7 @@ class RestaurantService : ServiceUtil(), IRestaurantService {
         restaurantId: Any,
         dateStart: LocalDateTime?,
         dateEnd: LocalDateTime?,
-        tableId: Id?,
+        tableId: Int?,
         hasOrders: Boolean?,
         isTakeaway: Boolean?,
         orderBy: GetVisitsSort?

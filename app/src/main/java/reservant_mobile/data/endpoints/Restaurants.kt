@@ -40,7 +40,7 @@ class Restaurants(
             val parent: Id,
             val dateStart: String? = null,
             val dateEnd: String? = null,
-            val tableId: Id? = null,
+            val tableId: Int? = null,
             val hasOrders: Boolean? = null,
             val isTakeaway: Boolean? = null,
             val visitSorting: String? = null,
