@@ -320,9 +320,17 @@ fun OrderCard(order: OrderDetails) {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            order.items.forEach { item ->
+            order.items.forEachIndexed { index, item ->
                 DishCard(item = item)
-                Spacer(modifier = Modifier.height(4.dp))
+                if (index < order.items.size - 1) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
             }
         }
     }
@@ -331,9 +339,6 @@ fun OrderCard(order: OrderDetails) {
 @Composable
 fun DishCard(item: OrderDetails.MenuItemDetails) {
     Card(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-        elevation = CardDefaults.cardElevation(1.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -368,7 +373,7 @@ fun DishCard(item: OrderDetails.MenuItemDetails) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "${item.amount} x ${stringResource(R.string.price_label, item.cost)}",
+                    text = "${item.amount} x ${stringResource(R.string.price_label, item.price)}",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
