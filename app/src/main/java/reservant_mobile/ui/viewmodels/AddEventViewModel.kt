@@ -83,7 +83,7 @@ class AddEventViewModel(
                 description = description,
                 time = time,
                 mustJoinUntil = mustJoinUntil,
-                maxPeople = maxPeopleInt!!,
+                maxPeople = maxPeopleInt,
                 restaurantId = selectedRestaurant?.restaurantId,
                 photo = photo
              )
