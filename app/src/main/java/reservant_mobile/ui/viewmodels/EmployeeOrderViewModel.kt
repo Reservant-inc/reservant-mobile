@@ -26,7 +26,6 @@ class EmployeeOrderViewModel(
     private val restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val userService: IUserService = UserService(),
-    private val menuService: IRestaurantMenuService = RestaurantMenuService(),
     private val ordersService: IOrdersService = OrdersService()
 ) : ReservantViewModel() {
 
@@ -91,8 +90,7 @@ class EmployeeOrderViewModel(
 
                 if (fetchedOrder != null) {
                     val items = fetchedOrder.items?.mapNotNull { item ->
-                        val menuItem = item.menuItemId?.let { menuService.getMenuItem(it).value }
-                        menuItem?.let {
+                        item.menuItem?.let {
                             OrderDetails.MenuItemDetails(
                                 name = it.name,
                                 price = it.price,
@@ -102,7 +100,6 @@ class EmployeeOrderViewModel(
                             )
                         }
                     }.orEmpty()
-
                     visitDetails.add(
                         OrderDetails(
                             orderId = fetchedOrder.orderId ?: -1,
