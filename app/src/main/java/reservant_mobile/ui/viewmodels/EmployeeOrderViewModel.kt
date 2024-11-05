@@ -129,6 +129,7 @@ class EmployeeOrderViewModel(
                 takeaway = visit.takeaway
             )
         }
+
     }
 }
 
