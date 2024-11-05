@@ -34,10 +34,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
@@ -127,19 +132,39 @@ fun RestaurantCard(
 
                     val isOpen = openingTime != null && closingTime != null && currentTime > openingTime && currentTime < closingTime
 
-                    if (isOpen){
-                        val isNearClosing = closingTime!!.minusHours(1) < currentTime
+                    closingTime?.let {
+                        if (isOpen){
+                            val isNearClosing = closingTime!!.minusHours(1) < currentTime
 
-                        closingTime?.let {
-                            Text(text = it.toString(),style = MaterialTheme.typography.bodyMedium)
+                            if (isNearClosing) {
+                                Text(
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    text = "${stringResource(id = R.string.label_closing_soon)}: $it",
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            } else {
+                                Text(
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    text = "${stringResource(id = R.string.label_closing_at)}: $it",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+                        } else {
+                            Text(
+                                modifier = Modifier.padding(top = 4.dp),
+                                text = "${stringResource(id = R.string.label_closed)}: $it",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+
                         }
-
-                    } else {
-                        closingTime?.let {
-                            Text(text = it.toString(),style = MaterialTheme.typography.bodyMedium)
-                        }
-
                     }
+
+
+
+
 
 
 
