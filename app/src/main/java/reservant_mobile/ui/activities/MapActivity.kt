@@ -692,6 +692,7 @@ fun StarRatingFilter(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EventStatusRadioFilter(
     selectedStatus: GetEventsStatus?,
@@ -703,26 +704,19 @@ fun EventStatusRadioFilter(
       onStatusSelected(status)
     }
 
-    Row(
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     )  {
-        FilterChip(
-            label = { Text(text = stringResource(id = R.string.label_all))},
-            selected = currentStatus == null,
-            onClick = {
-                selectStatus(null)
-            }
-        )
-
         GetEventsStatus.entries.forEach { status ->
+            val statusValue = if(status == GetEventsStatus.All) null else status
             FilterChip(
                 label = {Text(text = stringResource(id = status.stringId))},
-                selected = currentStatus == status,
+                selected = currentStatus == statusValue,
                 onClick = {
-                    selectStatus(status)
+                    selectStatus(statusValue)
                 }
             )
         }
