@@ -11,6 +11,7 @@ class Events(
     val name: String? = null,
     val dateFrom: String? = null,
     val dateUntil: String? = null,
+    val friendsOnly: Boolean? = null,
     val eventStatus: String? = null,
     val page: Int? = null,
     val perPage: Int? = null

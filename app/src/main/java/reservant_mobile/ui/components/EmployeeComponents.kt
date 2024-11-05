@@ -7,14 +7,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +32,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
@@ -153,6 +161,7 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
     vm.clearFields()
     var formSent by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -201,6 +210,9 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
+
+                MyDatePickerDialog(onDateChange = { birthday -> vm.birthday.value = birthday })
+
                 FormInput(
                     inputText = vm.phoneNum.value,
                     onValueChange = { vm.phoneNum.value = it },
@@ -215,11 +227,32 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
+
                 FormInput(
                     inputText = vm.password.value,
                     onValueChange = { vm.password.value = it },
                     label = stringResource(id = R.string.label_password),
-                    optional = false,
+                    leadingIcon = {
+                        androidx.compose.material3.IconButton(onClick = {
+                            isPasswordVisible = !isPasswordVisible
+                        }) {
+                            Icon(
+                                imageVector = if (isPasswordVisible)
+                                    Icons.Filled.Visibility
+                                else
+                                    Icons.Filled.VisibilityOff,
+                                contentDescription = stringResource(R.string.label_password_visibility)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isPasswordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
                     isError = vm.isPasswordInvalid(),
                     errorText = stringResource(
                         if (vm.getPasswordError() != -1)
@@ -229,6 +262,8 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     ),
                     formSent = formSent
                 )
+
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = vm.isHallEmployee,
@@ -280,10 +315,10 @@ fun EditEmployeeDialog(
     onDismiss: () -> Unit,
     vm: EmployeeViewModel
 ) {
-    vm.login.value = employee.login.substringAfter('+')
-    vm.firstName.value = employee.firstName
-    vm.lastName.value = employee.lastName
-    vm.phoneNum.value = employee.phoneNumber
+    vm.firstName.value = employee.firstName.toString()
+    vm.lastName.value = employee.lastName.toString()
+    vm.birthday.value = employee.birthDate.toString()
+    vm.phoneNum.value = employee.phoneNumber.toString()
     vm.isHallEmployee = employee.isHallEmployee
     vm.isBackdoorEmployee = employee.isBackdoorEmployee
 
@@ -295,20 +330,6 @@ fun EditEmployeeDialog(
         title = { Text(stringResource(id = R.string.label_employee_edit)) },
         text = {
             Column {
-                FormInput(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
                 FormInput(
                     inputText = vm.firstName.value,
                     onValueChange = { vm.firstName.value = it },
@@ -336,6 +357,10 @@ fun EditEmployeeDialog(
                             R.string.error_register_invalid_lastname
                     ),
                     formSent = formSent
+                )
+                MyDatePickerDialog(
+                    startStringValue = vm.birthday.value,
+                    onDateChange = { birthday -> vm.birthday.value = birthday }
                 )
                 FormInput(
                     inputText = vm.phoneNum.value,

@@ -10,6 +10,7 @@ import reservant_mobile.data.endpoints.Events
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.utils.GetEventsStatus
 import java.time.LocalDate
 
 interface IEventService{
@@ -20,7 +21,8 @@ interface IEventService{
                           name: String? = null,
                           dateFrom: LocalDate? = null,
                           dateUntil: LocalDate? = null,
-                          eventStatus: EventDTO.EventStatus? = null): Result<Flow<PagingData<EventDTO>>?>
+                          friendsOnly: Boolean? = null,
+                          eventStatus: GetEventsStatus? = null): Result<Flow<PagingData<EventDTO>>?>
     suspend fun addEvent(event: EventDTO): Result<EventDTO?>
     suspend fun getEvent(eventId: Any): Result<EventDTO?>
     suspend fun updateEvent(eventId: Any, event:EventDTO): Result<EventDTO?>
@@ -42,7 +44,8 @@ class EventService(): ServiceUtil(), IEventService{
         name: String?,
         dateFrom: LocalDate?,
         dateUntil: LocalDate?,
-        eventStatus: EventDTO.EventStatus?
+        friendsOnly: Boolean?,
+        eventStatus: GetEventsStatus?
     ): Result<Flow<PagingData<EventDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Events(
@@ -53,6 +56,7 @@ class EventService(): ServiceUtil(), IEventService{
                 name = name,
                 dateFrom = dateFrom?.toString(),
                 dateUntil = dateUntil?.toString(),
+                friendsOnly = friendsOnly,
                 eventStatus = eventStatus?.toString(),
                 page = page,
                 perPage = perPage
@@ -106,7 +110,7 @@ class EventService(): ServiceUtil(), IEventService{
             parent = Events.Id(eventId=eventId.toString()),
             userId = userId
         ),"")
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     @OptIn(InternalSerializationApi::class)

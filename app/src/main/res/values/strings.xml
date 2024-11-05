@@ -122,7 +122,7 @@
     <string name="label_alcohol">Alcohol Percentage</string>
     <string name="label_logout_action">Log out</string>
     <string name="label_orders">Orders</string>
-    <string name="label_social">Social</string>
+    <string name="label_find_friends">Find friends</string>
     <string name="label_search">Search...</string>
     <string name="label_filters">Filters</string>
     <string name="label_date">Date</string>
@@ -254,5 +254,25 @@
     <string name="seats_label">Seats: %1$d</string>
     <string name="available_label">Available</string>
     <string name="occupied_label">Occupied</string>
-
+    <string name="restaurant_notification_channel_id" translatable="false">restaurant_notification_channel_id</string>
+    <string name="restaurant_notification_channel_name">Restaurants</string>
+    <string name="friends_notification_channel_id" translatable="false">friends_notification_channel_id</string>
+    <string name="friends_notification_channel_name">Friends</string>
+    <string name="events_notification_channel_id" translatable="false">events_notification_channel_id</string>
+    <string name="events_notification_channel_name">Events</string>
+    <string name="visits_notification_channel_id" translatable="false">visits_notification_channel_id</string>
+    <string name="visits_notification_channel_name">Visits</string>
+    <string name="error_threads_not_found">Not found any message threads</string>
+    <string name="empty_search">Type in search to see results</string>
+    <string name="error_users_not_found">Not found any users</string>
+    <string name="label_sent_by">Sent by</string>
+    <string name="label_read_at">Read at</string>
+    <string name="label_event_category_created">Created by</string>
+    <string name="label_event_category_participated">Participated in</string>
+    <string name="label_event_category_interested">Interested in</string>
+    <string name="label_with_friends_only">With friends only</string>
+    <string name="label_reservation_status_deposit_not_paid">Deposit not paid</string>
+    <string name="label_reservation_status_to_be_reviewed">To be reviewed</string>
+    <string name="label_reservation_status_approved">Approved</string>
+    <string name="label_reservation_status_declined">Declined</string>
 </resources>

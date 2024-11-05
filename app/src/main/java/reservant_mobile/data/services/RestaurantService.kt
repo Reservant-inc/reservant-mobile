@@ -29,6 +29,7 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.utils.GetDeliveriesSort
 import reservant_mobile.data.utils.GetIngredientsSort
+import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
 import reservant_mobile.data.utils.GetVisitsSort
@@ -57,12 +58,17 @@ interface IRestaurantService{
     suspend fun deleteGroup(id: Any): Result<Boolean>
     suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<RestaurantDTO?>
     suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
-    suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean>
-    suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
-    suspend fun getEmployees(): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun addEmployeeToRestaurant(id: Any, emp: List<RestaurantEmployeeDTO>): Result<Boolean>
+    suspend fun getMyEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getEmployees(
+        restaurantId: Any,
+        hallOnly: Boolean? = null,
+        backdoorOnly: Boolean? = null): Result<List<RestaurantEmployeeDTO>?>
     suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?>
     suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
+    suspend fun editEmployment(empList: List<RestaurantEmployeeDTO>): Result<Boolean>
     suspend fun getRestaurantTags(): Result<List<String>?>
     /***
      * Available order values : see GetRestaurantOrders class
@@ -87,6 +93,10 @@ interface IRestaurantService{
     suspend fun getVisits(restaurantId: Any,
                           dateStart: LocalDateTime? = null,
                           dateEnd: LocalDateTime? = null,
+                          tableId: Int? = null,
+                          hasOrders: Boolean? = null,
+                          isTakeaway: Boolean? = null,
+                          reservationStatus: GetReservationStatus? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
@@ -221,7 +231,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return complexResultWrapper(res)
     }
 
-    override suspend fun addEmployeeToRestaurant(id: Any, emp: RestaurantEmployeeDTO): Result<Boolean> {
+    override suspend fun addEmployeeToRestaurant(id: Any, emp: List<RestaurantEmployeeDTO>): Result<Boolean> {
         val res = api.post(
             MyRestaurants.Id.Employees(
             parent = MyRestaurants.Id(restaurantId = id.toString())
@@ -229,7 +239,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
-    override suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?> {
+    override suspend fun getMyEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(
             MyRestaurants.Id.Employees(
             parent = MyRestaurants.Id(restaurantId = restaurantId.toString())
@@ -237,8 +247,21 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return complexResultWrapper(res)
     }
 
-    override suspend fun getEmployees(): Result<List<RestaurantEmployeeDTO>?> {
+    override suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(User.Employees())
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getEmployees(
+        restaurantId: Any,
+        hallOnly: Boolean?,
+        backdoorOnly: Boolean?
+    ): Result<List<RestaurantEmployeeDTO>?> {
+        val res = api.get(Restaurants.Id.Employees(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                hallOnly = hallOnly,
+                backdoorOnly = backdoorOnly
+            ))
         return complexResultWrapper(res)
     }
 
@@ -254,6 +277,11 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun deleteEmployment(employmentId: Int): Result<Boolean> {
         val res = api.delete(Employments.Id(id = employmentId.toString()))
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
+    }
+
+    override suspend fun editEmployment(empList: List<RestaurantEmployeeDTO>): Result<Boolean> {
+        val res = api.put(Employments(), empList)
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
@@ -355,6 +383,10 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         restaurantId: Any,
         dateStart: LocalDateTime?,
         dateEnd: LocalDateTime?,
+        tableId: Int?,
+        hasOrders: Boolean?,
+        isTakeaway: Boolean?,
+        reservationStatus: GetReservationStatus?,
         orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
@@ -362,6 +394,10 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 dateStart = dateStart?.toString(),
                 dateEnd = dateEnd?.toString(),
+                tableId = tableId,
+                hasOrders = hasOrders,
+                isTakeaway = isTakeaway,
+                reservationStatus = reservationStatus.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage

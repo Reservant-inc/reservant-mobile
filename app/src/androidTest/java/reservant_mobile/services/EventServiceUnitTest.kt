@@ -16,6 +16,7 @@ class EventServiceUnitTest: ServiceTest() {
     private val ser: IEventService = EventService()
 
     private lateinit var event: EventDTO
+    val userId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29"
 
 
     @Before
@@ -31,14 +32,17 @@ class EventServiceUnitTest: ServiceTest() {
         val eventTimeString = eventTime.format(formatter)
         val mustJoinUntilTimeString = mustJoinUntilTime.format(formatter)
 
+
         event = EventDTO(
             name = "Biba w JD",
             description = "string",
             time = eventTimeString,
             maxPeople = 10,
             mustJoinUntil = mustJoinUntilTimeString,
-            restaurantId = 1
+            restaurantId = 1,
+            photo = "test-jd.png"
          )
+
     }
 
     @Test
@@ -76,21 +80,21 @@ class EventServiceUnitTest: ServiceTest() {
     }
 
     @Test
-    fun accept_user_return_true()= runTest{
-        assertThat(ser.acceptUser(1, "test").value).isTrue()
-    }
-
-    @Test
-    fun reject_user_return_true()= runTest{
-        assertThat(ser.rejectUser(1, "test").value).isTrue()
-    }
-
-    @Test
     fun get_interested_users_return_pagination()= runTest{
         val items = ser.getInterestedUser(1).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
         assertThat(itemsSnapshot).isNotEmpty()
+    }
+
+    @Test
+    fun accept_user_return_true()= runTest{
+        assertThat(ser.acceptUser(1, userId).value).isTrue()
+    }
+
+    @Test
+    fun reject_user_return_true()= runTest{
+        assertThat(ser.rejectUser(1, userId).value).isTrue()
     }
 }

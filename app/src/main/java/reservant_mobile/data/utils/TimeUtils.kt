@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.Locale
 
-fun formatDateTime(dateString: String, pattern: String): String {
+fun formatToDateTime(dateString: String, pattern: String): String {
     return try {
         val formatter = DateTimeFormatterBuilder()
             .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
@@ -19,5 +19,13 @@ fun formatDateTime(dateString: String, pattern: String): String {
         dateTime.format(DateTimeFormatter.ofPattern(pattern, Locale.getDefault()))
     } catch (e: Exception) {
         "" // Zwróć pusty string w przypadku błędu parsowania
+    }
+}
+
+fun formatToDateTime(dateString: String): LocalDateTime {
+    return try {
+        return LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
+    } catch (e: Exception) {
+        LocalDateTime.now()
     }
 }

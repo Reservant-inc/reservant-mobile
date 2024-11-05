@@ -32,11 +32,15 @@ import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -59,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -68,10 +73,13 @@ import androidx.navigation.toRoute
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import org.osmdroid.views.MapView
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.NotificationService
+import reservant_mobile.data.utils.GetEventsStatus
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -80,11 +88,13 @@ import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
+import reservant_mobile.ui.components.SwitchWithLabel
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -99,6 +109,12 @@ fun MapActivity(){
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
+            val notificationHandler = NotificationHandler(LocalContext.current)
+
+            mapViewModel.viewModelScope.launch {
+                notificationHandler.awaitNotification()
+            }
+
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
             val restaurants by rememberUpdatedState(newValue = mapViewModel.restaurants.collectAsLazyPagingItems())
@@ -113,8 +129,9 @@ fun MapActivity(){
 
             //events fiters
             var eventSearchQuery by remember { mutableStateOf("") }
-            var selectedEventStatus: EventDTO.EventStatus? by remember { mutableStateOf(null) }
+            var selectedEventStatus: GetEventsStatus? by remember { mutableStateOf(null) }
             var eventSelectedDateFrom: LocalDate? by remember { mutableStateOf(null) }
+            var eventSelectedFriendsOnly: Boolean? by remember { mutableStateOf(null) }
             var eventSelectedDateUntil: LocalDate? by remember { mutableStateOf(null) }
             var showEventFiltersSheet by remember { mutableStateOf(false) }
 
@@ -174,6 +191,7 @@ fun MapActivity(){
                             }
                         }
 
+                        // ### PAGINATION EXAMPLE ###
                         if (restaurants.loadState.refresh is LoadState.Loading) {
                             LoadingScreenWithTimeout(timeoutMillis = 20000.milliseconds)
                         } else if(restaurants.itemCount < 1 || restaurants.loadState.hasError){
@@ -192,11 +210,7 @@ fun MapActivity(){
                                     if (item != null) {
                                         RestaurantCard(
                                             onClick = {
-                                                navController.navigate(
-                                                    RestaurantRoutes.Details(
-                                                        restaurantId = item.restaurantId
-                                                    )
-                                                )
+                                                navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
                                             },
                                             name = item.name,
                                             location = item.address,
@@ -208,13 +222,11 @@ fun MapActivity(){
                                             showRestaurantBottomSheet = true
                                             true
                                         }
-
                                     }
-
                                 }
                             }
-
                         }
+                        // ##########################
                     }
                 },
                 stringResource(id = R.string.label_events) to {
@@ -275,7 +287,7 @@ fun MapActivity(){
                                         EventCard(
                                             eventCreator = item.name,
                                             eventDate = item.time,
-                                            eventLocation = item.restaurant.address,
+                                            eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                             interestedCount = item.numberInterested,
                                             takePartCount = item.numberParticipants
                                         )
@@ -349,7 +361,7 @@ fun MapActivity(){
                                     onRatingSelected = { rating -> restaurantSelectedRating = rating }
                                 )
 
-                                Spacer(modifier = Modifier.height(25.dp))
+                                HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                                 Text(
                                     text = stringResource(id = R.string.label_search_filter_tags),
@@ -360,20 +372,21 @@ fun MapActivity(){
                                 FlowRow(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp)
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
-                                    tagList.forEach { brand ->
+                                    tagList.forEach { tag ->
                                         val  errorString = stringResource(id = R.string.error_too_many_tags)
 
-                                        TagChip(
-                                            tagName = brand,
-                                            isSelected = restaurantSelectedTags.contains(brand),
+                                        FilterChip(
+                                            label = {Text(text = tag)},
+                                            selected = restaurantSelectedTags.contains(tag),
                                             onClick = {
-                                                if (restaurantSelectedTags.contains(brand)) {
-                                                    restaurantSelectedTags.remove(brand)
+                                                if (restaurantSelectedTags.contains(tag)) {
+                                                    restaurantSelectedTags.remove(tag)
                                                 } else {
                                                     if (restaurantSelectedTags.size < 5) {
-                                                        restaurantSelectedTags.add(brand)
+                                                        restaurantSelectedTags.add(tag)
                                                     } else {
                                                         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
                                                     }
@@ -391,11 +404,13 @@ fun MapActivity(){
             if(showEventFiltersSheet){
                 MessageSheet(
                     buttonLabelId = R.string.label_apply,
+                    height = 500.dp,
                     onDismiss = {showEventFiltersSheet = false},
                     buttonOnClick = {
                         mapViewModel.event_status = selectedEventStatus
                         mapViewModel.event_dateFrom = eventSelectedDateFrom
                         mapViewModel.event_dateUntil = eventSelectedDateUntil
+                        mapViewModel.event_friendsOnly = eventSelectedFriendsOnly
 
                         mapViewModel.refreshEvents(userLocation = startPoint)
                     },
@@ -415,7 +430,7 @@ fun MapActivity(){
                                 onStatusSelected = {status -> selectedEventStatus = status}
                             )
 
-                            Spacer(modifier = Modifier.height(25.dp))
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
 
                             Text(
                                 text = stringResource(id = R.string.label_search_filter_date_range),
@@ -465,6 +480,15 @@ fun MapActivity(){
                                     allowFutureDates = true
                                 )
                             }
+                            HorizontalDivider(Modifier.padding(vertical = 10.dp))
+
+                            SwitchWithLabel(
+                                label = stringResource(id = R.string.label_with_friends_only),
+                                checked = eventSelectedFriendsOnly?: false,
+                                onCheckedChange = {
+                                    eventSelectedFriendsOnly = it
+                                }
+                            )
                         }
                     }
                 )
@@ -640,31 +664,6 @@ fun RestaurantDetailPreview(
     }
 }
 
-
-@Composable
-fun TagChip(tagName: String, isSelected: Boolean, onClick: () -> Unit) {
-    val selectedColor = MaterialTheme.colorScheme.primary
-    val notSelectedColor = MaterialTheme.colorScheme.background
-
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                color = if (isSelected) selectedColor else notSelectedColor,
-                shape = RoundedCornerShape(20.dp)
-            )
-            .toggleable(
-                value = isSelected,
-                onValueChange = { onClick() }
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = tagName,
-        )
-    }
-}
-
 @Composable
 fun StarRatingFilter(
     selectedRating: Int,
@@ -693,49 +692,33 @@ fun StarRatingFilter(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EventStatusRadioFilter(
-    selectedStatus: EventDTO.EventStatus?,
-    onStatusSelected: (EventDTO.EventStatus?) -> Unit
+    selectedStatus: GetEventsStatus?,
+    onStatusSelected: (GetEventsStatus?) -> Unit
 ) {
     var currentStatus by remember { mutableStateOf(selectedStatus) }
-    val selectStatus = {status:EventDTO.EventStatus? ->
+    val selectStatus = {status:GetEventsStatus? ->
       currentStatus = status
       onStatusSelected(status)
     }
 
-    Column(
-        modifier = Modifier.padding(8.dp),
-        //verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { selectStatus(null) }
-        ) {
-            RadioButton(
-                selected = currentStatus == null,
-                onClick = { selectStatus(null) }
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    )  {
+        GetEventsStatus.entries.forEach { status ->
+            val statusValue = if(status == GetEventsStatus.All) null else status
+            FilterChip(
+                label = {Text(text = stringResource(id = status.stringId))},
+                selected = currentStatus == statusValue,
+                onClick = {
+                    selectStatus(statusValue)
+                }
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(id = R.string.label_all))
-        }
-
-        EventDTO.EventStatus.entries.forEach { status ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { selectStatus(status) }
-            ) {
-                RadioButton(
-                    selected = currentStatus == status,
-                    onClick = { selectStatus(status) }
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = stringResource(id = status.stringId))
-            }
         }
     }
 }

@@ -77,7 +77,7 @@ class ProfileViewModel(
     private fun fetchUserEvents() {
         viewModelScope.launch {
             isLoading = true
-            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserInterestedEvents()
+            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserEvents()
 
             if (!result.isError) {
                 _eventsFlow.value = result.value?.cachedIn(viewModelScope)

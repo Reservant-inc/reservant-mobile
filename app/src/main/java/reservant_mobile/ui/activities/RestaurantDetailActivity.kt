@@ -75,8 +75,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.UserService
-import reservant_mobile.data.utils.formatDateTime
-import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
@@ -573,7 +572,7 @@ fun ReviewCard(review: ReviewDTO, onClick: () -> Unit) {
                 }
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
                     Text(
-                        text = review.createdAt?.let { formatDateTime(it, "dd.MM.yyyy") } ?: "",
+                        text = review.createdAt?.let { formatToDateTime(it, "dd.MM.yyyy") } ?: "",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }

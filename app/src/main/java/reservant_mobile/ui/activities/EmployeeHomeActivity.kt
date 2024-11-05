@@ -4,6 +4,7 @@
 package reservant_mobile.ui.activities
 
 import android.graphics.Bitmap
+import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -67,6 +68,7 @@ import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EmployeeRoutes
@@ -74,6 +76,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun EmployeeHomeActivity() {
@@ -225,13 +228,26 @@ fun EmployeeHomeActivity() {
                                 CircularProgressIndicator()
                             }
                         } else if (empHomeVM.isError) {
-                            MissingPage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .align(alignment = Alignment.CenterHorizontally)
-                                    .padding(vertical = 40.dp),
-                                errorStringId = R.string.label_no_restaurants_found
-                            )
+                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                MissingPage(
+                                    modifier = Modifier
+                                        .align(alignment = Alignment.CenterHorizontally)
+                                        .padding(vertical = 40.dp)
+                                        .weight(3f),
+                                    errorStringId = R.string.label_no_restaurants_found
+                                )
+                                EmpMenuButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(190.dp)
+                                        .weight(1f),
+                                    option = EmpMenuOption(
+                                        text = stringResource(id = R.string.label_settings),
+                                        icon = Icons.Outlined.Settings,
+                                        onClick = { innerNavController.navigate(MainRoutes.Settings)}
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -306,7 +322,7 @@ fun EmployeeHomeActivity() {
                         ) {
                             items(options.size) { optionIndex ->
                                 val option = options[optionIndex]
-                                EmpMenuButton(option)
+                                EmpMenuButton(option = option)
                             }
                         }
                     }
@@ -347,13 +363,14 @@ data class EmpMenuOption(
 
 @Composable
 fun EmpMenuButton(
+    modifier: Modifier = Modifier
+        .padding(8.dp)
+        .size(190.dp),
     option: EmpMenuOption
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .padding(8.dp)
-            .size(190.dp),
+        modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
         onClick = option.onClick
     ) {

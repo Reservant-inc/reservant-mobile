@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.LazyPagingItems
 import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.utils.formatDateTime
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
@@ -90,7 +90,7 @@ fun OrderList(orders: LazyPagingItems<OrderDTO>?) {
 
 @Composable
 fun OrderCard(order: OrderDTO) {
-    val formattedDate = order.date?.let { formatDateTime(it, "HH:mm") }
+    val formattedDate = order.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = order.cost?.let { "%.2f zł".format(it) }
 
     Card(

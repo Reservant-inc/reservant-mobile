@@ -36,7 +36,17 @@ class Restaurants(
          * Available visitSorting values : DateAsc, DateDesc
          */
         @Resource("visits")
-        class Visits(val parent: Id, val dateStart: String? = null, val dateEnd: String? = null, val visitSorting: String? = null, val page: Int? = null, val perPage: Int? = null)
+        class Visits(
+            val parent: Id,
+            val dateStart: String? = null,
+            val dateEnd: String? = null,
+            val tableId: Int? = null,
+            val hasOrders: Boolean? = null,
+            val isTakeaway: Boolean? = null,
+            val reservationStatus: String? = null,
+            val visitSorting: String? = null,
+            val page: Int? = null,
+            val perPage: Int? = null)
 
         /***
          * Available order values : NameAsc, NameDesc, AmountAsc, AmountDesc
@@ -62,5 +72,7 @@ class Restaurants(
         class MenuItems(val parent: Id)
         @Resource("available-hours")
         class AvailableHours(val parent: Id, val date: String? = null, val numberOfGuests: Int? = null)
+        @Resource("employees")
+        class Employees(val parent: Id, val hallOnly: Boolean? = null, val backdoorOnly: Boolean? = null)
     }
 }

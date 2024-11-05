@@ -14,14 +14,16 @@ data class OrderDTO(
     val note: String? = null,
     val items: List<OrderItemDTO>? = null,
     val employeeId: String? = null,
-    val employees: List<UserSummaryDTO>? = null
+    val assignedEmployee: UserSummaryDTO? = null
 
 ){
     @Serializable
     data class OrderItemDTO(
-        val menuItemId: Int,
+        val menuItem: RestaurantMenuItemDTO? = null,
+        val menuItemId: Int? = null,
         val amount: Int,
-        val cost: Double? = null,
+        val oneItemPrice: Double? = null,
+        val totalCost: Double? = null,
         val status: String? = null
     )
 

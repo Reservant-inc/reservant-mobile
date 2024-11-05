@@ -85,6 +85,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
@@ -1251,6 +1252,8 @@ fun FilterOption(status: String, onFilterSelected: (String) -> Unit) {
 fun LoadedPhotoComponent(
     photoModifier: Modifier = Modifier,
     placeholderModifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+    placeholder: Int = R.drawable.unknown_image,
     getPhoto: suspend () -> Bitmap?,
 ) {
     var isLoading by remember {
@@ -1278,13 +1281,15 @@ fun LoadedPhotoComponent(
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = "loaded_photo",
-                    modifier = photoModifier
+                    modifier = photoModifier,
+                    contentScale = contentScale
                 )
             } else {
                 Image(
-                    painterResource(id = R.drawable.unknown_image),
+                    painterResource(placeholder),
                     contentDescription = "placeholder_photo",
-                    modifier = placeholderModifier
+                    modifier = placeholderModifier,
+                    contentScale = contentScale
                 )
             }
         }
@@ -1398,5 +1403,31 @@ fun RequestPermission(
         if (permission.string.isNotEmpty() && !permissionState.status.isGranted) {
             requestPermissionLauncher.launch(permission.string)
         }
+    }
+}
+
+@Composable
+fun SwitchWithLabel(
+    label: String,
+    checked: Boolean,
+    onCheckedChange:  ((Boolean) -> Unit)?
+) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+        )
     }
 }

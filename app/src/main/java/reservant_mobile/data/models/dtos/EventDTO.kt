@@ -11,6 +11,7 @@ data class EventDTO (
     val description: String,
     val maxPeople: Int? = null,
     val time: String,
+    val photo: String? = null,
     val mustJoinUntil: String,
     val creator: Participant? = null,
     val restaurant: RestaurantDTO? = null,
