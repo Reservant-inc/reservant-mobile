@@ -372,7 +372,8 @@ fun OpeningHours(
             .padding(vertical = 4.dp)
     ) {
         Text(
-            modifier = Modifier.animateContentSize(),
+            modifier = Modifier
+                .animateContentSize(),
             text = buildAnnotatedString {
                 if (isExpanded) {
 
@@ -398,7 +399,8 @@ fun OpeningHours(
 
                         append(" • ")
 
-                        if (availableHours.from == null && availableHours.until == null){
+                        //if (availableHours.from == null && availableHours.until == null){ TODO
+                        if (date.dayOfWeek == DayOfWeek.SUNDAY){
                             withStyle(SpanStyle(color = MaterialTheme.colorScheme.error)){
                                 append(stringResource(id = R.string.label_closed))
                             }
