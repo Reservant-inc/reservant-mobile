@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentCompositionErrors
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -112,22 +113,35 @@ fun RestaurantCard(
                 availableHours?.let {
 
                     var openingTime by remember {
-                        mutableStateOf(it.getRestaurantOpeningTime() ?: LocalTime.of(0,0))
+                        mutableStateOf(it.getRestaurantOpeningTime())
                     }
 
                     var closingTime by remember {
-                        mutableStateOf(it.getRestaurantOpeningTime(opening = false) ?: LocalTime.of(0,0))
+                        mutableStateOf(it.getRestaurantOpeningTime(opening = false))
                     }
 
                     var currentTime by remember {
                         mutableStateOf(LocalTime.now())
                     }
 
-                    val isOpen = closingTime == LocalTime.of(0,0) || closingTime > currentTime
+                    val isOpen = openingTime != null && closingTime != null && currentTime > openingTime && currentTime < closingTime
 
-                    val isNearClosing = isOpen && closingTime.minusHours(1) < currentTime
+                    if (isOpen){
+                        val isNearClosing = closingTime!!.minusHours(1) < currentTime
 
-                    //Text(text = it,style = MaterialTheme.typography.bodyMedium)
+                        closingTime?.let {
+                            Text(text = it.toString(),style = MaterialTheme.typography.bodyMedium)
+                        }
+
+                    } else {
+                        closingTime?.let {
+                            Text(text = it.toString(),style = MaterialTheme.typography.bodyMedium)
+                        }
+
+                    }
+
+
+
                 }
             }
         }
