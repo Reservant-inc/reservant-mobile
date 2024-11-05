@@ -41,11 +41,15 @@ class EmployeeHomeViewModel(
         isLoading = true
         val selectedId = localDataService.getData(PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT)
 
-        if(selectedId.isEmpty())
+        if(selectedId.isEmpty()){
+            isLoading = false
             return
+        }
 
-        if(restaurants.isEmpty())
+        if(restaurants.isEmpty()){
+            isLoading = false
             return
+        }
 
         selectedRestaurant = restaurants.find { it.restaurantId == selectedId.toInt() }
         isLoading = false

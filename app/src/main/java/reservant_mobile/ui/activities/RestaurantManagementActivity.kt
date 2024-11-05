@@ -464,7 +464,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
         composable<RestaurantManagementRoutes.Edit> {
             RegisterRestaurantActivity(
-                navControllerHome = navControllerHome,
+                navControllerHome = navController,
                 group = selectedGroup,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
             )

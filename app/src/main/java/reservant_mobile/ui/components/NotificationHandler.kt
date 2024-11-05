@@ -108,22 +108,20 @@ class NotificationHandler(
             while (true){
                 val notification = service.receiveNotificationFromSession(session)
 
-                if (!notification.isError && notification.value != null){
-
-                    val notification = notification.value
-
-                    val photo = notification.photo?.let {
-                        fileService.getImage(it)
-                    } ?: Result(isError = true, value = null)
-
-
-                    showBasicNotification(
-                        notification.notificationType.toString(),
-                        "Parse content here", // TODO add content parsing
-                        photo.value
-                    )
-
+                if (notification.isError || notification.value == null){
+                    return
                 }
+
+                val photo = notification.value.photo?.let {
+                    fileService.getImage(it)
+                } ?: Result(isError = true, value = null)
+
+
+                showBasicNotification(
+                    notification.value.notificationType.toString(),
+                    "Parse content here", // TODO add content parsing
+                    photo.value
+                )
 
             }
 
