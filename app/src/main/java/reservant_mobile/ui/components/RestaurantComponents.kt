@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,15 +34,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentCompositionErrors
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -48,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
@@ -57,7 +63,14 @@ import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.data.utils.getRestaurantOpeningTime
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjuster
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @Composable
 fun RestaurantCard(
@@ -109,7 +122,7 @@ fun RestaurantCard(
 
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(top = 16.dp)
             ) {
                 Text(
                     text = name,
@@ -144,14 +157,14 @@ fun RestaurantCard(
 
                             if (isNearClosing) {
                                 Text(
-                                    modifier = Modifier.padding(top = 4.dp),
+                                    modifier = Modifier.padding(vertical = 4.dp),
                                     text = "${stringResource(id = R.string.label_closing_soon)}: $it",
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } else {
                                 Text(
-                                    modifier = Modifier.padding(top = 4.dp),
+                                    modifier = Modifier.padding(vertical = 4.dp),
                                     text = "${stringResource(id = R.string.label_closing_at)}: $it",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -159,7 +172,7 @@ fun RestaurantCard(
 
                         } else {
                             Text(
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(vertical = 4.dp),
                                 text = "${stringResource(id = R.string.label_closed)}: $it",
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodyMedium
@@ -167,12 +180,6 @@ fun RestaurantCard(
 
                         }
                     }
-
-
-
-
-
-
 
                 }
             }
@@ -327,25 +334,72 @@ fun OpeningHours(
         mutableStateOf(false)
     }
 
+    val openingTime by remember {
+        mutableStateOf(openingHours.getRestaurantOpeningTime())
+    }
+    
+    val closingTime by remember {
+        mutableStateOf(openingHours.getRestaurantOpeningTime(opening = false))
+    }
+
+    val currentTime by remember {
+        mutableStateOf(LocalTime.now())
+    }
+
+    val currentDay by remember {
+        mutableIntStateOf(LocalDate.now().dayOfWeek.value - 1)
+    }
+    
+    val isOpen = openingTime != null && closingTime != null && currentTime > openingTime && currentTime < closingTime
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Text(modifier = Modifier.animateContentSize(),
+        Text(
+            modifier = Modifier.animateContentSize(),
             text = buildAnnotatedString {
-            if (isExpanded){
-                append("Mon: 00:00 - 15:00\n")
-                append("Tue: 00:00 - 15:00\n")
-                append("Thu: 00:00 - 15:00\n")
-            } else {
-                append("Today: 00:00 - 15:00")
-            }
-        }, maxLines = if (isExpanded) Int.MAX_VALUE else 1,)
+                if (isExpanded) {
+
+                    openingHours.forEachIndexed { index, availableHours ->
+
+                        val date by remember {
+                            mutableStateOf(
+                                LocalDate.now()
+                                    .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+                                    .plusDays(index.toLong())
+                            )
+                        }
+
+                        if (index == currentDay) {
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        }
+
+                        append(date.format(DateTimeFormatter.ofPattern("E", Locale.getDefault())))
+
+                        if (index == currentDay) {
+                            pop()
+                        }
+
+                        append(" • ${availableHours.from} - ${availableHours.until}\n")
+
+                    }
+
+                } else {
+                    pushStyle(SpanStyle(color = if (isOpen) Color.Green else Color.Red))
+                    append(stringResource(id = if (isOpen) R.string.label_open else R.string.label_closed ))
+                    pop()
+                    append(" • $openingTime - $closingTime")
+                }
+            },
+            maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+        )
         Icon(
             Icons.Rounded.KeyboardArrowDown,
             contentDescription = "Expand icon",
             modifier = Modifier
+                .clip(CircleShape)
                 .padding(horizontal = 4.dp)
                 .rotate(if (isExpanded) 180f else 0f)
                 .clickable {
