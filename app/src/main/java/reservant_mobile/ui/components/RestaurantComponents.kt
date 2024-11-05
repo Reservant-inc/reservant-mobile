@@ -40,9 +40,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.data.utils.getRestaurantClosingTime
+import java.time.LocalTime
 
 @Composable
 fun RestaurantCard(
@@ -50,7 +53,8 @@ fun RestaurantCard(
     name: String,
     location: String,
     city: String,
-    image: ImageBitmap?
+    image: ImageBitmap?,
+    availableHours: List<RestaurantDTO.AvailableHours>?
 ) {
     Card(
         modifier = Modifier
@@ -105,6 +109,21 @@ fun RestaurantCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
+
+                availableHours?.let {
+
+                    var closingTime by remember {
+                        mutableStateOf(getRestaurantClosingTime(it) ?: LocalTime.of(0,0))
+                    }
+
+                    var currentTime = LocalTime.now()
+
+                    val isOpen = closingTime == LocalTime.of(0,0) || closingTime > currentTime
+
+                    val isNearClosing = isOpen && closingTime.minusHours(1) < currentTime
+
+                    //Text(text = it,style = MaterialTheme.typography.bodyMedium)
+                }
             }
         }
     }
