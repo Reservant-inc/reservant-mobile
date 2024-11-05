@@ -37,6 +37,10 @@ enum class GetUserEventsCategory(val stringId: Int){
 }
 
 enum class GetEventsStatus(val stringId: Int){
+    /***
+     * For labeling only, do not use as a param, use null instead
+     */
+    All(R.string.label_all),
     Future(R.string.label_event_status_future),
     NonJoinable(R.string.label_event_status_nonJoinable),
     Past(R.string.label_event_status_past)
