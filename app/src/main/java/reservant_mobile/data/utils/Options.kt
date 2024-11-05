@@ -41,3 +41,10 @@ enum class GetEventsStatus(val stringId: Int){
     NonJoinable(R.string.label_event_status_nonJoinable),
     Past(R.string.label_event_status_past)
 }
+
+enum class GetReservationStatus(val stringId: Int){
+    DepositNotPaid(R.string.label_reservation_status_deposit_not_paid),
+    ToBeReviewed(R.string.label_reservation_status_to_be_reviewed),
+    Approved(R.string.label_reservation_status_approved),
+    Declined(R.string.label_reservation_status_declined)
+}

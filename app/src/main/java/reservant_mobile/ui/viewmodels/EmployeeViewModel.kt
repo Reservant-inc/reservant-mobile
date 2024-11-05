@@ -51,7 +51,7 @@ class EmployeeViewModel(
             isLoading = true
             try {
                 val result: Result<List<RestaurantEmployeeDTO>?> =
-                    restaurantService.getEmployees(restaurantId)
+                    restaurantService.getMyEmployees(restaurantId)
                 if (!result.isError && result.value != null) {
                     employees = result.value
                 }
