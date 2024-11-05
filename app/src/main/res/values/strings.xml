@@ -413,4 +413,5 @@
     <string name="label_closing_at">Closing at</string>
     <string name="label_closed">Closed</string>
     <string name="label_closing_soon">Closing soon</string>
+    <string name="label_open">Open</string>
 </resources>

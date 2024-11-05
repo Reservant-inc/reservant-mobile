@@ -33,6 +33,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -239,7 +240,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                 }
 
                                 Column(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                         .padding(horizontal = 16.dp)
                                 ) {
                                     Text(
@@ -259,6 +261,9 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     )
 
                                     restaurant.openingHours?.let {
+
+                                        HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+
                                         OpeningHours(openingHours = restaurant.openingHours)
                                     }
                                 }
