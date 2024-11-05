@@ -59,8 +59,8 @@ interface IRestaurantService{
     suspend fun moveToGroup(restaurantId: Any, groupId: Any): Result<RestaurantDTO?>
     suspend fun createEmployee(emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun addEmployeeToRestaurant(id: Any, emp: List<RestaurantEmployeeDTO>): Result<Boolean>
-    suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
-    suspend fun getEmployees(): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getMyEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?>
     suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?>
     suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
@@ -235,7 +235,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
-    override suspend fun getEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?> {
+    override suspend fun getMyEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(
             MyRestaurants.Id.Employees(
             parent = MyRestaurants.Id(restaurantId = restaurantId.toString())
@@ -243,7 +243,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return complexResultWrapper(res)
     }
 
-    override suspend fun getEmployees(): Result<List<RestaurantEmployeeDTO>?> {
+    override suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(User.Employees())
         return complexResultWrapper(res)
     }
