@@ -1,6 +1,8 @@
 package reservant_mobile.data.utils
 
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
@@ -28,4 +30,9 @@ fun formatToDateTime(dateString: String): LocalDateTime {
     } catch (e: Exception) {
         LocalDateTime.now()
     }
+}
+
+fun getRestaurantClosingTime(openingHours: List<RestaurantDTO.AvailableHours>): LocalTime? {
+    val closingTime = openingHours[LocalDateTime.now().dayOfWeek.value - 1].until
+    return if (closingTime != null) LocalTime.parse(closingTime) else null
 }
