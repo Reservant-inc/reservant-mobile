@@ -122,14 +122,17 @@ fun RestaurantCard(
 
             Column(
                 modifier = Modifier
-                    .padding(top = 16.dp)
+                    .padding(horizontal = 16.dp)
+
             ) {
                 Text(
+                    modifier = Modifier.padding(top = 8.dp),
                     text = name,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
+                    modifier = Modifier.padding(top = 4.dp),
                     text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
@@ -157,14 +160,14 @@ fun RestaurantCard(
 
                             if (isNearClosing) {
                                 Text(
-                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                                     text = "${stringResource(id = R.string.label_closing_soon)}: $it",
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             } else {
                                 Text(
-                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                                     text = "${stringResource(id = R.string.label_closing_at)}: $it",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -172,7 +175,7 @@ fun RestaurantCard(
 
                         } else {
                             Text(
-                                modifier = Modifier.padding(vertical = 4.dp),
+                                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                                 text = "${stringResource(id = R.string.label_closed)}: $it",
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodyMedium
