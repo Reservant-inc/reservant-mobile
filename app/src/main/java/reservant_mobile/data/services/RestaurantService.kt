@@ -61,6 +61,10 @@ interface IRestaurantService{
     suspend fun addEmployeeToRestaurant(id: Any, emp: List<RestaurantEmployeeDTO>): Result<Boolean>
     suspend fun getMyEmployees(restaurantId: Any): Result<List<RestaurantEmployeeDTO>?>
     suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?>
+    suspend fun getEmployees(
+        restaurantId: Any,
+        hallOnly: Boolean? = null,
+        backdoorOnly: Boolean? = null): Result<List<RestaurantEmployeeDTO>?>
     suspend fun getEmployee(id: Any): Result<RestaurantEmployeeDTO?>
     suspend fun editEmployee(id: Any, emp: RestaurantEmployeeDTO): Result<RestaurantEmployeeDTO?>
     suspend fun deleteEmployment(employmentId: Int): Result<Boolean>
@@ -245,6 +249,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
     override suspend fun getUserEmployees(): Result<List<RestaurantEmployeeDTO>?> {
         val res = api.get(User.Employees())
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getEmployees(
+        restaurantId: Any,
+        hallOnly: Boolean?,
+        backdoorOnly: Boolean?
+    ): Result<List<RestaurantEmployeeDTO>?> {
+        val res = api.get(Restaurants.Id.Employees(
+                parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+                hallOnly = hallOnly,
+                backdoorOnly = backdoorOnly
+            ))
         return complexResultWrapper(res)
     }
 

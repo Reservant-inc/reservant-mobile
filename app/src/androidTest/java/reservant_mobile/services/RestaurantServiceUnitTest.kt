@@ -70,7 +70,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
             amountUsed = 10.0
         )
     )
-    private val restaurantId = 1
+    private val restaurantId = 2
 
     @Before
     fun setupData() = runBlocking {
@@ -152,6 +152,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun get_restaurant_employees_return_not_null()= runTest{
         assertThat(ser.getMyEmployees(restaurantId).value).isNotNull()
+        assertThat(ser.getEmployees(restaurantId).value).isNotNull()
     }
 
     @Test
