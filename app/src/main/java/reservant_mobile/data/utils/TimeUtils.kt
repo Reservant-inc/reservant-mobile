@@ -32,13 +32,13 @@ fun formatToDateTime(dateString: String): LocalDateTime {
     }
 }
 
-fun getRestaurantOpeningTime(openingHours: List<RestaurantDTO.AvailableHours>, opening: Boolean = true): LocalTime? {
+fun List<RestaurantDTO.AvailableHours>.getRestaurantOpeningTime(opening: Boolean = true): LocalTime? {
     val dayOfWeek = LocalDateTime.now().dayOfWeek.value - 1
 
     val time = if (opening) {
-        openingHours[dayOfWeek].from
+        this[dayOfWeek].from
     } else {
-        openingHours[dayOfWeek].until
+        this[dayOfWeek].until
     }
 
     return if (time != null) LocalTime.parse(time) else null
