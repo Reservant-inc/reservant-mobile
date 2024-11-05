@@ -401,4 +401,7 @@
     <string name="error_invalid_number">Nieprawidłowa liczba</string>
     <string name="label_choose_time">Wybierz godzinę</string>
     <string name="error_select_restaurant">Wybierz restaurację</string>
+    <string name="label_closing_at">Zamknięte o</string>
+    <string name="label_closed">Zamknięte</string>
+    <string name="label_closing_soon">Wkrótce zamknięte</string>
 </resources>

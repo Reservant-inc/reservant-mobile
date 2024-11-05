@@ -410,4 +410,7 @@
     <string name="error_invalid_number">Invalid number</string>
     <string name="label_choose_time">Choose Time</string>
     <string name="error_select_restaurant">Select a restaurant</string>
+    <string name="label_closing_at">Closing at</string>
+    <string name="label_closed">Closed</string>
+    <string name="label_closing_soon">Closing soon</string>
 </resources>
