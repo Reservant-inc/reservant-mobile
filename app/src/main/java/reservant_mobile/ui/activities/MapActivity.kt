@@ -372,20 +372,21 @@ fun MapActivity(){
                                 FlowRow(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp)
+                                        .padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
-                                    tagList.forEach { brand ->
+                                    tagList.forEach { tag ->
                                         val  errorString = stringResource(id = R.string.error_too_many_tags)
 
-                                        TagChip(
-                                            tagName = brand,
-                                            isSelected = restaurantSelectedTags.contains(brand),
+                                        FilterChip(
+                                            label = {Text(text = tag)},
+                                            selected = restaurantSelectedTags.contains(tag),
                                             onClick = {
-                                                if (restaurantSelectedTags.contains(brand)) {
-                                                    restaurantSelectedTags.remove(brand)
+                                                if (restaurantSelectedTags.contains(tag)) {
+                                                    restaurantSelectedTags.remove(tag)
                                                 } else {
                                                     if (restaurantSelectedTags.size < 5) {
-                                                        restaurantSelectedTags.add(brand)
+                                                        restaurantSelectedTags.add(tag)
                                                     } else {
                                                         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
                                                     }
@@ -663,31 +664,6 @@ fun RestaurantDetailPreview(
     }
 }
 
-
-@Composable
-fun TagChip(tagName: String, isSelected: Boolean, onClick: () -> Unit) {
-    val selectedColor = MaterialTheme.colorScheme.primary
-    val notSelectedColor = MaterialTheme.colorScheme.background
-
-    Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .background(
-                color = if (isSelected) selectedColor else notSelectedColor,
-                shape = RoundedCornerShape(20.dp)
-            )
-            .toggleable(
-                value = isSelected,
-                onValueChange = { onClick() }
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = tagName,
-        )
-    }
-}
-
 @Composable
 fun StarRatingFilter(
     selectedRating: Int,
@@ -731,42 +707,24 @@ fun EventStatusRadioFilter(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     )  {
-        EventStatusChip(
-            text = stringResource(id = R.string.label_all),
-            isSelected = currentStatus == null,
-            onSelectionChanged = {
+        FilterChip(
+            label = { Text(text = stringResource(id = R.string.label_all))},
+            selected = currentStatus == null,
+            onClick = {
                 selectStatus(null)
             }
         )
 
         GetEventsStatus.entries.forEach { status ->
-            EventStatusChip(
-                text = stringResource(id = status.stringId),
-                isSelected = currentStatus == status,
-                onSelectionChanged = {
+            FilterChip(
+                label = {Text(text = stringResource(id = status.stringId))},
+                selected = currentStatus == status,
+                onClick = {
                     selectStatus(status)
                 }
             )
         }
     }
-}
-
-@Composable
-fun EventStatusChip(text: String, isSelected: Boolean, onSelectionChanged: (Boolean) -> Unit) {
-    val selectedColor = MaterialTheme.colorScheme.primary
-    val notSelectedColor = MaterialTheme.colorScheme.background
-
-    FilterChip(
-        selected = isSelected,
-        onClick = { onSelectionChanged(!isSelected) },
-        label = {
-            Text(text = text)
-        },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = selectedColor,  // Change to your preferred selected color
-            containerColor = notSelectedColor,         // Change to your preferred unselected color
-        )
-    )
 }
