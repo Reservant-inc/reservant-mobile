@@ -29,6 +29,7 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.utils.GetDeliveriesSort
 import reservant_mobile.data.utils.GetIngredientsSort
+import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
 import reservant_mobile.data.utils.GetVisitsSort
@@ -91,6 +92,7 @@ interface IRestaurantService{
                           tableId: Int? = null,
                           hasOrders: Boolean? = null,
                           isTakeaway: Boolean? = null,
+                          reservationStatus: GetReservationStatus? = null,
                           orderBy: GetVisitsSort? = null): Result<Flow<PagingData<VisitDTO>>?>
 
     /***
@@ -367,6 +369,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         tableId: Int?,
         hasOrders: Boolean?,
         isTakeaway: Boolean?,
+        reservationStatus: GetReservationStatus?,
         orderBy: GetVisitsSort?
     ): Result<Flow<PagingData<VisitDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
@@ -377,6 +380,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                 tableId = tableId,
                 hasOrders = hasOrders,
                 isTakeaway = isTakeaway,
+                reservationStatus = reservationStatus.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage

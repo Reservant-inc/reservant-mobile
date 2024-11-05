@@ -43,6 +43,7 @@ class Restaurants(
             val tableId: Int? = null,
             val hasOrders: Boolean? = null,
             val isTakeaway: Boolean? = null,
+            val reservationStatus: String? = null,
             val visitSorting: String? = null,
             val page: Int? = null,
             val perPage: Int? = null)
