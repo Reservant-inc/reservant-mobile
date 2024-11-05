@@ -43,7 +43,7 @@ import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
-import reservant_mobile.data.utils.getRestaurantClosingTime
+import reservant_mobile.data.utils.getRestaurantOpeningTime
 import java.time.LocalTime
 
 @Composable
@@ -112,10 +112,16 @@ fun RestaurantCard(
                 availableHours?.let {
 
                     var closingTime by remember {
-                        mutableStateOf(getRestaurantClosingTime(it) ?: LocalTime.of(0,0))
+                        mutableStateOf(getRestaurantOpeningTime(it) ?: LocalTime.of(0,0))
                     }
 
-                    var currentTime = LocalTime.now()
+                    var openingTime by remember {
+
+                    }
+
+                    var currentTime by remember {
+                        mutableStateOf(LocalTime.now())
+                    }
 
                     val isOpen = closingTime == LocalTime.of(0,0) || closingTime > currentTime
 
