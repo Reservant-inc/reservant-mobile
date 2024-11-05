@@ -112,12 +112,12 @@ fun RestaurantCard(
 
                 availableHours?.let {
 
-                    var closingTime by remember {
-                        mutableStateOf(getRestaurantOpeningTime(it) ?: LocalTime.of(0,0))
+                    var openingTime by remember {
+                        mutableStateOf(it.getRestaurantOpeningTime() ?: LocalTime.of(0,0))
                     }
 
-                    var openingTime by remember {
-
+                    var closingTime by remember {
+                        mutableStateOf(it.getRestaurantOpeningTime(opening = false) ?: LocalTime.of(0,0))
                     }
 
                     var currentTime by remember {
