@@ -257,4 +257,7 @@
     <string name="label_event_category_participated">Wzięty udział</string>
     <string name="label_event_category_interested">Zainteresowane</string>
     <string name="label_with_friends_only">Tylko ze znajomymi</string>
+    <string name="label_closing_at">Zamknięte o</string>
+    <string name="label_closed">Zamknięte</string>
+    <string name="label_closing_soon">Wkrótce zamknięte</string>
 </resources>
