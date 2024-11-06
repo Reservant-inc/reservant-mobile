@@ -209,16 +209,16 @@ fun DishCard(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
-                }
-            }
-            // Conditional display of Change Status button
-            if (!isReservation && isToday) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {  },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(text = stringResource(R.string.change_status_button))
+
+                    if (!isReservation && isToday) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = {  },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text(text = stringResource(R.string.change_status_button))
+                        }
+                    }
                 }
             }
         }
