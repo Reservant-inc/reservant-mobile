@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
 
 @Composable
@@ -35,7 +37,6 @@ fun EventDetailActivity(
     val event = remember { mutableStateOf(mockEventData()) }
 
     val isOwner = true
-
 
     Scaffold(
         topBar = {
@@ -74,19 +75,25 @@ fun EventDetailActivity(
             item {
                 Text(
                     text = "Event Information",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .padding(top = 16.dp, bottom = 8.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "Description: ${event.value.description}")
-                Text(text = "Date and Time: ${event.value.time}")
+
+                val date = formatToDateTime(event.value.time, "dd.MM.yyyy")
+                val time = formatToDateTime(event.value.time, "HH:mm")
+
+                Text(text = "Date and Time: $date $time")
+
                 Text(
                     text = "Location: ${event.value.restaurant?.name}",
                     modifier = Modifier.clickable {
                         // Navigate to restaurant details
-                    },
+                    }
+                        .padding(bottom = 16.dp),
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (isOwner) {
@@ -111,14 +118,18 @@ fun EventDetailActivity(
 
             if (isOwner) {
                 item {
-                    Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = "Join Requests",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
                 items(joinRequests) { user ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "${user.firstName} ${user.lastName}",
@@ -126,11 +137,24 @@ fun EventDetailActivity(
                             modifier = Modifier.padding(top = 12.dp)
                         )
                         Row {
-                            IconButton(onClick = { /* Approve user */ }) {
+                            Button(
+                                onClick = { /* Approve user */ },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Zielony przycisk
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(end = 4.dp)
+                            ) {
                                 Icon(Icons.Default.Check, contentDescription = "Approve")
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Approve")
                             }
-                            IconButton(onClick = { /* Reject user */ }) {
+                            Button(
+                                onClick = { /* Reject user */ },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error), // Zmieniony kolor na taki sam jak "Cancel Event"
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
                                 Icon(Icons.Default.Close, contentDescription = "Reject")
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Reject")
                             }
                         }
                     }
@@ -157,7 +181,7 @@ fun EventDetailActivity(
 fun mockEventData(): EventDTO {
     return EventDTO(
         eventId = 1,
-        name = "Sample Event",
+        name = "Restaurant pool party",
         description = "This is a sample event.",
         time = "2023-12-31T20:00",
         mustJoinUntil = "2023-12-30T23:59",
