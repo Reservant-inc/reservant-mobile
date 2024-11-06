@@ -301,4 +301,12 @@
     <string name="unknown">Nieznany</string>
     <string name="error_orders">Wystąpił błąd podczas pobierania zamówień</string>
     <string name="unknown_dish">Nieznane danie</string>
+    <string name="accept">Akceptuj</string>
+    <string name="decline">Odrzuć</string>
+    <string name="change_status">Zmień status</string>
+    <string name="reservations_management">Zarządzanie rezerwacjami</string>
+    <string name="loading_reservations">Ładowanie rezerwacji...</string>
+    <string name="error_loading_reservations">Błąd podczas ładowania rezerwacji</string>
+    <string name="no_pending_reservations">Brak oczekujących rezerwacji</string>
+    <string name="unknown_client">Nieznany klient</string>
 </resources>

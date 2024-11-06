@@ -29,7 +29,8 @@ import kotlin.time.Duration
 fun OrderDetailsScreen(
     visitId: Int,
     onReturnClick: () -> Unit,
-    viewModel: EmployeeOrderViewModel
+    viewModel: EmployeeOrderViewModel,
+    isReservation: Boolean = false
 ) {
     LaunchedEffect(visitId) {
         viewModel.fetchVisitDetailsById(visitId)
@@ -73,8 +74,35 @@ fun OrderDetailsScreen(
                 items(details.visit.orders?.size ?: 0) { index ->
                     val order = details.visit.orders?.get(index)
                     if (order != null) {
-                        OrderCard(order)
+                        OrderCard(
+                            order,
+                            isReservation = isReservation,
+                            visitDate = details.visit.date
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+            }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isReservation) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = {
+                        viewModel.approveVisit(visitId)
+                        onReturnClick()
+                    }) {
+                        Text(text = stringResource(R.string.accept))
+                    }
+                    Button(onClick = {
+                        viewModel.declineVisit(visitId)
+                        onReturnClick()
+                    }) {
+                        Text(text = stringResource(R.string.decline))
                     }
                 }
             }
@@ -85,7 +113,9 @@ fun OrderDetailsScreen(
 }
 
 @Composable
-fun OrderCard(order: OrderDTO) {
+fun OrderCard(order: OrderDTO,
+              isReservation: Boolean = false,
+              visitDate: String?) {
     Card(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
@@ -113,7 +143,7 @@ fun OrderCard(order: OrderDTO) {
             Spacer(modifier = Modifier.height(8.dp))
 
             order.items?.forEachIndexed { index, item ->
-                DishCard(item = item)
+                DishCard(item = item, isReservation = isReservation, visitDate = visitDate)
                 if (index < order.items.size - 1) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(
@@ -129,50 +159,72 @@ fun OrderCard(order: OrderDTO) {
 }
 
 @Composable
-fun DishCard(item: OrderDTO.OrderItemDTO) {
+fun DishCard(
+    item: OrderDTO.OrderItemDTO,
+    isReservation: Boolean,
+    visitDate: String?
+) {
+    val isToday = visitDate?.let {
+        LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
+    } ?: false
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = item.menuItem?.name ?: stringResource(R.string.unknown_dish),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = item.menuItem?.name ?: stringResource(R.string.unknown_dish),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = item.status ?: stringResource(R.string.unknown_status),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                    Text(
+                        text = item.status ?: stringResource(R.string.unknown_status),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "${item.amount} x ${stringResource(R.string.price_label, item.oneItemPrice ?: 0.0)}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "${item.amount} x ${stringResource(R.string.price_label, item.oneItemPrice ?: 0.0)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+            // Conditional display of Change Status button
+            if (!isReservation && isToday) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {  },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(text = stringResource(R.string.change_status_button))
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
@@ -309,7 +361,7 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             }
 
 
-            if (visit.tip != null && visit.tip != -1.0) {
+            if (visit.tip != null && visit.tip != 0.0) {
                 Text(
                     text = stringResource(R.string.tip_label) + " %.2f zł".format(visit.tip),
                     style = MaterialTheme.typography.bodyMedium

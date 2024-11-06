@@ -30,18 +30,21 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.LazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
+import java.time.LocalDateTime
 
 @Composable
 fun OrderManagementScreen(
     onReturnClick: () -> Unit,
-    restaurantId: Int
+    restaurantId: Int,
+    isReservation: Boolean = false
 ) {
-    val viewModel = viewModel<EmployeeOrderViewModel>(
+    val viewModel: EmployeeOrderViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return EmployeeOrderViewModel(restaurantId = restaurantId) as T
@@ -50,6 +53,18 @@ fun OrderManagementScreen(
     )
 
     val innerNavController = rememberNavController()
+
+    val visitsFlow = if (isReservation) {
+        viewModel.getVisitsFlow(
+            dateStart = LocalDateTime.now(),
+            reservationStatus = GetReservationStatus.ToBeReviewed
+        )
+    } else {
+        viewModel.getVisitsFlow(
+            dateStart = LocalDateTime.now(),
+            reservationStatus = GetReservationStatus.Approved
+        )
+    }
 
     NavHost(
         navController = innerNavController,
@@ -63,94 +78,87 @@ fun OrderManagementScreen(
             ) {
                 IconWithHeader(
                     icon = Icons.Outlined.Book,
-                    text = stringResource(R.string.orders_management),
+                    text = if (isReservation) stringResource(R.string.reservations_management) else stringResource(R.string.orders_management),
                     showBackButton = true,
                     onReturnClick = onReturnClick
                 )
 
-                FloatingTabSwitch(
-                    pages = listOf(
-                        stringResource(R.string.current_orders) to {
-                            val currentVisits = viewModel.currentVisits.collectAsLazyPagingItems()
-                            Column {
-                                Spacer(modifier = Modifier.height(90.dp))
-                                when (currentVisits.loadState.refresh) {
-                                    is LoadState.Loading -> {
-                                        Text(
-                                            text = stringResource(R.string.loading_current_visits),
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
+                val visits = visitsFlow.collectAsLazyPagingItems()
 
-                                    is LoadState.Error -> {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_visits),
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-
-                                    else -> {
-                                        if (currentVisits.itemCount == 0) {
-                                            Text(
-                                                text = stringResource(R.string.no_current_visits),
-                                                modifier = Modifier.padding(16.dp)
-                                            )
-                                        } else {
-                                            OrderList(
-                                                visits = currentVisits,
-                                                homeNavController = innerNavController,
-                                                viewModel = viewModel
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                        },
-                        stringResource(R.string.past_orders) to {
-                            val pastVisits = viewModel.pastVisits.collectAsLazyPagingItems()
-                            Column {
-                                Spacer(modifier = Modifier.height(90.dp))
-                                when (pastVisits.loadState.refresh) {
-                                    is LoadState.Loading -> {
-                                        Text(
-                                            text = stringResource(R.string.loading_past_visits),
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-
-                                    is LoadState.Error -> {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_visits),
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-
-                                    else -> {
-                                        if (pastVisits.itemCount == 0) {
-                                            Text(
-                                                text = stringResource(R.string.no_past_visits),
-                                                modifier = Modifier.padding(16.dp)
-                                            )
-                                        } else {
-                                            OrderList(
-                                                visits = pastVisits,
-                                                homeNavController = innerNavController,
-                                                viewModel = viewModel
-                                            )
-                                        }
-                                    }
-                                }
+                if (isReservation) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    when (visits.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            Text(
+                                text = stringResource(R.string.loading_reservations),
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        is LoadState.Error -> {
+                            Text(
+                                text = stringResource(R.string.error_loading_reservations),
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        else -> {
+                            if (visits.itemCount == 0) {
+                                Text(
+                                    text = stringResource(R.string.no_pending_reservations),
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            } else {
+                                OrderList(
+                                    visits = visits,
+                                    homeNavController = innerNavController,
+                                    viewModel = viewModel,
+                                    isReservation = true
+                                )
                             }
                         }
+                    }
+                } else {
+                    FloatingTabSwitch(
+                        pages = listOf(
+                            stringResource(R.string.current_orders) to {
+                                val currentVisits = viewModel.getVisitsFlow(
+                                    dateStart = LocalDateTime.now(),
+                                    reservationStatus = GetReservationStatus.Approved
+                                ).collectAsLazyPagingItems()
+                                Column {
+                                    Spacer(modifier = Modifier.height(90.dp))
+                                    OrderList(
+                                        visits = currentVisits,
+                                        homeNavController = innerNavController,
+                                        viewModel = viewModel,
+                                        isReservation = false
+                                    )
+                                }
+                            },
+                            stringResource(R.string.past_orders) to {
+                                val pastVisits = viewModel.getVisitsFlow(
+                                    dateEnd = LocalDateTime.now(),
+                                    reservationStatus = GetReservationStatus.Approved
+                                ).collectAsLazyPagingItems()
+                                Column {
+                                    Spacer(modifier = Modifier.height(90.dp))
+                                    OrderList(
+                                        visits = pastVisits,
+                                        homeNavController = innerNavController,
+                                        viewModel = viewModel,
+                                        isReservation = false
+                                    )
+                                }
+                            }
+                        )
                     )
-                )
+                }
             }
         }
         composable<RestaurantRoutes.OrderDetail> {
             OrderDetailsScreen(
                 onReturnClick = { innerNavController.popBackStack() },
                 visitId = it.toRoute<RestaurantRoutes.OrderDetail>().visitId,
+                isReservation = isReservation,
                 viewModel = viewModel
             )
         }
@@ -158,7 +166,12 @@ fun OrderManagementScreen(
 }
 
 @Composable
-fun OrderList(visits: LazyPagingItems<VisitDTO>?, homeNavController: NavHostController, viewModel: EmployeeOrderViewModel) {
+fun OrderList(
+    visits: LazyPagingItems<VisitDTO>?,
+    homeNavController: NavHostController,
+    viewModel: EmployeeOrderViewModel,
+    isReservation: Boolean = false
+) {
     if (visits == null || visits.itemCount == 0) {
         Text(text = stringResource(R.string.no_visits_available))
         return
@@ -171,7 +184,7 @@ fun OrderList(visits: LazyPagingItems<VisitDTO>?, homeNavController: NavHostCont
             val visit = visits[index]
             if (visit != null) {
                 viewModel.cacheVisit(visit)
-                VisitCard(visit = visit, homeNavController = homeNavController)
+                VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation)
             } else {
                 Text(text = stringResource(R.string.loading_visit))
             }
@@ -179,25 +192,26 @@ fun OrderList(visits: LazyPagingItems<VisitDTO>?, homeNavController: NavHostCont
     }
 }
 
+
 @Composable
-fun VisitCard(visit: VisitDTO, homeNavController: NavHostController) {
+fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservation: Boolean = false) {
     val formattedDate = visit.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
-    val clientId = "Pracownik - brakuje w Backu"
-    val tableId = visit.tableId ?: stringResource(R.string.unknown_table)
+    val clientId = "Pracownik - Brakuje w backu"
+    val tableId = visit.tableId?.toString() ?: stringResource(R.string.unknown_table)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable(onClick = {
-                homeNavController.navigate(
-                    RestaurantRoutes.OrderDetail(
-                        visitId = visit.visitId!!
-                    )
+            homeNavController.navigate(
+                RestaurantRoutes.OrderDetail(
+                    visitId = visit.visitId!!
                 )
-            }),
+            )
+        }),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -225,13 +239,19 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController) {
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                if (!isReservation) {
+                    Text(
+                        text = formattedCost ?: stringResource(R.string.unknown_cost),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formattedCost ?: stringResource(R.string.unknown_cost),
+                    text = stringResource(R.string.table_label) + " " + tableId,
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(R.string.table_label) + " " + tableId, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
 }
+

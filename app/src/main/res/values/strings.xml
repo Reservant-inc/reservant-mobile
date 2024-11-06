@@ -310,4 +310,12 @@
     <string name="unknown">Unknown</string>
     <string name="error_orders">Error while fetching orders</string>
     <string name="unknown_dish">Unknown dish</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="change_status">Change Status</string>
+    <string name="reservations_management">Reservations Management</string>
+    <string name="loading_reservations">Loading reservations...</string>
+    <string name="error_loading_reservations">Error loading reservations</string>
+    <string name="no_pending_reservations">No pending reservations</string>
+    <string name="unknown_client">Unknown client</string>
 </resources>
