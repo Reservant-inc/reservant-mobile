@@ -160,7 +160,8 @@ fun OrderCard(
                     isReservation = isReservation,
                     visitDate = visitDate,
                     viewModel = viewModel,
-                    orderId = order.orderId ?: 0
+                    orderId = order.orderId ?: 0,
+                    visitId = order.visitId ?: 0
                 )
                 if (index < order.items.size - 1) {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -182,7 +183,8 @@ fun DishCard(
     isReservation: Boolean,
     visitDate: String?,
     viewModel: EmployeeOrderViewModel,
-    orderId: Int
+    orderId: Int,
+    visitId: Int
 ) {
     val isToday = visitDate?.let {
         LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
@@ -254,7 +256,8 @@ fun DishCard(
                     orderId = orderId,
                     menuItemId = item.menuItemId ?: 0,
                     employeeId = employeeId,
-                    status = status
+                    status = status,
+                    visitId = visitId
                 )
                 showChangeStatusDialog.value = false
             },

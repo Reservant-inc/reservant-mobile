@@ -128,7 +128,7 @@ class EmployeeOrderViewModel(
         }
     }
 
-    fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String) {
+    fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String, visitId: Int) {
         viewModelScope.launch {
             val orderDTO = OrderDTO(
                 employeeId = employeeId,
@@ -141,12 +141,13 @@ class EmployeeOrderViewModel(
             )
             val result = ordersService.changeOrderStatus(orderId, orderDTO)
             if (!result.isError) {
-                // Optionally, update the UI or fetch updated data
+                fetchVisitDetailsById(visitId)
             } else {
-                // Handle error
+                // Error
             }
         }
     }
+
 
 }
 
