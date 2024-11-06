@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -118,46 +119,15 @@ fun EventDetailActivity(
 
             if (isOwner) {
                 item {
-                    Text(
-                        text = "Join Requests",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
                 }
                 items(joinRequests) { user ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "${user.firstName} ${user.lastName}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(top = 12.dp)
-                        )
-                        Row {
-                            Button(
-                                onClick = { /* Approve user */ },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Zielony przycisk
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                modifier = Modifier.padding(end = 4.dp)
-                            ) {
-                                Icon(Icons.Default.Check, contentDescription = "Approve")
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Approve")
-                            }
-                            Button(
-                                onClick = { /* Reject user */ },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error), // Zmieniony kolor na taki sam jak "Cancel Event"
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Icon(Icons.Default.Close, contentDescription = "Reject")
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Reject")
-                            }
-                        }
-                    }
+                    UserListItem(
+                        user = user,
+                        showButtons = true,
+                        onApproveClick = { /* Approve user action */ },
+                        onRejectClick = { /* Reject user action */ }
+                    )
                     HorizontalDivider()
                 }
                 item {
@@ -199,18 +169,59 @@ fun mockEventData(): EventDTO {
 }
 
 @Composable
-fun UserListItem(user: EventDTO.Participant) {
+fun UserListItem(
+    user: EventDTO.Participant,
+    showButtons: Boolean = false,
+    onApproveClick: (() -> Unit)? = null,
+    onRejectClick: (() -> Unit)? = null
+) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth() // Upewniamy się, że Row zajmuje całą szerokość
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // avatar
+        // Avatar
+        Image(
+            painter = painterResource(id = R.drawable.jd),
+            contentDescription = null,
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
         Text(
             text = "${user.firstName} ${user.lastName}",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f) // Tekst zajmuje pozostałą przestrzeń
         )
+
+        if (showButtons) {
+            Row {
+                Button(
+                    onClick = { onApproveClick?.invoke() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Zielony przycisk
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(end = 4.dp)
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = "Approve")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Approve")
+                }
+
+                Button(
+                    onClick = { onRejectClick?.invoke() },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error), // Czerwony przycisk
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Reject")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Reject")
+                }
+            }
+        }
     }
 }
