@@ -82,9 +82,8 @@ fun EventDetailActivity(
                 )
                 Text(text = "Description: ${event.value.description}")
 
-                val date = formatToDateTime(event.value.time, "dd.MM.yyyy")
+                val date = formatToDateTime(event.value.time, "dd MMMM yyyy")
                 val time = formatToDateTime(event.value.time, "HH:mm")
-
                 Text(text = "Date and Time: $date $time")
 
                 Text(
@@ -153,8 +152,8 @@ fun mockEventData(): EventDTO {
         eventId = 1,
         name = "Restaurant pool party",
         description = "This is a sample event.",
-        time = "2023-12-31T20:00",
-        mustJoinUntil = "2023-12-30T23:59",
+        time = "2023-12-31T20:00:00",
+        mustJoinUntil = "2023-12-30T23:59:00",
         restaurant = RestaurantDTO(
             restaurantId = 1,
             name = "Sample Restaurant",
