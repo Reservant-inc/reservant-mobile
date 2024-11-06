@@ -309,4 +309,5 @@
     <string name="number_of_people_label">Number of People:</string>
     <string name="unknown">Unknown</string>
     <string name="error_orders">Error while fetching orders</string>
+    <string name="unknown_dish">Unknown dish</string>
 </resources>

@@ -14,11 +14,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
-import reservant_mobile.ui.viewmodels.OrderDetails
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -56,8 +56,8 @@ fun OrderDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (details.participants.isNotEmpty()) {
-                ParticipantsList(participants = details.participants)
+            if (details.visit.participants?.isNotEmpty() == true) {
+                ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -70,9 +70,12 @@ fun OrderDetailsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyColumn {
-                items(details.orders.size) { index ->
-                    OrderCard(order = details.orders[index])
-                    Spacer(modifier = Modifier.height(8.dp))
+                items(details.visit.orders?.size ?: 0) { index ->
+                    val order = details.visit.orders?.get(index)
+                    if (order != null) {
+                        OrderCard(order)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
         }
@@ -82,13 +85,103 @@ fun OrderDetailsScreen(
 }
 
 @Composable
+fun OrderCard(order: OrderDTO) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
+        elevation = CardDefaults.cardElevation(2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = order.status.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = stringResource(R.string.order_total_label, order.cost ?: 0.0),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            order.items?.forEachIndexed { index, item ->
+                DishCard(item = item)
+                if (index < order.items.size - 1) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DishCard(item: OrderDTO.OrderItemDTO) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = item.menuItem?.name ?: stringResource(R.string.unknown_dish),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = item.status ?: stringResource(R.string.unknown_status),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "${item.amount} x ${stringResource(R.string.price_label, item.oneItemPrice ?: 0.0)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
+    val visit = visitDetails.visit
     Column(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        // Wyświetlanie klienta
         Text(
             text = stringResource(R.string.client_label, visitDetails.clientName),
             style = MaterialTheme.typography.headlineSmall,
@@ -97,23 +190,20 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-        val visitDateTime = LocalDateTime.parse(visitDetails.date, formatter)
-
-        val isToday = visitDateTime.toLocalDate().isEqual(LocalDate.now())
+        val isToday = visit.date?.let {
+            LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
+        } ?: false
 
         val formattedDateRange = if (isToday) {
-            "${formatToDateTime(visitDetails.date, "HH:mm")} - ${
+            "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
                 formatToDateTime(
-                    visitDetails.endTime,
-                    "HH:mm"
+                    visit.endTime ?: "", "HH:mm"
                 )
             }"
         } else {
-            "${formatToDateTime(visitDetails.date, "dd.MM.yyyy HH:mm")} - ${
+            "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
                 formatToDateTime(
-                    visitDetails.endTime,
-                    "HH:mm"
+                    visit.endTime ?: "", "HH:mm"
                 )
             }"
         }
@@ -131,13 +221,13 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
         ) {
             Row {
                 Text(
-                    text = if (visitDetails.takeaway == true) stringResource(R.string.takeaway_label)
+                    text = if (visit.takeaway == true) stringResource(R.string.takeaway_label)
                     else stringResource(R.string.table_label),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = if (visitDetails.takeaway == true) "" else " " + visitDetails.tableId.toString(),
+                    text = if (visit.takeaway == true) "" else " ${visit.tableId}",
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -148,9 +238,41 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
+                val totalGuests = (visit.numberOfGuests ?: 0) + (visit.participants?.size ?: 0) + 1
+
                 Text(
-                    text = " " + visitDetails.numberOfPeople.toString(),
+                    text = " $totalGuests",
                     style = MaterialTheme.typography.bodyLarge
+                )
+
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (visit.reservationDate != null) {
+                val reservationFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+                val reservationDate = LocalDate.parse(visit.reservationDate, reservationFormatter)
+
+                val isReservationToday = reservationDate.isEqual(LocalDate.now())
+
+                if (!isReservationToday) {
+                    Text(
+                        text = stringResource(R.string.reservation_date_label) + " ${reservationDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            if (visit.deposit != null && visit.deposit != -1.0) {
+                Text(
+                    text = stringResource(R.string.deposit_label) + " %.2f zł".format(visit.deposit),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -161,102 +283,50 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (visitDetails.reservationDate != "Unknown") {
-                val reservationFormatter = DateTimeFormatter.ISO_LOCAL_DATE
-                val reservationDate =
-                    LocalDate.parse(visitDetails.reservationDate, reservationFormatter)
+            if (visit.paymentTime != null) {
+                val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                val paymentDateTime = LocalDateTime.parse(visit.paymentTime, dateTimeFormatter)
 
-                val isReservationToday = reservationDate.isEqual(LocalDate.now())
+                val isPaymentToday = paymentDateTime.toLocalDate().isEqual(LocalDate.now())
+                val formattedPaymentTime = if (isPaymentToday) {
+                    formatToDateTime(visit.paymentTime, "HH:mm")
+                } else {
+                    formatToDateTime(visit.paymentTime, "dd.MM.yyyy HH:mm")
+                }
 
                 Row {
-                    if (!isReservationToday) {
-                        Text(
-                            text = stringResource(R.string.reservation_date_label),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = " " + visitDetails.reservationDate,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-
-            Row {
-                // Wyświetlanie depozytu, jeśli jest różny od -1.0
-                if (visitDetails.deposit != -1.0) {
-                    Text(
-                        text = stringResource(R.string.deposit_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = " " + "%.2f".format(visitDetails.deposit) + " zł",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row {
-                if (visitDetails.paymentTime != "Unknown") {
-                    val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-                    val paymentDateTime =
-                        LocalDateTime.parse(visitDetails.paymentTime, dateTimeFormatter)
-
-                    val isPaymentToday = paymentDateTime.toLocalDate().isEqual(LocalDate.now())
                     Text(
                         text = stringResource(R.string.payment_time_label),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
+                    Text(
+                        text = " $formattedPaymentTime",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
 
-                    Text(
-                        text = if (isPaymentToday) {
-                            " " + formatToDateTime(visitDetails.paymentTime, "HH:mm")
-                        } else {
-                            " " + formatToDateTime(visitDetails.paymentTime, "dd.MM.yyyy HH:mm")
-                        },
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
             }
-            Row {
-                // Wyświetlanie napiwku, jeśli jest różny od -1.0
-                if (visitDetails.tip != -1.0) {
-                    Text(
-                        text = stringResource(R.string.tip_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = " " + "%.2f".format(visitDetails.tip) + " zł",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+
+
+            if (visit.tip != null && visit.tip != -1.0) {
+                Text(
+                    text = stringResource(R.string.tip_label) + " %.2f zł".format(visit.tip),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Wyświetlanie całkowitego kosztu
         Text(
-            text = stringResource(R.string.total_cost_label, "%.2f".format(visitDetails.totalCost)),
+            text = stringResource(R.string.total_cost_label, "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0)),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
     }
 }
-
 
 @Composable
 fun ParticipantsList(participants: List<String>) {
@@ -288,110 +358,6 @@ fun ParticipantCard(participantName: String) {
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
-        }
-    }
-}
-
-@Composable
-fun OrderCard(order: OrderDetails) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
-        elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = order.status,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = stringResource(R.string.order_total_label, order.cost),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            order.items.forEachIndexed { index, item ->
-                DishCard(item = item)
-                if (index < order.items.size - 1) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.primary,
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun DishCard(item: OrderDetails.MenuItemDetails) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = item.status ?: stringResource(R.string.unknown_status),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "${item.amount} x ${stringResource(R.string.price_label, item.price)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = {
-                        // Logika zmiany statusu zamówienia (do zaimplementowania)
-                    },
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.change_status_button),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
         }
     }
 }

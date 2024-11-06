@@ -3,13 +3,7 @@ package reservant_mobile.ui.viewmodels
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.IOrdersService
@@ -18,6 +12,7 @@ import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.GetReservationStatus
 import java.time.LocalDateTime
 
 class EmployeeOrderViewModel(
@@ -34,9 +29,9 @@ class EmployeeOrderViewModel(
             restaurantId = restaurantId,
             dateStart = LocalDateTime.now(),
             dateEnd = null,
-            orderBy = null
+            orderBy = null,
+            reservationStatus = GetReservationStatus.Approved
         )
-
         if (!result.isError && result.value != null) {
             emitAll(result.value.cachedIn(viewModelScope))
         } else {
@@ -51,15 +46,15 @@ class EmployeeOrderViewModel(
             restaurantId = restaurantId,
             dateStart = null,
             dateEnd = LocalDateTime.now(),
-            orderBy = null
+            orderBy = null,
+            reservationStatus = GetReservationStatus.Approved
         )
-
         if (!result.isError && result.value != null) {
             emitAll(result.value.cachedIn(viewModelScope))
         } else {
             emit(PagingData.empty())
         }
-    }.catch { exception ->
+    }.catch {
         emit(PagingData.empty())
     }
 
@@ -79,87 +74,26 @@ class EmployeeOrderViewModel(
 
     private fun fetchVisitDetails(visit: VisitDTO) {
         viewModelScope.launch {
-            val visitDetails = mutableListOf<OrderDetails>()
             val userSummary = userService.getUserSimpleInfo(visit.clientId ?: "")
-            val participants = visit.participants
-            visit.orders?.forEach { order ->
-                val orderResult = ordersService.getOrder(order.orderId!!)
-                val fetchedOrder = orderResult.value
+            val clientName = "${userSummary.value?.firstName ?: ""} ${userSummary.value?.lastName ?: ""}".trim()
+            
+            val fullOrders = visit.orders?.mapNotNull { partialOrder ->
+                val orderResult = partialOrder.orderId?.let { ordersService.getOrder(it) }
+                if (!orderResult?.isError!!) orderResult.value else null
+            } ?: emptyList()
 
-                if (fetchedOrder != null) {
-                    val items = fetchedOrder.items?.mapNotNull { item ->
-                        item.menuItem?.let {
-                            OrderDetails.MenuItemDetails(
-                                name = it.name,
-                                price = it.price,
-                                amount = item.amount,
-                                status = item.status,
-                                cost = item.totalCost ?: -1.0
-                            )
-                        }
-                    }.orEmpty()
-                    visitDetails.add(
-                        OrderDetails(
-                            orderId = fetchedOrder.orderId ?: -1,
-                            items = items,
-                            cost = fetchedOrder.cost ?: -1.0,
-                            status = fetchedOrder.status.toString()
-                        )
-                    )
-                }
-            }
+            val updatedVisit = visit.copy(orders = fullOrders)
 
             _selectedVisitDetails.value = VisitDetailsUIState(
-                clientName = "${userSummary.value?.firstName} ${userSummary.value?.lastName}",
-                participants = participants.takeIf { it!!.isNotEmpty() }?.map { "${it.firstName} ${it.lastName}" } ?: emptyList(),
-                orders = visitDetails,
-                totalCost = visit.orders?.sumOf { it.cost ?: -1.0 } ?: -1.0,
-                tableId = visit.tableId ?: -1,
-                numberOfPeople = when {
-                    visit.participants?.isNotEmpty() == true && visit.numberOfGuests != null -> visit.numberOfGuests + visit.participants.size + 1
-                    visit.participants?.isNotEmpty() == true -> visit.participants.size + 1
-                    visit.numberOfGuests != null -> visit.numberOfGuests + 1
-                    else -> 1 },
-                tip = visit.tip ?: -1.0,
-                date = visit.date ?: "Unknown",
-                endTime = visit.endTime ?: "Unknown",
-                paymentTime = visit.paymentTime  ?: "Unknown",
-                deposit = visit.deposit ?: -1.0,
-                reservationDate = visit.reservationDate  ?: "Unknown",
-                takeaway = visit.takeaway
+                clientName = clientName,
+                visit = updatedVisit
             )
         }
-
     }
+
 }
 
 data class VisitDetailsUIState(
     val clientName: String,
-    val participants: List<String>,
-    val orders: List<OrderDetails>,
-    val totalCost: Double,
-    val tableId: Int,
-    val numberOfPeople: Int,
-    val tip: Double,
-    val date: String,
-    val endTime: String,
-    val paymentTime: String,
-    val deposit: Double,
-    val reservationDate: String,
-    val takeaway: Boolean?,
+    val visit: VisitDTO
 )
-
-data class OrderDetails(
-    val orderId: Int,
-    val items: List<MenuItemDetails>,
-    val status: String,
-    val cost: Double
-) {
-    data class MenuItemDetails(
-        val name: String,
-        val price: Double,
-        val amount: Int,
-        val status: String?,
-        val cost: Double
-    )
-}
