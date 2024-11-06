@@ -287,7 +287,7 @@ fun MapActivity(){
                                 items(2) {
                                     EventCard(
                                         eventCreator = "testowy",
-                                        eventDate = "2024-11-06T12:18:54.254Z",
+                                        eventDate = "2023-12-30T23:59:00",
                                         eventLocation = "Bar",
                                         interestedCount = 2,
                                         takePartCount = 10,
