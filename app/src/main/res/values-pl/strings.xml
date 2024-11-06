@@ -312,4 +312,9 @@
     <string name="note_label">Notatka:</string>
     <string name="reservation_details">Szczegóły rezerwacji</string>
     <string name="reservation_label">Rezerwacja</string>
+    <string name="change_order_item_status">Zmień Status Pozycji Zamówienia</string>
+    <string name="select_employee">Wybierz Pracownika</string>
+    <string name="select_status">Wybierz Status</string>
+    <string name="submit">Zatwierdź</string>
+    <string name="cancel">Anuluj</string>
 </resources>

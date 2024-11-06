@@ -499,7 +499,8 @@ fun ChangeStatusDialog(
 ) {
     val employeeList by viewModel.employees.collectAsState()
     val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap = employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val employeeIdMap =
+        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
 
     var selectedEmployeeName by remember { mutableStateOf("") }
     val expandedEmployee = remember { mutableStateOf(false) }
@@ -514,7 +515,7 @@ fun ChangeStatusDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Change Order Item Status") },
+        title = { Text(text = stringResource(R.string.change_order_item_status)) },
         text = {
             Column {
                 ComboBox(
@@ -522,7 +523,7 @@ fun ChangeStatusDialog(
                     value = selectedEmployeeName,
                     onValueChange = { selectedEmployeeName = it },
                     options = employeeNames,
-                    label = "Select Employee"
+                    label = stringResource(R.string.select_employee)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
@@ -530,7 +531,7 @@ fun ChangeStatusDialog(
                     value = selectedStatus,
                     onValueChange = { selectedStatus = it },
                     options = statusOptions,
-                    label = "Select Status"
+                    label = stringResource(R.string.select_status)
                 )
             }
         },
@@ -543,14 +544,14 @@ fun ChangeStatusDialog(
                     }
                 }
             ) {
-                Text("Submit")
+                Text(text = stringResource(R.string.submit))
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cancel")
+                Text(text = stringResource(R.string.cancel))
             }
         }
     )
