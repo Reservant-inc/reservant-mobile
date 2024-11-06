@@ -318,4 +318,8 @@
     <string name="error_loading_reservations">Error loading reservations</string>
     <string name="no_pending_reservations">No pending reservations</string>
     <string name="unknown_client">Unknown client</string>
+    <string name="note_label">Note:</string>
+    <string name="reservation_details">Reservation Details</string>
+    <string name="reservation_label">Reservation</string>
+
 </resources>

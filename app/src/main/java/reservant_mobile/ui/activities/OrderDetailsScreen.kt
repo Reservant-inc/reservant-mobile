@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,8 +46,8 @@ fun OrderDetailsScreen(
                 .padding(16.dp)
         ) {
             IconWithHeader(
-                icon = Icons.Outlined.Book,
-                text = stringResource(R.string.order_details),
+                icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
+                text = stringResource(if (isReservation) R.string.reservation_details else R.string.order_details),
                 showBackButton = true,
                 onReturnClick = onReturnClick
             )
@@ -61,13 +62,14 @@ fun OrderDetailsScreen(
                 ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.orders_label),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
+            if(details.visit.orders?.size != 0) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.orders_label),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyColumn {
@@ -84,7 +86,12 @@ fun OrderDetailsScreen(
                 }
             }
 
+            if(details.visit.orders?.size != 0) {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
+            NoteCard(note = "TO BE IMPLEMENTED XD") //TODO
+            
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isReservation) {
@@ -372,7 +379,11 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.total_cost_label, "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0)),
+            text = if ((visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0) == 0.0) {
+                stringResource(R.string.reservation_label)
+            } else {
+                stringResource(R.string.total_cost_label, "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0))
+            },
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -409,6 +420,37 @@ fun ParticipantCard(participantName: String) {
                 text = participantName,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun NoteCard(note: String) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+        elevation = CardDefaults.cardElevation(2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.note_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = note,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

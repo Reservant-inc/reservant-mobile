@@ -309,4 +309,7 @@
     <string name="error_loading_reservations">Błąd podczas ładowania rezerwacji</string>
     <string name="no_pending_reservations">Brak oczekujących rezerwacji</string>
     <string name="unknown_client">Nieznany klient</string>
+    <string name="note_label">Notatka:</string>
+    <string name="reservation_details">Szczegóły rezerwacji</string>
+    <string name="reservation_label">Rezerwacja</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -77,7 +78,7 @@ fun OrderManagementScreen(
                     .padding(16.dp)
             ) {
                 IconWithHeader(
-                    icon = Icons.Outlined.Book,
+                    icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
                     text = if (isReservation) stringResource(R.string.reservations_management) else stringResource(R.string.orders_management),
                     showBackButton = true,
                     onReturnClick = onReturnClick
@@ -241,7 +242,11 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservati
                 Spacer(modifier = Modifier.height(4.dp))
                 if (!isReservation) {
                     Text(
-                        text = formattedCost ?: stringResource(R.string.unknown_cost),
+                        text = if ((visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0) == 0.0) {
+                            stringResource(R.string.reservation_label)
+                        } else {
+                            formattedCost ?: stringResource(R.string.unknown_cost)
+                        },
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
