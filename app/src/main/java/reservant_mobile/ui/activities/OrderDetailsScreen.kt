@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
@@ -79,7 +80,8 @@ fun OrderDetailsScreen(
                         OrderCard(
                             order,
                             isReservation = isReservation,
-                            visitDate = details.visit.date
+                            visitDate = details.visit.date,
+                            viewModel = viewModel
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -120,9 +122,12 @@ fun OrderDetailsScreen(
 }
 
 @Composable
-fun OrderCard(order: OrderDTO,
-              isReservation: Boolean = false,
-              visitDate: String?) {
+fun OrderCard(
+    order: OrderDTO,
+    isReservation: Boolean = false,
+    visitDate: String?,
+    viewModel: EmployeeOrderViewModel
+) {
     Card(
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary),
@@ -150,7 +155,13 @@ fun OrderCard(order: OrderDTO,
             Spacer(modifier = Modifier.height(8.dp))
 
             order.items?.forEachIndexed { index, item ->
-                DishCard(item = item, isReservation = isReservation, visitDate = visitDate)
+                DishCard(
+                    item = item,
+                    isReservation = isReservation,
+                    visitDate = visitDate,
+                    viewModel = viewModel,
+                    orderId = order.orderId ?: 0
+                )
                 if (index < order.items.size - 1) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(
@@ -169,11 +180,15 @@ fun OrderCard(order: OrderDTO,
 fun DishCard(
     item: OrderDTO.OrderItemDTO,
     isReservation: Boolean,
-    visitDate: String?
+    visitDate: String?,
+    viewModel: EmployeeOrderViewModel,
+    orderId: Int
 ) {
     val isToday = visitDate?.let {
         LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
     } ?: false
+
+    val showChangeStatusDialog = remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -220,7 +235,7 @@ fun DishCard(
                     if (!isReservation && isToday) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
-                            onClick = {  },
+                            onClick = { showChangeStatusDialog.value = true },
                             modifier = Modifier.align(Alignment.End)
                         ) {
                             Text(text = stringResource(R.string.change_status_button))
@@ -230,7 +245,24 @@ fun DishCard(
             }
         }
     }
+
+    if (showChangeStatusDialog.value) {
+        ChangeStatusDialog(
+            onDismiss = { showChangeStatusDialog.value = false },
+            onSubmit = { employeeId, status ->
+                viewModel.changeOrderStatus(
+                    orderId = orderId,
+                    menuItemId = item.menuItemId ?: 0,
+                    employeeId = employeeId,
+                    status = status
+                )
+                showChangeStatusDialog.value = false
+            },
+            viewModel = viewModel
+        )
+    }
 }
+
 
 
 @Composable
@@ -454,4 +486,69 @@ fun NoteCard(note: String) {
             )
         }
     }
+}
+
+@Composable
+fun ChangeStatusDialog(
+    onDismiss: () -> Unit,
+    onSubmit: (String, String) -> Unit,
+    viewModel: EmployeeOrderViewModel
+) {
+    val employeeList by viewModel.employees.collectAsState()
+    val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
+    val employeeIdMap = employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+
+    var selectedEmployeeName by remember { mutableStateOf("") }
+    val expandedEmployee = remember { mutableStateOf(false) }
+
+    val statusOptions = listOf("Ordered", "InProgress", "Ready", "Delivered", "Cancelled")
+    var selectedStatus by remember { mutableStateOf("") }
+    val expandedStatus = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchEmployees()
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Change Order Item Status") },
+        text = {
+            Column {
+                ComboBox(
+                    expanded = expandedEmployee,
+                    value = selectedEmployeeName,
+                    onValueChange = { selectedEmployeeName = it },
+                    options = employeeNames,
+                    label = "Select Employee"
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                ComboBox(
+                    expanded = expandedStatus,
+                    value = selectedStatus,
+                    onValueChange = { selectedStatus = it },
+                    options = statusOptions,
+                    label = "Select Status"
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val employeeId = employeeIdMap[selectedEmployeeName]
+                    if (employeeId != null && selectedStatus.isNotEmpty()) {
+                        onSubmit(employeeId, selectedStatus)
+                    }
+                }
+            ) {
+                Text("Submit")
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 }
