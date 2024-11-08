@@ -20,8 +20,8 @@ data class OrderDTO(
     @Serializable
     data class OrderItemDTO(
         val menuItem: RestaurantMenuItemDTO? = null,
-        val menuItemId: Int? = null,
-        val amount: Int,
+        var menuItemId: Int? = null,
+        val amount: Int? = null,
         val oneItemPrice: Double? = null,
         val totalCost: Double? = null,
         val status: String? = null
