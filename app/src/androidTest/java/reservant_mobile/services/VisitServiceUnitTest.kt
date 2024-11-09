@@ -62,4 +62,14 @@ class VisitServiceUnitTest: ServiceTest() {
     fun pay_deposit_return_not_null()= runTest{
         assertThat(ser.payDeposit(1).value).isNotNull()
     }
+
+    @Test
+    fun confirm_visit_start_return_true()= runTest{
+        assertThat(ser.confirmStart(1).value).isTrue()
+    }
+
+    @Test
+    fun confirm_visit_end_return_true()= runTest{
+        assertThat(ser.confirmStart(1).value).isTrue()
+    }
 }

@@ -13,6 +13,9 @@ interface IVisitsService{
     suspend fun approveVisit(visitId: Any): Result<Boolean>
     suspend fun declineVisit(visitId: Any): Result<Boolean>
     suspend fun payDeposit(visitId: Any): Result<MoneyDTO?>
+    suspend fun confirmStart(visitId: Any): Result<Boolean>
+    suspend fun confirmEnd(visitId: Any): Result<Boolean>
+
 }
 
 class VisitsService():ServiceUtil(), IVisitsService {
@@ -39,5 +42,15 @@ class VisitsService():ServiceUtil(), IVisitsService {
     override suspend fun payDeposit(visitId: Any): Result<MoneyDTO?> {
         val res = api.post(Wallet.PayDeposit(visitId = visitId.toString()), visitId)
         return complexResultWrapper(res)
+    }
+
+    override suspend fun confirmStart(visitId: Any): Result<Boolean> {
+        val res = api.post(Visits.VisitID.ConfirmStart(parent = Visits.VisitID(visitId = visitId.toString())), "")
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
+    }
+
+    override suspend fun confirmEnd(visitId: Any): Result<Boolean> {
+        val res = api.post(Visits.VisitID.ConfirmEnd(parent = Visits.VisitID(visitId = visitId.toString())), "")
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
     }
 }
