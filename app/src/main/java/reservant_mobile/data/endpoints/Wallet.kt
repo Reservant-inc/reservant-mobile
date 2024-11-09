@@ -14,4 +14,6 @@ class Wallet{
     @Resource("history")
     class History(val parent: Wallet = Wallet(), val page: Int? = null, val perPage: Int? = null)
 
+    @Resource("pay-deposit")
+    class PayDeposit(val parent: Wallet = Wallet(), val visitId: String? = null)
 }

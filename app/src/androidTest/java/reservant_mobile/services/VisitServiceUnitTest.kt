@@ -33,7 +33,6 @@ class VisitServiceUnitTest: ServiceTest() {
             numberOfGuests = 1,
             tip = 0.0,
             takeaway = false,
-            restaurantId = 1,
             tableId = 1,
             participantIds = emptyList()
             )
@@ -57,5 +56,10 @@ class VisitServiceUnitTest: ServiceTest() {
     @Test
     fun decline_visit_return_true()= runTest{
         assertThat(ser.declineVisit(1).value).isTrue()
+    }
+
+    @Test
+    fun pay_deposit_return_not_null()= runTest{
+        assertThat(ser.payDeposit(1).value).isNotNull()
     }
 }
