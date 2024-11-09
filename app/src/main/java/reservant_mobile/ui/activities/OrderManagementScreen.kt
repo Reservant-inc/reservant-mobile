@@ -58,12 +58,12 @@ fun OrderManagementScreen(
     val visitsFlow = if (isReservation) {
         viewModel.getVisitsFlow(
             dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.ToBeReviewed
+            reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
         )
     } else {
         viewModel.getVisitsFlow(
             dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.Approved
+            reservationStatus = GetReservationStatus.ApprovedByRestaurant
         )
     }
 
@@ -123,7 +123,7 @@ fun OrderManagementScreen(
                             stringResource(R.string.current_orders) to {
                                 val currentVisits = viewModel.getVisitsFlow(
                                     dateStart = LocalDateTime.now(),
-                                    reservationStatus = GetReservationStatus.Approved
+                                    reservationStatus = GetReservationStatus.ApprovedByRestaurant
                                 ).collectAsLazyPagingItems()
                                 Column {
                                     Spacer(modifier = Modifier.height(90.dp))
@@ -138,7 +138,7 @@ fun OrderManagementScreen(
                             stringResource(R.string.past_orders) to {
                                 val pastVisits = viewModel.getVisitsFlow(
                                     dateEnd = LocalDateTime.now(),
-                                    reservationStatus = GetReservationStatus.Approved
+                                    reservationStatus = GetReservationStatus.ApprovedByRestaurant
                                 ).collectAsLazyPagingItems()
                                 Column {
                                     Spacer(modifier = Modifier.height(90.dp))
