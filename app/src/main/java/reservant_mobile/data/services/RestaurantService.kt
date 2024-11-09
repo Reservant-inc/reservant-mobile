@@ -25,6 +25,7 @@ import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.TableDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.utils.GetDeliveriesSort
@@ -122,6 +123,8 @@ interface IRestaurantService{
                                      dateUntil: LocalDateTime? = null,
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
+    suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?>
+
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -504,5 +507,12 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
 
         val sps = ServicePagingSource(call, serializer = PageDTO.serializer(IngredientDTO.CorrectionDTO::class.serializer()))
         return pagingResultWrapper(sps)
+    }
+
+    override suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?> {
+        val res  = api.get(Restaurants.Id.Tables(
+            parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+        ))
+        return complexResultWrapper(res)
     }
 }
