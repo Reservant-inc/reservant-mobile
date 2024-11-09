@@ -250,7 +250,6 @@
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
     <string name="restaurant_tables_header">Restaurant Tables</string>
-    <string name="table_label">Table %1$d</string>
     <string name="seats_label">Seats: %1$d</string>
     <string name="available_label">Available</string>
     <string name="occupied_label">Occupied</string>
