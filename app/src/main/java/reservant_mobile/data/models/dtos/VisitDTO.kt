@@ -10,6 +10,14 @@ data class VisitDTO(
      */
     val date: String? = null,
     val endTime: String? = null,
+    /***
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
+     */
+    val actualStartTime: String? = null,
+    /***
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
+     */
+    val actualEndTime: String? = null,
     val numberOfGuests: Int? = null,
     val numberOfPeople: Int? = null,
     val paymentTime: String? = null,
