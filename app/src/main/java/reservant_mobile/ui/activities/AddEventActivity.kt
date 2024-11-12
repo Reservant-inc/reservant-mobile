@@ -193,22 +193,35 @@ fun AddEventActivity(navController: NavHostController) {
                 modifier = Modifier
                     .height(200.dp)
                     .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                    .padding(8.dp)
+                    .padding(top = 8.dp, bottom = 8.dp)
             ) {
                 items(restaurants.itemCount) { index ->
                     val restaurant = restaurants[index]
                     if (restaurant != null) {
-                        Text(
-                            text = restaurant.name,
+                        val isSelected = restaurant.restaurantId == addEventViewModel.selectedRestaurant?.restaurantId
+                        Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .scale(0.9f)
                                 .clickable {
-                                    addEventViewModel.selectedRestaurant = restaurant
-                                }
-                                .padding(8.dp)
-                        )
+                                    if (isSelected) {
+                                        addEventViewModel.selectedRestaurant = null
+                                    } else {
+                                        addEventViewModel.selectedRestaurant = restaurant
+                                    }
+                                },
+                            color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(8.dp),
+                            tonalElevation = if (isSelected) 4.dp else 0.dp
+                        ) {
+                            Text(
+                                text = restaurant.name,
+                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 4.dp)
+                            )
+                        }
                     }
                 }
+
             }
         } else if(restaurants != null && restaurants.itemCount == 0){
             Text("There are no restaurants to select.")
