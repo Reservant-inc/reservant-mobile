@@ -271,6 +271,7 @@
     <string name="label_event_category_interested">Interested in</string>
     <string name="label_with_friends_only">With friends only</string>
     <string name="label_reservation_status_deposit_not_paid">Deposit not paid</string>
+    <string name="label_no_people_yet">No people yet</string>
     <string name="label_reservation_status_to_be_reviewed">To be reviewed by restaurant</string>
     <string name="label_reservation_status_approved">Approved by restaurant</string>
     <string name="label_reservation_status_declined">Declined by restaurant</string>
