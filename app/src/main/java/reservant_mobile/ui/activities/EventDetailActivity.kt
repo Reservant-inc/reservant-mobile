@@ -161,9 +161,9 @@ fun EventDetailActivity(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable {
-                            if(!eventDetailVM.isLoading && eventDetailVM.event!!.restaurantId != null){
+                            if(!eventDetailVM.isLoading && eventDetailVM.event!!.restaurant != null){
                                 navController.navigate(
-                                    RestaurantRoutes.Details(restaurantId = eventDetailVM.event!!.restaurantId!!)
+                                    RestaurantRoutes.Details(restaurantId = eventDetailVM.event!!.restaurant!!.restaurantId)
                                 )
                             }
                         }
@@ -229,6 +229,10 @@ fun EventDetailActivity(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 items(eventDetailVM.event!!.participants ?: emptyList()) { participant ->
+                    if(eventDetailVM.event!!.participants!!.isEmpty())
+                        Text(
+                            text = "No one participates at this event."
+                        )
                     UserListItem(user = participant)
                     HorizontalDivider()
                 }
