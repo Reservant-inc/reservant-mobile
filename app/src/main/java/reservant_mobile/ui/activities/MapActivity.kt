@@ -100,6 +100,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import java.time.LocalDate
+import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -287,16 +288,6 @@ fun MapActivity(){
                                         .background(MaterialTheme.colorScheme.surfaceVariant),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    item {
-                                        EventCard(
-                                            eventCreator = "doe joe",
-                                            eventDate = "test time111",
-                                            eventLocation = "test location",
-                                            interestedCount = 1,
-                                            takePartCount = 2,
-                                            eventName = "Event name"
-                                        )
-                                    }
                                     items(events.itemCount) { index ->
                                         val item = events[index]
                                         if(item != null){
