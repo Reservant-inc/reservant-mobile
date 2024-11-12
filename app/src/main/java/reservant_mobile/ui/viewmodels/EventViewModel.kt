@@ -94,6 +94,10 @@ class EventViewModel(
         return true
     }
 
+    suspend fun updateEvent() {
+        // post
+    }
+
     suspend fun addEvent(context: Context) {
         isSaving.value = true
         if (isFormValid()) {
