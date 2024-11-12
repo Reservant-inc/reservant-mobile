@@ -45,6 +45,7 @@ class APIService{
     val backendUrl= "http://$backendIp:$backendPort"
 
     private val localService = LocalDataService()
+
     private val client = HttpClient(CIO){
         defaultRequest {
             url(backendUrl)
@@ -76,6 +77,14 @@ class APIService{
         }
         install(Resources)
 
+    }
+
+    private val wsClient = HttpClient(CIO){
+        install(client)
+        install(WebSockets) {
+            pingInterval = 10_000
+            contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        }
     }
 
     private suspend inline fun getBearerTokens():BearerTokens {
@@ -178,7 +187,7 @@ class APIService{
 
     suspend fun createWebsocketSession(path: String):Result<DefaultClientWebSocketSession?> {
         return try {
-            val ws = client.webSocketSession(method = HttpMethod.Get, host = backendIp, port = backendPort, path = path)
+            val ws = wsClient.webSocketSession(method = HttpMethod.Get, host = backendIp, port = backendPort, path = path)
             Result(isError = false, value = ws)
         }catch (e: Exception){
             println("[WS ERROR]: "+e.message)
