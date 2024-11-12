@@ -5,8 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,14 +20,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.utils.formatToDateTime
@@ -46,6 +53,8 @@ fun EventDetailActivity(
         }
     )
 
+    var showEditDialog by remember { mutableStateOf(false) }
+
     if(eventDetailVM.isLoading){
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -65,7 +74,7 @@ fun EventDetailActivity(
                         if (eventDetailVM.isEventOwner) {
                             IconButton(
                                 onClick = {
-
+                                    showEditDialog = true
                                 }
                             ) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit Event")
@@ -93,6 +102,20 @@ fun EventDetailActivity(
                     )
                 }
 
+                if (showEditDialog) {
+                    item {
+                        EditEventDialog(
+                            event = eventDetailVM.event!!,
+                            onDismiss = { showEditDialog = false },
+                            onSave = { updatedEvent ->
+                                eventDetailVM.viewModelScope.launch {
+                                    //eventDetailVM.updateEvent(updatedEvent)
+                                }
+                                showEditDialog = false
+                            }
+                        )
+                    }
+                }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -270,4 +293,125 @@ fun UserListItem(
             }
         }
     }
+}
+
+@Composable
+fun EditEventDialog(
+    event: EventDTO,
+    onDismiss: () -> Unit,
+    onSave: (EventDTO) -> Unit
+) {
+
+    // State variables for form fields
+    var name by remember { mutableStateOf(event.name ?: "") }
+    var description by remember { mutableStateOf(event.description ?: "") }
+    var maxPeople by remember { mutableStateOf(event.maxPeople?.toString() ?: "") }
+    var photo by remember { mutableStateOf(event.photo ?: "") }
+
+    // Date and Time pickers for 'time' and 'mustJoinUntil'
+    var eventDate by remember { mutableStateOf(event.time?.substring(0, 10) ?: "") }
+    var eventTime by remember { mutableStateOf(event.time?.substring(11, 16) ?: "") }
+    var joinUntilDate by remember { mutableStateOf(event.mustJoinUntil?.substring(0, 10) ?: "") }
+    var joinUntilTime by remember { mutableStateOf(event.mustJoinUntil?.substring(11, 16) ?: "") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    // Validate and prepare the updated event data
+                    val updatedEvent = event.copy(
+                        name = name,
+                        description = description,
+                        maxPeople = maxPeople.toIntOrNull(),
+                        photo = photo,
+                        time = "${eventDate}T${eventTime}",
+                        mustJoinUntil = "${joinUntilDate}T${joinUntilTime}"
+                    )
+                    onSave(updatedEvent)
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Edit Event") },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Event Name") },
+                    isError = name.isBlank(),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    isError = description.isBlank(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = maxPeople,
+                    onValueChange = { maxPeople = it },
+                    label = { Text("Max People") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = maxPeople.toIntOrNull() == null,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Date and Time pickers
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    DatePickerField(
+//                        label = "Event Date",
+//                        selectedDate = eventDate,
+//                        onDateSelected = { eventDate = it }
+//                    )
+//                    TimePickerField(
+//                        label = "Event Time",
+//                        selectedTime = eventTime,
+//                        onTimeSelected = { eventTime = it }
+//                    )
+//                }
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    DatePickerField(
+//                        label = "Join Until Date",
+//                        selectedDate = joinUntilDate,
+//                        onDateSelected = { joinUntilDate = it }
+//                    )
+//                    TimePickerField(
+//                        label = "Join Until Time",
+//                        selectedTime = joinUntilTime,
+//                        onTimeSelected = { joinUntilTime = it }
+//                    )
+//                }
+
+                OutlinedTextField(
+                    value = photo,
+                    onValueChange = { photo = it },
+                    label = { Text("Photo URL") },
+                    isError = photo.isBlank(),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+            }
+        }
+    )
 }
