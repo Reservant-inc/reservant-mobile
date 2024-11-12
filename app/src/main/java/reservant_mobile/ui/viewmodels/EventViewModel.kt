@@ -20,19 +20,21 @@ import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 
 class EventViewModel(
+    private val eventId: Int = 0,
+    fetchRestaurants: Boolean = true, // true for AddEventActivity, false for EventDetailActivity
     private val eventService: IEventService = EventService(),
     private val restaurantService: IRestaurantService = RestaurantService(),
-    private val eventId: Int = 0,
-    fetchRestaurants: Boolean = true
 ) : ReservantViewModel() {
 
     private val _restaurantsFlow = MutableStateFlow<Flow<PagingData<RestaurantDTO>>?>(null)
     val restaurantsFlow: StateFlow<Flow<PagingData<RestaurantDTO>>?> = _restaurantsFlow
+
 
     val searchQuery = MutableStateFlow("")
     var isLoading: Boolean by mutableStateOf(false)
@@ -49,6 +51,7 @@ class EventViewModel(
     var formSent by mutableStateOf(false)
 
     var event by mutableStateOf<EventDTO?>(null)
+    var isEventOwner by mutableStateOf(false)
 
     var result: Result<EventDTO?> = Result(isError = false, value = null)
         private set
@@ -87,6 +90,7 @@ class EventViewModel(
             return false
         }
         event = resultEvent.value
+        isEventOwner = event!!.creator!!.userId == UserService.UserObject.userId
         return true
     }
 

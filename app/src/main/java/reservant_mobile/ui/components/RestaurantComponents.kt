@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -167,6 +168,8 @@ fun EventCard(
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop,
                     )
                 }
 
@@ -197,6 +200,10 @@ fun EventCard(
                     if(takePartCount != 0)
                         Text(
                             text = "$takePartCount "+stringResource(R.string.label_takePart)
+                        )
+                    if(interestedCount == 0 && takePartCount == 0)
+                        Text(
+                            text = stringResource(R.string.label_no_people_yet)
                         )
                 }
             }
