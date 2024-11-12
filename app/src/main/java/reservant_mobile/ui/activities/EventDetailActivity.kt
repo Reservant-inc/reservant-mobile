@@ -259,7 +259,6 @@ fun UserListItem(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Avatar
         Image(
             painter = painterResource(id = R.drawable.jd),
             contentDescription = null,
