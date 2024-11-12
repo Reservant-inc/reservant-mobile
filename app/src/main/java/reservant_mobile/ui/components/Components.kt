@@ -139,6 +139,7 @@ import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.activities.FilterOptionWithStars
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -636,19 +637,13 @@ fun MyFloatingActionButton(
 }
 
 @Composable
-fun ProgressBar(currentStep: Int) {
-    val progress = when (currentStep) {
-        1 -> 0.33f
-        2 -> 0.66f
-        3 -> 1f
-        else -> 0f
-    }
+fun ProgressBar(currentStep: Int, maxStep: Int) {
+    val progress = currentStep.toFloat() / maxStep
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(8.dp)
-
     ) {
         Row {
             Box(

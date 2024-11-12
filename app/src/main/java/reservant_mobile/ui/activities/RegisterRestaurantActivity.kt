@@ -124,7 +124,7 @@ fun RegisterRestaurantActivity(
                     )
                 }
 
-                ProgressBar(currentStep = 1)
+                ProgressBar(currentStep = 1, maxStep = 4)
 
                 FormInput(
                     inputText = restaurantViewModel.name.value,
@@ -280,7 +280,7 @@ fun RegisterRestaurantActivity(
                     )
                 }
 
-                ProgressBar(currentStep = 2)
+                ProgressBar(currentStep = 2, maxStep = 4)
 
                 Spacer(modifier = Modifier.height(30.dp))
 
@@ -450,6 +450,35 @@ fun RegisterRestaurantActivity(
 
             }
         }
+        composable<RegisterRestaurantRoutes.OpeningHours> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                if (restaurantId == null && group == null) {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_new_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
+                    )
+                } else {
+                    IconWithHeader(
+                        icon = Icons.Rounded.RestaurantMenu,
+                        text = stringResource(R.string.label_edit_restaurant),
+                        showBackButton = true,
+                        onReturnClick = { navController.popBackStack() }
+                    )
+                }
+
+                ProgressBar(currentStep = 3, maxStep = 4)
+
+            }
+        }
         composable<RegisterRestaurantRoutes.Description> {
             Column(
                 modifier = Modifier
@@ -475,7 +504,7 @@ fun RegisterRestaurantActivity(
                     )
                 }
 
-                ProgressBar(currentStep = 3)
+                ProgressBar(currentStep = 4, maxStep = 4)
 
                 TagList(
                     tags = restaurantViewModel.selectedTags,
