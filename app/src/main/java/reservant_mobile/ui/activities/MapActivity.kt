@@ -268,8 +268,7 @@ fun MapActivity(){
                         if(events.loadState.refresh is LoadState.Loading){
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                         }
-                        else if (false
-                            //events.itemCount < 1 || events.loadState.hasError
+                        else if (events.itemCount < 1 || events.loadState.hasError
                             ){
                             MissingPage(
                                 errorString = stringResource(
@@ -295,7 +294,7 @@ fun MapActivity(){
                                             takePartCount = item.numberParticipants,
                                             onClick = {
                                                 navController.navigate(
-                                                    EventRoutes.Details
+                                                    EventRoutes.Details(eventId = item.eventId)
                                                 )
                                             }
                                         )
