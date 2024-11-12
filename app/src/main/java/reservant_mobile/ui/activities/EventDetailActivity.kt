@@ -57,13 +57,17 @@ fun EventDetailActivity(
         Scaffold(
             topBar = {
                 IconWithHeader(
-                    text = eventDetailVM.event?.name ?: "Event",
+                    text = eventDetailVM.event!!.name!!,
                     showBackButton = true,
                     onReturnClick = { navController.popBackStack() },
                     icon = Icons.Default.CalendarMonth,
                     actions = {
                         if (eventDetailVM.isEventOwner) {
-                            IconButton(onClick = { /* Navigate to edit event */ }) {
+                            IconButton(
+                                onClick = {
+
+                                }
+                            ) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit Event")
                             }
                         }
