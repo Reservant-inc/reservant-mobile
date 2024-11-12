@@ -284,23 +284,6 @@ fun MapActivity(){
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                items(2) {
-                                    EventCard(
-                                        eventCreator = "testowy",
-                                        eventDate = "2023-12-30T23:59:00",
-                                        eventLocation = "Bar",
-                                        interestedCount = 2,
-                                        takePartCount = 10,
-                                        onClick = {
-                                            navController.navigate(
-                                                EventRoutes.Details(
-                                                    eventId = 1
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-
                                 items(events.itemCount) { index ->
                                     val item = events[index]
                                     if(item != null){
