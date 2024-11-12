@@ -74,5 +74,7 @@ class Restaurants(
         class AvailableHours(val parent: Id, val date: String? = null, val numberOfGuests: Int? = null)
         @Resource("employees")
         class Employees(val parent: Id, val hallOnly: Boolean? = null, val backdoorOnly: Boolean? = null)
+        @Resource("tables")
+        class Tables(val parent: Id)
     }
 }

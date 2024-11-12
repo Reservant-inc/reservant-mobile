@@ -288,4 +288,9 @@ class RestaurantServiceUnitTest: ServiceTest() {
         assertThat(itemsSnapshot).isNotEmpty()
     }
 
+    @Test
+    fun get_tables_return_not_null()= runTest{
+        assertThat(ser.getCurrentTables(restaurantId).value).isNotNull()
+    }
+
 }

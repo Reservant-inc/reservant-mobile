@@ -11,5 +11,11 @@ class Visits {
 
         @Resource("decline")
         class Decline(val parent: VisitID)
+
+        @Resource("confirm-start")
+        class ConfirmStart(val parent: VisitID)
+
+        @Resource("confirm-end")
+        class ConfirmEnd(val parent: VisitID)
     }
 }
