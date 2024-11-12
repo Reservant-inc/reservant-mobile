@@ -115,14 +115,13 @@ fun AddEventActivity(navController: NavHostController) {
                         )
                     }
                 }
-                Column(modifier = Modifier.weight(0.55f)) {
+                Column(modifier = Modifier.weight(0.55f).align(Alignment.CenterVertically)) {
                     MyTimePickerDialog(
                         onTimeSelected = { selectedTime ->
                             addEventViewModel.eventTime = selectedTime
                         },
                         modifier = Modifier
                             .scale(0.85f)
-                            .padding(top = 16.dp)
                     )
                 }
             }
@@ -151,14 +150,13 @@ fun AddEventActivity(navController: NavHostController) {
                         )
                     }
                 }
-                Column(modifier = Modifier.weight(0.55f)) {
+                Column(modifier = Modifier.weight(0.55f).align(Alignment.CenterVertically)) {
                     MyTimePickerDialog(
                         onTimeSelected = { selectedTime ->
                             addEventViewModel.mustJoinTime = selectedTime
                         },
                         modifier = Modifier
                             .scale(0.85f)
-                            .padding(top = 16.dp)
                     )
                 }
             }
