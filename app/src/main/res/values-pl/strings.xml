@@ -244,6 +244,10 @@
     <string name="label_event_status_past">W przeszłości</string>
     <string name="label_search_filter_event_status">Znajdz wydarzenie przez status</string>
     <string name="label_search_filter_date_range">Wydarzenia z podanego okresu</string>
+    <string name="restaurant_tables_header">Stoły Restauracji</string>
+    <string name="seats_label">Miejsca: %1$d</string>
+    <string name="available_label">Dostępny</string>
+    <string name="occupied_label">Zajęty</string>
     <string name="restaurant_notification_channel_name">Restauracje</string>
     <string name="friends_notification_channel_name">Znajomi</string>
     <string name="events_notification_channel_name">Wydarzenia</string>
