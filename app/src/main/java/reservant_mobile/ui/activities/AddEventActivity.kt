@@ -172,18 +172,18 @@ fun AddEventActivity(navController: NavHostController) {
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
         )
 
+        Text(
+            text = stringResource(id = R.string.label_available_restaurants),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { addEventViewModel.searchQuery.value = it },
             label = { Text(stringResource(id = R.string.label_search_restaurants)) },
             trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
-        )
-
-        Text(
-            text = stringResource(id = R.string.label_available_restaurants),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(vertical = 8.dp)
         )
 
         if (restaurants != null && restaurants.itemCount != 0) {
