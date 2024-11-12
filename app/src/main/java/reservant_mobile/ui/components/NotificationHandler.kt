@@ -2,34 +2,30 @@ package reservant_mobile.ui.components
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import androidx.activity.ComponentActivity.NOTIFICATION_SERVICE
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
 import com.example.reservant_mobile.R
-import kotlinx.coroutines.coroutineScope
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.utils.io.core.Closeable
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.close
 import kotlinx.coroutines.launch
+import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.services.UserService
-import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
-class NotificationHandler(
+class NotificationHandler (
     private val context: Context,
     private val service: NotificationService = NotificationService(),
     private val fileService: FileService = FileService()
-) {
+) : Closeable {
 
     private val restaurantChannelId = getString(context, R.string.restaurant_notification_channel_id)
     private val friendsChannelId = getString(context, R.string.friends_notification_channel_id)
@@ -39,6 +35,8 @@ class NotificationHandler(
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
     private var channelsReady = false
+
+    private var session: DefaultClientWebSocketSession? = null
 
     init {
         setupChannels()
@@ -100,13 +98,13 @@ class NotificationHandler(
     }
 
     suspend fun awaitNotification(){
-        val session = service.getNotificationSession()
+        val res = service.getNotificationSession()
 
-        if (!session.isError && session.value != null){
-            val session = session.value
+        if (!res.isError && res.value != null){
+            session = res.value
 
             while (true){
-                val notification = service.receiveNotificationFromSession(session)
+                val notification = service.receiveNotificationFromSession(session!!)
 
                 if (notification.isError || notification.value == null){
                     return
@@ -125,7 +123,6 @@ class NotificationHandler(
 
             }
 
-
         }
 
     }
@@ -143,6 +140,14 @@ class NotificationHandler(
             Random.nextInt(), //TODO: save notification ID somewhere ???
             notification
         )
+    }
+
+    override fun close() {
+        session?.let {
+            it.launch {
+                it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
+            }
+        }
     }
 
 }

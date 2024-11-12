@@ -109,11 +109,8 @@ fun MapActivity(){
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
             val mapViewModel = viewModel<MapViewModel>()
-            val notificationHandler = NotificationHandler(LocalContext.current)
 
-            mapViewModel.viewModelScope.launch {
-                notificationHandler.awaitNotification()
-            }
+
 
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
