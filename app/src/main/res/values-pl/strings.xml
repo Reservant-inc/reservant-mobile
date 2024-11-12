@@ -262,9 +262,9 @@
     <string name="label_event_category_interested">Zainteresowane</string>
     <string name="label_with_friends_only">Tylko ze znajomymi</string>
     <string name="label_reservation_status_deposit_not_paid">Nie zapłacono kaucji</string>
-    <string name="label_reservation_status_to_be_reviewed">W trakcie rozpatrywania</string>
-    <string name="label_reservation_status_approved">Zatwwierdzono</string>
-    <string name="label_reservation_status_declined">Odrzucono</string>
+    <string name="label_reservation_status_to_be_reviewed">W trakcie rozpatrywania przez restauracje</string>
+    <string name="label_reservation_status_approved">Zatwwierdzono przez restauracje</string>
+    <string name="label_reservation_status_declined">Odrzucono przez restauracje</string>
     <string name="order_details">Szczegóły zamówienia</string>
     <string name="orders_label">Zamówienia:</string>
     <string name="client_label">Klient: %1$s</string>

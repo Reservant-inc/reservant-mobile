@@ -48,7 +48,7 @@ enum class GetEventsStatus(val stringId: Int){
 
 enum class GetReservationStatus(val stringId: Int){
     DepositNotPaid(R.string.label_reservation_status_deposit_not_paid),
-    ToBeReviewed(R.string.label_reservation_status_to_be_reviewed),
-    Approved(R.string.label_reservation_status_approved),
-    Declined(R.string.label_reservation_status_declined)
+    ToBeReviewedByRestaurant(R.string.label_reservation_status_to_be_reviewed),
+    ApprovedByRestaurant(R.string.label_reservation_status_approved),
+    DeclinedByRestaurant(R.string.label_reservation_status_declined)
 }
