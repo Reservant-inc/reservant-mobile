@@ -217,7 +217,7 @@ fun AddEventActivity(navController: NavHostController) {
                                 text = restaurant.name,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                                    .padding(vertical = 8.dp, horizontal = 8.dp)
                             )
                         }
                     }
