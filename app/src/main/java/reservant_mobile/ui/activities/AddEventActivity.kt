@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
@@ -169,7 +170,7 @@ fun AddEventActivity(navController: NavHostController) {
             isError = (addEventViewModel.maxPeople.isBlank() || addEventViewModel.maxPeople.toIntOrNull() == null) && addEventViewModel.formSent,
             errorText = stringResource(id = R.string.error_invalid_number),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
         )
 
         Text(
