@@ -269,7 +269,14 @@ fun EmployeeHomeActivity() {
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_restaurant_tables),
                             icon = Icons.Outlined.TableBar,
-                            background = painterResource(id = R.drawable.table_cafe_town_restaurant)
+                            background = painterResource(id = R.drawable.table_cafe_town_restaurant),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.Tables(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_reservations),
@@ -339,14 +346,14 @@ fun EmployeeHomeActivity() {
                 composable<RestaurantRoutes.ManageOrders> {
                     OrderManagementScreen(
                         onReturnClick = { innerNavController.popBackStack() },
-                        restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId
-                    )
-                }
-                composable<RestaurantRoutes.Reservation> {
-                    OrderManagementScreen(
-                        onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId,
                         isReservation = true
+                    )
+                }
+                composable<RestaurantRoutes.Tables> {
+                    EmployeeTablesActivity(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Tables>().restaurantId
                     )
                 }
             }
