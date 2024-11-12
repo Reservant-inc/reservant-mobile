@@ -121,7 +121,8 @@ fun AddEventActivity(navController: NavHostController) {
                             addEventViewModel.eventTime = selectedTime
                         },
                         modifier = Modifier
-                            .scale(0.7f)
+                            .scale(0.85f)
+                            .padding(top = 20.dp)
                     )
                 }
             }
@@ -156,7 +157,8 @@ fun AddEventActivity(navController: NavHostController) {
                             addEventViewModel.mustJoinTime = selectedTime
                         },
                         modifier = Modifier
-                            .scale(0.7f)
+                            .scale(0.85f)
+                            .padding(top = 20.dp)
                     )
                 }
             }
