@@ -18,6 +18,11 @@ data object RestaurantRoutes {
     )
 
     @Serializable
+    data class Warehouse(
+        val restaurantId: Int
+    )
+
+    @Serializable
     data class Reservation(
         val restaurantId: Int
     )

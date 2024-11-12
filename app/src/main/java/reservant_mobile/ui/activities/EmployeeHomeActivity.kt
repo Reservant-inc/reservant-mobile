@@ -2,6 +2,7 @@
 
 package reservant_mobile.ui.activities
 
+import WarehouseActivity
 import android.graphics.Bitmap
 import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
@@ -293,7 +294,14 @@ fun EmployeeHomeActivity() {
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_stock),
                             icon = Icons.Outlined.ShoppingBasket,
-                            background = painterResource(id = R.drawable.wood_wine_store)
+                            background = painterResource(id = R.drawable.wood_wine_store),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.Warehouse(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
@@ -363,6 +371,12 @@ fun EmployeeHomeActivity() {
                     EmployeeTablesActivity(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Tables>().restaurantId
+                    )
+                }
+                composable<RestaurantRoutes.Warehouse> {
+                    WarehouseActivity(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId
                     )
                 }
             }
