@@ -287,7 +287,7 @@ fun MapActivity(){
                                     val item = events[index]
                                     if(item != null){
                                         EventCard(
-                                            eventCreator = item.name,
+                                            eventName = item.name,
                                             eventDate = item.time,
                                             eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                             interestedCount = item.numberInterested,

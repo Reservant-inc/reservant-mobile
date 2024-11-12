@@ -119,7 +119,7 @@ fun EventsContent() {
     ) {
         repeat(3) {
             EventCard(
-                eventCreator = "Name of event",
+                eventName = "Name of event",
                 eventDate = "Saturday, 2024-06-22",
                 eventLocation = "John's Doe - Warsaw",
                 interestedCount = 20,
@@ -135,7 +135,7 @@ fun EventsContent() {
 
 @Composable
 fun EventCard(
-    eventCreator: String,
+    eventName: String,
     eventDate: String,
     eventLocation: String,
     interestedCount: Int,
@@ -179,12 +179,12 @@ fun EventCard(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventLocation,
+                    text = eventName,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventCreator,
+                    text = eventLocation,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
