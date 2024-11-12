@@ -122,7 +122,7 @@ fun AddEventActivity(navController: NavHostController) {
                         },
                         modifier = Modifier
                             .scale(0.85f)
-                            .padding(top = 20.dp)
+                            .padding(top = 16.dp)
                     )
                 }
             }
@@ -158,7 +158,7 @@ fun AddEventActivity(navController: NavHostController) {
                         },
                         modifier = Modifier
                             .scale(0.85f)
-                            .padding(top = 20.dp)
+                            .padding(top = 16.dp)
                     )
                 }
             }
@@ -193,7 +193,6 @@ fun AddEventActivity(navController: NavHostController) {
                 modifier = Modifier
                     .height(200.dp)
                     .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-                    .padding(top = 8.dp, bottom = 8.dp)
             ) {
                 items(restaurants.itemCount) { index ->
                     val restaurant = restaurants[index]
@@ -202,7 +201,7 @@ fun AddEventActivity(navController: NavHostController) {
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .scale(0.9f)
+                                .padding(start = 8.dp, end = 8.dp, top = 8.dp)
                                 .clickable {
                                     if (isSelected) {
                                         addEventViewModel.selectedRestaurant = null
@@ -216,13 +215,15 @@ fun AddEventActivity(navController: NavHostController) {
                         ) {
                             Text(
                                 text = restaurant.name,
-                                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 4.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
                             )
                         }
                     }
                 }
-
             }
+
         } else if(restaurants != null && restaurants.itemCount == 0){
             Text("There are no restaurants to select.")
         } else {
