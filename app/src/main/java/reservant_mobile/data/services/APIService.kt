@@ -71,10 +71,6 @@ class APIService{
                 }
             }
         }
-        install(WebSockets) {
-                pingInterval = 10_000
-                contentConverter = KotlinxWebsocketSerializationConverter(Json)
-        }
         install(Resources)
 
     }
