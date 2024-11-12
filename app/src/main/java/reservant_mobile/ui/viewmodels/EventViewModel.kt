@@ -9,11 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.EventService
@@ -35,6 +37,8 @@ class EventViewModel(
     private val _restaurantsFlow = MutableStateFlow<Flow<PagingData<RestaurantDTO>>?>(null)
     val restaurantsFlow: StateFlow<Flow<PagingData<RestaurantDTO>>?> = _restaurantsFlow
 
+    private val _interestedState = MutableStateFlow<PagingData<UserDTO>>(PagingData.empty())
+    val interested: StateFlow<PagingData<UserDTO>> = _interestedState.asStateFlow()
 
     val searchQuery = MutableStateFlow("")
     var isLoading: Boolean by mutableStateOf(false)
@@ -52,6 +56,7 @@ class EventViewModel(
 
     var event by mutableStateOf<EventDTO?>(null)
     var isEventOwner by mutableStateOf(false)
+    var eventInterested by mutableStateOf<List<UserDTO?>?>(null)
 
     var result: Result<EventDTO?> = Result(isError = false, value = null)
         private set
@@ -91,6 +96,28 @@ class EventViewModel(
         }
         event = resultEvent.value
         isEventOwner = event!!.creator!!.userId == UserService.UserObject.userId
+
+        // fetching interested list
+        if(isEventOwner){
+            val res = eventService.getInterestedUser(
+                eventId = eventId
+            )
+            if(res.isError || res.value == null)
+                throw Exception()
+
+            res.value.cachedIn(viewModelScope).collect { pagingData ->
+                _interestedState.value = pagingData.map { dto ->
+                    UserDTO(
+                        userId = dto.userId,
+                        firstName = dto.firstName,
+                        lastName = dto.lastName,
+                        photo = dto.photo // TODO: NULL
+                    )
+                }
+            }
+
+        }
+
         return true
     }
 

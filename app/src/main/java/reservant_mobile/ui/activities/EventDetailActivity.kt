@@ -30,10 +30,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.EventRoutes
@@ -54,6 +56,7 @@ fun EventDetailActivity(
     )
 
     var showEditDialog by remember { mutableStateOf(false) }
+    val interested by rememberUpdatedState(newValue = eventDetailVM.interested.collectAsLazyPagingItems())
 
     if(eventDetailVM.isLoading){
         Box(
@@ -200,24 +203,26 @@ fun EventDetailActivity(
                     }
                 }
 
-                val joinRequests = listOf(
-                    EventDTO.Participant(userId = "1", firstName = "Charlie", lastName = "Brown"),
-                    EventDTO.Participant(userId = "2", firstName = "Dana", lastName = "White")
-                )
-
                 if (eventDetailVM.isEventOwner) {
                     item {
                         Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    items(joinRequests) { user ->
-                        UserListItem(
-                            user = user,
-                            showButtons = true,
-                            onApproveClick = { /* Approve user action */ },
-                            onRejectClick = { /* Reject user action */ }
-                        )
-                        HorizontalDivider()
+                    items(interested.itemCount) { index ->
+                        val item = interested[index]
+                        if (item != null) {
+                            UserListItem(
+                                user = EventDTO.Participant(
+                                    userId = item.userId!!,
+                                    firstName = item.firstName,
+                                    lastName = item.lastName
+                                ),
+                                showButtons = true,
+                                onApproveClick = { /* Approve user action */ },
+                                onRejectClick = { /* Reject user action */ }
+                            )
+                            HorizontalDivider()
+                        }
                     }
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
