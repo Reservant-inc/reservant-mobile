@@ -339,7 +339,7 @@ fun AddDeliveryDialog(
             ButtonComponent(
                 onClick = {
                     if (storeName.isNotBlank() && amountOrdered.toDoubleOrNull() ?: 0.0 > 0.0) {
-                        onSubmit(storeName, amountOrdered)
+                        onSubmit(storeName.takeIf { it.isNotBlank() } ?: "", amountOrdered)
                         onDismiss()
                     }
                 },
