@@ -228,8 +228,6 @@
     <string name="label_apply">Apply</string>
     <string name="message_not_found_any">Not found any %1$s</string>
     <string name="label_stars">stars</string>
-    <string name="label_interested">interested</string>
-    <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
     <string name="label_current_reports">Current reports</string>
@@ -249,10 +247,6 @@
     <string name="label_event_status_past">Past</string>
     <string name="label_search_filter_event_status">Find event by current status</string>
     <string name="label_search_filter_date_range">Filter by date range</string>
-    <string name="restaurant_tables_header">Restaurant Tables</string>
-    <string name="seats_label">Seats: %1$d</string>
-    <string name="available_label">Available</string>
-    <string name="occupied_label">Occupied</string>
     <string name="restaurant_notification_channel_id" translatable="false">restaurant_notification_channel_id</string>
     <string name="restaurant_notification_channel_name">Restaurants</string>
     <string name="friends_notification_channel_id" translatable="false">friends_notification_channel_id</string>
@@ -395,4 +389,18 @@
     <string name="label_start_date">Start date</string>
     <string name="label_event_join_until">Join until</string>
     <string name="label_event_photo">Event photo</string>
+    <string name="label_interested">interested</string>
+    <string name="label_takePart">take part</string>
+    <string name="label_add_event">Add Event</string>
+    <string name="label_event_name">Event name</string>
+    <string name="label_event_description">Event description</string>
+    <string name="label_event_max_people">Max people</string>
+    <string name="label_search_restaurants">Search restaurant</string>
+    <string name="label_selected_restaurant">Selected restaurant:</string>
+    <string name="error_add_event_failed">Adding event failed</string>
+    <string name="error_fill_all_fields">Fill all fields</string>
+    <string name="label_available_restaurants">Available restaurants:</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_number">Invalid number</string>
+    <string name="label_choose_time">Choose Time</string>
 </resources>

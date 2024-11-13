@@ -88,6 +88,7 @@ import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
@@ -274,8 +275,8 @@ fun MapActivity(){
                                 )
                             )
                         } else {
-                            LazyColumn(
-                                Modifier
+                            Box(
+                                modifier = Modifier
                                     .fillMaxSize()
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -297,6 +298,14 @@ fun MapActivity(){
                                         )
                                     }
                                 }
+                                MyFloatingActionButton(
+                                    onClick = {
+                                        navController.navigate(EventRoutes.AddEvent)
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                )
                             }
                         }
                     }
@@ -509,6 +518,8 @@ fun MapActivity(){
                 navController = navController,
                 eventId = it.toRoute<EventRoutes.Details>().eventId
             )
+        composable<EventRoutes.AddEvent>{
+            AddEventActivity(navController = navController)
         }
     }
 

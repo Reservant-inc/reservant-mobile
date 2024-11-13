@@ -23,7 +23,7 @@
     <string name="error_register_password_match">Hasła muszą się zgadzać</string>
     <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
     <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
-    <string name="label_register_birthday_dialog">Otwórz dialog wyboru daty</string>
+    <string name="label_register_birthday_dialog">Wybierz datę</string>
     <string name="label_restaurant_name">Nazwa</string>
     <string name="label_restaurant_type">Rodzaj restaurancji</string>
     <string name="label_restaurant_type_restaurant">Restauracja</string>
@@ -223,8 +223,6 @@
     <string name="label_apply">Zastosuj</string>
     <string name="message_not_found_any">Nie znaleziono %1$s</string>
     <string name="label_stars">gwiazdki</string>
-    <string name="label_interested">zainteresowani</string>
-    <string name="label_takePart">bierze udział</string>
     <string name="error_loading_events">Błąd podczas wczytywania wydarzeń</string>
     <string name="error_loading_more_events">Bład podczas wczytywania następnych wydarzeń</string>
     <string name="label_current_reports">Bieżące zgłoszenia</string>
@@ -244,10 +242,6 @@
     <string name="label_event_status_past">W przeszłości</string>
     <string name="label_search_filter_event_status">Znajdz wydarzenie przez status</string>
     <string name="label_search_filter_date_range">Wydarzenia z podanego okresu</string>
-    <string name="restaurant_tables_header">Stoły Restauracji</string>
-    <string name="seats_label">Miejsca: %1$d</string>
-    <string name="available_label">Dostępny</string>
-    <string name="occupied_label">Zajęty</string>
     <string name="restaurant_notification_channel_name">Restauracje</string>
     <string name="friends_notification_channel_name">Znajomi</string>
     <string name="events_notification_channel_name">Wydarzenia</string>
@@ -386,4 +380,18 @@
     <string name="label_start_date">Data rozpoczęcia</string>
     <string name="label_event_join_until">Dołączyć przed</string>
     <string name="label_event_photo">Zdjęcie wydarzenia</string>
+    <string name="label_interested">zainteresowani</string>
+    <string name="label_takePart">bierze udział</string>
+    <string name="label_add_event">Dodaj Wydarzenie</string>
+    <string name="label_event_name">Nazwa wydarzenia</string>
+    <string name="label_event_description">Opis wydarzenia</string>
+    <string name="label_event_max_people">Maksymalna liczba osób</string>
+    <string name="label_search_restaurants">Wyszukaj restaurację</string>
+    <string name="label_selected_restaurant">Wybrana restauracja:</string>
+    <string name="error_add_event_failed">Dodawanie eventu nieudane</string>
+    <string name="error_fill_all_fields">Wypełnij wszystkie pola</string>
+    <string name="label_available_restaurants">Dostępne restauracje:</string>
+    <string name="error_field_required">To pole jest wymagane</string>
+    <string name="error_invalid_number">Nieprawidłowa liczba</string>
+    <string name="label_choose_time">Wybierz godzinę</string>
 </resources>

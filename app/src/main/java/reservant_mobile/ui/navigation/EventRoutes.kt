@@ -7,5 +7,7 @@ data object EventRoutes{
     data class Details(
         val eventId: Int
     )
+    @Serializable
+    object AddEvent
 
 }

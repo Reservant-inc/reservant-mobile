@@ -165,6 +165,7 @@ fun EventCard(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.restaurant_photo),
+                        contentScale = ContentScale.Crop,
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .fillMaxSize()
@@ -178,6 +179,12 @@ fun EventCard(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+                if(eventName != null)
+                    Text(
+                        text = eventName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 Text(
                     text = eventName,
                     style = MaterialTheme.typography.headlineSmall,
