@@ -32,6 +32,8 @@ class WarehouseViewModel(
     var ingredientsWithoutAmountToOrderList by mutableStateOf<List<IngredientDTO>>(emptyList())
     var showMissingAmountToOrderDialog by mutableStateOf(false)
 
+    var showAddedToCartMessage by mutableStateOf(false)
+    var addedToCartMessage by mutableStateOf("")
 
     fun loadIngredients(
         restaurantId: Int,
@@ -55,45 +57,11 @@ class WarehouseViewModel(
         isAddDeliveryDialogVisible = true
     }
 
-    fun addDelivery(restaurantId: Int, storeName: String, amountOrdered: Int) {
-        selectedIngredient?.let { ingredient ->
-            viewModelScope.launch {
-                val delivery = DeliveryDTO(
-                    restaurantId = restaurantId,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            ingredientId = ingredient.ingredientId,
-                            amountOrdered = amountOrdered.toDouble(),
-                            storeName = storeName
-                        )
-                    )
-                )
-                val result = deliveryService.addDelivery(delivery)
-                if (!result.isError) {
-                    // Handle successful delivery addition, e.g., refresh data or show a success message
-                    loadIngredients(restaurantId) // Reload ingredients after adding delivery
-                } else {
-                    // Handle error, e.g., show an error message
-                }
-            }
-        }
-    }
-
-    fun addIngredient(ingredient: IngredientDTO) {
-        viewModelScope.launch {
-            val result = restaurantService.addIngredient(ingredient)
-            if (!result.isError && result.value != null) {
-                // Refresh ingredients list
-                loadIngredients(ingredient.restaurantId ?: 0)
-                isAddIngredientDialogVisible = false
-            } else {
-                // Handle error
-            }
-        }
-    }
-
     fun addToCart(item: DeliveryDTO.DeliveryIngredientDTO) {
-        cart.add(item)
+        val alreadyInCart = cart.any { it.ingredientId == item.ingredientId }
+        if (!alreadyInCart) {
+            cart.add(item)
+        }
     }
 
     fun removeFromCart(item: DeliveryDTO.DeliveryIngredientDTO) {
@@ -108,13 +76,11 @@ class WarehouseViewModel(
             )
             val result = deliveryService.addDelivery(delivery)
             if (!result.isError) {
-                // Order submitted successfully
                 cart.clear()
                 isCartVisible = false
-                // Refresh ingredients list
                 loadIngredients(restaurantId)
             } else {
-                // Handle error
+                // Obsługa błędu
             }
         }
     }
@@ -124,20 +90,30 @@ class WarehouseViewModel(
             val quantity = ingredient.amount ?: 0.0
             val minQuantity = ingredient.minimalAmount ?: 0.0
             val amountToOrder = ingredient.amountToOrder
-            quantity < minQuantity && amountToOrder != null
+            val isAlreadyInCart = cart.any { it.ingredientId == ingredient.ingredientId }
+            quantity < minQuantity && amountToOrder != null && !isAlreadyInCart
         }
+
         cart.addAll(ingredientsToAdd.map { ingredient ->
             DeliveryDTO.DeliveryIngredientDTO(
                 ingredientId = ingredient.ingredientId ?: 0,
                 amountOrdered = ingredient.amountToOrder ?: 0.0,
-                storeName = "Default Store"
+                storeName = "Domyślny Sklep"
             )
         })
+
+        if (ingredientsToAdd.isNotEmpty()) {
+            val addedCount = ingredientsToAdd.size
+            addedToCartMessage = "Pomyślnie dodano $addedCount składników do koszyka."
+            showAddedToCartMessage = true
+        }
+
         val ingredientsWithoutAmountToOrder = ingredients.value.filter { ingredient ->
             val quantity = ingredient.amount ?: 0.0
             val minQuantity = ingredient.minimalAmount ?: 0.0
             val amountToOrder = ingredient.amountToOrder
-            quantity < minQuantity && amountToOrder == null
+            val isAlreadyInCart = cart.any { it.ingredientId == ingredient.ingredientId }
+            quantity < minQuantity && amountToOrder == null && !isAlreadyInCart
         }
         if (ingredientsWithoutAmountToOrder.isNotEmpty()) {
             ingredientsWithoutAmountToOrderList = ingredientsWithoutAmountToOrder
@@ -145,4 +121,15 @@ class WarehouseViewModel(
         }
     }
 
+    fun addIngredient(ingredient: IngredientDTO) {
+        viewModelScope.launch {
+            val result = restaurantService.addIngredient(ingredient)
+            if (!result.isError && result.value != null) {
+                loadIngredients(ingredient.restaurantId ?: 0)
+                isAddIngredientDialogVisible = false
+            } else {
+                // Obsługa błędu
+            }
+        }
+    }
 }

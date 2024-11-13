@@ -9,17 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.AddBox
+import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,10 +66,8 @@ fun WarehouseActivity(
         }
     )
 
-    // Pobierz dane składników
     val ingredients by viewModel.ingredients.collectAsState()
 
-    // Załaduj składniki, kiedy ekran się ładuje
     LaunchedEffect(Unit) {
         viewModel.loadIngredients(restaurantId)
     }
@@ -85,7 +80,7 @@ fun WarehouseActivity(
             verticalArrangement = Arrangement.Top
         ) {
             IconWithHeader(
-                icon = Icons.Outlined.AddBox,
+                icon = Icons.Outlined.Warehouse,
                 text = "Magazyn",
                 showBackButton = true,
                 onReturnClick = onReturnClick
@@ -100,14 +95,14 @@ fun WarehouseActivity(
                         .weight(1f)
                         .padding(end = 8.dp),
                     onClick = { viewModel.generateNewList() },
-                    label = "Generate New List"
+                    label = "Generuj nową listę"
                 )
                 ButtonComponent(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
                     onClick = { viewModel.isAddIngredientDialogVisible = true },
-                    label = "New Ingredient"
+                    label = "Nowy składnik"
                 )
             }
 
@@ -119,7 +114,7 @@ fun WarehouseActivity(
                 items(ingredients.size) { index ->
                     val ingredient = ingredients[index]
                     ProductCard(
-                        name = ingredient.publicName ?: "no name",
+                        name = ingredient.publicName ?: "Brak nazwy",
                         quantity = ingredient.amount ?: 0.0,
                         minQuantity = ingredient.minimalAmount ?: 0.0,
                         unit = ingredient.unitOfMeasurement ?: UnitOfMeasurement.Unit,
@@ -129,25 +124,25 @@ fun WarehouseActivity(
                 }
             }
         }
-    }
 
-    FloatingActionButton(
-        modifier = Modifier
-            .padding(16.dp),
-        onClick = { viewModel.isCartVisible = true }
-    ) {
-        BadgedBox(
-            badge = {
-                if (viewModel.cart.isNotEmpty()) {
-                    Text(viewModel.cart.size.toString())
-                }
-            }
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            onClick = { viewModel.isCartVisible = true }
         ) {
-            Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart")
+            BadgedBox(
+                badge = {
+                    if (viewModel.cart.isNotEmpty()) {
+                        Text(viewModel.cart.size.toString())
+                    }
+                }
+            ) {
+                Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Koszyk")
+            }
         }
     }
 
-    // Show Cart Modal Bottom Sheet
     if (viewModel.isCartVisible) {
         ModalBottomSheet(
             onDismissRequest = { viewModel.isCartVisible = false }
@@ -164,20 +159,55 @@ fun WarehouseActivity(
         AddDeliveryDialog(
             onDismiss = { viewModel.isAddDeliveryDialogVisible = false },
             onSubmit = { storeName, amountOrdered ->
-                viewModel.addDelivery(restaurantId, storeName, amountOrdered)
+                val ingredient = viewModel.selectedIngredient
+                if (ingredient != null) {
+                    viewModel.addToCart(
+                        DeliveryDTO.DeliveryIngredientDTO(
+                            ingredientId = ingredient.ingredientId ?: 0,
+                            amountOrdered = amountOrdered.toDouble(),
+                            storeName = storeName
+                        )
+                    )
+                }
+                viewModel.isAddDeliveryDialogVisible = false
             },
-            ingredient = viewModel.selectedIngredient,
+            ingredient = viewModel.selectedIngredient
+        )
+    }
+
+    if (viewModel.isAddIngredientDialogVisible) {
+        AddIngredientDialog(
+            onDismiss = { viewModel.isAddIngredientDialogVisible = false },
+            onSubmit = { ingredient ->
+                viewModel.addIngredient(ingredient)
+            },
             restaurantId = restaurantId
+        )
+    }
+
+    if (viewModel.showAddedToCartMessage) {
+        AlertDialog(
+            onDismissRequest = { viewModel.showAddedToCartMessage = false },
+            title = { Text("Dodano do koszyka") },
+            text = {
+                Text(viewModel.addedToCartMessage)
+            },
+            confirmButton = {
+                ButtonComponent(
+                    onClick = { viewModel.showAddedToCartMessage = false },
+                    label = "OK"
+                )
+            }
         )
     }
 
     if (viewModel.showMissingAmountToOrderDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.showMissingAmountToOrderDialog = false },
-            title = { Text("Missing Order Quantities") },
+            title = { Text("Brak domyślnej ilości do zamówienia") },
             text = {
                 Column {
-                    Text("The following ingredients have quantities below minimal levels but no default order quantity:")
+                    Text("Następujące składniki nie zostały dodane do koszyka, ponieważ nie mają ustawionej domyślnej ilości do zamówienia:")
                     Spacer(modifier = Modifier.height(8.dp))
                     viewModel.ingredientsWithoutAmountToOrderList.forEach { ingredient ->
                         Text("- ${ingredient.publicName}")
@@ -192,9 +222,7 @@ fun WarehouseActivity(
             }
         )
     }
-
 }
-
 
 @Composable
 fun ProductCard(
@@ -229,26 +257,26 @@ fun ProductCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Name: $name",
+                        text = "Nazwa: $name",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Quantity: $quantity$unitAbbreviation",
+                        text = "Ilość: $quantity$unitAbbreviation",
                         color = if (quantity < minQuantity) Color.Red else Color.Black,
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Minimal Quantity: $minQuantity$unitAbbreviation",
+                        text = "Minimalna ilość: $minQuantity$unitAbbreviation",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                     if (defaultOrderQuantity != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Default Order Quantity: $defaultOrderQuantity$unitAbbreviation",
+                            text = "Domyślna ilość do zamówienia: $defaultOrderQuantity$unitAbbreviation",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
@@ -260,7 +288,7 @@ fun ProductCard(
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(
-                        text = "ADD",
+                        text = "Dodaj",
                         color = Color(0xFF955E71),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
@@ -271,34 +299,37 @@ fun ProductCard(
     }
 }
 
-
 @Composable
 fun AddDeliveryDialog(
     onDismiss: () -> Unit,
-    onSubmit: (String, Int) -> Unit,
-    ingredient: IngredientDTO?,
-    restaurantId: Int
+    onSubmit: (String, String) -> Unit,
+    ingredient: IngredientDTO?
 ) {
     var storeName by remember { mutableStateOf("") }
-    var amountOrdered by remember { mutableStateOf("40") } // Changed to String for FormInput
+    var amountOrdered by remember { mutableStateOf("") }
+
+    LaunchedEffect(ingredient) {
+        amountOrdered = ingredient?.amountToOrder?.toString() ?: ""
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add to Cart") },
+        title = { Text("Dodaj do koszyka") },
         text = {
             Column {
-                Text(text = "Ingredient: ${ingredient?.publicName}")
+                Text(text = "Składnik: ${ingredient?.publicName}")
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = storeName,
                     onValueChange = { storeName = it },
-                    label = "Store Name"
+                    label = "Nazwa sklepu",
+                    optional = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amountOrdered,
                     onValueChange = { amountOrdered = it },
-                    label = "Amount Ordered",
+                    label = "Ilość do zamówienia",
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     maxLines = 1
                 )
@@ -307,23 +338,22 @@ fun AddDeliveryDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    if (storeName.isNotBlank() && amountOrdered.toIntOrNull() ?: 0 > 0) {
-                        onSubmit(storeName, amountOrdered.toInt())
+                    if (storeName.isNotBlank() && amountOrdered.toDoubleOrNull() ?: 0.0 > 0.0) {
+                        onSubmit(storeName, amountOrdered)
                         onDismiss()
                     }
                 },
-                label = "Add to Cart"
+                label = "Dodaj do koszyka"
             )
         },
         dismissButton = {
             ButtonComponent(
                 onClick = onDismiss,
-                label = "Cancel"
+                label = "Anuluj"
             )
         }
     )
 }
-
 
 @Composable
 fun AddIngredientDialog(
@@ -341,13 +371,13 @@ fun AddIngredientDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add New Ingredient") },
+        title = { Text("Dodaj nowy składnik") },
         text = {
             Column {
                 FormInput(
                     inputText = publicName,
                     onValueChange = { publicName = it },
-                    label = "Name"
+                    label = "Nazwa"
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
@@ -357,27 +387,27 @@ fun AddIngredientDialog(
                         unitOfMeasurement = UnitOfMeasurement.valueOf(it)
                     },
                     options = unitOptions,
-                    label = "Unit of Measurement"
+                    label = "Jednostka miary"
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
-                    label = "Minimal Amount",
+                    label = "Minimalna ilość",
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
-                    label = "Amount to Order",
+                    label = "Ilość do zamówienia",
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amount,
                     onValueChange = { amount = it },
-                    label = "Initial Amount",
+                    label = "Początkowa ilość",
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -395,13 +425,13 @@ fun AddIngredientDialog(
                     )
                     onSubmit(ingredient)
                 },
-                label = "Add Ingredient"
+                label = "Dodaj składnik"
             )
         },
         dismissButton = {
             ButtonComponent(
                 onClick = onDismiss,
-                label = "Cancel"
+                label = "Anuluj"
             )
         }
     )
@@ -418,7 +448,7 @@ fun CartContent(
             .fillMaxHeight(0.8f)
             .padding(16.dp)
     ) {
-        Text(text = "Your Cart", style = MaterialTheme.typography.headlineSmall)
+        Text(text = "Twój koszyk", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(cartItems.size) { index ->
@@ -433,7 +463,7 @@ fun CartContent(
         ButtonComponent(
             modifier = Modifier.fillMaxWidth(),
             onClick = onSubmitOrder,
-            label = "Submit Order"
+            label = "Złóż zamówienie"
         )
     }
 }
@@ -456,12 +486,12 @@ fun CartItemCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = "Ingredient ID: ${item.ingredientId}")
-                Text(text = "Store Name: ${item.storeName}")
-                Text(text = "Amount Ordered: ${item.amountOrdered}")
+                Text(text = "ID składnika: ${item.ingredientId}")
+                Text(text = "Nazwa sklepu: ${item.storeName}")
+                Text(text = "Ilość zamówiona: ${item.amountOrdered}")
             }
             IconButton(onClick = onRemove) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Remove")
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Usuń")
             }
         }
     }
