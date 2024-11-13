@@ -203,7 +203,7 @@ fun EventDetailActivity(
                     }
                 }
 
-                if (eventDetailVM.isEventOwner) {
+                if (eventDetailVM.isEventOwner && interested.itemCount != 0) {
                     item {
                         Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
