@@ -366,4 +366,8 @@
     <string name="store_name_colon">Store name: %1$s</string>
     <string name="amount_ordered_colon">Amount ordered: %1$s</string>
     <string name="remove">Remove</string>
+    <string name="successfully_added_to_cart">Successfully added ingredient to cart.</string>
+    <string name="successfully_added_multiple_to_cart">Successfully added %1$d ingredients to cart.</string>
+    <string name="ingredient_already_in_cart">Ingredient is already in the cart.</string>
+    <string name="ingredients_already_in_cart">The following ingredients are already in the cart: %1$s</string>
 </resources>

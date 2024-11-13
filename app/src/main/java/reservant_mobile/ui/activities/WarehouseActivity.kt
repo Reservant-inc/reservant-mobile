@@ -54,6 +54,7 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WarehouseActivity(
@@ -192,7 +193,7 @@ fun WarehouseActivity(
             onDismissRequest = { viewModel.showAddedToCartMessage = false },
             title = { Text(stringResource(id = R.string.added_to_cart)) },
             text = {
-                Text(viewModel.addedToCartMessage)
+                Text(stringResource(id = viewModel.addedToCartMessageResId, *viewModel.addedToCartMessageArgs))
             },
             confirmButton = {
                 ButtonComponent(
@@ -208,7 +209,11 @@ fun WarehouseActivity(
             onDismissRequest = { viewModel.showAlreadyInCartMessage = false },
             title = { Text(stringResource(id = R.string.already_in_cart)) },
             text = {
-                Text(viewModel.alreadyInCartMessage)
+                if (viewModel.alreadyInCartIngredientNames.isNotEmpty()) {
+                    Text(stringResource(id = viewModel.alreadyInCartMessageResId, viewModel.alreadyInCartIngredientNames))
+                } else {
+                    Text(stringResource(id = viewModel.alreadyInCartMessageResId))
+                }
             },
             confirmButton = {
                 ButtonComponent(

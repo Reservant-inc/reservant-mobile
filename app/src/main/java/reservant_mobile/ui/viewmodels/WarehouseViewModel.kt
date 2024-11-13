@@ -3,6 +3,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,10 +34,12 @@ class WarehouseViewModel(
     var showMissingAmountToOrderDialog by mutableStateOf(false)
 
     var showAddedToCartMessage by mutableStateOf(false)
-    var addedToCartMessage by mutableStateOf("")
+    var addedToCartMessageResId by mutableStateOf(0)
 
     var showAlreadyInCartMessage by mutableStateOf(false)
-    var alreadyInCartMessage by mutableStateOf("")
+    var alreadyInCartMessageResId by mutableStateOf(0)
+
+    var alreadyInCartIngredientNames by mutableStateOf("")
 
     fun loadIngredients(
         restaurantId: Int,
@@ -64,10 +67,10 @@ class WarehouseViewModel(
         val alreadyInCart = cart.any { it.ingredientId == item.ingredientId }
         if (!alreadyInCart) {
             cart.add(item)
-            addedToCartMessage = "Pomyślnie dodano składnik do koszyka."
+            addedToCartMessageResId = R.string.successfully_added_to_cart
             showAddedToCartMessage = true
         } else {
-            alreadyInCartMessage = "Składnik jest już w koszyku."
+            alreadyInCartMessageResId = R.string.ingredient_already_in_cart
             showAlreadyInCartMessage = true
         }
     }
@@ -128,13 +131,15 @@ class WarehouseViewModel(
 
         if (ingredientsToAdd.isNotEmpty()) {
             val addedCount = ingredientsToAdd.size
-            addedToCartMessage = "Pomyślnie dodano $addedCount składników do koszyka."
+            addedToCartMessageResId = R.string.successfully_added_multiple_to_cart
+            addedToCartMessageArgs = arrayOf(addedCount)
             showAddedToCartMessage = true
         }
 
         if (ingredientsAlreadyInCart.isNotEmpty()) {
             val alreadyInCartNames = ingredientsAlreadyInCart.joinToString(", ") { it.publicName ?: "Brak nazwy" }
-            alreadyInCartMessage = "Następujące składniki są już w koszyku: $alreadyInCartNames"
+            alreadyInCartIngredientNames = alreadyInCartNames
+            alreadyInCartMessageResId = R.string.ingredients_already_in_cart
             showAlreadyInCartMessage = true
         }
 
@@ -155,4 +160,7 @@ class WarehouseViewModel(
             }
         }
     }
+
+    var addedToCartMessageArgs: Array<Any> = emptyArray() // Argumenty dla komunikatu
+
 }
