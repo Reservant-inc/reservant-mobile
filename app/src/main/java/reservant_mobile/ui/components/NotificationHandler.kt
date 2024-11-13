@@ -12,6 +12,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.utils.io.core.Closeable
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.Roles
@@ -97,30 +98,36 @@ class NotificationHandler (
         setupChannel(visitsChannelId, getString(context, R.string.visits_notification_channel_name))
     }
 
-    suspend fun awaitNotification(){
+    suspend fun createSession(){
         val res = service.getNotificationSession()
-
         if (!res.isError && res.value != null){
             session = res.value
+            println("[NOTIFICATIONS] Websocket session created")
+        }else{
+            println("[NOTIFICATIONS] Error occurred while creating session")
+        }
+    }
 
-            while (true){
-                val notification = service.receiveNotificationFromSession(session!!)
+    suspend fun awaitNotification(){
+        if (session == null){
+            println("[NOTIFICATIONS] awaitNotification() was called but session was closed or is null")
+            return
+        }
 
-                if (notification.isError || notification.value == null){
-                    return
-                }
+        while (true){
 
+            val notification = service.receiveNotificationFromSession(session!!)
+
+            if (!notification.isError && notification.value != null){
                 val photo = notification.value.photo?.let {
                     fileService.getImage(it)
                 } ?: Result(isError = true, value = null)
-
 
                 showBasicNotification(
                     notification.value.notificationType.toString(),
                     "Parse content here", // TODO add content parsing
                     photo.value
                 )
-
             }
 
         }
@@ -146,8 +153,11 @@ class NotificationHandler (
         session?.let {
             it.launch {
                 it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
+                println("[NOTIFICATION] Websocket session closed")
             }
         }
+
+        session = null
     }
 
 }

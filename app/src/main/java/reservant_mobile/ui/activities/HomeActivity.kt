@@ -70,9 +70,9 @@ fun HomeActivity() {
             }
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
-
                 viewmodel.viewModelScope.launch {
                     notificationHandler.use {
+                        it.createSession()
                         it.awaitNotification()
                     }
                 }
