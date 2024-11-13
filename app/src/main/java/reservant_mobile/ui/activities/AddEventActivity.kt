@@ -42,6 +42,7 @@ import java.time.LocalDate
 @Composable
 fun AddEventActivity(navController: NavHostController) {
     val addEventViewModel: AddEventViewModel = viewModel()
+
     val restaurantsFlow by addEventViewModel.restaurantsFlow.collectAsState()
     val restaurants = restaurantsFlow?.collectAsLazyPagingItems()
 
@@ -49,14 +50,13 @@ fun AddEventActivity(navController: NavHostController) {
 
     val context = LocalContext.current
 
-    // Remember scroll state for vertical scrolling
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .verticalScroll(scrollState), // Enable scrolling
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         IconWithHeader(
@@ -90,7 +90,8 @@ fun AddEventActivity(navController: NavHostController) {
                 addEventViewModel.photo = file.toString()
             },
             context = context,
-            isError = addEventViewModel.photo.isBlank() && addEventViewModel.formSent
+            isError = addEventViewModel.photo.isBlank(),
+            formSent = addEventViewModel.formSent
         )
 
         Column {

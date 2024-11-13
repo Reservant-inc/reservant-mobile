@@ -23,6 +23,7 @@ import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
+import reservant_mobile.data.utils.isFileSizeInvalid
 
 class AddEventViewModel(
     private val eventService: IEventService = EventService(),
@@ -76,7 +77,24 @@ class AddEventViewModel(
             val time = "${eventDate}T${eventTime}"
             val mustJoinUntil = "${mustJoinDate}T${mustJoinTime}"
 
-            sendPhoto(photo, context)
+            val eventPhoto = if (
+                !photo.endsWith(".png", ignoreCase = true) &&
+                !photo.endsWith(".jpg", ignoreCase = true) &&
+                !isFileSizeInvalid(context, photo)
+            ) {
+                sendPhoto(photo, context)
+            } else {
+                null
+            }
+            println("PHOTO FILE NAME $photo")
+            if(eventPhoto != null){
+                photo = if(eventPhoto.isError)
+                    eventPhoto.value?.fileName ?: ""
+                else
+                    "Błędny plik"
+            }
+
+            println("PHOTO FILE NAME AFTER VALIDATION $photo")
 
             val newEvent = EventDTO(
                 name = eventName,
@@ -86,7 +104,7 @@ class AddEventViewModel(
                 maxPeople = maxPeopleInt,
                 restaurantId = selectedRestaurant?.restaurantId,
                 photo = photo
-             )
+            )
             viewModelScope.launch {
                 val result = eventService.addEvent(newEvent)
                 this@AddEventViewModel.result = result
