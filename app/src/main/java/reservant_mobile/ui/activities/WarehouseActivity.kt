@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource // Importuj dla stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.UnitOfMeasurement
@@ -81,7 +83,7 @@ fun WarehouseActivity(
         ) {
             IconWithHeader(
                 icon = Icons.Outlined.Warehouse,
-                text = "Magazyn",
+                text = stringResource(id = R.string.warehouse_title),
                 showBackButton = true,
                 onReturnClick = onReturnClick
             )
@@ -95,14 +97,14 @@ fun WarehouseActivity(
                         .weight(1f)
                         .padding(end = 8.dp),
                     onClick = { viewModel.generateNewList() },
-                    label = "Generuj nową listę"
+                    label = stringResource(id = R.string.generate_new_list)
                 )
                 ButtonComponent(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
                     onClick = { viewModel.isAddIngredientDialogVisible = true },
-                    label = "Nowy składnik"
+                    label = stringResource(id = R.string.new_ingredient)
                 )
             }
 
@@ -114,7 +116,7 @@ fun WarehouseActivity(
                 items(ingredients.size) { index ->
                     val ingredient = ingredients[index]
                     ProductCard(
-                        name = ingredient.publicName ?: "Brak nazwy",
+                        name = ingredient.publicName ?: stringResource(id = R.string.no_name),
                         quantity = ingredient.amount ?: 0.0,
                         minQuantity = ingredient.minimalAmount ?: 0.0,
                         unit = ingredient.unitOfMeasurement ?: UnitOfMeasurement.Unit,
@@ -138,7 +140,7 @@ fun WarehouseActivity(
                     }
                 }
             ) {
-                Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Koszyk")
+                Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = stringResource(id = R.string.cart))
             }
         }
     }
@@ -165,7 +167,7 @@ fun WarehouseActivity(
                         DeliveryDTO.DeliveryIngredientDTO(
                             ingredientId = ingredient.ingredientId ?: 0,
                             amountOrdered = amountOrdered.toDouble(),
-                            storeName = storeName
+                            storeName = storeName.takeIf { it.isNotBlank() }
                         )
                     )
                 }
@@ -188,14 +190,30 @@ fun WarehouseActivity(
     if (viewModel.showAddedToCartMessage) {
         AlertDialog(
             onDismissRequest = { viewModel.showAddedToCartMessage = false },
-            title = { Text("Dodano do koszyka") },
+            title = { Text(stringResource(id = R.string.added_to_cart)) },
             text = {
                 Text(viewModel.addedToCartMessage)
             },
             confirmButton = {
                 ButtonComponent(
                     onClick = { viewModel.showAddedToCartMessage = false },
-                    label = "OK"
+                    label = stringResource(id = R.string.ok)
+                )
+            }
+        )
+    }
+
+    if (viewModel.showAlreadyInCartMessage) {
+        AlertDialog(
+            onDismissRequest = { viewModel.showAlreadyInCartMessage = false },
+            title = { Text(stringResource(id = R.string.already_in_cart)) },
+            text = {
+                Text(viewModel.alreadyInCartMessage)
+            },
+            confirmButton = {
+                ButtonComponent(
+                    onClick = { viewModel.showAlreadyInCartMessage = false },
+                    label = stringResource(id = R.string.ok)
                 )
             }
         )
@@ -204,10 +222,10 @@ fun WarehouseActivity(
     if (viewModel.showMissingAmountToOrderDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.showMissingAmountToOrderDialog = false },
-            title = { Text("Brak domyślnej ilości do zamówienia") },
+            title = { Text(stringResource(id = R.string.missing_default_order_quantity)) },
             text = {
                 Column {
-                    Text("Następujące składniki nie zostały dodane do koszyka, ponieważ nie mają ustawionej domyślnej ilości do zamówienia:")
+                    Text(stringResource(id = R.string.following_ingredients_not_added))
                     Spacer(modifier = Modifier.height(8.dp))
                     viewModel.ingredientsWithoutAmountToOrderList.forEach { ingredient ->
                         Text("- ${ingredient.publicName}")
@@ -217,7 +235,7 @@ fun WarehouseActivity(
             confirmButton = {
                 ButtonComponent(
                     onClick = { viewModel.showMissingAmountToOrderDialog = false },
-                    label = "OK"
+                    label = stringResource(id = R.string.ok)
                 )
             }
         )
@@ -257,26 +275,26 @@ fun ProductCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Nazwa: $name",
+                        text = stringResource(id = R.string.name_colon, name),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Ilość: $quantity$unitAbbreviation",
+                        text = stringResource(id = R.string.quantity_colon, "$quantity$unitAbbreviation"),
                         color = if (quantity < minQuantity) Color.Red else Color.Black,
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Minimalna ilość: $minQuantity$unitAbbreviation",
+                        text = stringResource(id = R.string.min_quantity_colon, "$minQuantity$unitAbbreviation"),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                     if (defaultOrderQuantity != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Domyślna ilość do zamówienia: $defaultOrderQuantity$unitAbbreviation",
+                            text = stringResource(id = R.string.default_order_quantity_colon, "$defaultOrderQuantity$unitAbbreviation"),
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
@@ -288,7 +306,7 @@ fun ProductCard(
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(
-                        text = "Dodaj",
+                        text = stringResource(id = R.string.add),
                         color = Color(0xFF955E71),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
@@ -314,22 +332,22 @@ fun AddDeliveryDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Dodaj do koszyka") },
+        title = { Text(stringResource(id = R.string.add_to_cart)) },
         text = {
             Column {
-                Text(text = "Składnik: ${ingredient?.publicName}")
+                Text(text = stringResource(id = R.string.ingredient_colon, ingredient?.publicName ?: ""))
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = storeName,
                     onValueChange = { storeName = it },
-                    label = "Nazwa sklepu",
+                    label = stringResource(id = R.string.store_name),
                     optional = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amountOrdered,
                     onValueChange = { amountOrdered = it },
-                    label = "Ilość do zamówienia",
+                    label = stringResource(id = R.string.amount_to_order),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     maxLines = 1
                 )
@@ -338,18 +356,18 @@ fun AddDeliveryDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    if (storeName.isNotBlank() && amountOrdered.toDoubleOrNull() ?: 0.0 > 0.0) {
+                    if (amountOrdered.toDoubleOrNull() ?: 0.0 > 0.0) {
                         onSubmit(storeName.takeIf { it.isNotBlank() } ?: "", amountOrdered)
                         onDismiss()
                     }
                 },
-                label = "Dodaj do koszyka"
+                label = stringResource(id = R.string.add_to_cart)
             )
         },
         dismissButton = {
             ButtonComponent(
                 onClick = onDismiss,
-                label = "Anuluj"
+                label = stringResource(id = R.string.cancel)
             )
         }
     )
@@ -371,13 +389,13 @@ fun AddIngredientDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Dodaj nowy składnik") },
+        title = { Text(stringResource(id = R.string.add_new_ingredient)) },
         text = {
             Column {
                 FormInput(
                     inputText = publicName,
                     onValueChange = { publicName = it },
-                    label = "Nazwa"
+                    label = stringResource(id = R.string.name)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
@@ -387,27 +405,27 @@ fun AddIngredientDialog(
                         unitOfMeasurement = UnitOfMeasurement.valueOf(it)
                     },
                     options = unitOptions,
-                    label = "Jednostka miary"
+                    label = stringResource(id = R.string.unit_of_measurement)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
-                    label = "Minimalna ilość",
+                    label = stringResource(id = R.string.min_quantity),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
-                    label = "Ilość do zamówienia",
+                    label = stringResource(id = R.string.amount_to_order),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amount,
                     onValueChange = { amount = it },
-                    label = "Początkowa ilość",
+                    label = stringResource(id = R.string.initial_amount),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
@@ -425,13 +443,13 @@ fun AddIngredientDialog(
                     )
                     onSubmit(ingredient)
                 },
-                label = "Dodaj składnik"
+                label = stringResource(id = R.string.add_ingredient)
             )
         },
         dismissButton = {
             ButtonComponent(
                 onClick = onDismiss,
-                label = "Anuluj"
+                label = stringResource(id = R.string.cancel)
             )
         }
     )
@@ -448,7 +466,7 @@ fun CartContent(
             .fillMaxHeight(0.8f)
             .padding(16.dp)
     ) {
-        Text(text = "Twój koszyk", style = MaterialTheme.typography.headlineSmall)
+        Text(text = stringResource(id = R.string.your_cart), style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(cartItems.size) { index ->
@@ -463,7 +481,7 @@ fun CartContent(
         ButtonComponent(
             modifier = Modifier.fillMaxWidth(),
             onClick = onSubmitOrder,
-            label = "Złóż zamówienie"
+            label = stringResource(id = R.string.submit_order)
         )
     }
 }
@@ -486,12 +504,14 @@ fun CartItemCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = "ID składnika: ${item.ingredientId}")
-                Text(text = "Nazwa sklepu: ${item.storeName}")
-                Text(text = "Ilość zamówiona: ${item.amountOrdered}")
+                Text(text = stringResource(id = R.string.ingredient_id_colon, item.ingredientId ?: 0.0))
+                if (!item.storeName.isNullOrBlank()) {
+                    Text(text = stringResource(id = R.string.store_name_colon, item.storeName))
+                }
+                Text(text = stringResource(id = R.string.amount_ordered_colon, item.amountOrdered ?: 0.0))
             }
             IconButton(onClick = onRemove) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Usuń")
+                Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(id = R.string.remove))
             }
         }
     }

@@ -35,6 +35,9 @@ class WarehouseViewModel(
     var showAddedToCartMessage by mutableStateOf(false)
     var addedToCartMessage by mutableStateOf("")
 
+    var showAlreadyInCartMessage by mutableStateOf(false)
+    var alreadyInCartMessage by mutableStateOf("")
+
     fun loadIngredients(
         restaurantId: Int,
         orderBy: GetIngredientsSort? = null
@@ -61,6 +64,11 @@ class WarehouseViewModel(
         val alreadyInCart = cart.any { it.ingredientId == item.ingredientId }
         if (!alreadyInCart) {
             cart.add(item)
+            addedToCartMessage = "Pomyślnie dodano składnik do koszyka."
+            showAddedToCartMessage = true
+        } else {
+            alreadyInCartMessage = "Składnik jest już w koszyku."
+            showAlreadyInCartMessage = true
         }
     }
 
@@ -94,6 +102,22 @@ class WarehouseViewModel(
             quantity < minQuantity && amountToOrder != null && !isAlreadyInCart
         }
 
+        val ingredientsAlreadyInCart = ingredients.value.filter { ingredient ->
+            val quantity = ingredient.amount ?: 0.0
+            val minQuantity = ingredient.minimalAmount ?: 0.0
+            val amountToOrder = ingredient.amountToOrder
+            val isAlreadyInCart = cart.any { it.ingredientId == ingredient.ingredientId }
+            quantity < minQuantity && amountToOrder != null && isAlreadyInCart
+        }
+
+        val ingredientsWithoutAmountToOrder = ingredients.value.filter { ingredient ->
+            val quantity = ingredient.amount ?: 0.0
+            val minQuantity = ingredient.minimalAmount ?: 0.0
+            val amountToOrder = ingredient.amountToOrder
+            val isAlreadyInCart = cart.any { it.ingredientId == ingredient.ingredientId }
+            quantity < minQuantity && amountToOrder == null && !isAlreadyInCart
+        }
+
         cart.addAll(ingredientsToAdd.map { ingredient ->
             DeliveryDTO.DeliveryIngredientDTO(
                 ingredientId = ingredient.ingredientId ?: 0,
@@ -108,13 +132,12 @@ class WarehouseViewModel(
             showAddedToCartMessage = true
         }
 
-        val ingredientsWithoutAmountToOrder = ingredients.value.filter { ingredient ->
-            val quantity = ingredient.amount ?: 0.0
-            val minQuantity = ingredient.minimalAmount ?: 0.0
-            val amountToOrder = ingredient.amountToOrder
-            val isAlreadyInCart = cart.any { it.ingredientId == ingredient.ingredientId }
-            quantity < minQuantity && amountToOrder == null && !isAlreadyInCart
+        if (ingredientsAlreadyInCart.isNotEmpty()) {
+            val alreadyInCartNames = ingredientsAlreadyInCart.joinToString(", ") { it.publicName ?: "Brak nazwy" }
+            alreadyInCartMessage = "Następujące składniki są już w koszyku: $alreadyInCartNames"
+            showAlreadyInCartMessage = true
         }
+
         if (ingredientsWithoutAmountToOrder.isNotEmpty()) {
             ingredientsWithoutAmountToOrderList = ingredientsWithoutAmountToOrder
             showMissingAmountToOrderDialog = true
