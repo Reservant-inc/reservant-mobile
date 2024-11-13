@@ -103,7 +103,7 @@ interface IRestaurantService{
     /***
      * Available order values : see GetIngredientsSort class
      */
-    suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<Flow<PagingData<IngredientDTO>>?>
+    suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<List<IngredientDTO>?>
 
     /***
      * Available order values : see GetDeliveriesSort class
@@ -413,17 +413,14 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun getIngredients(
         restaurantId: Any,
         orderBy: GetIngredientsSort?
-    ): Result<Flow<PagingData<IngredientDTO>>?> {
-        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
+    ): Result<List<IngredientDTO>?> {
+        val res = api.get(
             Restaurants.Id.Ingredients(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                orderBy = orderBy?.toString(),
-                page = page,
-                perPage = perPage
-            ))}
-
-        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(IngredientDTO::class.serializer()))
-        return pagingResultWrapper(sps)
+                orderBy = orderBy?.toString()
+            )
+        )
+        return complexResultWrapper(res)
     }
 
     override suspend fun getDeliveries(
