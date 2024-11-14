@@ -347,6 +347,13 @@ fun EmployeeHomeActivity() {
                     OrderManagementScreen(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId,
+                        isReservation = false
+                    )
+                }
+                composable<RestaurantRoutes.Reservation> {
+                    OrderManagementScreen(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId,
                         isReservation = true
                     )
                 }
