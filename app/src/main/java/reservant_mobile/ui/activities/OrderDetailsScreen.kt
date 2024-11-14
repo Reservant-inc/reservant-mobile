@@ -349,7 +349,7 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (visit.reservationDate != null) {
-                val reservationFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+                val reservationFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
                 val reservationDate = LocalDate.parse(visit.reservationDate, reservationFormatter)
 
                 val isReservationToday = reservationDate.isEqual(LocalDate.now())
