@@ -1,14 +1,34 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,7 +65,6 @@ fun OrderDetailsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             IconWithHeader(
                 icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
@@ -54,30 +73,36 @@ fun OrderDetailsScreen(
                 onReturnClick = onReturnClick
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ClientInfoSection(details)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-            ClientInfoSection(details)
+                if (details.visit.participants?.isNotEmpty() == true) {
+                    item {
+                        ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                if (details.visit.orders?.isNotEmpty() == true) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.orders_label),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-            if (details.visit.participants?.isNotEmpty() == true) {
-                ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
-            }
-
-            if(details.visit.orders?.size != 0) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.orders_label),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn {
-                items(details.visit.orders?.size ?: 0) { index ->
-                    val order = details.visit.orders?.get(index)
-                    if (order != null) {
+                    items(details.visit.orders.size) { index ->
+                        val order = details.visit.orders[index]
                         OrderCard(
                             order,
                             isReservation = isReservation,
@@ -87,19 +112,19 @@ fun OrderDetailsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-            }
 
-            if(details.visit.orders?.size != 0) {
-                Spacer(modifier = Modifier.height(16.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    NoteCard(note = "TO BE IMPLEMENTED XD") // TODO
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
-
-            NoteCard(note = "TO BE IMPLEMENTED XD") //TODO
-            
-            Spacer(modifier = Modifier.height(16.dp))
 
             if (isReservation) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = {
@@ -430,15 +455,15 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
 @Composable
 fun ParticipantsList(participants: List<String>) {
-    Text(
-        text = stringResource(R.string.participants_label),
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    LazyColumn {
-        items(participants.size) { index ->
-            ParticipantCard(participantName = participants[index])
+    Column {
+        Text(
+            text = stringResource(R.string.participants_label),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        participants.forEach { participantName ->
+            ParticipantCard(participantName = participantName)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
