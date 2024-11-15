@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
@@ -261,7 +262,8 @@ fun DishCard(
                 )
                 showChangeStatusDialog.value = false
             },
-            viewModel = viewModel
+            viewModel = viewModel,
+            status = item.status ?: ""
         )
     }
 }
@@ -495,18 +497,19 @@ fun NoteCard(note: String) {
 fun ChangeStatusDialog(
     onDismiss: () -> Unit,
     onSubmit: (String, String) -> Unit,
-    viewModel: EmployeeOrderViewModel
+    viewModel: EmployeeOrderViewModel,
+    status: String
 ) {
     val employeeList by viewModel.employees.collectAsState()
     val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
     val employeeIdMap =
         employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
 
-    var selectedEmployeeName by remember { mutableStateOf("") }
+    var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
 
     val statusOptions = listOf("Ordered", "InProgress", "Ready", "Delivered", "Cancelled")
-    var selectedStatus by remember { mutableStateOf("") }
+    var selectedStatus by remember { mutableStateOf(status) }
     val expandedStatus = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
