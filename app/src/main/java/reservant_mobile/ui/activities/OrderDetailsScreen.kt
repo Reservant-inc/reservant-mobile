@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.StatusUtils
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
@@ -178,7 +180,7 @@ fun OrderCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = order.status.toString(),
+                    text = StatusUtils.getStatusDisplayName(order.status?.toString() ?: "", LocalContext.current),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold
@@ -274,7 +276,7 @@ fun DishCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = item.status ?: stringResource(R.string.unknown_status),
+                        text = StatusUtils.getStatusDisplayName(item.status ?: "", LocalContext.current),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -545,16 +547,22 @@ fun ChangeStatusDialog(
     viewModel: EmployeeOrderViewModel,
     status: String
 ) {
+    val context = LocalContext.current
+
     val employeeList by viewModel.employees.collectAsState()
     val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap =
-        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val employeeIdMap = employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
 
     var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
 
-    val statusOptions = listOf("Ordered", "InProgress", "Ready", "Delivered", "Cancelled")
-    var selectedStatus by remember { mutableStateOf(status) }
+    val statusOptions = StatusUtils.statusOptions
+    val statusDisplayNames = statusOptions.map { context.getString(it.displayNameResId) }
+
+    val statusMap = statusOptions.associateBy({ it.statusString }, { context.getString(it.displayNameResId) })
+    val reverseStatusMap = statusOptions.associateBy({ context.getString(it.displayNameResId) }, { it.statusString })
+
+    var selectedStatusDisplayName by remember { mutableStateOf(statusMap[status] ?: status) }
     val expandedStatus = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -576,9 +584,9 @@ fun ChangeStatusDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
                     expanded = expandedStatus,
-                    value = selectedStatus,
-                    onValueChange = { selectedStatus = it },
-                    options = statusOptions,
+                    value = selectedStatusDisplayName,
+                    onValueChange = { selectedStatusDisplayName = it },
+                    options = statusDisplayNames,
                     label = stringResource(R.string.select_status)
                 )
             }
@@ -587,8 +595,9 @@ fun ChangeStatusDialog(
             Button(
                 onClick = {
                     val employeeId = employeeIdMap[selectedEmployeeName]
-                    if (employeeId != null && selectedStatus.isNotEmpty()) {
-                        onSubmit(employeeId, selectedStatus)
+                    val selectedStatusString = reverseStatusMap[selectedStatusDisplayName]
+                    if (employeeId != null && selectedStatusString != null) {
+                        onSubmit(employeeId, selectedStatusString)
                     }
                 }
             ) {
@@ -604,6 +613,7 @@ fun ChangeStatusDialog(
         }
     )
 }
+
 
 @Composable
 fun TableCard(visit: VisitDTO, navHostController: NavHostController) {
