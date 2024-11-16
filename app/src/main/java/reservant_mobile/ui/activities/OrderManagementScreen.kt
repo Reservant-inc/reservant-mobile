@@ -35,7 +35,6 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.formatToDateTime
-import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -62,26 +61,20 @@ fun OrderManagementScreen(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    val reservationVisitsFlow = remember {
-        viewModel.getVisitsFlow(
-            dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
-        )
-    }
+    val reservationVisitsFlow = viewModel.getVisitsFlow(
+        dateStart = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
+    )
 
-    val currentVisitsFlow = remember {
-        viewModel.getVisitsFlow(
-            dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.ApprovedByRestaurant
-        )
-    }
+    val currentVisitsFlow = viewModel.getVisitsFlow(
+        dateStart = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ApprovedByRestaurant
+    )
 
-    val pastVisitsFlow = remember {
-        viewModel.getVisitsFlow(
-            dateEnd = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.ApprovedByRestaurant
-        )
-    }
+    val pastVisitsFlow = viewModel.getVisitsFlow(
+        dateEnd = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ApprovedByRestaurant
+    )
 
     val reservationVisits = if (isReservation) reservationVisitsFlow.collectAsLazyPagingItems() else null
     val currentVisits = if (!isReservation && selectedTabIndex == 0) currentVisitsFlow.collectAsLazyPagingItems() else null

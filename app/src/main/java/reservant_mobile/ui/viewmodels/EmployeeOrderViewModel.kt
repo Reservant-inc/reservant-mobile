@@ -29,24 +29,28 @@ class EmployeeOrderViewModel(
 
     private val visitCache = mutableMapOf<Int, VisitDTO>()
 
+    private val _refreshTrigger = MutableStateFlow(0)
+
     fun getVisitsFlow(
         dateStart: LocalDateTime? = null,
         dateEnd: LocalDateTime? = null,
         reservationStatus: GetReservationStatus? = null
-    ): Flow<PagingData<VisitDTO>> = flow {
-        val result = restaurantService.getVisits(
-            restaurantId = restaurantId,
-            dateStart = dateStart,
-            dateEnd = dateEnd,
-            reservationStatus = reservationStatus
-        )
-        if (!result.isError && result.value != null) {
-            emitAll(result.value.cachedIn(viewModelScope))
-        } else {
+    ): Flow<PagingData<VisitDTO>> = _refreshTrigger.flatMapLatest {
+        flow {
+            val result = restaurantService.getVisits(
+                restaurantId = restaurantId,
+                dateStart = dateStart,
+                dateEnd = dateEnd,
+                reservationStatus = reservationStatus
+            )
+            if (!result.isError && result.value != null) {
+                emitAll(result.value.cachedIn(viewModelScope))
+            } else {
+                emit(PagingData.empty())
+            }
+        }.catch {
             emit(PagingData.empty())
         }
-    }.catch {
-        emit(PagingData.empty())
     }
 
     private val _selectedVisitDetails = MutableStateFlow<VisitDetailsUIState?>(null)
@@ -94,9 +98,7 @@ class EmployeeOrderViewModel(
         viewModelScope.launch {
             val result = visitsService.approveVisit(visitId)
             if (!result.isError) {
-                // Optionally, refresh data or update UI
-            } else {
-                // Handle error
+                _refreshTrigger.value += 1
             }
         }
     }
@@ -105,9 +107,7 @@ class EmployeeOrderViewModel(
         viewModelScope.launch {
             val result = visitsService.declineVisit(visitId)
             if (!result.isError) {
-                // Optionally, refresh data or update UI
-            } else {
-                // Handle error
+                _refreshTrigger.value += 1
             }
         }
     }
