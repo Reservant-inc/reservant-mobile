@@ -112,12 +112,6 @@ fun OrderDetailsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    NoteCard(note = "TO BE IMPLEMENTED XD") // TODO
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
             }
 
             if (isReservation) {
@@ -198,6 +192,26 @@ fun OrderCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
+            }
+            if(order.note != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.note_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = order.note,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -482,37 +496,6 @@ fun ParticipantCard(participantName: String) {
                 text = participantName,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-fun NoteCard(note: String) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-        elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.note_label),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = note,
-                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
