@@ -35,9 +35,11 @@ import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 @Composable
 fun OrderManagementScreen(
@@ -91,10 +93,7 @@ fun OrderManagementScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     when (visits.loadState.refresh) {
                         is LoadState.Loading -> {
-                            Text(
-                                text = stringResource(R.string.loading_reservations),
-                                modifier = Modifier.padding(16.dp)
-                            )
+                            LoadingScreenWithTimeout(Duration.parse("10s"))
                         }
                         is LoadState.Error -> {
                             Text(
