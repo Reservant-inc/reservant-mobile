@@ -34,13 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
 import java.time.LocalDate
@@ -53,7 +56,8 @@ fun OrderDetailsScreen(
     visitId: Int,
     onReturnClick: () -> Unit,
     viewModel: EmployeeOrderViewModel,
-    isReservation: Boolean = false
+    isReservation: Boolean = false,
+    navHostController: NavHostController
 ) {
     LaunchedEffect(visitId) {
         viewModel.fetchVisitDetailsById(visitId)
@@ -80,7 +84,7 @@ fun OrderDetailsScreen(
             ) {
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
-                    ClientInfoSection(details)
+                    ClientInfoSection(details, navHostController)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
@@ -193,7 +197,7 @@ fun OrderCard(
                     Spacer(modifier = Modifier.height(4.dp))
                 }
             }
-            if(order.note != null) {
+            if (order.note != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -269,7 +273,12 @@ fun DishCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "${item.amount} x ${stringResource(R.string.price_label, item.oneItemPrice ?: 0.0)}",
+                        text = "${item.amount} x ${
+                            stringResource(
+                                R.string.price_label,
+                                item.oneItemPrice ?: 0.0
+                            )
+                        }",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -308,45 +317,56 @@ fun DishCard(
 }
 
 
-
 @Composable
-fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
+fun ClientInfoSection(visitDetails: VisitDetailsUIState, navHostController: NavHostController) {
     val visit = visitDetails.visit
     Column(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = stringResource(R.string.client_label, visitDetails.clientName),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val isToday = visit.date?.let {
-            LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
-        } ?: false
-
-        val formattedDateRange = if (isToday) {
-            "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
-                formatToDateTime(
-                    visit.endTime ?: "", "HH:mm"
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(0.75f)
+            ) {
+                Text(
+                    text = visitDetails.clientName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
-            }"
-        } else {
-            "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
-                formatToDateTime(
-                    visit.endTime ?: "", "HH:mm"
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val isToday = visit.date?.let {
+                    LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
+                } ?: false
+
+                val formattedDateRange = if (isToday) {
+                    "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
+                        formatToDateTime(
+                            visit.endTime ?: "", "HH:mm"
+                        )
+                    }"
+                } else {
+                    "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
+                        formatToDateTime(
+                            visit.endTime ?: "", "HH:mm"
+                        )
+                    }"
+                }
+                Text(
+                    text = formattedDateRange,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
-            }"
+            }
+            if(visit.takeaway == false) {
+                TableCard(visit, navHostController = navHostController)
+            }
         }
-        Text(
-            text = formattedDateRange,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -354,17 +374,14 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row {
-                Text(
-                    text = if (visit.takeaway == true) stringResource(R.string.takeaway_label)
-                    else stringResource(R.string.table_label),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = if (visit.takeaway == true) "" else " ${visit.tableId}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            if (visit.takeaway == true) {
+                Row {
+                    Text(
+                        text = stringResource(R.string.takeaway_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             Row {
@@ -397,7 +414,11 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
                 if (!isReservationToday) {
                     Text(
-                        text = stringResource(R.string.reservation_date_label) + " ${reservationDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}",
+                        text = stringResource(R.string.reservation_date_label) + " ${
+                            reservationDate.format(
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                            )
+                        }",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -458,7 +479,9 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             text = if ((visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0) == 0.0) {
                 stringResource(R.string.reservation_label)
             } else {
-                stringResource(R.string.total_cost_label, "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0))
+                stringResource(
+                    R.string.total_cost_label,
+                    "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0))
             },
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
@@ -566,4 +589,38 @@ fun ChangeStatusDialog(
             }
         }
     )
+}
+
+@Composable
+fun TableCard(visit: VisitDTO, navHostController: NavHostController) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+        elevation = CardDefaults.cardElevation(2.dp),
+        onClick = {
+            navHostController.navigate(RestaurantRoutes.Tables(restaurantId = visit.restaurant!!.restaurantId))
+        }
+    )
+    {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.table_label),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = visit.tableId.toString(),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
 }

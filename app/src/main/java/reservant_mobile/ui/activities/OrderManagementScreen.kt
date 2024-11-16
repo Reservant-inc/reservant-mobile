@@ -43,7 +43,8 @@ import java.time.LocalDateTime
 fun OrderManagementScreen(
     onReturnClick: () -> Unit,
     restaurantId: Int,
-    isReservation: Boolean = false
+    isReservation: Boolean = false,
+    navHostController: NavHostController
 ) {
     val viewModel: EmployeeOrderViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -160,7 +161,8 @@ fun OrderManagementScreen(
                 onReturnClick = { innerNavController.popBackStack() },
                 visitId = it.toRoute<RestaurantRoutes.OrderDetail>().visitId,
                 isReservation = isReservation,
-                viewModel = viewModel
+                viewModel = viewModel,
+                navHostController = navHostController
             )
         }
     }
