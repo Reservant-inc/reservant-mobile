@@ -292,7 +292,7 @@ fun EmployeeHomeActivity() {
                             }
                         ),
                         EmpMenuOption(
-                            text = stringResource(id = R.string.label_stock),
+                            text = stringResource(id = R.string.label_warehouse),
                             icon = Icons.Outlined.ShoppingBasket,
                             background = painterResource(id = R.drawable.wood_wine_store),
                             onClick = {

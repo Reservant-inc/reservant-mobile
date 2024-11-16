@@ -361,4 +361,5 @@
     <string name="successfully_added_multiple_to_cart">Pomyślnie dodano %1$d składników do koszyka.</string>
     <string name="ingredient_already_in_cart">Składnik jest już w koszyku.</string>
     <string name="ingredients_already_in_cart">Następujące składniki są już w koszyku: %1$s</string>
+    <string name="label_warehouse">Magazyn</string>
 </resources>

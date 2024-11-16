@@ -370,4 +370,5 @@
     <string name="successfully_added_multiple_to_cart">Successfully added %1$d ingredients to cart.</string>
     <string name="ingredient_already_in_cart">Ingredient is already in the cart.</string>
     <string name="ingredients_already_in_cart">The following ingredients are already in the cart: %1$s</string>
+    <string name="label_warehouse">Warehouse</string>
 </resources>
