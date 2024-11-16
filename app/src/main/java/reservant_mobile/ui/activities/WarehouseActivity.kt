@@ -49,6 +49,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.UnitOfMeasurement
+import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormInput
@@ -128,22 +129,15 @@ fun WarehouseActivity(
             }
         }
 
-        FloatingActionButton(
+        BadgeFloatingButton(
+            icon = Icons.Default.ShoppingCart,
+            contentDescription = stringResource(id = R.string.cart),
+            itemCount = viewModel.cart.size,
+            onClick = { viewModel.isCartVisible = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = { viewModel.isCartVisible = true }
-        ) {
-            BadgedBox(
-                badge = {
-                    if (viewModel.cart.isNotEmpty()) {
-                        Text(viewModel.cart.size.toString())
-                    }
-                }
-            ) {
-                Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = stringResource(id = R.string.cart))
-            }
-        }
+                .padding(16.dp)
+        )
     }
 
     if (viewModel.isCartVisible) {
