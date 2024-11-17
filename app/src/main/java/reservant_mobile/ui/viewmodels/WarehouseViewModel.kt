@@ -128,7 +128,8 @@ class WarehouseViewModel(
             DeliveryDTO.DeliveryIngredientDTO(
                 ingredientId = ingredient.ingredientId ?: 0,
                 amountOrdered = ingredient.amountToOrder ?: 0.0,
-                storeName = null
+                storeName = null,
+                ingredientName = ingredient.publicName
             )
         })
 
