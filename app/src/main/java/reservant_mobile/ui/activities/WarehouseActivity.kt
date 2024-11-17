@@ -296,7 +296,7 @@ fun ProductCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.name_colon, name),
+                        text = name,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
