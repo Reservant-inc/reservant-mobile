@@ -568,7 +568,7 @@ fun CartItemCard(
         border = BorderStroke(1.dp, Color.LightGray)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
