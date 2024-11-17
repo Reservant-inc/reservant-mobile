@@ -371,4 +371,9 @@
     <string name="ingredient_already_in_cart">Ingredient is already in the cart.</string>
     <string name="ingredients_already_in_cart">The following ingredients are already in the cart: %1$s</string>
     <string name="label_warehouse">Warehouse</string>
+    <string name="edit">Edit</string>
+    <string name="edit_ingredient">Edit Ingredient</string>
+    <string name="new_amount">New amount</string>
+    <string name="comment">Comment</string>
+    <string name="save_changes">Save changes</string>
 </resources>

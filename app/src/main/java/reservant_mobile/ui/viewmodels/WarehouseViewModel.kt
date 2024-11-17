@@ -41,6 +41,9 @@ class WarehouseViewModel(
 
     var alreadyInCartIngredientNames by mutableStateOf("")
 
+    var isEditIngredientDialogVisible by mutableStateOf(false)
+    var ingredientToEdit: IngredientDTO? by mutableStateOf(null)
+
     fun loadIngredients(
         restaurantId: Int,
         orderBy: GetIngredientsSort? = null
@@ -163,4 +166,44 @@ class WarehouseViewModel(
 
     var addedToCartMessageArgs: Array<Any> = emptyArray() // Argumenty dla komunikatu
 
+    fun editIngredient(ingredientId: Any, updatedIngredient: IngredientDTO) {
+        viewModelScope.launch {
+            val result = restaurantService.editIngredient(ingredientId, updatedIngredient)
+            if (!result.isError && result.value != null) {
+                loadIngredients(updatedIngredient.restaurantId ?: 0)
+            } else {
+                // Obsługa błędu
+            }
+        }
+    }
+
+    fun correctIngredient(ingredient: IngredientDTO, newAmount: Double, comment: String) {
+        viewModelScope.launch {
+            val result = restaurantService.correctIngredient(ingredient.ingredientId ?: 0, newAmount, comment)
+            if (!result.isError && result.value != null) {
+                loadIngredients(result.value.ingredient?.restaurantId ?: 0)
+            } else {
+                // Obsługa błędu
+            }
+        }
+    }
+
+    fun showEditIngredientDialog(ingredient: IngredientDTO) {
+        ingredientToEdit = ingredient
+        isEditIngredientDialogVisible = true
+    }
+
+    fun submitEditIngredient(
+        updatedIngredient: IngredientDTO,
+        newAmount: Double?,
+        comment: String?
+    ) {
+        if (newAmount != null && comment != null) {
+            // Jeśli jest korekta ilości
+            correctIngredient(updatedIngredient, newAmount, comment)
+        } else {
+            // Jeśli tylko edycja danych składnika
+            editIngredient(updatedIngredient.ingredientId ?: 0, updatedIngredient)
+        }
+    }
 }

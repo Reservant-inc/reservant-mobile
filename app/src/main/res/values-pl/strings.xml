@@ -362,4 +362,9 @@
     <string name="ingredient_already_in_cart">Składnik jest już w koszyku.</string>
     <string name="ingredients_already_in_cart">Następujące składniki są już w koszyku: %1$s</string>
     <string name="label_warehouse">Magazyn</string>
+    <string name="edit">Edytuj</string>
+    <string name="edit_ingredient">Edytuj składnik</string>
+    <string name="new_amount">Nowa ilość</string>
+    <string name="comment">Komentarz</string>
+    <string name="save_changes">Zapisz zmiany</string>
 </resources>

@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material3.AlertDialog
@@ -123,7 +124,8 @@ fun WarehouseActivity(
                         minQuantity = ingredient.minimalAmount ?: 0.0,
                         unit = ingredient.unitOfMeasurement ?: UnitOfMeasurement.Unit,
                         defaultOrderQuantity = ingredient.amountToOrder,
-                        onAddClick = { viewModel.showAddDeliveryDialog(ingredient) }
+                        onAddClick = { viewModel.showAddDeliveryDialog(ingredient) },
+                        onEditClick = { viewModel.showEditIngredientDialog(ingredient) } // Obsługa kliknięcia edycji
                     )
                 }
             }
@@ -173,12 +175,26 @@ fun WarehouseActivity(
     }
 
     if (viewModel.isAddIngredientDialogVisible) {
-        AddIngredientDialog(
+        AddOrEditIngredientDialog(
             onDismiss = { viewModel.isAddIngredientDialogVisible = false },
-            onSubmit = { ingredient ->
+            onSubmit = { ingredient, _, _ ->
                 viewModel.addIngredient(ingredient)
             },
-            restaurantId = restaurantId
+            restaurantId = restaurantId,
+            isEdit = false
+        )
+    }
+
+
+    if (viewModel.isEditIngredientDialogVisible && viewModel.ingredientToEdit != null) {
+        AddOrEditIngredientDialog(
+            onDismiss = { viewModel.isEditIngredientDialogVisible = false },
+            onSubmit = { updatedIngredient, newAmount, comment ->
+                viewModel.submitEditIngredient(updatedIngredient, newAmount, comment)
+            },
+            restaurantId = restaurantId,
+            isEdit = true,
+            existingIngredient = viewModel.ingredientToEdit
         )
     }
 
@@ -248,7 +264,8 @@ fun ProductCard(
     minQuantity: Double,
     unit: UnitOfMeasurement,
     defaultOrderQuantity: Double?,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val unitAbbreviation = when (unit) {
         UnitOfMeasurement.Gram -> "g"
@@ -299,22 +316,37 @@ fun ProductCard(
                         )
                     }
                 }
-                OutlinedButton(
-                    onClick = onAddClick,
-                    border = BorderStroke(1.dp, Color(0xFF955E71)),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.add),
-                        color = Color(0xFF955E71),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Column{
+                    OutlinedButton(
+                        onClick = onAddClick,
+                        border = BorderStroke(1.dp, Color(0xFF955E71)),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.add),
+                            color = Color(0xFF955E71),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    IconButton(
+                        onClick = onEditClick,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(top = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(id = R.string.edit)
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun AddDeliveryDialog(
@@ -355,7 +387,7 @@ fun AddDeliveryDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    if (amountOrdered.toDoubleOrNull() ?: 0.0 > 0.0) {
+                    if ((amountOrdered.toDoubleOrNull() ?: 0.0) > 0.0) {
                         onSubmit(storeName.takeIf { it.isNotBlank() } ?: "", amountOrdered)
                         onDismiss()
                     }
@@ -373,22 +405,26 @@ fun AddDeliveryDialog(
 }
 
 @Composable
-fun AddIngredientDialog(
+fun AddOrEditIngredientDialog(
     onDismiss: () -> Unit,
-    onSubmit: (IngredientDTO) -> Unit,
-    restaurantId: Int
+    onSubmit: (IngredientDTO, Double?, String?) -> Unit,
+    restaurantId: Int,
+    isEdit: Boolean = false,
+    existingIngredient: IngredientDTO? = null
 ) {
-    var publicName by remember { mutableStateOf("") }
-    var unitOfMeasurement by remember { mutableStateOf(UnitOfMeasurement.Gram) }
-    var minimalAmount by remember { mutableStateOf("") }
-    var amountToOrder by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
+    var publicName by remember { mutableStateOf(existingIngredient?.publicName ?: "") }
+    var unitOfMeasurement by remember { mutableStateOf(existingIngredient?.unitOfMeasurement ?: UnitOfMeasurement.Gram) }
+    var minimalAmount by remember { mutableStateOf(existingIngredient?.minimalAmount?.toString() ?: "") }
+    var amountToOrder by remember { mutableStateOf(existingIngredient?.amountToOrder?.toString() ?: "") }
+    var amount by remember { mutableStateOf(existingIngredient?.amount?.toString() ?: "") }
+    var newAmount by remember { mutableStateOf("") }
+    var comment by remember { mutableStateOf("") }
     val unitOptions = UnitOfMeasurement.values().map { it.name }
     val expanded = remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(id = R.string.add_new_ingredient)) },
+        title = { Text(if (isEdit) stringResource(id = R.string.edit_ingredient) else stringResource(id = R.string.add_new_ingredient)) },
         text = {
             Column {
                 FormInput(
@@ -421,28 +457,49 @@ fun AddIngredientDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                FormInput(
-                    inputText = amount,
-                    onValueChange = { amount = it },
-                    label = stringResource(id = R.string.initial_amount),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
+                if (!isEdit) {
+                    FormInput(
+                        inputText = amount,
+                        onValueChange = { amount = it },
+                        label = stringResource(id = R.string.initial_amount),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FormInput(
+                        inputText = newAmount,
+                        onValueChange = { newAmount = it },
+                        label = stringResource(id = R.string.new_amount),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FormInput(
+                        inputText = comment,
+                        onValueChange = { comment = it },
+                        label = stringResource(id = R.string.comment),
+                        keyboardOptions = KeyboardOptions.Default
+                    )
+                }
             }
         },
         confirmButton = {
             ButtonComponent(
                 onClick = {
                     val ingredient = IngredientDTO(
+                        ingredientId = existingIngredient?.ingredientId,
                         publicName = publicName,
                         unitOfMeasurement = unitOfMeasurement,
                         minimalAmount = minimalAmount.toDoubleOrNull(),
                         amountToOrder = amountToOrder.toDoubleOrNull(),
-                        amount = amount.toDoubleOrNull(),
+                        amount = if (isEdit) existingIngredient?.amount else amount.toDoubleOrNull(),
                         restaurantId = restaurantId
                     )
-                    onSubmit(ingredient)
+                    val newAmountValue = if (isEdit) newAmount.toDoubleOrNull() else null
+                    val commentValue = if (isEdit) comment.takeIf { it.isNotBlank() } else null
+                    onSubmit(ingredient, newAmountValue, commentValue)
+                    onDismiss()
                 },
-                label = stringResource(id = R.string.add_ingredient)
+                label = if (isEdit) stringResource(id = R.string.save_changes) else stringResource(id = R.string.add_ingredient)
             )
         },
         dismissButton = {

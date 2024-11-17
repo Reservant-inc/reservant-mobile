@@ -69,6 +69,7 @@ fun FormInput(
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    isDisabled: Boolean = false
 ) {
 
     var beginValidation: Boolean by remember {
