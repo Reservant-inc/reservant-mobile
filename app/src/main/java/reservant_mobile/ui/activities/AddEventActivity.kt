@@ -36,6 +36,7 @@ import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.MyTimePickerDialog
+import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.viewmodels.EventViewModel
 import java.time.LocalDate
 
@@ -70,8 +71,13 @@ fun AddEventActivity(navController: NavHostController) {
             inputText = addEventViewModel.eventName,
             onValueChange = { addEventViewModel.eventName = it },
             label = stringResource(id = R.string.label_event_name),
-            isError = addEventViewModel.eventName.isBlank() && addEventViewModel.formSent,
-            errorText = stringResource(id = R.string.error_field_required),
+            isError = addEventViewModel.isEventNameInvalid() && addEventViewModel.formSent,
+            errorText = stringResource(
+                if (addEventViewModel.getEventNameError() != -1)
+                    addEventViewModel.getEventNameError()
+                else
+                    R.string.error_field_required
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -79,8 +85,13 @@ fun AddEventActivity(navController: NavHostController) {
             inputText = addEventViewModel.description,
             onValueChange = { addEventViewModel.description = it },
             label = stringResource(id = R.string.label_event_description),
-            isError = addEventViewModel.description.isBlank() && addEventViewModel.formSent,
-            errorText = stringResource(id = R.string.error_field_required),
+            isError = addEventViewModel.isDescriptionInvalid() && addEventViewModel.formSent,
+            errorText = stringResource(
+                if (addEventViewModel.getDescriptionError() != -1)
+                    addEventViewModel.getDescriptionError()
+                else
+                    R.string.error_field_required
+            ),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -90,7 +101,13 @@ fun AddEventActivity(navController: NavHostController) {
                 addEventViewModel.photo = file.toString()
             },
             context = context,
-            isError = addEventViewModel.photo.isBlank(),
+            isError = addEventViewModel.isPhotoInvalid() && addEventViewModel.formSent,
+            errorText = stringResource(
+                if (addEventViewModel.getPhotoError() != -1)
+                    addEventViewModel.getPhotoError()
+                else
+                    R.string.error_field_required
+            ),
             formSent = addEventViewModel.formSent
         )
 
@@ -109,15 +126,24 @@ fun AddEventActivity(navController: NavHostController) {
                         allowFutureDates = true,
                         startDate = LocalDate.now().toString()
                     )
-                    if (addEventViewModel.eventDate.isBlank() && addEventViewModel.formSent) {
+                    if (addEventViewModel.isEventDateInvalid() && addEventViewModel.formSent) {
                         Text(
-                            text = stringResource(id = R.string.error_field_required),
+                            text = stringResource(
+                                if (addEventViewModel.getEventDateError() != -1)
+                                    addEventViewModel.getEventDateError()
+                                else
+                                    R.string.error_field_required
+                            ),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
                 }
-                Column(modifier = Modifier.weight(0.55f).align(Alignment.CenterVertically)) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.55f)
+                        .align(Alignment.CenterVertically)
+                ) {
                     MyTimePickerDialog(
                         onTimeSelected = { selectedTime ->
                             addEventViewModel.eventTime = selectedTime
@@ -144,15 +170,24 @@ fun AddEventActivity(navController: NavHostController) {
                         allowFutureDates = true,
                         startDate = LocalDate.now().toString()
                     )
-                    if (addEventViewModel.mustJoinDate.isBlank() && addEventViewModel.formSent) {
+                    if (addEventViewModel.isMustJoinDateInvalid() && addEventViewModel.formSent) {
                         Text(
-                            text = stringResource(id = R.string.error_field_required),
+                            text = stringResource(
+                                if (addEventViewModel.getMustJoinDateError() != -1)
+                                    addEventViewModel.getMustJoinDateError()
+                                else
+                                    R.string.error_field_required
+                            ),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
                 }
-                Column(modifier = Modifier.weight(0.55f).align(Alignment.CenterVertically)) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.55f)
+                        .align(Alignment.CenterVertically)
+                ) {
                     MyTimePickerDialog(
                         onTimeSelected = { selectedTime ->
                             addEventViewModel.mustJoinTime = selectedTime
@@ -168,8 +203,13 @@ fun AddEventActivity(navController: NavHostController) {
             inputText = addEventViewModel.maxPeople,
             onValueChange = { addEventViewModel.maxPeople = it },
             label = stringResource(id = R.string.label_event_max_people),
-            isError = (addEventViewModel.maxPeople.isBlank() || addEventViewModel.maxPeople.toIntOrNull() == null) && addEventViewModel.formSent,
-            errorText = stringResource(id = R.string.error_invalid_number),
+            isError = addEventViewModel.isMaxPeopleInvalid() && addEventViewModel.formSent,
+            errorText = stringResource(
+                if (addEventViewModel.getMaxPeopleError() != -1)
+                    addEventViewModel.getMaxPeopleError()
+                else
+                    R.string.error_invalid_number
+            ),
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
         )
@@ -223,9 +263,8 @@ fun AddEventActivity(navController: NavHostController) {
                     }
                 }
             }
-
-        } else if(restaurants != null && restaurants.itemCount == 0){
-            Text("There are no restaurants to select.")
+        } else if (restaurants != null && restaurants.itemCount == 0) {
+            Text(stringResource(id = R.string.label_no_restaurants_found))
         } else {
             CircularProgressIndicator()
         }
@@ -253,20 +292,16 @@ fun AddEventActivity(navController: NavHostController) {
             }
         }
 
+        ShowErrorToast(context = context, id = addEventViewModel.getToastError())
+
         ButtonComponent(
             onClick = {
                 addEventViewModel.formSent = true
                 addEventViewModel.viewModelScope.launch {
                     addEventViewModel.addEvent(context)
-                }
-                if (addEventViewModel.result.isError) {
-                    if (addEventViewModel.isFormValid()) {
-                        Toast.makeText(context, R.string.error_add_event_failed, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, R.string.error_fill_all_fields, Toast.LENGTH_LONG).show()
+                    if (!addEventViewModel.result.isError) {
+                        navController.popBackStack()
                     }
-                } else {
-                    navController.popBackStack()
                 }
             },
             label = stringResource(id = R.string.label_add_event),

@@ -23,7 +23,7 @@
     <string name="error_register_password_match">Hasła muszą się zgadzać</string>
     <string name="error_register_invalid_lastname">Niepoprawne nazwisko</string>
     <string name="label_register_birthday_select">Wybierz datę urodzenia</string>
-    <string name="label_register_birthday_dialog">Otwórz dialog wyboru daty</string>
+    <string name="label_register_birthday_dialog">Wybierz datę</string>
     <string name="label_restaurant_name">Nazwa</string>
     <string name="label_restaurant_type">Rodzaj restaurancji</string>
     <string name="label_restaurant_type_restaurant">Restauracja</string>

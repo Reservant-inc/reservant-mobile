@@ -149,7 +149,6 @@ fun MyTimePickerDialog(
     modifier: Modifier = Modifier
 ) {
     val currentTime = Calendar.getInstance()
-
     val initialHour = if (initialTime.isNotEmpty()) initialTime.substringBefore(":").toInt() else currentTime.get(Calendar.HOUR_OF_DAY)
     val initialMinute = if (initialTime.isNotEmpty()) initialTime.substringAfter(":").toInt() else currentTime.get(Calendar.MINUTE)
 
@@ -160,7 +159,7 @@ fun MyTimePickerDialog(
     )
 
     var showDialog by remember { mutableStateOf(false) }
-    var selectedTime by remember { mutableStateOf(initialTime) }
+    var selectedTime by remember { mutableStateOf(String.format("%02d:%02d", initialHour, initialMinute)) }
 
     Column(modifier = modifier) {
         OutlinedButton(
@@ -171,7 +170,7 @@ fun MyTimePickerDialog(
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
         ) {
             Text(
-                text = selectedTime.ifEmpty { stringResource(R.string.label_choose_time) },
+                text = selectedTime,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge
             )
