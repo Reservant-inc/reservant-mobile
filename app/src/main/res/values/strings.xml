@@ -362,7 +362,7 @@
     <string name="add_ingredient">Add ingredient</string>
     <string name="your_cart">Your cart</string>
     <string name="submit_order">Submit order</string>
-    <string name="ingredient_id_colon">Ingredient ID: %1$d</string>
+    <string name="ingredient_id_colon">Ingredient: %1$d</string>
     <string name="store_name_colon">Store name: %1$s</string>
     <string name="amount_ordered_colon">Amount ordered: %1$s</string>
     <string name="remove">Remove</string>
