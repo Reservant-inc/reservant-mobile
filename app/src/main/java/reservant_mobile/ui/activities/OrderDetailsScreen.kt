@@ -1,7 +1,9 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
@@ -143,9 +146,9 @@ fun OrderDetailsScreen(
                     }
                     Button(
                         onClick = {
-                        viewModel.declineVisit(visitId)
-                        onReturnClick()
-                    },
+                            viewModel.declineVisit(visitId)
+                            onReturnClick()
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError
@@ -180,7 +183,10 @@ fun OrderCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = StatusUtils.getStatusDisplayName(order.status?.toString() ?: "", LocalContext.current),
+                    text = StatusUtils.getStatusDisplayName(
+                        order.status?.toString() ?: "",
+                        LocalContext.current
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold
@@ -276,7 +282,10 @@ fun DishCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = StatusUtils.getStatusDisplayName(item.status ?: "", LocalContext.current),
+                        text = StatusUtils.getStatusDisplayName(
+                            item.status ?: "",
+                            LocalContext.current
+                        ),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -341,48 +350,42 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState, navHostController: NavH
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.75f)
-            ) {
-                Text(
-                    text = visitDetails.clientName,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
+            Text(
+                text = visitDetails.clientName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                val isToday = visit.date?.let {
-                    LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
-                } ?: false
+            val isToday = visit.date?.let {
+                LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
+            } ?: false
 
-                val formattedDateRange = if (isToday) {
-                    "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
-                        formatToDateTime(
-                            visit.endTime ?: "", "HH:mm"
-                        )
-                    }"
-                } else {
-                    "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
-                        formatToDateTime(
-                            visit.endTime ?: "", "HH:mm"
-                        )
-                    }"
-                }
-                Text(
-                    text = formattedDateRange,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
+            val formattedDateRange = if (isToday) {
+                "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
+                    formatToDateTime(
+                        visit.endTime ?: "", "HH:mm"
+                    )
+                }"
+            } else {
+                "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
+                    formatToDateTime(
+                        visit.endTime ?: "", "HH:mm"
+                    )
+                }"
             }
-            if(visit.takeaway == false) {
-                TableCard(visit, navHostController = navHostController)
-            }
+            Text(
+                text = formattedDateRange,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
         }
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -390,13 +393,42 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState, navHostController: NavH
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (visit.takeaway == true) {
-                Row {
+            Row {
+                if (visit.takeaway == true) {
                     Text(
                         text = stringResource(R.string.takeaway_label),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
+                } else {
+                    Box(
+                        modifier = Modifier.clickable {
+                            navHostController.navigate(
+                                RestaurantRoutes.Tables(
+                                    restaurantId = visit.restaurant!!.restaurantId
+                                )
+                            )
+                        }
+                    ) {
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.table_label),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline
+                                ),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = " ${visit.tableId}",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            )
+                        }
+
+                    }
                 }
             }
 
@@ -551,7 +583,8 @@ fun ChangeStatusDialog(
 
     val employeeList by viewModel.employees.collectAsState()
     val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap = employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val employeeIdMap =
+        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
 
     var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
@@ -559,8 +592,10 @@ fun ChangeStatusDialog(
     val statusOptions = StatusUtils.statusOptions
     val statusDisplayNames = statusOptions.map { context.getString(it.displayNameResId) }
 
-    val statusMap = statusOptions.associateBy({ it.statusString }, { context.getString(it.displayNameResId) })
-    val reverseStatusMap = statusOptions.associateBy({ context.getString(it.displayNameResId) }, { it.statusString })
+    val statusMap =
+        statusOptions.associateBy({ it.statusString }, { context.getString(it.displayNameResId) })
+    val reverseStatusMap =
+        statusOptions.associateBy({ context.getString(it.displayNameResId) }, { it.statusString })
 
     var selectedStatusDisplayName by remember { mutableStateOf(statusMap[status] ?: status) }
     val expandedStatus = remember { mutableStateOf(false) }
@@ -612,39 +647,4 @@ fun ChangeStatusDialog(
             }
         }
     )
-}
-
-
-@Composable
-fun TableCard(visit: VisitDTO, navHostController: NavHostController) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-        elevation = CardDefaults.cardElevation(2.dp),
-        onClick = {
-            navHostController.navigate(RestaurantRoutes.Tables(restaurantId = visit.restaurant!!.restaurantId))
-        }
-    )
-    {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.table_label),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = visit.tableId.toString(),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
 }
