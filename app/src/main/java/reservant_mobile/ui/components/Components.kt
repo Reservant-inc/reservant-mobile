@@ -321,7 +321,7 @@ fun IconWithHeader(
                 )
                 Text(
                     text = text,
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .align(Alignment.CenterVertically)

@@ -330,4 +330,9 @@
     <string name="select_status">Select Status</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
+    <string name="status_ordered">Ordered</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_delivered">Delivered</string>
+    <string name="status_cancelled">Cancelled</string>
 </resources>

@@ -1,25 +1,56 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.StatusUtils
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
 import java.time.LocalDate
@@ -32,7 +63,8 @@ fun OrderDetailsScreen(
     visitId: Int,
     onReturnClick: () -> Unit,
     viewModel: EmployeeOrderViewModel,
-    isReservation: Boolean = false
+    isReservation: Boolean = false,
+    navHostController: NavHostController
 ) {
     LaunchedEffect(visitId) {
         viewModel.fetchVisitDetailsById(visitId)
@@ -44,7 +76,6 @@ fun OrderDetailsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
             IconWithHeader(
                 icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
@@ -53,30 +84,36 @@ fun OrderDetailsScreen(
                 onReturnClick = onReturnClick
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ClientInfoSection(details, navHostController)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-            ClientInfoSection(details)
+                if (details.visit.participants?.isNotEmpty() == true) {
+                    item {
+                        ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                if (details.visit.orders?.isNotEmpty() == true) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.orders_label),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-            if (details.visit.participants?.isNotEmpty() == true) {
-                ParticipantsList(participants = details.visit.participants.map { "${it.firstName} ${it.lastName}" })
-            }
-
-            if(details.visit.orders?.size != 0) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.orders_label),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn {
-                items(details.visit.orders?.size ?: 0) { index ->
-                    val order = details.visit.orders?.get(index)
-                    if (order != null) {
+                    items(details.visit.orders.size) { index ->
+                        val order = details.visit.orders[index]
                         OrderCard(
                             order,
                             isReservation = isReservation,
@@ -88,29 +125,35 @@ fun OrderDetailsScreen(
                 }
             }
 
-            if(details.visit.orders?.size != 0) {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            NoteCard(note = "TO BE IMPLEMENTED XD") //TODO
-            
-            Spacer(modifier = Modifier.height(16.dp))
-
             if (isReservation) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(onClick = {
-                        viewModel.approveVisit(visitId)
-                        onReturnClick()
-                    }) {
+                    Button(
+                        onClick = {
+                            viewModel.approveVisit(visitId)
+                            onReturnClick()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        )
+                    ) {
                         Text(text = stringResource(R.string.accept))
                     }
-                    Button(onClick = {
-                        viewModel.declineVisit(visitId)
-                        onReturnClick()
-                    }) {
+                    Button(
+                        onClick = {
+                            viewModel.declineVisit(visitId)
+                            onReturnClick()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
                         Text(text = stringResource(R.string.decline))
                     }
                 }
@@ -140,7 +183,10 @@ fun OrderCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = order.status.toString(),
+                    text = StatusUtils.getStatusDisplayName(
+                        order.status?.toString() ?: "",
+                        LocalContext.current
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold
@@ -172,6 +218,26 @@ fun OrderCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
+            }
+            if (order.note != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.note_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = order.note,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
@@ -216,7 +282,10 @@ fun DishCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = item.status ?: stringResource(R.string.unknown_status),
+                        text = StatusUtils.getStatusDisplayName(
+                            item.status ?: "",
+                            LocalContext.current
+                        ),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -229,7 +298,12 @@ fun DishCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "${item.amount} x ${stringResource(R.string.price_label, item.oneItemPrice ?: 0.0)}",
+                        text = "${item.amount} x ${
+                            stringResource(
+                                R.string.price_label,
+                                item.oneItemPrice ?: 0.0
+                            )
+                        }",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -261,51 +335,57 @@ fun DishCard(
                 )
                 showChangeStatusDialog.value = false
             },
-            viewModel = viewModel
+            viewModel = viewModel,
+            status = item.status ?: ""
         )
     }
 }
 
 
-
 @Composable
-fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
+fun ClientInfoSection(visitDetails: VisitDetailsUIState, navHostController: NavHostController) {
     val visit = visitDetails.visit
     Column(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = stringResource(R.string.client_label, visitDetails.clientName),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = visitDetails.clientName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
-        val isToday = visit.date?.let {
-            LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
-        } ?: false
+            Spacer(modifier = Modifier.height(8.dp))
 
-        val formattedDateRange = if (isToday) {
-            "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
-                formatToDateTime(
-                    visit.endTime ?: "", "HH:mm"
-                )
-            }"
-        } else {
-            "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
-                formatToDateTime(
-                    visit.endTime ?: "", "HH:mm"
-                )
-            }"
+            val isToday = visit.date?.let {
+                LocalDateTime.parse(it).toLocalDate().isEqual(LocalDate.now())
+            } ?: false
+
+            val formattedDateRange = if (isToday) {
+                "${formatToDateTime(visit.date ?: "", "HH:mm")} - ${
+                    formatToDateTime(
+                        visit.endTime ?: "", "HH:mm"
+                    )
+                }"
+            } else {
+                "${formatToDateTime(visit.date ?: "", "dd.MM.yyyy HH:mm")} - ${
+                    formatToDateTime(
+                        visit.endTime ?: "", "HH:mm"
+                    )
+                }"
+            }
+            Text(
+                text = formattedDateRange,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
         }
-        Text(
-            text = formattedDateRange,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -314,16 +394,42 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                Text(
-                    text = if (visit.takeaway == true) stringResource(R.string.takeaway_label)
-                    else stringResource(R.string.table_label),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = if (visit.takeaway == true) "" else " ${visit.tableId}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                if (visit.takeaway == true) {
+                    Text(
+                        text = stringResource(R.string.takeaway_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.clickable {
+                            navHostController.navigate(
+                                RestaurantRoutes.Tables(
+                                    restaurantId = visit.restaurant!!.restaurantId
+                                )
+                            )
+                        }
+                    ) {
+                        Row {
+                            Text(
+                                text = stringResource(id = R.string.table_label),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline
+                                ),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = " ${visit.tableId}",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            )
+                        }
+
+                    }
+                }
             }
 
             Row {
@@ -356,7 +462,11 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
                 if (!isReservationToday) {
                     Text(
-                        text = stringResource(R.string.reservation_date_label) + " ${reservationDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))}",
+                        text = stringResource(R.string.reservation_date_label) + " ${
+                            reservationDate.format(
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                            )
+                        }",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -417,7 +527,9 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
             text = if ((visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0) == 0.0) {
                 stringResource(R.string.reservation_label)
             } else {
-                stringResource(R.string.total_cost_label, "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0))
+                stringResource(
+                    R.string.total_cost_label,
+                    "%.2f".format(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0))
             },
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
@@ -428,15 +540,15 @@ fun ClientInfoSection(visitDetails: VisitDetailsUIState) {
 
 @Composable
 fun ParticipantsList(participants: List<String>) {
-    Text(
-        text = stringResource(R.string.participants_label),
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    LazyColumn {
-        items(participants.size) { index ->
-            ParticipantCard(participantName = participants[index])
+    Column {
+        Text(
+            text = stringResource(R.string.participants_label),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        participants.forEach { participantName ->
+            ParticipantCard(participantName = participantName)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -461,52 +573,31 @@ fun ParticipantCard(participantName: String) {
 }
 
 @Composable
-fun NoteCard(note: String) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
-        elevation = CardDefaults.cardElevation(2.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.note_label),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = note,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-@Composable
 fun ChangeStatusDialog(
     onDismiss: () -> Unit,
     onSubmit: (String, String) -> Unit,
-    viewModel: EmployeeOrderViewModel
+    viewModel: EmployeeOrderViewModel,
+    status: String
 ) {
+    val context = LocalContext.current
+
     val employeeList by viewModel.employees.collectAsState()
     val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
     val employeeIdMap =
         employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
 
-    var selectedEmployeeName by remember { mutableStateOf("") }
+    var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
 
-    val statusOptions = listOf("Ordered", "InProgress", "Ready", "Delivered", "Cancelled")
-    var selectedStatus by remember { mutableStateOf("") }
+    val statusOptions = StatusUtils.statusOptions
+    val statusDisplayNames = statusOptions.map { context.getString(it.displayNameResId) }
+
+    val statusMap =
+        statusOptions.associateBy({ it.statusString }, { context.getString(it.displayNameResId) })
+    val reverseStatusMap =
+        statusOptions.associateBy({ context.getString(it.displayNameResId) }, { it.statusString })
+
+    var selectedStatusDisplayName by remember { mutableStateOf(statusMap[status] ?: status) }
     val expandedStatus = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -528,9 +619,9 @@ fun ChangeStatusDialog(
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
                     expanded = expandedStatus,
-                    value = selectedStatus,
-                    onValueChange = { selectedStatus = it },
-                    options = statusOptions,
+                    value = selectedStatusDisplayName,
+                    onValueChange = { selectedStatusDisplayName = it },
+                    options = statusDisplayNames,
                     label = stringResource(R.string.select_status)
                 )
             }
@@ -539,8 +630,9 @@ fun ChangeStatusDialog(
             Button(
                 onClick = {
                     val employeeId = employeeIdMap[selectedEmployeeName]
-                    if (employeeId != null && selectedStatus.isNotEmpty()) {
-                        onSubmit(employeeId, selectedStatus)
+                    val selectedStatusString = reverseStatusMap[selectedStatusDisplayName]
+                    if (employeeId != null && selectedStatusString != null) {
+                        onSubmit(employeeId, selectedStatusString)
                     }
                 }
             ) {
