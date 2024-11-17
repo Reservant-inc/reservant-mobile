@@ -152,17 +152,26 @@ fun ComboBox(
     label: String,
     isError: Boolean = false,
     errorText: String = "",
-    formSent: Boolean = false
+    formSent: Boolean = false,
+    isDisabled: Boolean = false
 ) {
 
     val onDismiss = { expanded.value = false }
     var beginValidation by remember { mutableStateOf(false) }
 
+    LaunchedEffect(isDisabled) {
+        if (isDisabled && expanded.value) {
+            expanded.value = false
+        }
+    }
+
     ExposedDropdownMenuBox(
         expanded = expanded.value,
         onExpandedChange = {
-            expanded.value = !expanded.value
-            beginValidation = true
+            if (!isDisabled) {
+                expanded.value = !expanded.value
+                beginValidation = true
+            }
         }
     ) {
         Column {
@@ -177,7 +186,8 @@ fun ComboBox(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
                 shape = RoundedCornerShape(8.dp),
-                isError = isError && (beginValidation || formSent)
+                isError = isError && (beginValidation || formSent),
+                enabled = !isDisabled
             )
 
             if (isError && (beginValidation || formSent)) {
@@ -196,7 +206,8 @@ fun ComboBox(
                     onClick = {
                         onValueChange(it)
                         onDismiss()
-                    }
+                    },
+                    enabled = !isDisabled
                 )
             }
         }

@@ -76,6 +76,7 @@ import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
@@ -370,30 +371,12 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 contentAlignment = Alignment.BottomEnd
             ) {
 
-                FloatingActionButton(
+                BadgeFloatingButton(
+                    icon = Icons.Default.ShoppingBag,
+                    contentDescription = stringResource(id = R.string.cart),
+                    itemCount = addedItems.size,
                     onClick = { navController.navigate(RestaurantRoutes.Reservation) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingBag,
-                        contentDescription = "ShoppingBag"
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .offset(x = 10.dp, y = (-35).dp)
-                        .size(32.dp)
-                        .background(MaterialTheme.colorScheme.primary, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = addedItems.size.toString(),
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-
+                )
             }
 
             var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }

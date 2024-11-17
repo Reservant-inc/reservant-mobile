@@ -2,6 +2,7 @@
 
 package reservant_mobile.ui.activities
 
+import WarehouseActivity
 import android.graphics.Bitmap
 import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
@@ -63,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -291,9 +293,16 @@ fun EmployeeHomeActivity() {
                             }
                         ),
                         EmpMenuOption(
-                            text = stringResource(id = R.string.label_stock),
+                            text = stringResource(id = R.string.label_warehouse),
                             icon = Icons.Outlined.ShoppingBasket,
-                            background = painterResource(id = R.drawable.wood_wine_store)
+                            background = painterResource(id = R.drawable.wood_wine_store),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.Warehouse(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
                         ),
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
@@ -363,6 +372,13 @@ fun EmployeeHomeActivity() {
                     EmployeeTablesActivity(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Tables>().restaurantId
+                    )
+                }
+                composable<RestaurantRoutes.Warehouse> {
+                    WarehouseActivity(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
+                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
                     )
                 }
             }

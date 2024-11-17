@@ -30,6 +30,7 @@ data class DeliveryDTO (
          * Time in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
          */
         val expiryDate: String? = null,
-        val storeName: String? = null
+        val storeName: String? = null,
+        val ingredientName: String? = null
     )
 }
