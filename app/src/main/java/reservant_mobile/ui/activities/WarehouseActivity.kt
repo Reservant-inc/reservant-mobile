@@ -62,6 +62,7 @@ import reservant_mobile.ui.components.IconWithHeader
 fun WarehouseActivity(
     onReturnClick: () -> Unit,
     restaurantId: Int,
+    isEmployee: Boolean
 ) {
     val viewModel: WarehouseViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -102,13 +103,15 @@ fun WarehouseActivity(
                     onClick = { viewModel.generateNewList() },
                     label = stringResource(id = R.string.generate_new_list)
                 )
-                ButtonComponent(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
-                    onClick = { viewModel.isAddIngredientDialogVisible = true },
-                    label = stringResource(id = R.string.new_ingredient)
-                )
+                if(!isEmployee) {
+                    ButtonComponent(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp),
+                        onClick = { viewModel.isAddIngredientDialogVisible = true },
+                        label = stringResource(id = R.string.new_ingredient)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -181,7 +184,8 @@ fun WarehouseActivity(
                 viewModel.addIngredient(ingredient)
             },
             restaurantId = restaurantId,
-            isEdit = false
+            isEdit = false,
+            isEmployee = isEmployee
         )
     }
 
@@ -194,7 +198,8 @@ fun WarehouseActivity(
             },
             restaurantId = restaurantId,
             isEdit = true,
-            existingIngredient = viewModel.ingredientToEdit
+            existingIngredient = viewModel.ingredientToEdit,
+            isEmployee = isEmployee
         )
     }
 
@@ -410,7 +415,8 @@ fun AddOrEditIngredientDialog(
     onSubmit: (IngredientDTO, Double?, String?) -> Unit,
     restaurantId: Int,
     isEdit: Boolean = false,
-    existingIngredient: IngredientDTO? = null
+    existingIngredient: IngredientDTO? = null,
+    isEmployee: Boolean = false
 ) {
     var publicName by remember { mutableStateOf(existingIngredient?.publicName ?: "") }
     var unitOfMeasurement by remember { mutableStateOf(existingIngredient?.unitOfMeasurement ?: UnitOfMeasurement.Gram) }
@@ -430,7 +436,8 @@ fun AddOrEditIngredientDialog(
                 FormInput(
                     inputText = publicName,
                     onValueChange = { publicName = it },
-                    label = stringResource(id = R.string.name)
+                    label = stringResource(id = R.string.name),
+                    isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 ComboBox(
@@ -440,21 +447,24 @@ fun AddOrEditIngredientDialog(
                         unitOfMeasurement = UnitOfMeasurement.valueOf(it)
                     },
                     options = unitOptions,
-                    label = stringResource(id = R.string.unit_of_measurement)
+                    label = stringResource(id = R.string.unit_of_measurement),
+                    isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
                     label = stringResource(id = R.string.min_quantity),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
                     label = stringResource(id = R.string.amount_to_order),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 if (!isEdit) {
@@ -462,7 +472,8 @@ fun AddOrEditIngredientDialog(
                         inputText = amount,
                         onValueChange = { amount = it },
                         label = stringResource(id = R.string.initial_amount),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isDisabled = isEmployee
                     )
                 } else {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -470,14 +481,16 @@ fun AddOrEditIngredientDialog(
                         inputText = newAmount,
                         onValueChange = { newAmount = it },
                         label = stringResource(id = R.string.new_amount),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isDisabled = false
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     FormInput(
                         inputText = comment,
                         onValueChange = { comment = it },
                         label = stringResource(id = R.string.comment),
-                        keyboardOptions = KeyboardOptions.Default
+                        keyboardOptions = KeyboardOptions.Default,
+                        isDisabled = false
                     )
                 }
             }

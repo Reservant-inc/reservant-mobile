@@ -64,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -376,7 +377,8 @@ fun EmployeeHomeActivity() {
                 composable<RestaurantRoutes.Warehouse> {
                     WarehouseActivity(
                         onReturnClick = { innerNavController.popBackStack() },
-                        restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId
+                        restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
+                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
                     )
                 }
             }
