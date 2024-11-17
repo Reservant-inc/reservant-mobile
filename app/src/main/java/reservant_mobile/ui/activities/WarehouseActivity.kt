@@ -167,7 +167,8 @@ fun WarehouseActivity(
                         DeliveryDTO.DeliveryIngredientDTO(
                             ingredientId = ingredient.ingredientId ?: 0,
                             amountOrdered = amountOrdered.toDouble(),
-                            storeName = storeName.takeIf { it.isNotBlank() }
+                            storeName = storeName.takeIf { it.isNotBlank() },
+                            ingredientName = ingredient.publicName
                         )
                     )
                 }
@@ -568,12 +569,14 @@ fun CartItemCard(
         border = BorderStroke(1.dp, Color.LightGray)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = stringResource(id = R.string.ingredient_id_colon, item.ingredientId ?: 0.0))
+                Text(text = stringResource(id = R.string.ingredient_colon, item.ingredientName ?: ""))
                 if (!item.storeName.isNullOrBlank()) {
                     Text(text = stringResource(id = R.string.store_name_colon, item.storeName))
                 }
