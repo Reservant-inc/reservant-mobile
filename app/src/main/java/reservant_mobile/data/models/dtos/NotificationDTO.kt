@@ -33,7 +33,7 @@ data class NotificationDTO(
     val dateRead: String? = null,
     val notificationType: NotificationType? = null,
     val photo: String? = null,
-    val details: Map<String, String>? = null
+    val details: Map<String, JsonElement>? = null
 ){
     @Serializable
     enum class NotificationType{

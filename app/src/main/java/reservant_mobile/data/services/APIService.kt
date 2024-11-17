@@ -60,7 +60,6 @@ class APIService{
             level = LogLevel.ALL
         }
         install(Auth) {
-
             bearer {
                 loadTokens {
                     getBearerTokens()
@@ -72,11 +71,9 @@ class APIService{
             }
         }
         install(Resources)
-
     }
 
-    private val wsClient = HttpClient(CIO){
-        install(client)
+    private val wsClient = client.config{
         install(WebSockets) {
             pingInterval = 10_000
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
