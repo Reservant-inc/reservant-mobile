@@ -317,4 +317,8 @@
     <string name="select_status">Wybierz Status</string>
     <string name="submit">Zatwierdź</string>
     <string name="cancel">Anuluj</string>
+    <string name="label_report_category_technical">Techniczny</string>
+    <string name="label_report_category_lost_item">Zgubiony przedmiot</string>
+    <string name="label_report_category_restaurant_employee">Pracownik restuaracji</string>
+    <string name="label_report_category_customer">Klient</string>
 </resources>

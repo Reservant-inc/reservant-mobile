@@ -326,4 +326,8 @@
     <string name="select_status">Select Status</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
+    <string name="label_report_category_technical">Technical</string>
+    <string name="label_report_category_lost_item">Lost item</string>
+    <string name="label_report_category_restaurant_employee">Restaurant employee</string>
+    <string name="label_report_category_customer">Customer</string>
 </resources>
