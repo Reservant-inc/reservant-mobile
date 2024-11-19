@@ -383,4 +383,5 @@
     <string name="confirm_delete_person">Are you sure you want to delete this person?</string>
     <string name="label_start_date">Start date</string>
     <string name="label_event_join_until">Join until</string>
+    <string name="label_event_photo">Event photo</string>
 </resources>

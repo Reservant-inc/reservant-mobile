@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.DeleteCountdownPopup
+import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.MyTimePickerDialog
@@ -61,6 +63,7 @@ fun EventDetailActivity(
     val interestedUsers = interestedUsersFlow?.collectAsLazyPagingItems()
 
     var showEditDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (eventDetailVM.isLoading) {
         Box(
@@ -119,7 +122,8 @@ fun EventDetailActivity(
                                     //eventDetailVM.updateEvent(updatedEvent)
                                 }
                                 showEditDialog = false
-                            }
+                            },
+                            context = context
                         )
                     }
                 }
@@ -343,7 +347,8 @@ fun UserListItem(
 fun EditEventDialog(
     event: EventDTO,
     onDismiss: () -> Unit,
-    onSave: (EventDTO) -> Unit
+    onSave: (EventDTO) -> Unit,
+    context: Context
 ) {
 
     var name by remember { mutableStateOf(event.name ?: "") }
@@ -477,13 +482,21 @@ fun EditEventDialog(
 
                 }
 
-                OutlinedTextField(
-                    value = photo,
-                    onValueChange = { photo = it },
-                    label = { Text("Photo URL") },
-                    isError = photo.isBlank(),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                // TODO: photo input
+                FormFileInput(
+                    label = stringResource(id = R.string.label_event_photo),
+                    onFilePicked = { file ->
+                        photo = file.toString()
+                    },
+                    context = context,
+                    //isError = addEventViewModel.isPhotoInvalid() && addEventViewModel.formSent,
+//                    errorText = stringResource(
+//                        if (addEventViewModel.getPhotoError() != -1)
+//                            addEventViewModel.getPhotoError()
+//                        else
+//                            R.string.error_field_required
+//                    ),
+                    //formSent = addEventViewModel.formSent
                 )
 
             }
