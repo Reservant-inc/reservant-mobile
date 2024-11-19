@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,19 +30,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
-import reservant_mobile.data.models.dtos.RestaurantDTO
-import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EventViewModel
-import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @Composable
 fun EventDetailActivity(
@@ -55,21 +51,23 @@ fun EventDetailActivity(
         }
     )
 
-    var showEditDialog by remember { mutableStateOf(false) }
-    val interested by rememberUpdatedState(newValue = eventDetailVM.interested.collectAsLazyPagingItems())
+    val interestedUsersFlow by eventDetailVM.interestedUsersFlow.collectAsState()
+    val interestedUsers = interestedUsersFlow?.collectAsLazyPagingItems()
 
-    if(eventDetailVM.isLoading){
+    var showEditDialog by remember { mutableStateOf(false) }
+
+    if (eventDetailVM.isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
-    }else{
+    } else {
         Scaffold(
             topBar = {
                 IconWithHeader(
-                    text = eventDetailVM.event!!.name!!,
+                    text = eventDetailVM.event?.name ?: "",
                     showBackButton = true,
                     onReturnClick = { navController.popBackStack() },
                     icon = Icons.Default.CalendarMonth,
@@ -188,44 +186,25 @@ fun EventDetailActivity(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (eventDetailVM.isEventOwner) {
-                    item {
-                        Button(
-                            onClick = { /* Cancel event action */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.Cancel, contentDescription = "Cancel Event")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Cancel Event")
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
-
-                if (eventDetailVM.isEventOwner && interested.itemCount != 0) {
+                if (eventDetailVM.isEventOwner && interestedUsers != null && interestedUsers.itemCount > 0) {
                     item {
                         Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    items(interested.itemCount) { index ->
-                        val item = interested[index]
-                        if (item != null) {
+                    items(interestedUsers.itemCount) { index ->
+                        var user = interestedUsers[index]
+                        if (user != null) {
                             UserListItem(
-                                user = EventDTO.Participant(
-                                    userId = item.userId!!,
-                                    firstName = item.firstName,
-                                    lastName = item.lastName
-                                ),
+                                user = user,
                                 showButtons = true,
                                 onApproveClick = {
                                     eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.acceptUser(item.userId)
+                                        eventDetailVM.acceptUser(user.userId)
                                     }
-                                                 },
+                                },
                                 onRejectClick = {
                                     eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.rejectUser(item.userId)
+                                        eventDetailVM.rejectUser(user.userId)
                                     }
                                 }
                             )
@@ -241,13 +220,18 @@ fun EventDetailActivity(
                     Text(text = "Participants", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                items(eventDetailVM.event!!.participants ?: emptyList()) { participant ->
-                    if(eventDetailVM.event!!.participants!!.isEmpty())
+                if (eventDetailVM.participants.isEmpty()) {
+                    item {
                         Text(
-                            text = "No one participates at this event."
+                            text = "No one participates at this event.",
+                            style = MaterialTheme.typography.bodyLarge
                         )
-                    UserListItem(user = participant)
-                    HorizontalDivider()
+                    }
+                } else {
+                    items(eventDetailVM.participants) { participant ->
+                        UserListItem(user = participant)
+                        HorizontalDivider()
+                    }
                 }
             }
         }
