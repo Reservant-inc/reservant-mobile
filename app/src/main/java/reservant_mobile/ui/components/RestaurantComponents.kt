@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -118,11 +119,14 @@ fun EventsContent() {
     ) {
         repeat(3) {
             EventCard(
-                eventCreator = "Name of event",
+                eventName = "Name of event",
                 eventDate = "Saturday, 2024-06-22",
                 eventLocation = "John's Doe - Warsaw",
                 interestedCount = 20,
-                takePartCount = 45
+                takePartCount = 45,
+                onClick = {
+
+                }
             )
             Modifier.padding(bottom = 16.dp)
         }
@@ -131,18 +135,20 @@ fun EventsContent() {
 
 @Composable
 fun EventCard(
-    eventCreator: String,
+    eventName: String,
     eventDate: String,
     eventLocation: String,
     interestedCount: Int,
-    takePartCount: Int
+    takePartCount: Int,
+    onClick: () -> Unit
 ) {
     val date = formatToDateTime(eventDate, "dd MMMM yyyy")
     val time = formatToDateTime(eventDate, "HH:mm")
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Box(
@@ -162,6 +168,8 @@ fun EventCard(
                         contentDescription = "Event Image",
                         modifier = Modifier
                             .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
                     )
                 }
 
@@ -171,12 +179,12 @@ fun EventCard(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventLocation,
+                    text = eventName,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = eventCreator,
+                    text = eventLocation,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -192,6 +200,10 @@ fun EventCard(
                     if(takePartCount != 0)
                         Text(
                             text = "$takePartCount "+stringResource(R.string.label_takePart)
+                        )
+                    if(interestedCount == 0 && takePartCount == 0)
+                        Text(
+                            text = stringResource(R.string.label_no_people_yet)
                         )
                 }
             }

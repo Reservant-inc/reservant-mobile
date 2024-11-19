@@ -95,6 +95,7 @@ import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.SwitchWithLabel
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -267,7 +268,8 @@ fun MapActivity(){
                         if(events.loadState.refresh is LoadState.Loading){
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                         }
-                        else if (events.itemCount < 1 || events.loadState.hasError){
+                        else if (events.itemCount < 1 || events.loadState.hasError
+                            ){
                             MissingPage(
                                 errorString = stringResource(
                                     id = R.string.message_not_found_any,
@@ -285,11 +287,16 @@ fun MapActivity(){
                                     val item = events[index]
                                     if(item != null){
                                         EventCard(
-                                            eventCreator = item.name,
+                                            eventName = item.name,
                                             eventDate = item.time,
                                             eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                             interestedCount = item.numberInterested,
-                                            takePartCount = item.numberParticipants
+                                            takePartCount = item.numberParticipants,
+                                            onClick = {
+                                                navController.navigate(
+                                                    EventRoutes.Details(eventId = item.eventId)
+                                                )
+                                            }
                                         )
                                     }
                                 }
@@ -499,6 +506,12 @@ fun MapActivity(){
         }
         composable<RestaurantRoutes.Reservation>{
             RestaurantReservationActivity(navController = navController)
+        }
+        composable<EventRoutes.Details>{
+            EventDetailActivity(
+                navController = navController,
+                eventId = it.toRoute<EventRoutes.Details>().eventId
+            )
         }
     }
 

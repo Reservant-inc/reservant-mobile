@@ -262,6 +262,7 @@
     <string name="label_event_category_interested">Zainteresowane</string>
     <string name="label_with_friends_only">Tylko ze znajomymi</string>
     <string name="label_reservation_status_deposit_not_paid">Nie zapłacono kaucji</string>
+    <string name="label_no_people_yet">Brak osób</string>
     <string name="label_reservation_status_to_be_reviewed">W trakcie rozpatrywania przez restauracje</string>
     <string name="label_reservation_status_approved">Zatwwierdzono przez restauracje</string>
     <string name="label_reservation_status_declined">Odrzucono przez restauracje</string>
@@ -371,4 +372,11 @@
     <string name="new_amount">Nowa ilość</string>
     <string name="comment">Komentarz</string>
     <string name="save_changes">Zapisz zmiany</string>
+    <string name="label_accept">Akceptuj</string>
+    <string name="label_reject">Odrzuć</string>
+    <string name="label_delete_user">Usuń użytkownika</string>
+    <string name="confirm_delete_person">Czy napewno chcesz usunąć tego użytkownika?</string>
+    <string name="label_start_date">Data rozpoczęcia</string>
+    <string name="label_event_join_until">Dołączyć przed</string>
+    <string name="label_event_photo">Zdjęcie wydarzenia</string>
 </resources>
