@@ -218,8 +218,16 @@ fun EventDetailActivity(
                                     lastName = item.lastName
                                 ),
                                 showButtons = true,
-                                onApproveClick = { /* Approve user action */ },
-                                onRejectClick = { /* Reject user action */ }
+                                onApproveClick = {
+                                    eventDetailVM.viewModelScope.launch {
+                                        eventDetailVM.acceptUser(item.userId)
+                                    }
+                                                 },
+                                onRejectClick = {
+                                    eventDetailVM.viewModelScope.launch {
+                                        eventDetailVM.rejectUser(item.userId)
+                                    }
+                                }
                             )
                             HorizontalDivider()
                         }

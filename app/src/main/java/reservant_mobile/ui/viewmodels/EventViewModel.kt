@@ -73,6 +73,13 @@ class EventViewModel(
         }
     }
 
+    suspend fun acceptUser(userId: String){
+        eventService.acceptUser(eventId, userId)
+    }
+
+    suspend fun rejectUser(userId: String){
+        eventService.rejectUser(eventId, userId)
+    }
     private suspend fun fetchRestaurants() {
         searchQuery
             .debounce(300)
