@@ -4,18 +4,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
-import androidx.core.content.ContextCompat.getSystemService
 import com.example.reservant_mobile.R
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.utils.io.core.Closeable
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import reservant_mobile.ApplicationService
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
@@ -26,7 +24,8 @@ import kotlin.random.Random
 class NotificationHandler (
     private val context: Context,
     private val service: NotificationService = NotificationService(),
-    private val fileService: FileService = FileService()
+    private val fileService: FileService = FileService(),
+    private val primaryColor: Color
 ) : Closeable {
 
     private val restaurantChannelId = getString(context, R.string.restaurant_notification_channel_id)
@@ -124,17 +123,14 @@ class NotificationHandler (
                     fileService.getImage(it)
                 } ?: Result(isError = true, value = null)
 
-                println("[NOTIFICATION DETAILS]: ${notification.value.details}")
 
                 val title = notification.value.notificationType?.let {
-                    context.getString(
-                        it.resId
-                    )
+                    context.getString(it.resId)
                 }
 
                 showBasicNotification(
                     title ?: "",
-                    notification.value.details?.get("contents").toString(),
+                    (notification.value.details?.get("contents") ?: "").toString(),
                     photo.value
                 )
             }
@@ -143,17 +139,19 @@ class NotificationHandler (
 
     }
 
-    fun showBasicNotification(title: String, content: String, photo: Bitmap?=null){
+    private fun showBasicNotification(title: String, content: String, photo: Bitmap? = null){
         val notification = NotificationCompat.Builder(context, restaurantChannelId)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.logo)
+            .setColor(primaryColor.toArgb())
+            .setSmallIcon(R.drawable.ic_logo)
+            .setLargeIcon(photo)
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify(
-            Random.nextInt(), //TODO: save notification ID somewhere ???
+            Random.nextInt(),
             notification
         )
     }

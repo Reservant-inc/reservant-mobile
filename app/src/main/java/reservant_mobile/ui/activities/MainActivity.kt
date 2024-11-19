@@ -1,33 +1,25 @@
 package reservant_mobile.ui.activities
 
 import android.Manifest
-import android.app.NotificationManager
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.input.key.Key.Companion.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.example.reservant_mobile.R
-import com.google.android.gms.common.api.GoogleApi
 import kotlinx.coroutines.launch
 import reservant_mobile.ApplicationService
-import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.FirebaseService
 import reservant_mobile.data.services.UserService
-import reservant_mobile.ui.components.NotificationHandler
-import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.LoginViewModel
 

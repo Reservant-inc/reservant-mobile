@@ -58,8 +58,6 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
         NavHost(navController = navController, startDestination = MainRoutes.Settings){
             composable<MainRoutes.Settings> {
 
-                val notificationHandler = NotificationHandler(LocalContext.current)
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -128,9 +126,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     UnderlinedItem(
                         icon = Icons.Filled.Settings,
                         text = stringResource(id = R.string.label_app_settings),
-                        onClick = {
-                            notificationHandler.showBasicNotification("TEST NOTIFICATION", "TEST")
-                        }
+                        onClick = { }
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)

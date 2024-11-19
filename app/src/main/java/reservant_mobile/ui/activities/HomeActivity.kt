@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import androidx.activity.ComponentActivity.NOTIFICATION_SERVICE
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,7 +47,7 @@ fun HomeActivity() {
     val bottomBarState = remember { (mutableStateOf(true)) }
     val isSystemInDarkMode = isSystemInDarkTheme()
     val viewmodel = viewModel<ReservantViewModel>()
-    val notificationHandler = NotificationHandler(LocalContext.current)
+    val notificationHandler = NotificationHandler(LocalContext.current, primaryColor = MaterialTheme.colorScheme.primary)
 
     var darkTheme by remember {
         mutableStateOf(isSystemInDarkMode)
