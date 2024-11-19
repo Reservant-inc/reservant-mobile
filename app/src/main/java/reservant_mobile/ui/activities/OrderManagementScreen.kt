@@ -11,6 +11,8 @@ import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,17 +35,19 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.formatToDateTime
-import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 @Composable
 fun OrderManagementScreen(
     onReturnClick: () -> Unit,
     restaurantId: Int,
-    isReservation: Boolean = false
+    isReservation: Boolean = false,
+    navHostController: NavHostController
 ) {
     val viewModel: EmployeeOrderViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -55,17 +59,26 @@ fun OrderManagementScreen(
 
     val innerNavController = rememberNavController()
 
-    val visitsFlow = if (isReservation) {
-        viewModel.getVisitsFlow(
-            dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.ToBeReviewed
-        )
-    } else {
-        viewModel.getVisitsFlow(
-            dateStart = LocalDateTime.now(),
-            reservationStatus = GetReservationStatus.Approved
-        )
-    }
+    var selectedTabIndex by remember { mutableStateOf(0) }
+
+    val reservationVisitsFlow = viewModel.getVisitsFlow(
+        dateStart = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
+    )
+
+    val currentVisitsFlow = viewModel.getVisitsFlow(
+        dateStart = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ApprovedByRestaurant
+    )
+
+    val pastVisitsFlow = viewModel.getVisitsFlow(
+        dateEnd = LocalDateTime.now(),
+        reservationStatus = GetReservationStatus.ApprovedByRestaurant
+    )
+
+    val reservationVisits = if (isReservation) reservationVisitsFlow.collectAsLazyPagingItems() else null
+    val currentVisits = if (!isReservation && selectedTabIndex == 0) currentVisitsFlow.collectAsLazyPagingItems() else null
+    val pastVisits = if (!isReservation && selectedTabIndex == 1) pastVisitsFlow.collectAsLazyPagingItems() else null
 
     NavHost(
         navController = innerNavController,
@@ -75,7 +88,6 @@ fun OrderManagementScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
             ) {
                 IconWithHeader(
                     icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
@@ -84,74 +96,120 @@ fun OrderManagementScreen(
                     onReturnClick = onReturnClick
                 )
 
-                val visits = visitsFlow.collectAsLazyPagingItems()
-
                 if (isReservation) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    when (visits.loadState.refresh) {
-                        is LoadState.Loading -> {
-                            Text(
-                                text = stringResource(R.string.loading_reservations),
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                        is LoadState.Error -> {
-                            Text(
-                                text = stringResource(R.string.error_loading_reservations),
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                        else -> {
-                            if (visits.itemCount == 0) {
+
+                    reservationVisits?.let { visits ->
+                        when (visits.loadState.refresh) {
+                            is LoadState.Loading -> {
+                                LoadingScreenWithTimeout(Duration.parse("10s"))
+                            }
+                            is LoadState.Error -> {
                                 Text(
-                                    text = stringResource(R.string.no_pending_reservations),
+                                    text = stringResource(R.string.error_loading_reservations),
                                     modifier = Modifier.padding(16.dp)
                                 )
-                            } else {
-                                OrderList(
-                                    visits = visits,
-                                    homeNavController = innerNavController,
-                                    viewModel = viewModel,
-                                    isReservation = true
-                                )
+                            }
+                            else -> {
+                                if (visits.itemCount == 0) {
+                                    Text(
+                                        text = stringResource(R.string.no_pending_reservations),
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                } else {
+                                    OrderList(
+                                        visits = visits,
+                                        homeNavController = innerNavController,
+                                        viewModel = viewModel,
+                                        isReservation = true
+                                    )
+                                }
                             }
                         }
                     }
                 } else {
-                    FloatingTabSwitch(
-                        pages = listOf(
-                            stringResource(R.string.current_orders) to {
-                                val currentVisits = viewModel.getVisitsFlow(
-                                    dateStart = LocalDateTime.now(),
-                                    reservationStatus = GetReservationStatus.Approved
-                                ).collectAsLazyPagingItems()
-                                Column {
-                                    Spacer(modifier = Modifier.height(90.dp))
-                                    OrderList(
-                                        visits = currentVisits,
-                                        homeNavController = innerNavController,
-                                        viewModel = viewModel,
-                                        isReservation = false
-                                    )
-                                }
-                            },
-                            stringResource(R.string.past_orders) to {
-                                val pastVisits = viewModel.getVisitsFlow(
-                                    dateEnd = LocalDateTime.now(),
-                                    reservationStatus = GetReservationStatus.Approved
-                                ).collectAsLazyPagingItems()
-                                Column {
-                                    Spacer(modifier = Modifier.height(90.dp))
-                                    OrderList(
-                                        visits = pastVisits,
-                                        homeNavController = innerNavController,
-                                        viewModel = viewModel,
-                                        isReservation = false
-                                    )
+                    val tabTitles = listOf(
+                        stringResource(R.string.current_orders),
+                        stringResource(R.string.past_orders)
+                    )
+
+                    TabRow(
+                        selectedTabIndex = selectedTabIndex,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        tabTitles.forEachIndexed { index, title ->
+                            Tab(
+                                text = { Text(title) },
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    when (selectedTabIndex) {
+                        0 -> {
+                            currentVisits?.let { visits ->
+                                when (visits.loadState.refresh) {
+                                    is LoadState.Loading -> {
+                                        LoadingScreenWithTimeout(Duration.parse("10s"))
+                                    }
+                                    is LoadState.Error -> {
+                                        Text(
+                                            text = stringResource(R.string.error_orders),
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+                                    else -> {
+                                        if (visits.itemCount == 0) {
+                                            Text(
+                                                text = stringResource(R.string.no_visits_available),
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+                                        } else {
+                                            OrderList(
+                                                visits = visits,
+                                                homeNavController = innerNavController,
+                                                viewModel = viewModel,
+                                                isReservation = false
+                                            )
+                                        }
+                                    }
                                 }
                             }
-                        )
-                    )
+                        }
+                        1 -> {
+                            pastVisits?.let { visits ->
+                                when (visits.loadState.refresh) {
+                                    is LoadState.Loading -> {
+                                        LoadingScreenWithTimeout(Duration.parse("10s"))
+                                    }
+                                    is LoadState.Error -> {
+                                        Text(
+                                            text = stringResource(R.string.error_orders),
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+                                    else -> {
+                                        if (visits.itemCount == 0) {
+                                            Text(
+                                                text = stringResource(R.string.no_visits_available),
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+                                        } else {
+                                            OrderList(
+                                                visits = visits,
+                                                homeNavController = innerNavController,
+                                                viewModel = viewModel,
+                                                isReservation = false
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -160,7 +218,8 @@ fun OrderManagementScreen(
                 onReturnClick = { innerNavController.popBackStack() },
                 visitId = it.toRoute<RestaurantRoutes.OrderDetail>().visitId,
                 isReservation = isReservation,
-                viewModel = viewModel
+                viewModel = viewModel,
+                navHostController = navHostController
             )
         }
     }
@@ -168,16 +227,11 @@ fun OrderManagementScreen(
 
 @Composable
 fun OrderList(
-    visits: LazyPagingItems<VisitDTO>?,
+    visits: LazyPagingItems<VisitDTO>,
     homeNavController: NavHostController,
     viewModel: EmployeeOrderViewModel,
     isReservation: Boolean = false
 ) {
-    if (visits == null || visits.itemCount == 0) {
-        Text(text = stringResource(R.string.no_visits_available))
-        return
-    }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -188,6 +242,23 @@ fun OrderList(
                 VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation)
             } else {
                 Text(text = stringResource(R.string.loading_visit))
+            }
+        }
+
+        visits.apply {
+            when {
+                loadState.append is LoadState.Loading -> {
+                    item { LoadingScreenWithTimeout(Duration.parse("10s")) }
+                }
+                loadState.append is LoadState.Error -> {
+                    val e = loadState.append as LoadState.Error
+                    item {
+                        Text(
+                            text = stringResource(R.string.error_orders),
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
