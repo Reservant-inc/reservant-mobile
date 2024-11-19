@@ -1,5 +1,6 @@
 package reservant_mobile.data.models.dtos
 
+import com.example.reservant_mobile.R
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -36,14 +37,14 @@ data class NotificationDTO(
     val details: Map<String, JsonElement>? = null
 ){
     @Serializable
-    enum class NotificationType{
-        NotificationRestaurantVerified,
-        NotificationNewRestaurantReview,
-        NotificationNewFriendRequest,
-        NotificationFriendRequestAccepted,
-        NotificationNewParticipationRequest,
-        NotificationParticipationRequestResponse,
-        NotificationVisitApprovedDeclined
+    enum class NotificationType(val resId: Int) {
+        NotificationRestaurantVerified(R.string.label_NotificationRestaurantVerified),
+        NotificationNewRestaurantReview(R.string.label_NotificationNewRestaurantReview),
+        NotificationNewFriendRequest(R.string.label_NotificationNewFriendRequest),
+        NotificationFriendRequestAccepted(R.string.label_NotificationFriendRequestAccepted),
+        NotificationNewParticipationRequest(R.string.label_NotificationNewParticipationRequest),
+        NotificationParticipationRequestResponse(R.string.label_NotificationParticipationRequestResponse),
+        NotificationVisitApprovedDeclined(R.string.label_NotificationVisitApprovedDeclined)
     }
 }
 

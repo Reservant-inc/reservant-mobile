@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
 import androidx.core.content.ContextCompat.getSystemService
@@ -123,9 +124,17 @@ class NotificationHandler (
                     fileService.getImage(it)
                 } ?: Result(isError = true, value = null)
 
+                println("[NOTIFICATION DETAILS]: ${notification.value.details}")
+
+                val title = notification.value.notificationType?.let {
+                    context.getString(
+                        it.resId
+                    )
+                }
+
                 showBasicNotification(
-                    notification.value.notificationType.toString(),
-                    "Parse content here", // TODO add content parsing
+                    title ?: "",
+                    notification.value.details?.get("contents").toString(),
                     photo.value
                 )
             }
