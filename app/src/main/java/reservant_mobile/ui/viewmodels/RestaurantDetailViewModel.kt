@@ -35,11 +35,6 @@ class RestaurantDetailViewModel(
     init {
         viewModelScope.launch {
             loadRestaurantAndMenus(restaurantId)
-
-//            restaurant!!.logo?.let {
-//                restaurantLogo = getPhoto(it)
-//            }
-
         }
     }
 
