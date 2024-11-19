@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -38,8 +39,11 @@ import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EventViewModel
+import java.time.LocalDate
 
 @Composable
 fun EventDetailActivity(
@@ -342,24 +346,21 @@ fun EditEventDialog(
     onSave: (EventDTO) -> Unit
 ) {
 
-    // State variables for form fields
     var name by remember { mutableStateOf(event.name ?: "") }
     var description by remember { mutableStateOf(event.description ?: "") }
     var maxPeople by remember { mutableStateOf(event.maxPeople?.toString() ?: "") }
     var photo by remember { mutableStateOf(event.photo ?: "") }
 
-    // Date and Time pickers for 'time' and 'mustJoinUntil'
-    var eventDate by remember { mutableStateOf(event.time?.substring(0, 10) ?: "") }
-    var eventTime by remember { mutableStateOf(event.time?.substring(11, 16) ?: "") }
-    var joinUntilDate by remember { mutableStateOf(event.mustJoinUntil?.substring(0, 10) ?: "") }
-    var joinUntilTime by remember { mutableStateOf(event.mustJoinUntil?.substring(11, 16) ?: "") }
+    var eventDate by remember { mutableStateOf(event.time.substring(0, 10) ?: "") }
+    var eventTime by remember { mutableStateOf(event.time.substring(11, 16) ?: "") }
+    var joinUntilDate by remember { mutableStateOf(event.mustJoinUntil.substring(0, 10) ?: "") }
+    var joinUntilTime by remember { mutableStateOf(event.mustJoinUntil.substring(11, 16) ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
                 onClick = {
-                    // Validate and prepare the updated event data
                     val updatedEvent = event.copy(
                         name = name,
                         description = description,
@@ -410,37 +411,71 @@ fun EditEventDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Date and Time pickers
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    DatePickerField(
-//                        label = "Event Date",
-//                        selectedDate = eventDate,
-//                        onDateSelected = { eventDate = it }
-//                    )
-//                    TimePickerField(
-//                        label = "Event Time",
-//                        selectedTime = eventTime,
-//                        onTimeSelected = { eventTime = it }
-//                    )
-//                }
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    DatePickerField(
-//                        label = "Join Until Date",
-//                        selectedDate = joinUntilDate,
-//                        onDateSelected = { joinUntilDate = it }
-//                    )
-//                    TimePickerField(
-//                        label = "Join Until Time",
-//                        selectedTime = joinUntilTime,
-//                        onTimeSelected = { joinUntilTime = it }
-//                    )
-//                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(0.45f)
+                    ) {
+                        MyDatePickerDialog(
+                            label = {
+                                Text(stringResource(R.string.label_start_date))
+                            },
+                            onDateChange = {
+                                eventDate = it
+                            },
+                            allowFutureDates = true,
+                            startDate = LocalDate.now().toString()
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(0.55f)
+                            .align(Alignment.CenterVertically)
+                    ){
+                        MyTimePickerDialog(
+                            onTimeSelected = { selectedTime ->
+                                eventTime = selectedTime
+                            },
+                            modifier = Modifier
+                                .scale(0.85f)
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.weight(0.45f)
+                    ){
+                        MyDatePickerDialog(
+                            label = {
+                                Text(stringResource(R.string.label_event_join_until))
+                            },
+                            onDateChange = {
+                                joinUntilDate = it
+                            },
+                            allowFutureDates = true,
+                            startDate = LocalDate.now().toString()
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                        .weight(0.55f)
+                        .align(Alignment.CenterVertically)
+                    ){
+                        MyTimePickerDialog(
+                            onTimeSelected = { selectedTime ->
+                                joinUntilTime = selectedTime
+                            },
+                            modifier = Modifier
+                                .scale(0.85f)
+                        )
+                    }
+
+                }
 
                 OutlinedTextField(
                     value = photo,

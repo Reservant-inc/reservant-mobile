@@ -372,4 +372,6 @@
     <string name="label_reject">Odrzuć</string>
     <string name="label_delete_user">Usuń użytkownika</string>
     <string name="confirm_delete_person">Czy napewno chcesz usunąć tego użytkownika?</string>
+    <string name="label_start_date">Data rozpoczęcia</string>
+    <string name="label_event_join_until">Dołączyć przed</string>
 </resources>
