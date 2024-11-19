@@ -377,4 +377,8 @@
     <string name="new_amount">New amount</string>
     <string name="comment">Comment</string>
     <string name="save_changes">Save changes</string>
+    <string name="label_accept">Accept</string>
+    <string name="label_reject">Reject</string>
+    <string name="label_delete_user">Delete user</string>
+    <string name="confirm_delete_person">Are you sure you want to delete this person?</string>
 </resources>

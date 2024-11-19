@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -35,6 +36,7 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EventViewModel
@@ -229,7 +231,10 @@ fun EventDetailActivity(
                     }
                 } else {
                     items(eventDetailVM.participants) { participant ->
-                        UserListItem(user = participant)
+                        UserListItem(
+                            user = participant,
+                            deletable = eventDetailVM.isEventOwner
+                        )
                         HorizontalDivider()
                     }
                 }
@@ -242,9 +247,13 @@ fun EventDetailActivity(
 fun UserListItem(
     user: EventDTO.Participant,
     showButtons: Boolean = false,
+    deletable: Boolean = false,
     onApproveClick: (() -> Unit)? = null,
-    onRejectClick: (() -> Unit)? = null
+    onRejectClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null
 ) {
+    var showPopup by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -276,9 +285,12 @@ fun UserListItem(
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
-                    Icon(Icons.Default.Check, contentDescription = "Approve")
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = stringResource(R.string.label_accept)
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Approve")
+                    Text(stringResource(R.string.label_accept))
                 }
 
                 Button(
@@ -286,12 +298,40 @@ fun UserListItem(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Reject")
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.label_reject)
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Reject")
+                    Text(stringResource(R.string.label_reject))
                 }
             }
+        } else if (deletable) {
+            IconButton(
+                onClick = { showPopup = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.label_delete_user),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
+    }
+
+    if (showPopup) {
+        DeleteCountdownPopup(
+            icon = Icons.Filled.DeleteForever,
+            title = stringResource(id = R.string.confirm_delete_title),
+            text = stringResource(id = R.string.confirm_delete_text),
+            onConfirm = {
+                onDeleteClick?.invoke()
+                showPopup = false
+            },
+            onDismissRequest = { showPopup = false },
+            confirmText = stringResource(id = R.string.label_yes_capital),
+            dismissText = stringResource(id = R.string.label_cancel)
+        )
     }
 }
 

@@ -368,4 +368,8 @@
     <string name="new_amount">Nowa ilość</string>
     <string name="comment">Komentarz</string>
     <string name="save_changes">Zapisz zmiany</string>
+    <string name="label_accept">Akceptuj</string>
+    <string name="label_reject">Odrzuć</string>
+    <string name="label_delete_user">Usuń użytkownika</string>
+    <string name="confirm_delete_person">Czy napewno chcesz usunąć tego użytkownika?</string>
 </resources>
