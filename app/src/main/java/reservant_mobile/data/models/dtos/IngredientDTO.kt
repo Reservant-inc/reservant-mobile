@@ -12,7 +12,8 @@ data class IngredientDTO (
     val minimalAmount: Double? = null,
     val amountToOrder: Double? = null,
     val amount: Double? = null,
-    val menuItem: IngredientMenuItemDTO? = null
+    val menuItem: IngredientMenuItemDTO? = null,
+    val restaurantId: Int? = null
 ){
     @Serializable
     data class IngredientMenuItemDTO(
