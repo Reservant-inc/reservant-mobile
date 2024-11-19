@@ -11,6 +11,7 @@ import reservant_mobile.data.endpoints.Employments
 import reservant_mobile.data.endpoints.Ingredients
 import reservant_mobile.data.endpoints.MyRestaurantGroups
 import reservant_mobile.data.endpoints.MyRestaurants
+import reservant_mobile.data.endpoints.Reports
 import reservant_mobile.data.endpoints.RestaurantTags
 import reservant_mobile.data.endpoints.Restaurants
 import reservant_mobile.data.endpoints.Reviews
@@ -21,6 +22,7 @@ import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.PageDTO
+import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
@@ -124,6 +126,7 @@ interface IRestaurantService{
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
     suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?>
+    suspend fun reportCustomer(description: String, reportedUserId: String, visitId: Int ): Result<ReportDTO?>
 
 }
 
@@ -510,6 +513,20 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val res  = api.get(Restaurants.Id.Tables(
             parent = Restaurants.Id(restaurantId = restaurantId.toString()),
         ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun reportCustomer(
+        description: String,
+        reportedUserId: String,
+        visitId: Int
+    ): Result<ReportDTO?> {
+        val dto = ReportDTO(
+            description = description,
+            reportedUserId = reportedUserId,
+            visitId = visitId
+        )
+        val res  = api.post(Reports.ReportCustomer(), dto)
         return complexResultWrapper(res)
     }
 }
