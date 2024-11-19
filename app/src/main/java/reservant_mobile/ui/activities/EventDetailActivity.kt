@@ -119,7 +119,7 @@ fun EventDetailActivity(
                             onDismiss = { showEditDialog = false },
                             onSave = { updatedEvent ->
                                 eventDetailVM.viewModelScope.launch {
-                                    //eventDetailVM.updateEvent(updatedEvent)
+                                    eventDetailVM.updateEvent(updatedEvent, context)
                                 }
                                 showEditDialog = false
                             },
@@ -186,11 +186,13 @@ fun EventDetailActivity(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Location: ${eventDetailVM.event!!.restaurant!!.name}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        if(eventDetailVM.event!!.restaurant != null){
+                            Text(
+                                text = "Location: ${eventDetailVM.event!!.restaurant!!.name}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -370,9 +372,10 @@ fun EditEventDialog(
                         name = name,
                         description = description,
                         maxPeople = maxPeople.toIntOrNull(),
-                        photo = photo,
+                        restaurantId = event.restaurant?.restaurantId,
                         time = "${eventDate}T${eventTime}",
-                        mustJoinUntil = "${joinUntilDate}T${joinUntilTime}"
+                        mustJoinUntil = "${joinUntilDate}T${joinUntilTime}",
+                        photo = photo
                     )
                     onSave(updatedEvent)
                 }
