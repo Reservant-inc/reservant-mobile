@@ -322,6 +322,13 @@
     <string name="select_status">Wybierz Status</string>
     <string name="submit">Zatwierdź</string>
     <string name="cancel">Anuluj</string>
+    <string name="label_NotificationRestaurantVerified">Twoja restauracja została zweryfikowana</string>
+    <string name="label_NotificationNewRestaurantReview">Nowa opinia o restauracji</string>
+    <string name="label_NotificationNewFriendRequest">Nowe zaproszenie do znajomych</string>
+    <string name="label_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
+    <string name="label_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>
+    <string name="label_NotificationParticipationRequestResponse">Ktoś odpowiedział na twoją prośbę dołączenia do wydarzenia</string>
+    <string name="label_NotificationVisitApprovedDeclined">Restauracja odpowiedziała na twoją wizytę</string>
     <string name="label_report_category_technical">Techniczny</string>
     <string name="label_report_category_lost_item">Zgubiony przedmiot</string>
     <string name="label_report_category_restaurant_employee">Pracownik restuaracji</string>

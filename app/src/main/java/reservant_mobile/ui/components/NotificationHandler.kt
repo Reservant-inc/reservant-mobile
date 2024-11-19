@@ -2,34 +2,31 @@ package reservant_mobile.ui.components
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import androidx.activity.ComponentActivity.NOTIFICATION_SERVICE
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getString
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
 import com.example.reservant_mobile.R
-import kotlinx.coroutines.coroutineScope
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.utils.io.core.Closeable
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.close
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.services.UserService
-import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
-class NotificationHandler(
+class NotificationHandler (
     private val context: Context,
     private val service: NotificationService = NotificationService(),
-    private val fileService: FileService = FileService()
-) {
+    private val fileService: FileService = FileService(),
+    private val primaryColor: Color
+) : Closeable {
 
     private val restaurantChannelId = getString(context, R.string.restaurant_notification_channel_id)
     private val friendsChannelId = getString(context, R.string.friends_notification_channel_id)
@@ -39,6 +36,8 @@ class NotificationHandler(
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
     private var channelsReady = false
+
+    private var session: DefaultClientWebSocketSession? = null
 
     init {
         setupChannels()
@@ -99,50 +98,73 @@ class NotificationHandler(
         setupChannel(visitsChannelId, getString(context, R.string.visits_notification_channel_name))
     }
 
+    suspend fun createSession(){
+        val res = service.getNotificationSession()
+        if (!res.isError && res.value != null){
+            session = res.value
+            println("[NOTIFICATIONS] Websocket session created")
+        }else{
+            println("[NOTIFICATIONS] Error occurred while creating session")
+        }
+    }
+
     suspend fun awaitNotification(){
-        val session = service.getNotificationSession()
+        if (session == null){
+            println("[NOTIFICATIONS] awaitNotification() was called but session was closed or is null")
+            return
+        }
 
-        if (!session.isError && session.value != null){
-            val session = session.value
+        while (true){
 
-            while (true){
-                val notification = service.receiveNotificationFromSession(session)
+            val notification = service.receiveNotificationFromSession(session!!)
 
-                if (notification.isError || notification.value == null){
-                    return
-                }
-
+            if (!notification.isError && notification.value != null){
                 val photo = notification.value.photo?.let {
                     fileService.getImage(it)
                 } ?: Result(isError = true, value = null)
 
 
+                val title = notification.value.notificationType?.let {
+                    context.getString(it.resId)
+                }
+
                 showBasicNotification(
-                    notification.value.notificationType.toString(),
-                    "Parse content here", // TODO add content parsing
+                    title ?: "",
+                    (notification.value.details?.get("contents") ?: "").toString(),
                     photo.value
                 )
-
             }
-
 
         }
 
     }
 
-    fun showBasicNotification(title: String, content: String, photo: Bitmap?=null){
+    private fun showBasicNotification(title: String, content: String, photo: Bitmap? = null){
         val notification = NotificationCompat.Builder(context, restaurantChannelId)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.logo)
+            .setColor(primaryColor.toArgb())
+            .setSmallIcon(R.drawable.ic_logo)
+            .setLargeIcon(photo)
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify(
-            Random.nextInt(), //TODO: save notification ID somewhere ???
+            Random.nextInt(),
             notification
         )
+    }
+
+    override fun close() {
+        session?.let {
+            it.launch {
+                it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
+                println("[NOTIFICATION] Websocket session closed")
+            }
+        }
+
+        session = null
     }
 
 }

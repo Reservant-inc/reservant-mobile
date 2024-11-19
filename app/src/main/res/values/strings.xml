@@ -331,6 +331,13 @@
     <string name="select_status">Select Status</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
+    <string name="label_NotificationRestaurantVerified">Your restaurant has been verified</string>
+    <string name="label_NotificationNewRestaurantReview">New review in your restaurant</string>
+    <string name="label_NotificationNewFriendRequest">New friend request</string>
+    <string name="label_NotificationFriendRequestAccepted">Friend request has been accepted</string>
+    <string name="label_NotificationNewParticipationRequest">Someone would like to join your event</string>
+    <string name="label_NotificationParticipationRequestResponse">Someone responded to your event join request</string>
+    <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
     <string name="label_report_category_technical">Technical</string>
     <string name="label_report_category_lost_item">Lost item</string>
     <string name="label_report_category_restaurant_employee">Restaurant employee</string>
