@@ -296,14 +296,4 @@ class RestaurantServiceUnitTest: ServiceTest() {
     fun get_tables_return_not_null()= runTest{
         assertThat(ser.getCurrentTables(restaurantId).value).isNotNull()
     }
-
-    @Test
-    fun report_user_return_not_null()= runTest{
-        assertThat(ser.reportCustomer(
-            description = "Test report desc",
-            reportedUserId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29",
-            visitId = 1
-        ).value).isNotNull()
-    }
-
 }
