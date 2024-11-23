@@ -10,7 +10,7 @@ data class UserSummaryDTO (
     val firstName: String? = null,
     val lastName: String? = null,
     val birthDate: String? = null,
-    val phoneNumber: String? = null,
+    val phoneNumber: PhoneNumberDTO? = null,
     val employments: List<Employments>? = null,
     val photo: String? = null,
     val friendStatus: FriendStatus? = null

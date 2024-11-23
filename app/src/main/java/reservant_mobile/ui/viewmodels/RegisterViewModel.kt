@@ -4,7 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import reservant_mobile.data.constants.Regex
+import reservant_mobile.data.models.dtos.PhoneNumberDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -36,7 +38,10 @@ class RegisterViewModel(
     val countriesList = getCountriesList()
     var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
 
-    private var phoneNumberWithCountryCode: String = "+${mobileCountry!!.code}${phoneNum.value}"
+    private var phoneNumberWithCountryCode = PhoneNumberDTO(
+        code = "+${mobileCountry!!.code}",
+        number = phoneNum.value
+    )
 
     var isLoginUnique by mutableStateOf(true)
     
@@ -103,9 +108,11 @@ class RegisterViewModel(
     }
 
     fun isPhoneInvalid() : Boolean{
-        phoneNumberWithCountryCode = "+${mobileCountry?.code}${phoneNum.value}"
-        return isInvalidWithRegex(Regex.PHONE_REG, phoneNumberWithCountryCode) ||
-                getFieldError(result, phoneNum.name) != -1
+        // fixme: proper phone number handling
+        return true
+//        phoneNumberWithCountryCode = "+${mobileCountry?.code}${phoneNum.value}"
+//        return isInvalidWithRegex(Regex.PHONE_REG, phoneNumberWithCountryCode) ||
+//                getFieldError(result, phoneNum.name) != -1
     }
 
     fun isPasswordInvalid() : Boolean{
