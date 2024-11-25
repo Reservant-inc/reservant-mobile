@@ -129,6 +129,7 @@ fun FormInput(
             shape = shape,
             isError = isError && (beginValidation || formSent),
             maxLines = maxLines,
+            singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
             enabled = !isDisabled
             )

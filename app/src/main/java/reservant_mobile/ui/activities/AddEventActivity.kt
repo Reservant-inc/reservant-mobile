@@ -78,7 +78,8 @@ fun AddEventActivity(navController: NavHostController) {
                 else
                     R.string.error_field_required
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
 
         FormInput(
@@ -92,7 +93,8 @@ fun AddEventActivity(navController: NavHostController) {
                 else
                     R.string.error_field_required
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )
 
         FormFileInput(
@@ -225,7 +227,7 @@ fun AddEventActivity(navController: NavHostController) {
             onValueChange = { addEventViewModel.searchQuery.value = it },
             label = { Text(stringResource(id = R.string.label_search_restaurants)) },
             trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
 
         if (restaurants != null && restaurants.itemCount != 0) {
