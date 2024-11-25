@@ -2,31 +2,39 @@ package reservant_mobile.ui.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import com.example.reservant_mobile.R
 import androidx.paging.cachedIn
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FileUploadDTO
-import reservant_mobile.data.models.dtos.UserDTO
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
+import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class EventViewModel(
     private val eventId: Int = 0,
     fetchRestaurants: Boolean = true, // true for AddEventActivity, false for EventDetailActivity
     private val eventService: IEventService = EventService(),
+    private val restaurantService: IRestaurantService = RestaurantService()
 ) : ReservantViewModel() {
 
     var isLoading: Boolean by mutableStateOf(false)
@@ -38,13 +46,39 @@ class EventViewModel(
     private val _interestedUsersFlow = MutableStateFlow<Flow<PagingData<EventDTO.Participant>>?>(null)
     val interestedUsersFlow: StateFlow<Flow<PagingData<EventDTO.Participant>>?> = _interestedUsersFlow
 
-    // Participants list
     var participants = mutableStateListOf<EventDTO.Participant>()
+        private set
+
+    private val currentDateTime = LocalDateTime.now()
+    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+    private val _restaurantsFlow = MutableStateFlow<Flow<PagingData<RestaurantDTO>>?>(null)
+    val restaurantsFlow: StateFlow<Flow<PagingData<RestaurantDTO>>?> = _restaurantsFlow
+
+    val searchQuery = MutableStateFlow("")
+
+    var eventName by mutableStateOf("")
+    var description by mutableStateOf("")
+    var eventDate by mutableStateOf("")
+    var eventTime: String by mutableStateOf(currentDateTime.format(timeFormatter))
+    var mustJoinDate by mutableStateOf("")
+    var mustJoinTime: String by mutableStateOf(currentDateTime.format(timeFormatter))
+    var maxPeople by mutableStateOf("")
+    var photo by mutableStateOf("")
+    var selectedRestaurant by mutableStateOf<RestaurantDTO?>(null)
+    var formSent by mutableStateOf(false)
+
+    var result by mutableStateOf(Result(isError = false, value = null as EventDTO?))
+
+    var isSaving = mutableStateOf(false)
         private set
 
     init {
         viewModelScope.launch {
-            getEvent()
+            if(fetchRestaurants)
+                fetchRestaurants()
+            else
+                getEvent()
         }
     }
 
@@ -84,7 +118,7 @@ class EventViewModel(
                     name = dto.name,
                     description = dto.description,
                     maxPeople = dto.maxPeople,
-                    restaurantId = dto.restaurantId,
+                    restaurantId = if (dto.restaurantId != 0) dto.restaurantId else null,
                     time = dto.time,
                     mustJoinUntil = dto.mustJoinUntil,
                     photo = eventPhotoResult.value?.fileName ?: ""
@@ -97,21 +131,6 @@ class EventViewModel(
         }else{
             // error
         }
-    }
-
-    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
-        if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
-            return null
-        }
-
-        val file = uri?.let { getFileFromUri(context, it.toUri()) }
-        var fDto = file?.let { fileService.sendFile(DataType.PNG, it) }
-        if (fDto != null) {
-            if (fDto.value == null) {
-                fDto = file?.let { fileService.sendFile(DataType.JPG, it) }
-            }
-        }
-        return fDto
     }
 
     private suspend fun getEvent(): Boolean {
@@ -149,5 +168,154 @@ class EventViewModel(
                 _interestedUsersFlow.value = null
             }
         }
+    }
+
+    private suspend fun fetchRestaurants() {
+        searchQuery
+            .debounce(300)
+            .distinctUntilChanged()
+            .collectLatest { query ->
+                val result = restaurantService.getRestaurants(name = if (query.isBlank()) null else query)
+                if (!result.isError) {
+                    _restaurantsFlow.value = result.value?.cachedIn(viewModelScope)
+                }
+            }
+    }
+
+    suspend fun addEvent(context: Context) {
+        isSaving.value = true
+        if (!isFormInvalid()) {
+            val maxPeopleInt = maxPeople.toIntOrNull()
+            val time = "${eventDate}T${eventTime}"
+            val mustJoinUntil = "${mustJoinDate}T${mustJoinTime}"
+
+            val eventPhotoResult = if (
+                !photo.endsWith(".png", ignoreCase = true) &&
+                !photo.endsWith(".jpg", ignoreCase = true) &&
+                !isFileSizeInvalid(context, photo)
+            ) {
+                sendPhoto(photo, context)
+            } else {
+                null
+            }
+
+            if (eventPhotoResult != null) {
+                if (!eventPhotoResult.isError) {
+                    photo = eventPhotoResult.value?.fileName ?: ""
+                } else {
+                    // Handle error from photo upload
+                    result = eventPhotoResult as Result<EventDTO?>
+                    isSaving.value = false
+                    return
+                }
+            }
+
+            val newEvent = EventDTO(
+                name = eventName,
+                description = description,
+                time = time,
+                mustJoinUntil = mustJoinUntil,
+                maxPeople = maxPeopleInt,
+                restaurantId = selectedRestaurant?.restaurantId,
+                photo = photo
+            )
+
+            val serviceResult = eventService.addEvent(newEvent)
+            result = serviceResult
+        } else {
+            result = Result(isError = true, value = null)
+        }
+        isSaving.value = false
+    }
+
+    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
+        if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
+            return null
+        }
+
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        var fDto = file?.let { fileService.sendFile(DataType.PNG, it) }
+        if (fDto != null) {
+            if (fDto.value == null) {
+                fDto = file?.let { fileService.sendFile(DataType.JPG, it) }
+            }
+        }
+        return fDto
+    }
+
+    fun isEventNameInvalid(): Boolean {
+        return eventName.isBlank()
+    }
+
+    fun getEventNameError(): Int {
+        return if (eventName.isBlank()) R.string.error_field_required else -1
+    }
+
+    fun isDescriptionInvalid(): Boolean {
+        return description.isBlank() || getFieldError(result, "description") != -1
+    }
+
+    fun getDescriptionError(): Int {
+        return getFieldError(result, "description")
+    }
+
+    fun isEventDateInvalid(): Boolean {
+        return eventDate.isBlank() || getFieldError(result, "time") != -1
+    }
+
+    fun getEventTimeInvalid(): Boolean {
+        return eventTime.isBlank()
+    }
+
+    fun isMustJoinDateInvalid(): Boolean {
+        return mustJoinDate.isBlank() || getFieldError(result, "mustJoinUntil") != -1
+    }
+
+    fun getMustJoinDateError(): Int {
+        return getFieldError(result, "mustJoinUntil")
+    }
+
+    fun getEventDateError(): Int {
+        return getFieldError(result, "time")
+    }
+
+    fun isPhotoInvalid(): Boolean {
+        return photo.isBlank() || getFieldError(result, "photo") != -1
+    }
+
+    fun getPhotoError(): Int {
+        return getFieldError(result, "photo")
+    }
+
+    fun isMaxPeopleInvalid(): Boolean {
+        val maxPeopleInt = maxPeople.toIntOrNull()
+        return maxPeopleInt == null
+    }
+
+    fun getMaxPeopleError(): Int {
+        return if (maxPeople.toIntOrNull() == null) R.string.error_invalid_number else -1
+    }
+
+    fun isSelectedRestaurantInvalid(): Boolean {
+        return selectedRestaurant == null
+    }
+
+    fun getSelectedRestaurantError(): Int {
+        return if (selectedRestaurant == null) R.string.error_select_restaurant else -1
+    }
+
+
+    fun isFormInvalid(): Boolean {
+        return isEventNameInvalid() ||
+                isDescriptionInvalid() ||
+                isEventDateInvalid() ||
+                isMustJoinDateInvalid() ||
+                isPhotoInvalid() ||
+                isMaxPeopleInvalid() ||
+                isSelectedRestaurantInvalid()
+    }
+
+    fun getToastError(): Int {
+        return getToastError(result)
     }
 }
