@@ -118,7 +118,7 @@ class EventViewModel(
                     name = dto.name,
                     description = dto.description,
                     maxPeople = dto.maxPeople,
-                    restaurantId = dto.restaurantId,
+                    restaurantId = if (dto.restaurantId != 0) dto.restaurantId else null,
                     time = dto.time,
                     mustJoinUntil = dto.mustJoinUntil,
                     photo = eventPhotoResult.value?.fileName ?: ""

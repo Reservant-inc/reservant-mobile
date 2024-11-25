@@ -228,7 +228,7 @@ fun AddEventActivity(navController: NavHostController) {
             onValueChange = { addEventViewModel.searchQuery.value = it },
             label = { Text(stringResource(id = R.string.label_search_restaurants)) },
             trailingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
         )
 
         if (restaurants != null && restaurants.itemCount != 0) {
@@ -272,19 +272,20 @@ fun AddEventActivity(navController: NavHostController) {
             CircularProgressIndicator()
         }
 
+        if (addEventViewModel.isSelectedRestaurantInvalid() && addEventViewModel.formSent) {
+            Text(
+                text = stringResource(id = R.string.error_select_restaurant),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+
         addEventViewModel.selectedRestaurant?.let {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
             ) {
-                if (addEventViewModel.isSelectedRestaurantInvalid() && addEventViewModel.formSent) {
-                    Text(
-                        text = stringResource(id = R.string.error_select_restaurant),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
                 Text(
                     text = stringResource(id = R.string.label_selected_restaurant) + " " + it.name,
                     style = MaterialTheme.typography.bodyMedium
