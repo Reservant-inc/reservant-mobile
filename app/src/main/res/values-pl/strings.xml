@@ -398,4 +398,5 @@
     <string name="error_field_required">To pole jest wymagane</string>
     <string name="error_invalid_number">Nieprawidłowa liczba</string>
     <string name="label_choose_time">Wybierz godzinę</string>
+    <string name="error_select_restaurant">Wybierz restaurację</string>
 </resources>

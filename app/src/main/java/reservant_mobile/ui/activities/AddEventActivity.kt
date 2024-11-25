@@ -72,14 +72,10 @@ fun AddEventActivity(navController: NavHostController) {
             onValueChange = { addEventViewModel.eventName = it },
             label = stringResource(id = R.string.label_event_name),
             isError = addEventViewModel.isEventNameInvalid() && addEventViewModel.formSent,
-            errorText = stringResource(
-                if (addEventViewModel.getEventNameError() != -1)
-                    addEventViewModel.getEventNameError()
-                else
-                    R.string.error_field_required
-            ),
+            errorText = stringResource(R.string.error_field_required),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            formSent = addEventViewModel.formSent
         )
 
         FormInput(
@@ -94,7 +90,8 @@ fun AddEventActivity(navController: NavHostController) {
                     R.string.error_field_required
             ),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            formSent = addEventViewModel.formSent
         )
 
         FormFileInput(
@@ -128,18 +125,6 @@ fun AddEventActivity(navController: NavHostController) {
                         allowFutureDates = true,
                         startDate = LocalDate.now().toString()
                     )
-                    if (addEventViewModel.isEventDateInvalid() && addEventViewModel.formSent) {
-                        Text(
-                            text = stringResource(
-                                if (addEventViewModel.getEventDateError() != -1)
-                                    addEventViewModel.getEventDateError()
-                                else
-                                    R.string.error_field_required
-                            ),
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
                 }
                 Column(
                     modifier = Modifier
@@ -152,6 +137,20 @@ fun AddEventActivity(navController: NavHostController) {
                         },
                         modifier = Modifier
                             .scale(0.85f)
+                    )
+                }
+            }
+            Row{
+                if (addEventViewModel.isEventDateInvalid() && addEventViewModel.formSent) {
+                    Text(
+                        text = stringResource(
+                            if (addEventViewModel.getEventDateError() != -1)
+                                addEventViewModel.getEventDateError()
+                            else
+                                R.string.error_field_required
+                        ),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
                     )
                 }
             }
@@ -172,18 +171,7 @@ fun AddEventActivity(navController: NavHostController) {
                         allowFutureDates = true,
                         startDate = LocalDate.now().toString()
                     )
-                    if (addEventViewModel.isMustJoinDateInvalid() && addEventViewModel.formSent) {
-                        Text(
-                            text = stringResource(
-                                if (addEventViewModel.getMustJoinDateError() != -1)
-                                    addEventViewModel.getMustJoinDateError()
-                                else
-                                    R.string.error_field_required
-                            ),
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
+
                 }
                 Column(
                     modifier = Modifier
@@ -199,6 +187,20 @@ fun AddEventActivity(navController: NavHostController) {
                     )
                 }
             }
+            Row{
+                if (addEventViewModel.isMustJoinDateInvalid() && addEventViewModel.formSent) {
+                    Text(
+                        text = stringResource(
+                            if (addEventViewModel.getMustJoinDateError() != -1)
+                                addEventViewModel.getMustJoinDateError()
+                            else
+                                R.string.error_field_required
+                        ),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
         }
 
         FormInput(
@@ -206,14 +208,13 @@ fun AddEventActivity(navController: NavHostController) {
             onValueChange = { addEventViewModel.maxPeople = it },
             label = stringResource(id = R.string.label_event_max_people),
             isError = addEventViewModel.isMaxPeopleInvalid() && addEventViewModel.formSent,
-            errorText = stringResource(
-                if (addEventViewModel.getMaxPeopleError() != -1)
-                    addEventViewModel.getMaxPeopleError()
-                else
-                    R.string.error_invalid_number
-            ),
+            errorText = stringResource(R.string.error_invalid_number),
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            formSent = addEventViewModel.formSent
         )
 
         Text(
@@ -277,6 +278,13 @@ fun AddEventActivity(navController: NavHostController) {
                 modifier = Modifier
                     .padding(vertical = 8.dp)
             ) {
+                if (addEventViewModel.isSelectedRestaurantInvalid() && addEventViewModel.formSent) {
+                    Text(
+                        text = stringResource(id = R.string.error_select_restaurant),
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
                 Text(
                     text = stringResource(id = R.string.label_selected_restaurant) + " " + it.name,
                     style = MaterialTheme.typography.bodyMedium

@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import com.example.reservant_mobile.R
 import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -242,11 +244,11 @@ class EventViewModel(
     }
 
     fun isEventNameInvalid(): Boolean {
-        return eventName.isBlank() || getFieldError(result, "name") != -1
+        return eventName.isBlank()
     }
 
     fun getEventNameError(): Int {
-        return getFieldError(result, "name")
+        return if (eventName.isBlank()) R.string.error_field_required else -1
     }
 
     fun isDescriptionInvalid(): Boolean {
@@ -287,12 +289,21 @@ class EventViewModel(
 
     fun isMaxPeopleInvalid(): Boolean {
         val maxPeopleInt = maxPeople.toIntOrNull()
-        return maxPeopleInt == null || getFieldError(result, "maxPeople") != -1
+        return maxPeopleInt == null
     }
 
     fun getMaxPeopleError(): Int {
-        return getFieldError(result, "maxPeople")
+        return if (maxPeople.toIntOrNull() == null) R.string.error_invalid_number else -1
     }
+
+    fun isSelectedRestaurantInvalid(): Boolean {
+        return selectedRestaurant == null
+    }
+
+    fun getSelectedRestaurantError(): Int {
+        return if (selectedRestaurant == null) R.string.error_select_restaurant else -1
+    }
+
 
     fun isFormInvalid(): Boolean {
         return isEventNameInvalid() ||
@@ -300,7 +311,8 @@ class EventViewModel(
                 isEventDateInvalid() ||
                 isMustJoinDateInvalid() ||
                 isPhotoInvalid() ||
-                isMaxPeopleInvalid()
+                isMaxPeopleInvalid() ||
+                isSelectedRestaurantInvalid()
     }
 
     fun getToastError(): Int {
