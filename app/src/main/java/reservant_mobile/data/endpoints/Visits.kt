@@ -17,5 +17,8 @@ class Visits {
 
         @Resource("confirm-end")
         class ConfirmEnd(val parent: VisitID)
+
+        @Resource("table")
+        class Table(val parent: VisitID)
     }
 }

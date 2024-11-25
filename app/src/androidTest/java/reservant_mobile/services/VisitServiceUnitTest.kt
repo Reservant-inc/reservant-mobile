@@ -72,4 +72,9 @@ class VisitServiceUnitTest: ServiceTest() {
     fun confirm_visit_end_return_true()= runTest{
         assertThat(ser.confirmStart(1).value).isTrue()
     }
+
+    @Test
+    fun update_table_return_true()= runTest{
+        assertThat(ser.updateTable(1,1).value).isTrue()
+    }
 }
