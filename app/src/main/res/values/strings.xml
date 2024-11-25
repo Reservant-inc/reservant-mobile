@@ -395,4 +395,17 @@
     <string name="label_start_date">Start date</string>
     <string name="label_event_join_until">Join until</string>
     <string name="label_event_photo">Event photo</string>
+    <string name="label_add_event">Add Event</string>
+    <string name="label_event_name">Event name</string>
+    <string name="label_event_description">Event description</string>
+    <string name="label_event_max_people">Max people</string>
+    <string name="label_search_restaurants">Search restaurant</string>
+    <string name="label_selected_restaurant">Selected restaurant:</string>
+    <string name="error_add_event_failed">Adding event failed</string>
+    <string name="error_fill_all_fields">Fill all fields</string>
+    <string name="label_available_restaurants">Available restaurants:</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_number">Invalid number</string>
+    <string name="label_choose_time">Choose Time</string>
+    <string name="error_select_restaurant">Select a restaurant</string>
 </resources>

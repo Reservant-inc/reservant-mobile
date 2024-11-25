@@ -88,6 +88,7 @@ import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.OsmMapView
 import reservant_mobile.ui.components.RatingBar
@@ -176,7 +177,7 @@ fun MapActivity(){
                                     .padding(vertical = 4.dp),
                                 shape = RoundedCornerShape(20.dp),
 
-                            )
+                                )
                             Spacer(modifier = Modifier.width(16.dp))
 
                             IconButton(
@@ -266,7 +267,7 @@ fun MapActivity(){
                             LoadingScreenWithTimeout(timeoutMillis = 10000.milliseconds)
                         }
                         else if (events.itemCount < 1 || events.loadState.hasError
-                            ){
+                        ){
                             MissingPage(
                                 errorString = stringResource(
                                     id = R.string.message_not_found_any,
@@ -274,29 +275,43 @@ fun MapActivity(){
                                 )
                             )
                         } else {
-                            LazyColumn(
-                                Modifier
+                            Box(
+                                modifier = Modifier
                                     .fillMaxSize()
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
-                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                items(events.itemCount) { index ->
-                                    val item = events[index]
-                                    if(item != null){
-                                        EventCard(
-                                            eventName = item.name,
-                                            eventDate = item.time,
-                                            eventLocation = if (item.restaurant != null) item.restaurant.address else "",
-                                            interestedCount = item.numberInterested,
-                                            takePartCount = item.numberParticipants,
-                                            onClick = {
-                                                navController.navigate(
-                                                    EventRoutes.Details(eventId = item.eventId)
-                                                )
-                                            }
-                                        )
+                                LazyColumn(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    items(events.itemCount) { index ->
+                                        val item = events[index]
+                                        if(item != null){
+                                            EventCard(
+                                                eventName = item.name,
+                                                eventDate = item.time,
+                                                eventLocation = if (item.restaurant != null) item.restaurant.address else "",
+                                                interestedCount = item.numberInterested,
+                                                takePartCount = item.numberParticipants,
+                                                onClick = {
+                                                    navController.navigate(
+                                                        EventRoutes.Details(eventId = item.eventId)
+                                                    )
+                                                }
+                                            )
+                                        }
                                     }
                                 }
+                                MyFloatingActionButton(
+                                    onClick = {
+                                        navController.navigate(EventRoutes.AddEvent)
+                                    },
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                )
                             }
                         }
                     }
@@ -510,6 +525,9 @@ fun MapActivity(){
                 eventId = it.toRoute<EventRoutes.Details>().eventId
             )
         }
+        composable<EventRoutes.AddEvent>{
+            AddEventActivity(navController = navController)
+        }
     }
 
 
@@ -710,8 +728,8 @@ fun EventStatusRadioFilter(
 ) {
     var currentStatus by remember { mutableStateOf(selectedStatus) }
     val selectStatus = {status:GetEventsStatus? ->
-      currentStatus = status
-      onStatusSelected(status)
+        currentStatus = status
+        onStatusSelected(status)
     }
 
     FlowRow(
