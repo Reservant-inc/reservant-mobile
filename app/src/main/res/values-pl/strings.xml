@@ -386,4 +386,6 @@
     <string name="label_start_date">Data rozpoczęcia</string>
     <string name="label_event_join_until">Dołączyć przed</string>
     <string name="label_event_photo">Zdjęcie wydarzenia</string>
+    <string name="taken_label">Zajęty</string>
+    <string name="visit_soon_label">Wizyta wkrótce</string>
 </resources>
