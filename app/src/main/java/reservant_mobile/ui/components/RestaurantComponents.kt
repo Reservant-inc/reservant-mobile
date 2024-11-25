@@ -170,7 +170,6 @@ fun EventCard(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
                     )
                 }
 
@@ -179,12 +178,6 @@ fun EventCard(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                if(eventName != null)
-                    Text(
-                        text = eventName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
                 Text(
                     text = eventName,
                     style = MaterialTheme.typography.headlineSmall,
