@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
@@ -32,6 +37,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +54,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
@@ -55,6 +63,7 @@ import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.ProfileViewModel
@@ -70,6 +79,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
     val friendsFlow by profileViewModel.friendsFlow.collectAsState()
     val friendsPagingItems = friendsFlow?.collectAsLazyPagingItems()
+
+    val eventsFlow by profileViewModel.eventsFlow.collectAsState()
+    val eventPagingItems = eventsFlow?.collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -145,7 +157,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                         stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems) },
                         stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
                         stringResource(R.string.label_orders) to { CurrentOrdersTab() },
-                        stringResource(R.string.label_event_history) to { HistoryTab() }
+                        stringResource(R.string.label_event_history) to { HistoryTab(eventPagingItems) }
                     )
                 )
             }
@@ -153,9 +165,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     }
 
 }
-
-
-
 
 
 @Composable
@@ -249,25 +258,23 @@ fun JoinRequestsTab() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 70.dp)
     ) {
+
         items(sampleEvents.size) { id ->
             val event = sampleEvents[id]
-            // Event Header
             Text(
                 text = event.eventName,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            // Join Requests List
             if (event.joinRequests.isNotEmpty()) {
                 event.joinRequests.forEach { participant ->
                     UserListItem(
                         user = participant,
                         showButtons = true,
                         onApproveClick = {
-                            // Placeholder for approve action
                             Toast.makeText(
                                 context,
                                 "${participant.firstName} approved for ${event.eventName}",
@@ -275,7 +282,6 @@ fun JoinRequestsTab() {
                             ).show()
                         },
                         onRejectClick = {
-                            // Placeholder for reject action
                             Toast.makeText(
                                 context,
                                 "${participant.firstName} rejected from ${event.eventName}",
@@ -300,12 +306,141 @@ fun JoinRequestsTab() {
 
 @Composable
 fun CurrentOrdersTab() {
-    // TODO: Zakładka obecnych zamówień z przyciskiem do potwierdzenia przybycia
+
+    // Sample orders data
+    val orders = remember {
+        mutableStateListOf(
+            Order(
+                orderId = 1,
+                restaurantName = "Pizzeria Bella Italia",
+                orderDate = "2023-10-10T19:30:00.000Z",
+                items = listOf(
+                    OrderItem(name = "Margherita Pizza", quantity = 2),
+                    OrderItem(name = "Garlic Bread", quantity = 1)
+                ),
+                isConfirmed = false
+            ),
+            Order(
+                orderId = 2,
+                restaurantName = "Sushi Master",
+                orderDate = "2023-10-12T12:00:00.000Z",
+                items = listOf(
+                    OrderItem(name = "California Roll", quantity = 3),
+                    OrderItem(name = "Miso Soup", quantity = 2)
+                ),
+                isConfirmed = false
+            )
+        )
+    }
+
+
+
+    if (orders.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = stringResource(R.string.label_no_current_orders))
+        }
+    } else {
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 64.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+        ) {
+            items(orders.size) { index ->
+                val order = orders[index]
+                OrderCard(order = order, onConfirmArrival = {
+                    // Simulate confirming arrival
+                    orders[index] = order.copy(isConfirmed = true)
+                })
+            }
+        }
+    }
 }
 
 @Composable
-fun HistoryTab() {
-    // TODO: Zakładka historii eventów
+fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
+
+    if (eventPagingItems == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(64.dp))
+            }
+
+            items(eventPagingItems.itemCount) { index ->
+                val event = eventPagingItems[index]
+                if (event != null) {
+                    EventCard(
+                        eventName = event.name ?: "No event name",
+                        eventDate = event.time,
+                        eventLocation = event.restaurant?.name ?: "Nowhere",
+                        interestedCount = event.numberInterested ?: 0,
+                        takePartCount = event.numberParticipants ?: 0,
+                        onClick = {}
+                    )
+                }
+            }
+
+            eventPagingItems.apply {
+                when {
+                    loadState.refresh is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.append is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.refresh is LoadState.Error -> {
+                        val e = eventPagingItems.loadState.refresh as LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                    loadState.append is LoadState.Error -> {
+                        val e = eventPagingItems.loadState.append as LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_more_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -347,10 +482,9 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
                 }
             }
 
-            // Obsługa stanów ładowania
             friendsPagingItems.apply {
                 when {
-                    loadState.refresh is androidx.paging.LoadState.Loading -> {
+                    loadState.refresh is LoadState.Loading -> {
                         item {
                             Box(
                                 modifier = Modifier
@@ -362,7 +496,7 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
                             }
                         }
                     }
-                    loadState.append is androidx.paging.LoadState.Loading -> {
+                    loadState.append is LoadState.Loading -> {
                         item {
                             Box(
                                 modifier = Modifier
@@ -374,7 +508,7 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
                             }
                         }
                     }
-                    loadState.refresh is androidx.paging.LoadState.Error -> {
+                    loadState.refresh is LoadState.Error -> {
                         item {
                             Text(
                                 text = stringResource(R.string.error_loading_friends),
@@ -383,7 +517,7 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
                             )
                         }
                     }
-                    loadState.append is androidx.paging.LoadState.Error -> {
+                    loadState.append is LoadState.Error -> {
                         item {
                             Text(
                                 text = stringResource(R.string.error_loading_more_friends),
@@ -398,29 +532,79 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
     }
 }
 
-// TODO: EXAMPLES
+// TODO: BACKEND INSTEAD OF EXAMPLES BELOW
 data class Event(
     val eventId: Int,
     val eventName: String,
     val joinRequests: List<EventDTO.Participant>
 )
 
-val sampleEvents = listOf(
-    Event(
-        eventId = 1,
-        eventName = "Community Meetup",
-        joinRequests = listOf(
-            EventDTO.Participant(userId = "user1", firstName = "Alice", lastName = "Smith"),
-            EventDTO.Participant(userId = "user2", firstName = "Bob", lastName = "Johnson")
-        )
-    ),
-    Event(
-        eventId = 2,
-        eventName = "Hackathon",
-        joinRequests = listOf(
-            EventDTO.Participant(userId = "user3", firstName = "Charlie", lastName = "Brown"),
-            EventDTO.Participant(userId = "user4", firstName = "Diana", lastName = "Prince"),
-            EventDTO.Participant(userId = "user5", firstName = "Ethan", lastName = "Hunt")
-        )
-    )
+data class OrderItem(
+    val name: String,
+    val quantity: Int
 )
+
+data class Order(
+    val orderId: Int,
+    val restaurantName: String,
+    val orderDate: String,
+    val items: List<OrderItem>,
+    var isConfirmed: Boolean = false
+)
+
+@Composable
+fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Restaurant Name
+            Text(
+                text = order.restaurantName,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Order Date
+            Text(
+                text = "${stringResource(R.string.label_order_date)}: ${formatToDateTime(order.orderDate)}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Order Items
+            Text(
+                text = stringResource(R.string.order_details),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+            )
+            order.items.forEach { item ->
+                Text(
+                    text = "${item.name} x${item.quantity}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Confirm Arrival Button or Confirmation Text
+            if (!order.isConfirmed) {
+                Button(
+                    onClick = { onConfirmArrival() },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text(text = stringResource(R.string.label_confirm_arrival))
+                }
+            } else {
+                Text(
+                    text = stringResource(R.string.label_arrival_confirmed),
+                    color = Color.Green,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+    }
+}
