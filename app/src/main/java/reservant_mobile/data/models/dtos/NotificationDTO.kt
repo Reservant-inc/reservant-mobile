@@ -83,15 +83,14 @@ data class NotificationDTO(
 
         },
         NotificationNewParticipationRequest(
-            R.string.label_NotificationNewParticipationRequest,
-            0
+            R.string.title_NotificationNewParticipationRequest,
+            R.string.body_NotificationNewParticipationRequest
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
-            }
-
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(
+                    details?.get("senderName")?.jsonPrimitive?.content ?: "",
+                    details?.get("eventName")?.jsonPrimitive?.content ?: "",
+                )
             }
 
         },
