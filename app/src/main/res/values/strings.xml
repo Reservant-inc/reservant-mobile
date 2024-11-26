@@ -333,7 +333,7 @@
     <string name="cancel">Cancel</string>
     <string name="label_NotificationRestaurantVerified">Your restaurant has been verified</string>
     <string name="content_NotificationRestaurantVerified">%1s has been verified</string>
-    <string name="label_NotificationNewRestaurantReview">New review in your restaurant</string>
+    <string name="label_NotificationNewRestaurantReview">New review in your restaurant - %1s</string>
     <string name="content_NotificationNewRestaurantReview">%1s\n%2s: %3s</string>
     <string name="label_NotificationNewFriendRequest">New friend request</string>
     <string name="label_NotificationFriendRequestAccepted">Friend request has been accepted</string>

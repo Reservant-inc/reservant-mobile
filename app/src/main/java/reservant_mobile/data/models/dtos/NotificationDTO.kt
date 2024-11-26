@@ -7,6 +7,8 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable()
 data class NotificationDTO(
@@ -32,10 +34,12 @@ data class NotificationDTO(
             R.string.label_NotificationRestaurantVerified,
             R.string.content_NotificationRestaurantVerified
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf()
+            }
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
             }
 
         },
@@ -44,11 +48,19 @@ data class NotificationDTO(
             R.string.content_NotificationNewRestaurantReview
         ){
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
             }
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                val starCount = details?.get("stars")?.jsonPrimitive?.intOrNull ?: 0
+
+                val stars = "★".repeat(starCount) + "☆".repeat(5 - starCount)
+
+                return arrayOf(
+                    stars,
+                    details?.get("authorName")?.jsonPrimitive?.content ?: "",
+                    details?.get("contents")?.jsonPrimitive?.content ?: ""
+                )
             }
 
         },

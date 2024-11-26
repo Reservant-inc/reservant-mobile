@@ -174,9 +174,9 @@ class NotificationHandler (
     private fun NotificationDTO.NotificationType.getContent(details: Map<String, JsonElement>?) : Pair<String, String> =
         details?.let {
             return context.getString(
-                this.titleResourceId, this.getTitleArguments(details)
+                this.titleResourceId, *this.getTitleArguments(details)
             ) to context.getString(
-                this.bodyResourceId, this.getBodyArguments(details)
+                this.bodyResourceId, *this.getBodyArguments(details)
             )
         } ?: ("" to "")
 
