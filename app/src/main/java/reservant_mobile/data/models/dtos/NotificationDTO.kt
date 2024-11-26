@@ -34,10 +34,6 @@ data class NotificationDTO(
             R.string.title_NotificationRestaurantVerified,
             R.string.body_NotificationRestaurantVerified
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                return arrayOf()
-            }
-
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
             }
@@ -68,10 +64,6 @@ data class NotificationDTO(
             R.string.title_NotificationNewFriendRequest,
             R.string.body_NotificationNewFriendRequest
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                return arrayOf()
-            }
-
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(
                     details?.get("senderName")?.jsonPrimitive?.content ?: ""
@@ -80,13 +72,9 @@ data class NotificationDTO(
 
         },
         NotificationFriendRequestAccepted(
-            R.string.label_NotificationFriendRequestAccepted,
+            R.string.title_NotificationFriendRequestAccepted,
             0
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
-            }
-
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
@@ -158,8 +146,8 @@ data class NotificationDTO(
 
         };
 
-        abstract fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any>
-        abstract fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any>
+        open fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
+        open fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
     }
 }
 

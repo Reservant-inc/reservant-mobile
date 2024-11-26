@@ -327,7 +327,8 @@
     <string name="title_NotificationNewRestaurantReview">Nowa opinia o restauracji</string>
     <string name="title_NotificationNewFriendRequest">Nowe zaproszenie do znajomych</string>
     <string name="body_NotificationNewFriendRequest">%1s wysłał Ci zaproszenie do znajomych</string>
-    <string name="label_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
+    <string name="title_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
+    <string name="body_NotificationFriendRequestAccepted">%1s zaakceptował Twoje zaproszenie do znajomych</string>
     <string name="label_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>
     <string name="label_NotificationParticipationRequestResponse">Ktoś odpowiedział na twoją prośbę dołączenia do wydarzenia</string>
     <string name="label_NotificationVisitApprovedDeclined">Restauracja odpowiedziała na twoją wizytę</string>

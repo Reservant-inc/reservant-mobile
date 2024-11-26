@@ -337,7 +337,8 @@
     <string name="body_NotificationNewRestaurantReview" translatable="false">%1s\n%2s: %3s</string>
     <string name="title_NotificationNewFriendRequest">New friend request</string>
     <string name="body_NotificationNewFriendRequest">%1s sent you a friend request</string>
-    <string name="label_NotificationFriendRequestAccepted">Friend request has been accepted</string>
+    <string name="title_NotificationFriendRequestAccepted">Friend request has been accepted</string>
+    <string name="body_NotificationFriendRequestAccepted">%1s has accepted your friend request</string>
     <string name="label_NotificationNewParticipationRequest">Someone would like to join your event</string>
     <string name="label_NotificationParticipationRequestResponse">Someone responded to your event join request</string>
     <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
