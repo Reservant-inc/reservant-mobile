@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -45,8 +47,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -54,9 +59,9 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProfileActivity(navController: NavHostController, userId: String) {
-
     val profileViewModel: ProfileViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -64,8 +69,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
         }
     )
 
-    val eventsFlow = profileViewModel.eventsFlow.collectAsState()
-    val eventsPagingItems = eventsFlow.value?.collectAsLazyPagingItems()
+    val friendsPagingItems = profileViewModel.friendsFlow.value?.collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -145,102 +149,21 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 profileViewModel.profileUser!!.birthDate?.let {
                                     Text(text = it, color = Color.Gray)
                                 }
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Star,
-                                        contentDescription = null,
-                                        tint = Color.Gray
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "5,00", // TODO: zmienna z oceną użytkownika z backu
-                                        color = Color.Gray
-                                    )
-                                }
                             }
-
-                            if (!profileViewModel.isCurrentUser) {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    when (profileViewModel.profileUser?.friendStatus) {
-                                        FriendStatus.Friend -> {
-                                            Button(
-                                                onClick = { profileViewModel.removeFriend() },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                            ) {
-                                                Text(text = stringResource(R.string.label_remove_friend))
-                                            }
-                                        }
-
-                                        FriendStatus.OutgoingRequest -> {
-                                            Button(
-                                                onClick = { profileViewModel.cancelFriendRequest() },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                            ) {
-                                                Text(text = stringResource(R.string.label_cancel))
-                                            }
-                                        }
-
-                                        FriendStatus.IncomingRequest -> {
-                                            Row {
-                                                Button(
-                                                    onClick = { profileViewModel.acceptFriendRequest() },
-                                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                                ) {
-                                                    Text(text = stringResource(R.string.label_accept_request))
-                                                }
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Button(
-                                                    onClick = { profileViewModel.rejectFriendRequest() },
-                                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                                ) {
-                                                    Text(text = stringResource(R.string.label_cancel_request))
-                                                }
-                                            }
-                                        }
-
-                                        FriendStatus.Stranger -> {
-                                            Button(
-                                                onClick = { profileViewModel.sendFriendRequest() },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Add,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                                                )
-                                                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                                Text(text = stringResource(R.string.label_add_friend))
-                                            }
-                                        }
-
-                                        null -> {
-                                            // Obsługa przypadku null, jeśli konieczne
-                                        }
-                                    }
-
-                                    profileViewModel.friendRequestError?.let { error ->
-                                        Text(text = error, color = MaterialTheme.colorScheme.error)
-                                    }
-
-                                    Button(
-                                        onClick = { /* TODO: Wyślij wiadomość */ },
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.Send,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                                        )
-                                    }
-                                }
+                        }
+                        if (profileViewModel.isCurrentUser) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                FloatingTabSwitch(
+                                    pages = listOf(
+                                        stringResource(R.string.label_info) to { InfoTab() },
+                                        stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems) },
+                                        stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
+                                        stringResource(R.string.label_orders) to { CurrentOrdersTab() },
+                                        stringResource(R.string.label_event_history) to { HistoryTab() }
+                                    )
+                                )
                             }
                         }
                     }
@@ -249,105 +172,106 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     }
                 }
             }
+        }
+    }
+}
 
-            if (profileViewModel.profileUser != null) {
-                if (profileViewModel.isCurrentUser) {
-                    item {
-                        FloatingTabSwitch(
-                            pages = listOf(
-                                stringResource(R.string.label_visits) to { VisitsTab() },
-                                stringResource(R.string.label_orders) to { OrdersTab() },
-                                stringResource(R.string.label_chats) to { ChatsTab() },
-                                stringResource(R.string.label_friends) to { FriendsTab() },
-                            )
-                        )
-                    }
-                } else {
-                    item {
-                        Text(
-                            text = stringResource(R.string.label_events),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(16.dp)
-                            //.align(alignment = Alignment.CenterHorizontally)
-                        )
-                    }
 
-                    if (eventsPagingItems == null) {
+@Composable
+fun InfoTab() {
+    // TODO: Zakładka o nas
+}
+
+@Composable
+fun JoinRequestsTab() {
+    // TODO: Zakładka prośby o dołączenie do eventów
+}
+
+@Composable
+fun CurrentOrdersTab() {
+    // TODO: Zakładka obecnych zamówień z przyciskiem do potwierdzenia przybycia
+}
+
+@Composable
+fun HistoryTab() {
+    // TODO: Zakładka historii eventów
+}
+
+@Composable
+fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
+    if (friendsPagingItems == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            items(friendsPagingItems.itemCount) { index ->
+                val friend = friendsPagingItems[index]
+                val otherUser = friend?.otherUser
+                if (otherUser != null) {
+                    UserListItem(
+                        user = EventDTO.Participant(
+                            userId = otherUser.userId,
+                            firstName = otherUser.firstName ?: "Unknown",
+                            lastName = otherUser.lastName ?: "User"
+                        ),
+                        showButtons = false
+                    )
+                }
+            }
+
+
+            // Obsługa stanów ładowania
+            friendsPagingItems.apply {
+                when {
+                    loadState.refresh is androidx.paging.LoadState.Loading -> {
                         item {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp),
+                                    .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator()
                             }
                         }
-                    } else {
-                        items(eventsPagingItems.itemCount) { index ->
-                            val event = eventsPagingItems[index]
-                            if (event != null) {
-                                EventCard(
-                                    eventName = event.name!!,
-                                    eventDate = event.time,
-                                    eventLocation = event.restaurant!!.address,
-                                    interestedCount = event.numberInterested ?: 0,
-                                    takePartCount = event.participants?.size ?: 0,
-                                    onClick = {}
-                                )
+                    }
+                    loadState.append is androidx.paging.LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
                             }
                         }
-
-                        eventsPagingItems.apply {
-                            when {
-                                loadState.refresh is androidx.paging.LoadState.Loading -> {
-                                    item {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator()
-                                        }
-                                    }
-                                }
-                                loadState.append is androidx.paging.LoadState.Loading -> {
-                                    item {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(16.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            CircularProgressIndicator()
-                                        }
-                                    }
-                                }
-                                loadState.refresh is androidx.paging.LoadState.Error -> {
-                                    val e = eventsPagingItems.loadState.refresh as androidx.paging.LoadState.Error
-                                    item {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_events),
-                                            color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
-                                loadState.append is androidx.paging.LoadState.Error -> {
-                                    val e = eventsPagingItems.loadState.append as androidx.paging.LoadState.Error
-                                    item {
-                                        Text(
-                                            text = stringResource(R.string.error_loading_more_events),
-                                            color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(16.dp)
-                                        )
-                                    }
-                                }
-                            }
+                    }
+                    loadState.refresh is androidx.paging.LoadState.Error -> {
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_friends),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                    loadState.append is androidx.paging.LoadState.Error -> {
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_more_friends),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
                         }
                     }
                 }
@@ -356,25 +280,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     }
 }
 
-@Composable
-fun VisitsTab() {
-    // Visits
-}
-
-@Composable
-fun OrdersTab() {
-    // Orders
-}
-
-@Composable
-fun ChatsTab() {
-    // Chats
-}
-
-@Composable
-fun FriendsTab() {
-    // Friends
-}
 
 data class Chat(val userName: String, val message: String)
 data class Friend(val name: String)
