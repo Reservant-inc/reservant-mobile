@@ -274,13 +274,13 @@ fun InfoTab(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Profile Picture and Name
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Profile Picture
+
                         Image(
-                            painter = painterResource(id = R.drawable.jd), // Replace with actual image
+                            painter = painterResource(id = R.drawable.jd),
                             contentDescription = stringResource(R.string.label_profile_picture),
                             modifier = Modifier
                                 .size(80.dp)
@@ -288,10 +288,10 @@ fun InfoTab(
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        // Name and Roles
+
                         Column {
                             Text(
-                                text = "${profileUser!!.firstName} ${profileUser.lastName}",
+                                text = "${profileUser.firstName} ${profileUser.lastName}",
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -307,12 +307,12 @@ fun InfoTab(
 
                     HorizontalDivider()
 
-                    // Contact Information
+
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Email
-                        profileUser!!.email.let {
+
+                        profileUser.email.let {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Email,
@@ -329,7 +329,6 @@ fun InfoTab(
                             }
                         }
 
-                        // Phone Number
                         profileUser.phoneNumber?.let {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
@@ -345,7 +344,6 @@ fun InfoTab(
                             }
                         }
 
-                        // Birth Date
                         profileUser.birthDate?.let {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
@@ -361,7 +359,6 @@ fun InfoTab(
                             }
                         }
 
-                        // Registered At
                         profileUser.registeredAt?.let {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
