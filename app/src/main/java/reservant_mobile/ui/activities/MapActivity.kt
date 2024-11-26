@@ -85,6 +85,7 @@ import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
+import reservant_mobile.ui.components.Logo
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
@@ -96,6 +97,7 @@ import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.SwitchWithLabel
+import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
@@ -105,14 +107,11 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun MapActivity(){
-
+fun MapActivity(isUserLoggedIn: Boolean = false){
     val navController = rememberNavController()
+    val mapViewModel = viewModel<MapViewModel>()
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
-            val mapViewModel = viewModel<MapViewModel>()
-
-
 
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
@@ -145,13 +144,38 @@ fun MapActivity(){
                 mv = mapViewModel.initMapView(context, startPoint)
             }
             if (showRestaurantBottomSheet) {
-                RestaurantDetailPreview(navController, showRestaurantId) {
-                    showRestaurantBottomSheet = false
-                }
+                RestaurantDetailPreview(
+                    navController = navController,
+                    restaurantId = showRestaurantId,
+                    onDismiss =  { showRestaurantBottomSheet = false },
+                    isUserLoggedIn = isUserLoggedIn
+                )
             }
 
 
-            val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
+            val pages: List<Pair<String, @Composable () -> Unit>> = listOfNotNull(
+                Pair<String, @Composable () -> Unit>(
+                    first = stringResource(id = R.string.label_login_action),
+                    second = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Logo()
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Login) }, label = stringResource(
+                                id = R.string.label_login_action
+                            ))
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Register) }, label = stringResource(
+                                id = R.string.label_signup
+                            ))
+                        }
+                    }
+                ).takeIf { !isUserLoggedIn },
                 stringResource(id = R.string.label_restaurants) to {
                     Column {
                         Row(
@@ -209,7 +233,9 @@ fun MapActivity(){
                                     if (item != null) {
                                         RestaurantCard(
                                             onClick = {
-                                                navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
+                                                if(isUserLoggedIn){
+                                                    navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
+                                                }
                                             },
                                             name = item.name,
                                             location = item.address,
@@ -296,22 +322,26 @@ fun MapActivity(){
                                                 interestedCount = item.numberInterested,
                                                 takePartCount = item.numberParticipants,
                                                 onClick = {
-                                                    navController.navigate(
-                                                        EventRoutes.Details(eventId = item.eventId)
-                                                    )
+                                                    if(isUserLoggedIn){
+                                                        navController.navigate(
+                                                            EventRoutes.Details(eventId = item.eventId)
+                                                        )
+                                                    }
                                                 }
                                             )
                                         }
                                     }
                                 }
-                                MyFloatingActionButton(
-                                    onClick = {
-                                        navController.navigate(EventRoutes.AddEvent)
-                                    },
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(16.dp)
-                                )
+                                if(isUserLoggedIn){
+                                    MyFloatingActionButton(
+                                        onClick = {
+                                            navController.navigate(EventRoutes.AddEvent)
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .padding(16.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -326,10 +356,10 @@ fun MapActivity(){
                     Box(
                         modifier = Modifier.fillMaxSize()
                     ){
-
                         FloatingTabSwitch(
                             pages = pages,
-                            color = MaterialTheme.colorScheme.surface)
+                            color = MaterialTheme.colorScheme.surface
+                        )
                     }
                 },
                 content = { innerPadding -> OsmMapView(mv, startPoint,
@@ -528,11 +558,14 @@ fun MapActivity(){
         composable<EventRoutes.AddEvent>{
             AddEventActivity(navController = navController)
         }
+        composable<AuthRoutes.Login>{
+            LandingActivity(startDestination = AuthRoutes.Login)
+        }
+        composable<AuthRoutes.Register>{
+            LandingActivity(startDestination = AuthRoutes.Register)
+
+        }
     }
-
-
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -540,13 +573,15 @@ fun MapActivity(){
 fun RestaurantDetailPreview(
     navController: NavHostController,
     restaurantId: Int,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isUserLoggedIn: Boolean = false
 ){
     val modalBottomSheetState = rememberModalBottomSheetState()
+    val sheetHeight = if(isUserLoggedIn) 450.dp else 350.dp
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
-        modifier = Modifier.height(450.dp)
+        modifier = Modifier.height(sheetHeight)
     ) {
         val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
             factory = object : ViewModelProvider.Factory {
@@ -666,17 +701,19 @@ fun RestaurantDetailPreview(
                                 }
                             }
 
-                            ButtonComponent(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .wrapContentHeight(align = Alignment.CenterVertically),
-                                onClick = {
-                                    onDismiss()
-                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
-                                },
+                            if(isUserLoggedIn){
+                                ButtonComponent(
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .wrapContentHeight(align = Alignment.CenterVertically),
+                                    onClick = {
+                                        onDismiss()
+                                        navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
+                                    },
 
-                                label = stringResource(id = R.string.label_show_more_details)
-                            )
+                                    label = stringResource(id = R.string.label_show_more_details)
+                                )
+                            }
                         }
                     }
                 }
