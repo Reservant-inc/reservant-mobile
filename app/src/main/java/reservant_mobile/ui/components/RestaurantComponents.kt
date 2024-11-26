@@ -470,12 +470,12 @@ fun OpeningHourDayInput(
                 MyTimePickerDialog(
                     initialTime = "09:00",
                     onTimeSelected = onStartTimeChange,
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(0.5f).padding(end = 4.dp)
                 )
                 MyTimePickerDialog(
                     initialTime = "20:00",
                     onTimeSelected = onEndTimeChange,
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(0.5f).padding(start = 4.dp)
                 )
             }
 
