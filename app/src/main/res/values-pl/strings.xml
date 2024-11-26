@@ -323,7 +323,9 @@
     <string name="submit">Zatwierdź</string>
     <string name="cancel">Anuluj</string>
     <string name="label_NotificationRestaurantVerified">Twoja restauracja została zweryfikowana</string>
+    <string name="content_NotificationRestaurantVerified">Zweryfikowano restaurację %1s</string>
     <string name="label_NotificationNewRestaurantReview">Nowa opinia o restauracji</string>
+    <string name="content_NotificationNewRestaurantReview">%1s ocenił/a Twoją restaurację - %2s</string>
     <string name="label_NotificationNewFriendRequest">Nowe zaproszenie do znajomych</string>
     <string name="label_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
     <string name="label_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>

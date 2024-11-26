@@ -1,25 +1,12 @@
 package reservant_mobile.data.models.dtos
 
 import com.example.reservant_mobile.R
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import reservant_mobile.data.models.dtos.NotificationDTO.NotificationType
 
 @Serializable()
 data class NotificationDTO(
@@ -37,16 +24,130 @@ data class NotificationDTO(
     val details: Map<String, JsonElement>? = null
 ){
     @Serializable
-    enum class NotificationType(val resId: Int) {
-        NotificationRestaurantVerified(R.string.label_NotificationRestaurantVerified),
-        NotificationNewRestaurantReview(R.string.label_NotificationNewRestaurantReview),
-        NotificationNewFriendRequest(R.string.label_NotificationNewFriendRequest),
-        NotificationFriendRequestAccepted(R.string.label_NotificationFriendRequestAccepted),
-        NotificationNewParticipationRequest(R.string.label_NotificationNewParticipationRequest),
-        NotificationParticipationRequestResponse(R.string.label_NotificationParticipationRequestResponse),
-        NotificationVisitApprovedDeclined(R.string.label_NotificationVisitApprovedDeclined),
-        NotificationNewMessage(R.string.label_NotificationNewMessage),
-        NotificationNewReservation(R.string.label_NotificationNewReservation)
+    enum class NotificationType(
+        val titleResourceId: Int,
+        val bodyResourceId: Int
+    ) {
+        NotificationRestaurantVerified(
+            R.string.label_NotificationRestaurantVerified,
+            R.string.content_NotificationRestaurantVerified
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationNewRestaurantReview(
+            R.string.label_NotificationNewRestaurantReview,
+            R.string.content_NotificationNewRestaurantReview
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationNewFriendRequest(
+            R.string.label_NotificationNewFriendRequest,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationFriendRequestAccepted(
+            R.string.label_NotificationFriendRequestAccepted,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationNewParticipationRequest(
+            R.string.label_NotificationNewParticipationRequest,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationParticipationRequestResponse(
+            R.string.label_NotificationParticipationRequestResponse,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationVisitApprovedDeclined(
+            R.string.label_NotificationVisitApprovedDeclined,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationNewMessage(
+            R.string.label_NotificationNewMessage,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        },
+        NotificationNewReservation(
+            R.string.label_NotificationNewReservation,
+            0
+        ){
+            override fun getTitleArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getBodyArguments(): Array<Any> {
+                TODO("Not yet implemented")
+            }
+
+        };
+
+        abstract fun getTitleArguments(): Array<Any>
+        abstract fun getBodyArguments(): Array<Any>
     }
 }
 

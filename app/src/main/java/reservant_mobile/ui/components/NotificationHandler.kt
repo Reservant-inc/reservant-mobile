@@ -15,16 +15,12 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.NotificationDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.services.UserService
-import reservant_mobile.data.utils.formatToDateTime
 import kotlin.random.Random
 
 class NotificationHandler (
@@ -130,9 +126,12 @@ class NotificationHandler (
                 } ?: Result(isError = true, value = null)
 
                 notification.value.notificationType?.let {
+
+                    val pair = it.getContent(notification.value.details)
+                    
                     showBasicNotification(
-                        context.getString(it.resId),
-                        it.getBody(notification.value.details),
+                        pair.first,
+                        pair.second,
                         photo.value
                     )
                 }
@@ -171,41 +170,15 @@ class NotificationHandler (
         session = null
     }
 
-    private fun NotificationDTO.NotificationType.getBody(details: Map<String, JsonElement>?) : String =
-        details?.let {
-            when {
-                this == NotificationDTO.NotificationType.NotificationRestaurantVerified ->
-                    "${details["restaurantName"]?.string()} has been verified"
-                this == NotificationDTO.NotificationType.NotificationNewRestaurantReview ->
-                    "${details["authorName"]?.string()} has reviewed your restaurant - ${details["restaurantName"]?.string()}"
-                this == NotificationDTO.NotificationType.NotificationNewFriendRequest ->
-                    "${details["senderName"]?.string()} sent you a friend request"
-                this == NotificationDTO.NotificationType.NotificationFriendRequestAccepted ->
-                    "${details["acceptingUserFullName"]?.string()} accepted your friend request"
-                this == NotificationDTO.NotificationType.NotificationNewParticipationRequest ->
-                    "${details["senderName"]?.string()} wants to join your event - ${details["eventName"]?.string()}"
-                this == NotificationDTO.NotificationType.NotificationParticipationRequestResponse ->
-                    if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
-                        "${details["creatorName"]?.string()} accepted you to an event - ${details["name"]?.string()}"
-                    else
-                        "${details["creatorName"]?.string()} rejected you from an event - ${details["name"]?.string()}"
-                this == NotificationDTO.NotificationType.NotificationVisitApprovedDeclined ->
-                    if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
-                        "${details["restaurantName"]?.string()} accepted your visit on " +
-                                formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
-                    else
-                        "${details["restaurantName"]?.string()} rejected your visit on " +
-                                formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
-                this == NotificationDTO.NotificationType.NotificationNewMessage ->
-                    "${details["authorName"]?.string()}: ${details["contents"]?.string()}"
-                this == NotificationDTO.NotificationType.NotificationNewReservation ->
-                    "There's a new reservation at ${details["restaurantName"]?.string()} on " +
-                            formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy") +
-                            " for ${details["numberOfPeople"]}"
-                else -> ""
-            }
-        } ?: ""
 
-    private fun JsonElement.string() : String = this.jsonPrimitive.content
+    private fun NotificationDTO.NotificationType.getContent(details: Map<String, JsonElement>?) : Pair<String, String> =
+        details?.let {
+            return context.getString(
+                this.titleResourceId, this.getTitleArguments()
+            ) to context.getString(
+                this.bodyResourceId, this.getBodyArguments()
+            )
+        } ?: ("" to "")
+
 }
 
