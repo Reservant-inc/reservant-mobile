@@ -169,6 +169,7 @@
     <string name="errorCode_AccessDenied">Nie masz uprawnień do wykonania tej czynności</string>
     <string name="errorCode_Duplicate">Istnieje już taki obiekt</string>
     <string name="errorCode_NotFound">Nie znaleziono</string>
+    <string name="errorCode_GreaterThanOrEqualValidator">%1s musi być większe lub równe %2s</string>
     <string name="label_ticket">Nowe zgłoszenie</string>
     <string name="label_ticket_history">Historia zgłoszeń</string>
     <string name="label_add_friend">Dodaj znajomego</string>

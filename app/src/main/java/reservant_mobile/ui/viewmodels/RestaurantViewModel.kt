@@ -1,13 +1,10 @@
 package reservant_mobile.ui.viewmodels
 
 import android.content.Context
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.util.fastCbrt
 import androidx.core.net.toUri
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
@@ -23,7 +20,6 @@ import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
-import java.text.Normalizer.Form
 import java.time.LocalTime
 import kotlin.math.max
 
@@ -32,9 +28,10 @@ class RestaurantViewModel(
 ): ReservantViewModel() {
 
     // Wynik rejestracji
-    var result by mutableStateOf(Result(isError = false, value = false))
-    var result2 by mutableStateOf(Result(isError = false, value = false))
-    var result3 by mutableStateOf(Result(isError = false, value = false))
+    var resultFirstStep by mutableStateOf(Result(isError = false, value = false))
+    var resultFileUploads by mutableStateOf(Result(isError = false, value = false))
+    var resultGroup by mutableStateOf(Result(isError = false, value = false))
+    var resultRegistration by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
@@ -107,23 +104,21 @@ class RestaurantViewModel(
 
         val restaurant = getRestaurantData()
 
-        val result = restaurantService.registerRestaurant(restaurant)
+        resultRegistration = restaurantService.registerRestaurant(restaurant)
 
-        if (result.isError){
-            result3.isError = true
-            result3.errors = result.errors
+        if (resultRegistration.isError){
             return false
         }
 
-        restaurantId = result.value?.restaurantId
+        restaurantId = resultRegistration.value?.restaurantId
 
         if(newGroup.value.isNotBlank()){
-            restaurantService.addGroup(RestaurantGroupDTO(
+            resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
                 name = newGroup.value,
                 restaurantIds = listOf(restaurantId!!)
             ))
+            return !resultGroup.isError
         }
-
         return true
     }
 
@@ -134,21 +129,21 @@ class RestaurantViewModel(
 
         val restaurant = getRestaurantData()
 
-        val response = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
+        resultRegistration = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
 
-        if (response.value == null){
+        if (resultRegistration.isError){
             return false
         }
 
         if(newGroup.value.isNotBlank()){
-                val new = RestaurantGroupDTO(
+                resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
                     name = newGroup.value,
                     restaurantIds = listOf(restaurantId!!)
-                )
-                result = restaurantService.addGroup(new)
+                ))
+                return !resultFirstStep.isError
         }
 
-        return result.value
+        return true
     }
 
     suspend fun validateFirstStep(): Boolean {
@@ -158,8 +153,8 @@ class RestaurantViewModel(
 
         val restaurant = getFirstStepData()
 
-        result = restaurantService.validateFirstStep(restaurant)
-        return result.value
+        resultFirstStep = restaurantService.validateFirstStep(restaurant)
+        return resultFirstStep.value
     }
 
     suspend fun validateSecondStep(context: Context): Boolean {
@@ -417,9 +412,12 @@ class RestaurantViewModel(
     }
 
     fun isMaxReservationDurationInvalid(): Boolean {
-        println("[ERRORS]: ${getFieldError(result3, maxReservationMinutes.name)}")
-        return maxReservationMinutes.value.toIntOrNull() == null ||
-                getFieldError(result3, maxReservationMinutes.name) != -1
+
+        val maxResMinutesInt = maxReservationMinutes.value.toIntOrNull()
+
+        return maxResMinutesInt == null ||
+                maxResMinutesInt <= 30 ||
+                getFieldError(resultRegistration, maxReservationMinutes.name) != -1
     }
 
     fun isGroupInvalid(): Boolean {
@@ -508,69 +506,69 @@ class RestaurantViewModel(
     }
 
     fun getNameError(): Int {
-        return getFieldError(result, name.name)
+        return getFieldError(resultFirstStep, name.name)
     }
 
     fun getRestaurantTypeError(): Int {
-        return getFieldError(result, restaurantType.name)
+        return getFieldError(resultFirstStep, restaurantType.name)
     }
 
     fun getNipError(): Int {
-        return getFieldError(result, nip.name)
+        return getFieldError(resultFirstStep, nip.name)
     }
 
     fun getAdressError(): Int {
-        return getFieldError(result, address.name)
+        return getFieldError(resultFirstStep, address.name)
     }
 
     fun getPostalError(): Int {
-        return getFieldError(result, postalCode.name)
+        return getFieldError(resultFirstStep, postalCode.name)
     }
 
     fun getCityError(): Int {
-        return getFieldError(result, city.name)
+        return getFieldError(resultFirstStep, city.name)
     }
 
     fun getRentalContractError(): Int {
-        return getFieldError(result2, rentalContract.name)
+        return getFieldError(resultFileUploads, rentalContract.name)
     }
 
     fun getAlcoholLicenseError(): Int {
-        return getFieldError(result2, alcoholLicense.name)
+        return getFieldError(resultFileUploads, alcoholLicense.name)
     }
 
     fun getBusinessPermissionError(): Int {
-        return getFieldError(result2, businessPermission.name)
+        return getFieldError(resultFileUploads, businessPermission.name)
     }
 
     fun getIdCardError(): Int {
-        return getFieldError(result2, idCard.name)
+        return getFieldError(resultFileUploads, idCard.name)
     }
 
     fun getLogoError(): Int {
-        return getFieldError(result2, logo.name)
+        return getFieldError(resultFileUploads, logo.name)
     }
 
     fun getGroupError(): Int {
-        return getFieldError(result3, newGroup.name)
+        return getFieldError(resultRegistration, newGroup.name)
     }
 
     fun getDescriptionError(): Int {
-        return getFieldError(result3, description.name)
+        return getFieldError(resultRegistration, description.name)
     }
 
     fun getReservationDurationError(): Int {
-        return getFieldError(result3, maxReservationMinutes.name)
+        return getFieldError(resultRegistration, maxReservationMinutes.name)
     }
 
     fun getToastError1(): Int {
-        return getToastError(result)
+        return getToastError(resultFirstStep)
     }
     fun getToastError2(): Int {
-        return getToastError(result2)
+        return getToastError(resultFileUploads)
     }
     fun getToastError3(): Int {
-        return getToastError(result3)
+        return getToastError(resultRegistration)
     }
 
 }

@@ -69,8 +69,8 @@ class MenuItemManagementViewModel(
 
         val result = service.createMenuItem(menuitem)
 
-        //TODO z jakiegoś powodu result.isError zwraca true, a dalej zwraca poprawne dane
-        //TODO result.menuitemid np to null ale nie wiem dlaczego bo zwraca dane normalnie ta koncowka
+        //TODO z jakiegoś powodu resultFirstStep.isError zwraca true, a dalej zwraca poprawne dane
+        //TODO resultFirstStep.menuitemid np to null ale nie wiem dlaczego bo zwraca dane normalnie ta koncowka
         println(result.errors)
         if(!result.isError){
             val menuItemId = result.value?.menuItemId

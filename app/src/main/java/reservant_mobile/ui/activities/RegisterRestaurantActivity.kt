@@ -540,7 +540,9 @@ fun RegisterRestaurantActivity(
 
                     if (isOpen && isOpeningTimeInvalid){
                         Text(
-                            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 8.dp),
                             text = stringResource(id = R.string.error_openTimeBeforeCloseTime),
                             color = MaterialTheme.colorScheme.error
                         )
@@ -662,12 +664,15 @@ fun RegisterRestaurantActivity(
                         onValueChange = { restaurantViewModel.maxReservationMinutes.value = it },
                         label = stringResource(id = R.string.label_restaurant_maxReservationDuration),
                         isError = restaurantViewModel.isMaxReservationDurationInvalid(),
-                        errorText = stringResource(
-                            if (restaurantViewModel.getReservationDurationError() != -1)
-                                restaurantViewModel.getReservationDurationError()
+                        errorText = if (restaurantViewModel.getReservationDurationError() != -1)
+                                stringResource(
+                                    id = restaurantViewModel.getReservationDurationError(),
+                                    restaurantViewModel.maxReservationMinutes.name,
+                                    "30"
+                                )
                             else
-                                R.string.error_registerRestaurant_invalid_max_duration
-                        ),
+                                stringResource(id = R.string.error_registerRestaurant_invalid_max_duration)
+                        ,
                         formSent = formSent3,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
