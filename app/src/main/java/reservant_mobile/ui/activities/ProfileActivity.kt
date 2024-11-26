@@ -67,11 +67,13 @@ import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.UserDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
 @Composable
@@ -115,273 +117,225 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        if(!profileViewModel.isLoading){
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.jd),
-                    contentDescription = stringResource(R.string.label_profile_picture),
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-                Text(
-                    text = "${profileViewModel.simpleProfileUser?.firstName ?: ""} ${profileViewModel.simpleProfileUser?.lastName ?: ""}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = stringResource(R.string.label_rating),
-                        tint = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "5.0", color = Color.Gray)
-                }
-            }
-
-            if (!profileViewModel.isCurrentUser) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    when (profileViewModel.simpleProfileUser?.friendStatus) {
-                        FriendStatus.Friend -> {
-                            Button(
-                                onClick = { profileViewModel.removeFriend() },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                if (profileViewModel.simpleProfileUser != null) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = stringResource(R.string.label_remove_friend))
-                            }
-                        }
+                                Image(
+                                    painter = painterResource(id = R.drawable.jd),
+                                    contentDescription = stringResource(R.string.label_profile_picture),
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
 
-                        FriendStatus.OutgoingRequest -> {
-                            Button(
-                                onClick = { profileViewModel.cancelFriendRequest() },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                            ) {
-                                Text(text = stringResource(R.string.label_cancel))
-                            }
-                        }
-
-                        FriendStatus.IncomingRequest -> {
-                            Row {
-                                Button(
-                                    onClick = { profileViewModel.acceptFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                ) {
-                                    Text(text = stringResource(R.string.label_accept_request))
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(
-                                    onClick = { profileViewModel.rejectFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                ) {
-                                    Text(text = stringResource(R.string.label_cancel_request))
+                                Column {
+                                    Text(
+                                        text = "${profileViewModel.simpleProfileUser?.firstName} ${profileViewModel.simpleProfileUser?.lastName}",
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    profileViewModel.fullProfileUser?.roles?.let {
+                                        Text(
+                                            text = it.joinToString(", "),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        FriendStatus.Stranger -> {
-                            Button(
-                                onClick = { profileViewModel.sendFriendRequest() },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            HorizontalDivider()
+
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Add,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                                )
-                                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                Text(text = stringResource(R.string.label_add_friend))
+                                profileViewModel.fullProfileUser?.email?.let {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Email,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    }
+                                }
+
+                                profileViewModel.fullProfileUser?.phoneNumber?.let { phoneNumber ->
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Phone,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "${phoneNumber.code} ${phoneNumber.number}",
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    }
+                                }
+
+                                profileViewModel.simpleProfileUser?.birthDate?.let {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Cake,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    }
+                                }
+
+                                profileViewModel.fullProfileUser?.registeredAt?.let {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Event,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = formatToDateTime(it, "dd MMM yyyy HH:mm"),
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                    }
+                                }
                             }
                         }
-
-                        null -> {
-                            // Obsługa przypadku null, jeśli konieczne
-                        }
-                    }
-
-                    profileViewModel.friendRequestError?.let { error ->
-                        Text(text = error, color = MaterialTheme.colorScheme.error)
-                    }
-
-                    Button(
-                        onClick = { /* TODO: Wyślij wiadomość */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = null,
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
                     }
                 }
-            }
 
-            if (profileViewModel.isCurrentUser) {
-                FloatingTabSwitch(
-                    pages = listOf(
-                        stringResource(R.string.label_info) to { InfoTab(profileViewModel.fullProfileUser) },
-                        stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems) },
-                        stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
-                        stringResource(R.string.label_orders) to { CurrentOrdersTab() },
-                        stringResource(R.string.label_event_history) to { HistoryTab(eventPagingItems) }
-                    )
-                )
-            }
-        }
-    }
-
-}
-
-
-@Composable
-fun InfoTab(
-    profileUser: UserDTO?
-) {
-    if(profileUser != null){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(64.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        Image(
-                            painter = painterResource(id = R.drawable.jd),
-                            contentDescription = stringResource(R.string.label_profile_picture),
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column {
-                            Text(
-                                text = "${profileUser.firstName} ${profileUser.lastName}",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            profileUser.roles?.let {
-                                Text(
-                                    text = it.joinToString(", "),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-
-                    HorizontalDivider()
-
-
+                if (!profileViewModel.isCurrentUser) {
                     Column(
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-
-                        profileUser.email.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Email,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                if (it != null) {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
+                        when (profileViewModel.simpleProfileUser?.friendStatus) {
+                            FriendStatus.Friend -> {
+                                Button(
+                                    onClick = { profileViewModel.removeFriend() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                ) {
+                                    Text(text = stringResource(R.string.label_remove_friend))
                                 }
                             }
-                        }
 
-                        profileUser.phoneNumber?.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Phone,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = it.code+" "+it.number,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                            FriendStatus.OutgoingRequest -> {
+                                Button(
+                                    onClick = { profileViewModel.cancelFriendRequest() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                ) {
+                                    Text(text = stringResource(R.string.label_cancel))
+                                }
+                            }
+
+                            FriendStatus.IncomingRequest -> {
+                                Row {
+                                    Button(
+                                        onClick = { profileViewModel.acceptFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    ) {
+                                        Text(text = stringResource(R.string.label_accept_request))
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = { profileViewModel.rejectFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                    ) {
+                                        Text(text = stringResource(R.string.label_cancel_request))
+                                    }
+                                }
+                            }
+
+                            FriendStatus.Stranger -> {
+                                Button(
+                                    onClick = { profileViewModel.sendFriendRequest() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                                    )
+                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                    Text(text = stringResource(R.string.label_add_friend))
+                                }
+                            }
+
+                            null -> {
+                                // Obsługa przypadku null, jeśli konieczne
                             }
                         }
 
-                        profileUser.birthDate?.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Cake,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            }
+                        profileViewModel.friendRequestError?.let { error ->
+                            Text(text = error, color = MaterialTheme.colorScheme.error)
                         }
 
-                        profileUser.registeredAt?.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Event,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = formatToDateTime(it, "dd MMM yyyy HH:mm"),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            }
+                        Button(
+                            onClick = { /* TODO: Wyślij wiadomość */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Send,
+                                contentDescription = null,
+                                modifier = Modifier.size(ButtonDefaults.IconSize)
+                            )
                         }
                     }
                 }
+
+                if (profileViewModel.isCurrentUser) {
+                    FloatingTabSwitch(
+                        pages = listOf(
+                            stringResource(R.string.label_orders) to { CurrentOrdersTab() },
+                            stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
+                            stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
+                            stringResource(R.string.label_event_history) to { HistoryTab(eventPagingItems) }
+                        )
+                    )
+                }
+            }
+        }else{
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                CircularProgressIndicator()
             }
         }
-    }else{
-        MissingPage()
     }
-}
 
+}
 
 @Composable
 fun JoinRequestsTab() {
@@ -408,12 +362,10 @@ fun JoinRequestsTab() {
         )
     )
 
-    Spacer(modifier = Modifier.height(64.dp))
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 64.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 80.dp, start = 16.dp, end = 16.dp)
     ) {
         items(sampleEvents.size) { id ->
             val event = sampleEvents[id]
@@ -427,7 +379,6 @@ fun JoinRequestsTab() {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    // Event Name
                     Text(
                         text = event.eventName,
                         style = MaterialTheme.typography.headlineSmall,
@@ -514,7 +465,7 @@ fun CurrentOrdersTab() {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 64.dp, start = 16.dp, end = 16.dp)
+                .padding(top = 80.dp, start = 16.dp, end = 16.dp)
         ) {
             items(orders.size) { index ->
                 val order = orders[index]
@@ -541,7 +492,7 @@ fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 64.dp, start = 16.dp, end = 16.dp)
+                .padding(top = 80.dp, start = 16.dp, end = 16.dp)
         ) {
             items(eventPagingItems.itemCount) { index ->
                 val event = eventPagingItems[index]
@@ -610,93 +561,113 @@ fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
 }
 
 @Composable
-fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-    ) {
-        if (friendsPagingItems == null) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        } else {
-            item{
-                Spacer(
-                    modifier = Modifier.height(64.dp)
-                )
-            }
-            items(friendsPagingItems.itemCount) { index ->
-                val friend = friendsPagingItems[index]
-                val otherUser = friend?.otherUser
-                if (otherUser != null) {
-                    UserListItem(
-                        user = EventDTO.Participant(
-                            userId = otherUser.userId,
-                            firstName = otherUser.firstName ?: "Unknown",
-                            lastName = otherUser.lastName ?: "User"
-                        ),
-                        showButtons = false
-                    )
-                }
-            }
+fun FriendsTab(
+    friendsPagingItems: LazyPagingItems<FriendRequestDTO>?,
+    navController: NavHostController
+) {
+    if (friendsPagingItems == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
 
-            friendsPagingItems.apply {
-                when {
-                    loadState.refresh is LoadState.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+            if (friendsPagingItems.itemCount == 0) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_no_friends),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            } else {
+
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column {
+
+                            for (index in 0 until friendsPagingItems.itemCount) {
+                                val friend = friendsPagingItems[index]
+                                val otherUser = friend?.otherUser
+                                if (otherUser != null) {
+                                    Spacer(modifier = Modifier.padding(4.dp))
+                                    UserListItem(
+                                        user = EventDTO.Participant(
+                                            userId = otherUser.userId,
+                                            firstName = otherUser.firstName ?: "Unknown",
+                                            lastName = otherUser.lastName ?: "User"
+                                        ),
+                                        showButtons = false,
+                                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                                        onCardClick = {
+                                            navController.navigate(UserRoutes.UserProfile(userId = otherUser.userId))
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.padding(4.dp))
+                                    if (index < friendsPagingItems.itemCount - 1) {
+                                        HorizontalDivider(
+                                            thickness = 1.dp,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-                    loadState.append is LoadState.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+                }
+
+                friendsPagingItems.apply {
+                    when (loadState.append) {
+                        is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         }
-                    }
-                    loadState.refresh is LoadState.Error -> {
-                        item {
-                            Text(
-                                text = stringResource(R.string.error_loading_friends),
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(16.dp)
-                            )
+
+                        is LoadState.Error -> {
+                            val e = friendsPagingItems.loadState.append as LoadState.Error
+                            item {
+                                Text(
+                                    text = stringResource(R.string.error_loading_more_friends),
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
                         }
-                    }
-                    loadState.append is LoadState.Error -> {
-                        item {
-                            Text(
-                                text = stringResource(R.string.error_loading_more_friends),
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        is LoadState.NotLoading -> { /* Do nothing */ }
                     }
                 }
             }
         }
     }
 }
+
 
 // TODO: BACKEND INSTEAD OF EXAMPLES BELOW
 data class Event(
