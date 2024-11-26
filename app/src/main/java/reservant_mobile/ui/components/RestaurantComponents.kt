@@ -21,18 +21,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
-import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositionErrors
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +49,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
@@ -66,9 +61,7 @@ import reservant_mobile.data.utils.getRestaurantOpeningTime
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjuster
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
@@ -432,5 +425,96 @@ fun OpeningHours(
                 }
         )
 
+    }
+}
+
+@Composable
+fun OpeningHoursInput(
+
+){
+    repeat(7){
+
+        var isEnabled by remember {
+            mutableStateOf(true)
+        }
+
+        val mod = if (isEnabled) Modifier else Modifier.background(Color.Gray)
+
+        Row (
+            modifier = mod
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            var startTime by remember {
+                mutableStateOf("")
+            }
+
+            var endTime by remember {
+                mutableStateOf("")
+            }
+
+            Checkbox(
+                checked = !isEnabled,
+                onCheckedChange = { isEnabled = !isEnabled }
+            )
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = "Monday",
+                textDecoration = if (isEnabled) TextDecoration.None else TextDecoration.LineThrough
+            )
+
+            if (isEnabled){
+                Column(
+                    modifier = Modifier
+                        .weight(0.45f)
+                ) {
+                    MyTimePickerDialog(
+                        initialTime = "09:00",
+                        onTimeSelected = { selectedTime ->
+                            startTime = selectedTime
+                        },
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(0.45f)
+                ) {
+                    MyTimePickerDialog(
+                        initialTime = "20:00",
+                        onTimeSelected = { selectedTime ->
+                            endTime = selectedTime
+                        },
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+            } else {
+                Column(
+                    modifier = Modifier.weight(0.9f)
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp).align(Alignment.CenterHorizontally),
+                        text = "Closed",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+
+        }
+    }
+}
+
+@Preview
+@Composable
+fun Preview(){
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+    ) {
+        OpeningHoursInput()
     }
 }

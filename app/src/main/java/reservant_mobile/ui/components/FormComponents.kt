@@ -147,7 +147,8 @@ fun FormInput(
 fun MyTimePickerDialog(
     initialTime: String = "",
     onTimeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val currentTime = Calendar.getInstance()
     val initialHour = if (initialTime.isNotEmpty()) initialTime.substringBefore(":").toInt() else currentTime.get(Calendar.HOUR_OF_DAY)
@@ -168,7 +169,8 @@ fun MyTimePickerDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(54.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+            enabled = enabled
         ) {
             Text(
                 text = selectedTime,

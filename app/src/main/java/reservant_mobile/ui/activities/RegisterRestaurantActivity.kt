@@ -49,6 +49,7 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.OpeningHoursInput
 import reservant_mobile.ui.components.ProgressBar
 import reservant_mobile.ui.components.SecondaryButton
 import reservant_mobile.ui.components.ShowErrorToast
@@ -263,7 +264,6 @@ fun RegisterRestaurantActivity(
                 horizontalAlignment = Alignment.Start
             ) {
 
-                Spacer(modifier = Modifier.height(30.dp))
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
@@ -440,7 +440,7 @@ fun RegisterRestaurantActivity(
                             formSent2 = true
 
                             if (restaurantViewModel.validateSecondStep(context)) {
-                                navController.navigate(RegisterRestaurantRoutes.Description)
+                                navController.navigate(RegisterRestaurantRoutes.OpeningHours)
                             }
 
                             isLoading = false
@@ -476,6 +476,17 @@ fun RegisterRestaurantActivity(
                 }
 
                 ProgressBar(currentStep = 3, maxStep = 4)
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                OpeningHoursInput()
+
+                ButtonComponent(
+                    label = if (restaurantId == null && group == null) stringResource(R.string.label_next) else stringResource(
+                        R.string.label_edit_restaurant
+                    ),
+                    onClick = { navController.navigate(RegisterRestaurantRoutes.Description) }
+                )
 
             }
         }
