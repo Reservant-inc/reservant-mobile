@@ -126,7 +126,6 @@ interface IRestaurantService{
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
     suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?>
-    suspend fun reportCustomer(description: String, reportedUserId: String, visitId: Int ): Result<ReportDTO?>
 
 }
 
@@ -513,20 +512,6 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val res  = api.get(Restaurants.Id.Tables(
             parent = Restaurants.Id(restaurantId = restaurantId.toString()),
         ))
-        return complexResultWrapper(res)
-    }
-
-    override suspend fun reportCustomer(
-        description: String,
-        reportedUserId: String,
-        visitId: Int
-    ): Result<ReportDTO?> {
-        val dto = ReportDTO(
-            description = description,
-            reportedUserId = reportedUserId,
-            visitId = visitId
-        )
-        val res  = api.post(Reports.ReportCustomer(), dto)
         return complexResultWrapper(res)
     }
 }

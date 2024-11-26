@@ -14,6 +14,10 @@ data class DeliveryDTO (
      * Time in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
      */
     val deliveredTime: String? = null,
+    /***
+     * Time in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
+     */
+    val canceledTime: String? = null,
     val restaurantId: Int? = null,
     val userId: String? = null,
     val userFullName: String? = null,

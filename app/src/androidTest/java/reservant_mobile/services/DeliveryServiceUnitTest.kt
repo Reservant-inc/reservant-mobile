@@ -38,4 +38,14 @@ class DeliveryServiceUnitTest: ServiceTest() {
     fun add_delivery_return_not_null()= runTest{
         assertThat(ser.addDelivery(delivery).value).isNotNull()
     }
+
+    @Test
+    fun confirm_return_not_null()= runTest{
+        assertThat(ser.confirmDelivery(1).value).isNotNull()
+    }
+
+    @Test
+    fun mark_canceled_return_not_null()= runTest{
+        assertThat(ser.markDeliveryCanceled(1).value).isNotNull()
+    }
 }

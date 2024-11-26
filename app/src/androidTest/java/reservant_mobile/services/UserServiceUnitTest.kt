@@ -175,4 +175,10 @@ class UserServiceUnitTest: ServiceTest(){
         )
         assertThat(userService.updateUserSettings(settings).value).isNotNull()
     }
+
+    @Test
+    fun change_password_return_true()= runTest{
+        val res = userService.changePassword(oldPassword = "Pa${"$"}${"$"}w0rd", newPassword = "P@ssw0rd")
+        assertThat(res.value).isTrue()
+    }
 }

@@ -395,6 +395,8 @@
     <string name="label_start_date">Start date</string>
     <string name="label_event_join_until">Join until</string>
     <string name="label_event_photo">Event photo</string>
+    <string name="taken_label">Taken</string>
+    <string name="visit_soon_label">Visit soon</string>
     <string name="label_add_event">Add Event</string>
     <string name="label_event_name">Event name</string>
     <string name="label_event_description">Event description</string>

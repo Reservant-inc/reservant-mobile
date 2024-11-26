@@ -12,7 +12,7 @@ data class RestaurantEmployeeDTO(
     val lastName: String? = null,
     val registeredAt: String? = null,
     val birthDate: String? = null,
-    val phoneNumber: String? = null,
+    val phoneNumber: PhoneNumberDTO? = null,
     val employments: List<RestaurantEmployeeDTO>? = null,
     val password: String? = null,
     val roles: List<String>? = null,

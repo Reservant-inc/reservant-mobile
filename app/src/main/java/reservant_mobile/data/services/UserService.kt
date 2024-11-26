@@ -66,8 +66,7 @@ interface IUserService{
     suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?>
     suspend fun getUserSettings(): Result<UserSettingsDTO?>
     suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?>
-
-
+    suspend fun changePassword(oldPassword: String, newPassword: String): Result<Boolean>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -317,6 +316,15 @@ class UserService(): ServiceUtil(), IUserService {
     override suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?> {
         val res = api.put(User.Settings(), settings)
         return complexResultWrapper(res)
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Boolean> {
+        val obj = mapOf(
+            "oldPassword" to oldPassword,
+            "newPassword" to newPassword
+        )
+        val res = api.post(Auth.ChangePassword(), obj)
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
     }
 
 }

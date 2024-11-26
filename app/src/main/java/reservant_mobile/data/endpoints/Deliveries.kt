@@ -6,5 +6,12 @@ import io.ktor.resources.Resource
 class Deliveries {
 
     @Resource("{deliveryId}")
-    class DeliveryId(val parent: Deliveries = Deliveries(), val deliveryId: String)
+    class DeliveryId(val parent: Deliveries = Deliveries(), val deliveryId: String){
+
+        @Resource("confirm-delivered")
+        class ConfirmDelivered(val parent: DeliveryId)
+
+        @Resource("mark-canceled")
+        class MarkCanceled(val parent: DeliveryId)
+    }
 }
