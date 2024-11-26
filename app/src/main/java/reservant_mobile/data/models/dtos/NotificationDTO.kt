@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.intOrNull
@@ -119,19 +120,26 @@ data class NotificationDTO(
         },
         NotificationParticipationRequestResponse{
             override fun getTitleResource(details: Map<String, JsonElement>?): Int {
-                return R.string.title_NotificationParticipationRequestResponse
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.title_NotificationParticipationRequestResponse_accepted
+                else R.string.title_NotificationParticipationRequestResponse_declined
             }
 
             override fun getBodyResource(details: Map<String, JsonElement>?): Int {
-                TODO("Not yet implemented")
-            }
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
 
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return if (isAccepted)
+                    R.string.body_NotificationParticipationRequestResponse_accepted
+                else R.string.body_NotificationParticipationRequestResponse_declined
             }
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(
+                    details?.get("creatorName")?.jsonPrimitive?.content ?: "",
+                    details?.get("name")?.jsonPrimitive?.content ?: ""
+                )
             }
 
         },
