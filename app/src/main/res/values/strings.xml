@@ -338,6 +338,8 @@
     <string name="label_NotificationNewParticipationRequest">Someone would like to join your event</string>
     <string name="label_NotificationParticipationRequestResponse">Someone responded to your event join request</string>
     <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
+    <string name="label_NotificationNewMessage">You have a new message</string>
+    <string name="label_NotificationNewReservation">Someone made a reservation at your restaurant</string>
     <string name="label_report_category_technical">Technical</string>
     <string name="label_report_category_lost_item">Lost item</string>
     <string name="label_report_category_restaurant_employee">Restaurant employee</string>

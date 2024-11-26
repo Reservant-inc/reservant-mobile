@@ -195,6 +195,12 @@ class NotificationHandler (
                     else
                         "${details["restaurantName"]} rejected your visit on " +
                                 formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
+                this == NotificationDTO.NotificationType.NotificationNewMessage ->
+                    "${details["authorName"]}: ${details["contents"]}"
+                this == NotificationDTO.NotificationType.NotificationNewReservation ->
+                    "There's a new reservation at ${details["restaurantName"]} on " +
+                            formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy") +
+                            " for ${details["numberOfPeople"]}"
                 else -> ""
             }
         } ?: ""

@@ -44,7 +44,9 @@ data class NotificationDTO(
         NotificationFriendRequestAccepted(R.string.label_NotificationFriendRequestAccepted),
         NotificationNewParticipationRequest(R.string.label_NotificationNewParticipationRequest),
         NotificationParticipationRequestResponse(R.string.label_NotificationParticipationRequestResponse),
-        NotificationVisitApprovedDeclined(R.string.label_NotificationVisitApprovedDeclined)
+        NotificationVisitApprovedDeclined(R.string.label_NotificationVisitApprovedDeclined),
+        NotificationNewMessage(R.string.label_NotificationNewMessage),
+        NotificationNewReservation(R.string.label_NotificationNewReservation)
     }
 }
 

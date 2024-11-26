@@ -329,6 +329,8 @@
     <string name="label_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>
     <string name="label_NotificationParticipationRequestResponse">Ktoś odpowiedział na twoją prośbę dołączenia do wydarzenia</string>
     <string name="label_NotificationVisitApprovedDeclined">Restauracja odpowiedziała na twoją wizytę</string>
+    <string name="label_NotificationNewMessage">Masz nową wiadomość</string>
+    <string name="label_NotificationNewReservation">Ktoś złożył rezerwację w Twojej restauracji</string>
     <string name="label_report_category_technical">Techniczny</string>
     <string name="label_report_category_lost_item">Zgubiony przedmiot</string>
     <string name="label_report_category_restaurant_employee">Pracownik restuaracji</string>
