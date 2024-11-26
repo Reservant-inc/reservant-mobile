@@ -56,6 +56,7 @@
     <string name="error_registerRestaurant_invalid_file">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Niepoprawny czas trwania rezerwacji</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
@@ -64,6 +65,7 @@
     <string name="label_uploadFiles">Wyślij potrzebne pliki:</string>
     <string name="label_restaurant_delivery">Dostawa</string>
     <string name="label_restaurant_description">Opis</string>
+    <string name="label_restaurant_maxReservationDuration">Maksymalny czas trwania rezerwacji</string>
     <string name="label_restaurant_tables">Stoliki</string>
     <string name="label_restaurant_delivery_available">Dostępna</string>
     <string name="label_restaurant_delivery_not_available">Nie Dostępna</string>
@@ -405,4 +407,5 @@
     <string name="label_closed">Zamknięte</string>
     <string name="label_closing_soon">Wkrótce zamknięte</string>
     <string name="label_open">Otwarte</string>
+    <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
 </resources>

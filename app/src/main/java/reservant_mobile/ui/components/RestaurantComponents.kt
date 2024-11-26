@@ -434,7 +434,9 @@ fun OpeningHourDayInput(
     dayOfWeek: String,
     isOpen: Boolean,
     onOpenChange: (Boolean) -> Unit,
+    startTime: String,
     onStartTimeChange: (String) -> Unit,
+    endTime: String,
     onEndTimeChange: (String) -> Unit,
 ){
     val mod = if (isOpen) Modifier else Modifier.background(Color.Gray)
@@ -468,12 +470,12 @@ fun OpeningHourDayInput(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 MyTimePickerDialog(
-                    initialTime = "09:00",
+                    initialTime = startTime,
                     onTimeSelected = onStartTimeChange,
                     modifier = Modifier.weight(0.5f).padding(end = 4.dp)
                 )
                 MyTimePickerDialog(
-                    initialTime = "20:00",
+                    initialTime = endTime,
                     onTimeSelected = onEndTimeChange,
                     modifier = Modifier.weight(0.5f).padding(start = 4.dp)
                 )
@@ -492,61 +494,5 @@ fun OpeningHourDayInput(
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun Preview(){
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize()
-    ) {
-
-        val openingHours = mutableListOf(
-            "" to "",
-            "" to "",
-            "" to "",
-            "" to "",
-            "" to "",
-            "" to "",
-            "" to "",
-        )
-
-        openingHours.forEachIndexed { index, _ ->
-            var isOpen by remember {
-                mutableStateOf(true)
-            }
-
-            val today by remember {
-                mutableStateOf(openingHours[index])
-            }
-
-            val date by remember {
-                mutableStateOf(
-                    LocalDate.now()
-                        .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
-                        .plusDays(index.toLong())
-                )
-            }
-
-            val dayOfWeek by remember {
-                mutableStateOf(date.format(DateTimeFormatter.ofPattern("EEEE", Locale.getDefault())))
-            }
-
-            OpeningHourDayInput(
-                dayOfWeek = dayOfWeek,
-                isOpen = isOpen,
-                onOpenChange = { isOpen = !isOpen },
-                onStartTimeChange = {
-                    openingHours[index] = it to today.second
-                },
-                onEndTimeChange = {
-                    openingHours[index] = today.first to it
-                }
-            )
-        }
-
     }
 }

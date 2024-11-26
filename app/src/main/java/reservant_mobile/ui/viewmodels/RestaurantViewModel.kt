@@ -5,7 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.util.fastCbrt
 import androidx.core.net.toUri
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
@@ -21,6 +23,9 @@ import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
+import java.text.Normalizer.Form
+import java.time.LocalTime
+import kotlin.math.max
 
 class RestaurantViewModel(
     private val restaurantService: IRestaurantService = RestaurantService()
@@ -48,8 +53,8 @@ class RestaurantViewModel(
     val logo: FormField = FormField(RestaurantDTO::logo.name)
 
     //Godziny otwarcia
-    val openingHours: MutableList<Pair<String, String>> = MutableList(7){
-        "" to ""
+    val openingHours: MutableList<Pair<String?, String?>> = MutableList(7){
+        "09:00" to "18:00"
     }
 
     // Tagowanie i inne
@@ -61,6 +66,7 @@ class RestaurantViewModel(
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
     var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
+    var maxReservationMinutes = FormField(RestaurantDTO::maxReservationDurationMinutes.name)
 
     var restaurantId by mutableStateOf<Int?>(null)
 
@@ -101,21 +107,21 @@ class RestaurantViewModel(
 
         val restaurant = getRestaurantData()
 
-        val response = restaurantService.registerRestaurant(restaurant)
-        result.isError = response.isError
+        val result = restaurantService.registerRestaurant(restaurant)
 
-        restaurantId = response.value?.restaurantId
-
-        if (response.value == null){
+        if (result.isError){
+            result3.isError = true
+            result3.errors = result.errors
             return false
         }
 
+        restaurantId = result.value?.restaurantId
+
         if(newGroup.value.isNotBlank()){
-                val new = RestaurantGroupDTO(
-                    name = newGroup.value,
-                    restaurantIds = listOf(restaurantId!!)
-                )
-                result = restaurantService.addGroup(new)
+            restaurantService.addGroup(RestaurantGroupDTO(
+                name = newGroup.value,
+                restaurantIds = listOf(restaurantId!!)
+            ))
         }
 
         return true
@@ -150,7 +156,7 @@ class RestaurantViewModel(
             return false
         }
 
-        val restaurant = getRestaurantData()
+        val restaurant = getFirstStepData()
 
         result = restaurantService.validateFirstStep(restaurant)
         return result.value
@@ -255,6 +261,18 @@ class RestaurantViewModel(
         return true
     }
 
+    private fun getFirstStepData(): RestaurantDTO {
+        return RestaurantDTO(
+            restaurantId = restaurantId ?: -1,
+            name = name.value,
+            restaurantType = restaurantType.value,
+            nip = nip.value,
+            address = address.value,
+            postalIndex = postalCode.value,
+            city = city.value,
+        )
+    }
+
     private fun getRestaurantData(): RestaurantDTO {
 
         return RestaurantDTO(
@@ -279,10 +297,11 @@ class RestaurantViewModel(
             location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046),
             openingHours = openingHours.map {
                 RestaurantDTO.AvailableHours(
-                    from = it.first.ifEmpty { null },
-                    until = it.second.ifEmpty { null }
+                    from = it.first?.ifEmpty { null },
+                    until = it.second?.ifEmpty { null }
                 )
-            }
+            },
+            maxReservationDurationMinutes = maxReservationMinutes.value.toInt()
         )
     }
 
@@ -326,6 +345,8 @@ class RestaurantViewModel(
                 isPostalCodeInvalid() ||
                 isCityInvalid() ||
                 isDescriptionInvalid() ||
+                isMaxReservationDurationInvalid() ||
+                areOpeningHoursInvalid() ||
                 isBusinessPermissionInvalid(context) ||
                 isIdCardInvalid(context) ||
                 isAlcoholLicenseInvalid(context) ||
@@ -395,6 +416,12 @@ class RestaurantViewModel(
         return description.value.isBlank()
     }
 
+    fun isMaxReservationDurationInvalid(): Boolean {
+        println("[ERRORS]: ${getFieldError(result3, maxReservationMinutes.name)}")
+        return maxReservationMinutes.value.toIntOrNull() == null ||
+                getFieldError(result3, maxReservationMinutes.name) != -1
+    }
+
     fun isGroupInvalid(): Boolean {
         return selectedGroup == null && newGroup.value.isBlank()
     }
@@ -455,6 +482,27 @@ class RestaurantViewModel(
                 )) || isFileSizeInvalid(context, value)
     }
 
+    fun isOpeningHoursTimeInvalid(times: Pair<String?, String?>): Boolean {
+        if (times.first == null && times.second == null){
+            return false
+        }
+
+        val startTime = times.first?.let {
+            LocalTime.parse(it)
+        }
+        val endTime = times.second?.let {
+            LocalTime.parse(it)
+        }
+
+        return startTime == null || endTime == null || startTime >= endTime
+    }
+
+    fun areOpeningHoursInvalid(): Boolean {
+        return openingHours.any {
+            isOpeningHoursTimeInvalid(it)
+        }
+    }
+
     fun areTagsInvalid(): Boolean {
         return selectedTags.isEmpty()
     }
@@ -509,6 +557,10 @@ class RestaurantViewModel(
 
     fun getDescriptionError(): Int {
         return getFieldError(result3, description.name)
+    }
+
+    fun getReservationDurationError(): Int {
+        return getFieldError(result3, maxReservationMinutes.name)
     }
 
     fun getToastError1(): Int {

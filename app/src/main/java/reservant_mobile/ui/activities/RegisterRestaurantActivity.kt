@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +50,7 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.OpeningHourDayInput
 import reservant_mobile.ui.components.ProgressBar
 import reservant_mobile.ui.components.SecondaryButton
 import reservant_mobile.ui.components.ShowErrorToast
@@ -57,6 +59,11 @@ import reservant_mobile.ui.components.TagSelectionScreen
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -453,7 +460,7 @@ fun RegisterRestaurantActivity(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 8.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
@@ -478,12 +485,77 @@ fun RegisterRestaurantActivity(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
+                restaurantViewModel.openingHours.forEachIndexed { index, pair ->
+                    var isOpen by remember {
+                        mutableStateOf(true)
+                    }
+
+                    val today by remember {
+                        mutableStateOf(restaurantViewModel.openingHours[index])
+                    }
+
+                    val dayOfWeek by remember {
+                        mutableStateOf(LocalDate.now()
+                            .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+                            .plusDays(index.toLong())
+                            .format(DateTimeFormatter
+                                .ofPattern("EEEE", Locale.getDefault()))
+                        )
+                    }
+
+                    var isOpeningTimeInvalid by remember {
+                        mutableStateOf(restaurantViewModel.isOpeningHoursTimeInvalid(pair))
+                    }
+
+                    OpeningHourDayInput(
+                        dayOfWeek = dayOfWeek,
+                        isOpen = isOpen,
+                        onOpenChange = {
+                            isOpen = !isOpen
+
+                            restaurantViewModel.openingHours[index] = if (isOpen)
+                                "09:00" to "18:00"
+                            else
+                                null to null
+
+                            isOpeningTimeInvalid = restaurantViewModel.isOpeningHoursTimeInvalid(
+                                restaurantViewModel.openingHours[index]
+                            )
+                        },
+                        startTime = pair.first ?: "09:00",
+                        onStartTimeChange = {
+                            restaurantViewModel.openingHours[index] = it to today.second
+                            isOpeningTimeInvalid = restaurantViewModel.isOpeningHoursTimeInvalid(
+                                restaurantViewModel.openingHours[index]
+                            )
+                        },
+                        endTime = pair.second ?: "18:00",
+                        onEndTimeChange = {
+                            restaurantViewModel.openingHours[index] = today.first to it
+                            isOpeningTimeInvalid = restaurantViewModel.isOpeningHoursTimeInvalid(
+                                restaurantViewModel.openingHours[index]
+                            )
+                        }
+                    )
+
+                    if (isOpen && isOpeningTimeInvalid){
+                        Text(
+                            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                            text = stringResource(id = R.string.error_openTimeBeforeCloseTime),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
 
                 ButtonComponent(
                     label = if (restaurantId == null && group == null) stringResource(R.string.label_next) else stringResource(
                         R.string.label_edit_restaurant
                     ),
-                    onClick = { navController.navigate(RegisterRestaurantRoutes.Description) }
+                    onClick = {
+                        if (!restaurantViewModel.areOpeningHoursInvalid()){
+                            navController.navigate(RegisterRestaurantRoutes.Description)
+                        }
+                    }
                 )
 
             }
@@ -585,6 +657,24 @@ fun RegisterRestaurantActivity(
                 }
 
                 Column {
+                    FormInput(
+                        inputText = restaurantViewModel.maxReservationMinutes.value,
+                        onValueChange = { restaurantViewModel.maxReservationMinutes.value = it },
+                        label = stringResource(id = R.string.label_restaurant_maxReservationDuration),
+                        isError = restaurantViewModel.isMaxReservationDurationInvalid(),
+                        errorText = stringResource(
+                            if (restaurantViewModel.getReservationDurationError() != -1)
+                                restaurantViewModel.getReservationDurationError()
+                            else
+                                R.string.error_registerRestaurant_invalid_max_duration
+                        ),
+                        formSent = formSent3,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Number
+                        )
+                    )
+
                     FormInput(
                         inputText = restaurantViewModel.description.value,
                         onValueChange = { restaurantViewModel.description.value = it },
