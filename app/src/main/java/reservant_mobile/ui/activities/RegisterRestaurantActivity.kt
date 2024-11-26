@@ -49,7 +49,6 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.components.OpeningHoursInput
 import reservant_mobile.ui.components.ProgressBar
 import reservant_mobile.ui.components.SecondaryButton
 import reservant_mobile.ui.components.ShowErrorToast
@@ -479,7 +478,6 @@ fun RegisterRestaurantActivity(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                OpeningHoursInput()
 
                 ButtonComponent(
                     label = if (restaurantId == null && group == null) stringResource(R.string.label_next) else stringResource(

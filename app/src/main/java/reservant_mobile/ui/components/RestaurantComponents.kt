@@ -1,6 +1,7 @@
 package reservant_mobile.ui.components
 
 import android.graphics.Bitmap
+import androidx.annotation.FloatRange
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -429,80 +430,67 @@ fun OpeningHours(
 }
 
 @Composable
-fun OpeningHoursInput(
-
+fun OpeningHourDayInput(
+    dayOfWeek: String,
+    isOpen: Boolean,
+    onOpenChange: (Boolean) -> Unit,
+    onStartTimeChange: (String) -> Unit,
+    onEndTimeChange: (String) -> Unit,
 ){
-    repeat(7){
+    val mod = if (isOpen) Modifier else Modifier.background(Color.Gray)
 
-        var isEnabled by remember {
-            mutableStateOf(true)
-        }
-
-        val mod = if (isEnabled) Modifier else Modifier.background(Color.Gray)
-
-        Row (
-            modifier = mod
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    Row (
+        modifier = mod
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .align(Alignment.CenterVertically)
         ){
-
-            var startTime by remember {
-                mutableStateOf("")
-            }
-
-            var endTime by remember {
-                mutableStateOf("")
-            }
-
             Checkbox(
-                checked = !isEnabled,
-                onCheckedChange = { isEnabled = !isEnabled }
+                modifier = Modifier.align(Alignment.CenterVertically),
+                checked = !isOpen,
+                onCheckedChange = onOpenChange
             )
             Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Monday",
-                textDecoration = if (isEnabled) TextDecoration.None else TextDecoration.LineThrough
+                modifier = Modifier.align(Alignment.CenterVertically),
+                text = dayOfWeek,
+                textDecoration = if (isOpen) TextDecoration.None else TextDecoration.LineThrough
             )
+        }
 
-            if (isEnabled){
-                Column(
-                    modifier = Modifier
-                        .weight(0.45f)
-                ) {
-                    MyTimePickerDialog(
-                        initialTime = "09:00",
-                        onTimeSelected = { selectedTime ->
-                            startTime = selectedTime
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(0.45f)
-                ) {
-                    MyTimePickerDialog(
-                        initialTime = "20:00",
-                        onTimeSelected = { selectedTime ->
-                            endTime = selectedTime
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
-            } else {
-                Column(
-                    modifier = Modifier.weight(0.9f)
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 8.dp).align(Alignment.CenterHorizontally),
-                        text = "Closed",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+
+        if (isOpen) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                MyTimePickerDialog(
+                    initialTime = "09:00",
+                    onTimeSelected = onStartTimeChange,
+                    modifier = Modifier.weight(0.5f)
+                )
+                MyTimePickerDialog(
+                    initialTime = "20:00",
+                    onTimeSelected = onEndTimeChange,
+                    modifier = Modifier.weight(0.5f)
+                )
             }
 
-
+        } else {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = "Closed",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -515,6 +503,50 @@ fun Preview(){
             .padding(8.dp)
             .fillMaxSize()
     ) {
-        OpeningHoursInput()
+
+        val openingHours = mutableListOf(
+            "" to "",
+            "" to "",
+            "" to "",
+            "" to "",
+            "" to "",
+            "" to "",
+            "" to "",
+        )
+
+        openingHours.forEachIndexed { index, _ ->
+            var isOpen by remember {
+                mutableStateOf(true)
+            }
+
+            val today by remember {
+                mutableStateOf(openingHours[index])
+            }
+
+            val date by remember {
+                mutableStateOf(
+                    LocalDate.now()
+                        .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+                        .plusDays(index.toLong())
+                )
+            }
+
+            val dayOfWeek by remember {
+                mutableStateOf(date.format(DateTimeFormatter.ofPattern("EEEE", Locale.getDefault())))
+            }
+
+            OpeningHourDayInput(
+                dayOfWeek = dayOfWeek,
+                isOpen = isOpen,
+                onOpenChange = { isOpen = !isOpen },
+                onStartTimeChange = {
+                    openingHours[index] = it to today.second
+                },
+                onEndTimeChange = {
+                    openingHours[index] = today.first to it
+                }
+            )
+        }
+
     }
 }
