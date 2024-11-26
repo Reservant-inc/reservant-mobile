@@ -424,4 +424,8 @@
     <string name="label_closing_soon">Wkrótce zamknięte</string>
     <string name="label_open">Otwarte</string>
     <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
+    <string name="label_join_requests">Prośby</string>
+    <string name="label_event_history">Wydarzenia</string>
+    <string name="error_loading_friends">Błąd podczas wczytywania znajomych</string>
+    <string name="error_loading_more_friends">Błąd podczas wczytywania reszty znajomych</string>
 </resources>

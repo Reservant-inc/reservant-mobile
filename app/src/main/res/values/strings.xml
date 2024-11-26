@@ -435,4 +435,9 @@
     <string name="label_closing_soon">Closing soon</string>
     <string name="label_open">Open</string>
     <string name="error_openTimeBeforeCloseTime">Opening time must be before closing time</string>
+    <string name="label_info" translatable="false">Info</string>
+    <string name="label_join_requests">Requests</string>
+    <string name="label_event_history">Events</string>
+    <string name="error_loading_friends">Error while loading friends</string>
+    <string name="error_loading_more_friends">Error while loading more friends</string>
 </resources>
