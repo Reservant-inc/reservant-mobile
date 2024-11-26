@@ -9,6 +9,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
+import reservant_mobile.data.utils.formatToDateTime
 
 @Serializable()
 data class NotificationDTO(
@@ -133,15 +134,22 @@ data class NotificationDTO(
 
         },
         NotificationNewReservation(
-            R.string.label_NotificationNewReservation,
-            0
+            R.string.title_NotificationNewReservation,
+            R.string.body_NotificationNewReservation
         ){
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
-            }
-
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                val date = formatToDateTime(
+                    details?.get("numberOfPeople")?.jsonPrimitive?.content ?: "",
+                    "dd-MM-yyyy"
+                )
+
+                val numOfPeople = details?.get("numberOfPeople")?.jsonPrimitive?.intOrNull ?: 0
+
+                return arrayOf(
+                    details?.get("restaurantName")?.jsonPrimitive?.content ?: "",
+                    date,
+                    numOfPeople,
+                )
             }
 
         };

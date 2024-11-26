@@ -345,7 +345,8 @@
     <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
     <string name="title_NotificationNewMessage">You have a new message</string>
     <string name="body_NotificationNewMessage" translatable="false">%1s: %2s</string>
-    <string name="label_NotificationNewReservation">Someone made a reservation at your restaurant</string>
+    <string name="title_NotificationNewReservation">Someone made a reservation at your restaurant</string>
+    <string name="body_NotificationNewReservation">Someone made a reservation at %1s on %2s for %3d</string>
     <string name="label_report_category_technical">Technical</string>
     <string name="label_report_category_lost_item">Lost item</string>
     <string name="label_report_category_restaurant_employee">Restaurant employee</string>
