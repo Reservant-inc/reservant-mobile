@@ -103,6 +103,7 @@ import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import java.time.LocalDate
+import kotlin.math.round
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -686,18 +687,21 @@ fun RestaurantDetailPreview(
                                         )
                                     }
 
-
-                                    Text(
-                                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(horizontal = 16.dp)
-                                    )
+                                    if(restaurant.provideDelivery){
+                                        Text(
+                                            text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(horizontal = 16.dp)
+                                        )
+                                    }
                                 }
-
-                                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    RatingBar(rating = 3.9f)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("3.9 (200+ opinii)")
+                                if(restaurant.rating != null){
+                                    val rating = restaurant.rating.toFloat()
+                                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                        RatingBar(rating = rating)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("${String.format("%.1f", rating)} (${restaurant.numberReviews} opinii)")
+                                    }
                                 }
                             }
 
