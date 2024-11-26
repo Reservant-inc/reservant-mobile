@@ -341,9 +341,10 @@
     <string name="body_NotificationFriendRequestAccepted">%1s has accepted your friend request</string>
     <string name="title_NotificationNewParticipationRequest">Someone would like to join your event</string>
     <string name="body_NotificationNewParticipationRequest">%1s wants to join your event - %2s</string>
-    <string name="label_NotificationParticipationRequestResponse">Someone responded to your event join request</string>
+    <string name="title_NotificationParticipationRequestResponse">Someone responded to your event join request</string>
     <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
-    <string name="label_NotificationNewMessage">You have a new message</string>
+    <string name="title_NotificationNewMessage">You have a new message</string>
+    <string name="body_NotificationNewMessage" translatable="false">%1s: %2s</string>
     <string name="label_NotificationNewReservation">Someone made a reservation at your restaurant</string>
     <string name="label_report_category_technical">Technical</string>
     <string name="label_report_category_lost_item">Lost item</string>
