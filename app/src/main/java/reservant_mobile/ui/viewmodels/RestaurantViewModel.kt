@@ -1,6 +1,7 @@
 package reservant_mobile.ui.viewmodels
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,6 +46,11 @@ class RestaurantViewModel(
     val businessPermission: FormField = FormField(RestaurantDTO::businessPermission.name)
     val idCard: FormField = FormField(RestaurantDTO::idCard.name)
     val logo: FormField = FormField(RestaurantDTO::logo.name)
+
+    //Godziny otwarcia
+    val openingHours: MutableList<Pair<String, String>> = MutableList(7){
+        "" to ""
+    }
 
     // Tagowanie i inne
     var tags = listOf(String())
@@ -270,7 +276,13 @@ class RestaurantViewModel(
             groupId = selectedGroup?.restaurantGroupId,
             photos = emptyList(),
             tables = emptyList(),
-            location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046)
+            location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046),
+            openingHours = openingHours.map {
+                RestaurantDTO.AvailableHours(
+                    from = it.first.ifEmpty { null },
+                    until = it.second.ifEmpty { null }
+                )
+            }
         )
     }
 
