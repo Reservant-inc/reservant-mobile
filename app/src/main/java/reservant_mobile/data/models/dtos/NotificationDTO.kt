@@ -73,10 +73,12 @@ data class NotificationDTO(
         },
         NotificationFriendRequestAccepted(
             R.string.title_NotificationFriendRequestAccepted,
-            0
+            R.string.body_NotificationFriendRequestAccepted
         ){
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(
+                    details?.get("acceptingUserFullName")?.jsonPrimitive?.content ?: ""
+                )
             }
 
         },
