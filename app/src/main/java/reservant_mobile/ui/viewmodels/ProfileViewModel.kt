@@ -45,6 +45,7 @@ class ProfileViewModel(
                 isCurrentUser = true
             }
             fetchFriends()
+            fetchUserEvents()
         }
     }
     
