@@ -27,23 +27,30 @@ data class NotificationDTO(
     val details: Map<String, JsonElement>? = null
 ){
     @Serializable
-    enum class NotificationType(
-        val titleResourceId: Int,
-        val bodyResourceId: Int
-    ) {
-        NotificationRestaurantVerified(
-            R.string.title_NotificationRestaurantVerified,
-            R.string.body_NotificationRestaurantVerified
-        ){
+    enum class NotificationType {
+        NotificationRestaurantVerified{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationRestaurantVerified
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationRestaurantVerified
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
             }
 
         },
-        NotificationNewRestaurantReview(
-            R.string.title_NotificationNewRestaurantReview,
-            R.string.body_NotificationNewRestaurantReview
-        ){
+        NotificationNewRestaurantReview{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewRestaurantReview
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewRestaurantReview
+            }
+
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
             }
@@ -61,10 +68,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationNewFriendRequest(
-            R.string.title_NotificationNewFriendRequest,
-            R.string.body_NotificationNewFriendRequest
-        ){
+        NotificationNewFriendRequest{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewFriendRequest
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewFriendRequest
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(
                     details?.get("senderName")?.jsonPrimitive?.content ?: ""
@@ -72,10 +84,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationFriendRequestAccepted(
-            R.string.title_NotificationFriendRequestAccepted,
-            R.string.body_NotificationFriendRequestAccepted
-        ){
+        NotificationFriendRequestAccepted{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationFriendRequestAccepted
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationFriendRequestAccepted
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(
                     details?.get("acceptingUserFullName")?.jsonPrimitive?.content ?: ""
@@ -83,10 +100,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationNewParticipationRequest(
-            R.string.title_NotificationNewParticipationRequest,
-            R.string.body_NotificationNewParticipationRequest
-        ){
+        NotificationNewParticipationRequest{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewParticipationRequest
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewParticipationRequest
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(
                     details?.get("senderName")?.jsonPrimitive?.content ?: "",
@@ -95,10 +117,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationParticipationRequestResponse(
-            R.string.title_NotificationParticipationRequestResponse,
-            0
-        ){
+        NotificationParticipationRequestResponse{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationParticipationRequestResponse
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                TODO("Not yet implemented")
+            }
+
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
@@ -108,10 +135,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationVisitApprovedDeclined(
-            R.string.label_NotificationVisitApprovedDeclined,
-            0
-        ){
+        NotificationVisitApprovedDeclined{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.label_NotificationVisitApprovedDeclined
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                TODO("Not yet implemented")
+            }
+
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
@@ -121,10 +153,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationNewMessage(
-            R.string.title_NotificationNewMessage,
-            R.string.body_NotificationNewMessage
-        ){
+        NotificationNewMessage{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewMessage
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewMessage
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(
                     details?.get("authorName")?.jsonPrimitive?.content ?: "",
@@ -133,10 +170,15 @@ data class NotificationDTO(
             }
 
         },
-        NotificationNewReservation(
-            R.string.title_NotificationNewReservation,
-            R.string.body_NotificationNewReservation
-        ){
+        NotificationNewReservation{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewReservation
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewReservation
+            }
+
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 val date = formatToDateTime(
                     details?.get("numberOfPeople")?.jsonPrimitive?.content ?: "",
@@ -153,6 +195,9 @@ data class NotificationDTO(
             }
 
         };
+
+        abstract fun getTitleResource(details: Map<String, JsonElement>?): Int
+        abstract fun getBodyResource(details: Map<String, JsonElement>?): Int
 
         open fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
         open fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
