@@ -246,7 +246,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val res = api.post(
             MyRestaurants.Id.Employees(
             parent = MyRestaurants.Id(restaurantId = id.toString())
-        ), listOf(emp))
+        ), emp)
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 

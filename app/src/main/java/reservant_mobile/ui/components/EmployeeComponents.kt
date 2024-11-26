@@ -42,6 +42,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import reservant_mobile.data.utils.getCountryDetailsByCode
 import reservant_mobile.ui.viewmodels.EmployeeViewModel
 
 @Composable
@@ -218,6 +219,16 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                     onValueChange = { vm.phoneNum.value = it },
                     label = stringResource(id = R.string.label_phone),
                     optional = false,
+                    leadingIcon = {
+                        CountryPickerView(
+                            countries = vm.countriesList,
+                            selectedCountry = getCountryDetailsByCode(vm.mobileCountry.value)!!,
+                            onSelection = { selectedCountry ->
+                                vm.mobileCountry.value = selectedCountry.code
+                            },
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
                     isError = vm.isPhoneInvalid(),
                     errorText = stringResource(
                         if (vm.getPhoneError() != -1)
@@ -318,7 +329,8 @@ fun EditEmployeeDialog(
     vm.firstName.value = employee.firstName.toString()
     vm.lastName.value = employee.lastName.toString()
     vm.birthday.value = employee.birthDate.toString()
-    vm.phoneNum.value = employee.phoneNumber.toString()
+    vm.phoneNum.value = employee.phoneNumber!!.number
+    vm.mobileCountry.value = employee.phoneNumber.code.replace("+", "")
     vm.isHallEmployee = employee.isHallEmployee
     vm.isBackdoorEmployee = employee.isBackdoorEmployee
 
@@ -362,10 +374,21 @@ fun EditEmployeeDialog(
                     startStringValue = vm.birthday.value,
                     onDateChange = { birthday -> vm.birthday.value = birthday }
                 )
+
                 FormInput(
                     inputText = vm.phoneNum.value,
                     onValueChange = { vm.phoneNum.value = it },
                     label = stringResource(id = R.string.label_phone),
+                    leadingIcon = {
+                        CountryPickerView(
+                            countries = vm.countriesList,
+                            selectedCountry = getCountryDetailsByCode(vm.mobileCountry.value)!!,
+                            onSelection = { selectedCountry ->
+                                vm.mobileCountry.value = selectedCountry.code
+                            },
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
                     optional = false,
                     isError = vm.isPhoneInvalid(),
                     errorText = stringResource(

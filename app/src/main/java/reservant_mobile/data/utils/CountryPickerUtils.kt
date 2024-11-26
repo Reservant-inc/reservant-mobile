@@ -32,3 +32,10 @@ fun getCountriesList(): List<Country> {
 
     return countries.sortedBy { it.fullName }
 }
+
+fun getCountryDetailsByCode(code: String): Country? {
+    val countries = getCountriesList()
+    if(code == "1")
+        return Country("us", "1", "United States")
+    return countries.find { it.code == code }
+}
