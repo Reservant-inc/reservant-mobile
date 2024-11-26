@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -170,65 +171,131 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 @Composable
 fun InfoTab() {
     val profileUser = UserService.UserObject
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-
         Spacer(modifier = Modifier.height(64.dp))
-        // First Name
-        Text(
-            text = "${stringResource(R.string.name)}: ${profileUser.firstName}",
-            style = MaterialTheme.typography.bodyLarge
-        )
 
-        // Last Name
-        Text(
-            text = "${stringResource(R.string.label_lastname)}: ${profileUser.lastName}",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        // Profile Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Profile Picture and Name
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Profile Picture
+                    Image(
+                        painter = painterResource(id = R.drawable.jd), // Replace with actual image
+                        contentDescription = stringResource(R.string.label_profile_picture),
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    // Name and Roles
+                    Column {
+                        Text(
+                            text = "${profileUser.firstName} ${profileUser.lastName}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        profileUser.roles?.let {
+                            Text(
+                                text = it.joinToString(", "),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
 
-        // Email
-//        profileUser.email?.let {
-//            Text(
-//                text = "${stringResource(R.string.label_email)}: $it",
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
-//
-//        // Phone Number
-//        profileUser.phoneNumber?.let {
-//            Text(
-//                text = "${stringResource(R.string.label_phone)}: $it",
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
-//
-//        // Birth Date
-//        profileUser.birthDate?.let {
-//            Text(
-//                text = "${stringResource(R.string.label_birthday)}: ${formatToDateTime(it, "dd MMM yyyy")}",
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
-//
-//        // Registered At
-//        profileUser.registeredAt?.let {
-//            Text(
-//                text = "${stringResource(R.string.label_registered_at)}: ${formatToDateTime(it, "dd MMM yyyy HH:mm")}",
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//        }
+                HorizontalDivider()
 
-        // Roles
-        Text(
-            text = "${stringResource(R.string.label_roles)}: ${profileUser.roles.joinToString(", ")}",
-            style = MaterialTheme.typography.bodyLarge
-        )
+//                // Contact Information
+//                Column(
+//                    verticalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    // Email
+//                    profileUser.email?.let {
+//                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                            Icon(
+//                                imageVector = Icons.Default.Email,
+//                                contentDescription = null,
+//                                tint = MaterialTheme.colorScheme.primary
+//                            )
+//                            Spacer(modifier = Modifier.width(8.dp))
+//                            Text(
+//                                text = it,
+//                                style = MaterialTheme.typography.bodyLarge
+//                            )
+//                        }
+//                    }
+//
+//                    // Phone Number
+//                    profileUser.phoneNumber?.let {
+//                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                            Icon(
+//                                imageVector = Icons.Default.Phone,
+//                                contentDescription = null,
+//                                tint = MaterialTheme.colorScheme.primary
+//                            )
+//                            Spacer(modifier = Modifier.width(8.dp))
+//                            Text(
+//                                text = it,
+//                                style = MaterialTheme.typography.bodyLarge
+//                            )
+//                        }
+//                    }
+//
+//                    // Birth Date
+//                    profileUser.birthDate?.let {
+//                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                            Icon(
+//                                imageVector = Icons.Default.Cake,
+//                                contentDescription = null,
+//                                tint = MaterialTheme.colorScheme.primary
+//                            )
+//                            Spacer(modifier = Modifier.width(8.dp))
+//                            Text(
+//                                text = formatToDateTime(it, "dd MMM yyyy"),
+//                                style = MaterialTheme.typography.bodyLarge
+//                            )
+//                        }
+//                    }
+//
+//                    // Registered At
+//                    profileUser.registeredAt?.let {
+//                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                            Icon(
+//                                imageVector = Icons.Default.Event,
+//                                contentDescription = null,
+//                                tint = MaterialTheme.colorScheme.primary
+//                            )
+//                            Spacer(modifier = Modifier.width(8.dp))
+//                            Text(
+//                                text = formatToDateTime(it, "dd MMM yyyy HH:mm"),
+//                                style = MaterialTheme.typography.bodyLarge
+//                            )
+//                        }
+//                    }
+//                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun JoinRequestsTab() {
@@ -255,54 +322,71 @@ fun JoinRequestsTab() {
         )
     )
 
+    Spacer(modifier = Modifier.height(64.dp))
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 70.dp)
+            .padding(horizontal = 16.dp)
     ) {
-
         items(sampleEvents.size) { id ->
             val event = sampleEvents[id]
-            Text(
-                text = event.eventName,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            if (event.joinRequests.isNotEmpty()) {
-                event.joinRequests.forEach { participant ->
-                    UserListItem(
-                        user = participant,
-                        showButtons = true,
-                        onApproveClick = {
-                            Toast.makeText(
-                                context,
-                                "${participant.firstName} approved for ${event.eventName}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        onRejectClick = {
-                            Toast.makeText(
-                                context,
-                                "${participant.firstName} rejected from ${event.eventName}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                elevation = CardDefaults.cardElevation(4.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    // Event Name
+                    Text(
+                        text = event.eventName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
                     )
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.label_no_join_requests),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Divider()
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    if (event.joinRequests.isNotEmpty()) {
+                        event.joinRequests.forEach { participant ->
+                            UserListItem(
+                                user = participant,
+                                showButtons = true,
+                                onApproveClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "${participant.firstName} approved for ${event.eventName}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onRejectClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "${participant.firstName} rejected from ${event.eventName}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    } else {
+                        Text(
+                            text = stringResource(R.string.label_no_join_requests),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
 
 @Composable
 fun CurrentOrdersTab() {
@@ -371,19 +455,15 @@ fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(top = 64.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(64.dp))
-            }
-
             items(eventPagingItems.itemCount) { index ->
                 val event = eventPagingItems[index]
                 if (event != null) {
                     EventCard(
-                        eventName = event.name ?: "No event name",
+                        eventName = event.name ?: "",
                         eventDate = event.time,
-                        eventLocation = event.restaurant?.name ?: "Nowhere",
+                        eventLocation = event.restaurant?.name ?: "",
                         interestedCount = event.numberInterested ?: 0,
                         takePartCount = event.numberParticipants ?: 0,
                         onClick = {}
@@ -558,42 +638,70 @@ fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Restaurant Name
-            Text(
-                text = order.restaurantName,
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+            // Restaurant Info
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Restaurant Image/Icon
+                Image(
+                    painter = painterResource(id = R.drawable.restaurant_photo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(8.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                // Restaurant Name and Date
+                Column {
+                    Text(
+                        text = order.restaurantName,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${stringResource(R.string.label_order_date)}: ${formatToDateTime(order.orderDate)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+            }
 
-            // Order Date
-            Text(
-                text = "${stringResource(R.string.label_order_date)}: ${formatToDateTime(order.orderDate)}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
             // Order Items
-            Text(
-                text = stringResource(R.string.order_details),
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-            )
-            order.items.forEach { item ->
-                Text(
-                    text = "${item.name} x${item.quantity}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                order.items.forEach { item ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "x${item.quantity}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Confirm Arrival Button or Confirmation Text
             if (!order.isConfirmed) {
                 Button(
                     onClick = { onConfirmArrival() },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = stringResource(R.string.label_confirm_arrival))
                 }
@@ -601,7 +709,7 @@ fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
                 Text(
                     text = stringResource(R.string.label_arrival_confirmed),
                     color = Color.Green,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    modifier = Modifier.align(Alignment.End),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
