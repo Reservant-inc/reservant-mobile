@@ -113,8 +113,6 @@ fun RegisterRestaurantActivity(
                 horizontalAlignment = Alignment.Start
             ) {
 
-                Spacer(modifier = Modifier.padding(top = 8.dp))
-
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
@@ -460,7 +458,7 @@ fun RegisterRestaurantActivity(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
@@ -487,7 +485,7 @@ fun RegisterRestaurantActivity(
 
                 restaurantViewModel.openingHours.forEachIndexed { index, pair ->
                     var isOpen by remember {
-                        mutableStateOf(true)
+                        mutableStateOf(pair.first != null && pair.second != null)
                     }
 
                     val today by remember {
@@ -566,7 +564,7 @@ fun RegisterRestaurantActivity(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

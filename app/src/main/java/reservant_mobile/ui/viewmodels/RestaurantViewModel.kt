@@ -50,7 +50,7 @@ class RestaurantViewModel(
     val logo: FormField = FormField(RestaurantDTO::logo.name)
 
     //Godziny otwarcia
-    val openingHours: MutableList<Pair<String?, String?>> = MutableList(7){
+    var openingHours: MutableList<Pair<String?, String?>> = MutableList(7){
         "09:00" to "18:00"
     }
 
@@ -93,6 +93,15 @@ class RestaurantViewModel(
             delivery = restaurant.value.provideDelivery
             selectedTags = restaurant.value.tags
             selectedGroup = group
+            restaurant.value.maxReservationDurationMinutes?.let {
+                maxReservationMinutes.value = it.toString()
+            }
+            openingHours = restaurant.value.openingHours?.map {
+                it.from to it.until
+            }?.toMutableList() ?: MutableList(7){
+                "09:00" to "18:00"
+            }
+
         }
     }
 
