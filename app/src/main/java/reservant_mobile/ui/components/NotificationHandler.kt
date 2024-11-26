@@ -15,12 +15,15 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonPrimitive
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.NotificationDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.NotificationService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.formatToDateTime
 import kotlin.random.Random
 
 class NotificationHandler (
@@ -172,6 +175,26 @@ class NotificationHandler (
             when {
                 this == NotificationDTO.NotificationType.NotificationRestaurantVerified ->
                     "${details["restaurantName"]} has been verified"
+                this == NotificationDTO.NotificationType.NotificationNewRestaurantReview ->
+                    "${details["authorName"]} has reviewed your restaurant - ${details["restaurantName"]}"
+                this == NotificationDTO.NotificationType.NotificationNewFriendRequest ->
+                    "${details["senderName"]} sent you a friend request"
+                this == NotificationDTO.NotificationType.NotificationFriendRequestAccepted ->
+                    "${details["acceptingUserFullName"]} accepted your friend request"
+                this == NotificationDTO.NotificationType.NotificationNewParticipationRequest ->
+                    "${details["senderName"]} wants to join your event - ${details["eventName"]}"
+                this == NotificationDTO.NotificationType.NotificationParticipationRequestResponse ->
+                    if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
+                        "${details["creatorName"]} accepted you to an event - ${details["name"]}"
+                    else
+                        "${details["creatorName"]} rejected you from an event - ${details["name"]}"
+                this == NotificationDTO.NotificationType.NotificationVisitApprovedDeclined ->
+                    if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
+                        "${details["restaurantName"]} accepted your visit on " +
+                                formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
+                    else
+                        "${details["restaurantName"]} rejected your visit on " +
+                                formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
                 else -> ""
             }
         } ?: ""
