@@ -43,9 +43,8 @@ class ProfileViewModel(
             loadUser(userId = profileUserId)
             if (UserObject.userId == profileUserId) {
                 isCurrentUser = true
-            } else {
-                fetchFriends()
             }
+            fetchFriends()
         }
     }
     
