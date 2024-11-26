@@ -65,15 +65,17 @@ data class NotificationDTO(
 
         },
         NotificationNewFriendRequest(
-            R.string.label_NotificationNewFriendRequest,
-            0
+            R.string.title_NotificationNewFriendRequest,
+            R.string.body_NotificationNewFriendRequest
         ){
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf()
             }
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return arrayOf(
+                    details?.get("senderName")?.jsonPrimitive?.content ?: ""
+                )
             }
 
         },
