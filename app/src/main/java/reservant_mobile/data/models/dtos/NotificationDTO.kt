@@ -145,19 +145,31 @@ data class NotificationDTO(
         },
         NotificationVisitApprovedDeclined{
             override fun getTitleResource(details: Map<String, JsonElement>?): Int {
-                return R.string.label_NotificationVisitApprovedDeclined
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.title_NotificationVisitApprovedDeclined_accepted
+                else R.string.title_NotificationVisitApprovedDeclined_declined
             }
 
             override fun getBodyResource(details: Map<String, JsonElement>?): Int {
-                TODO("Not yet implemented")
-            }
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
 
-            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                return if (isAccepted)
+                    R.string.body_NotificationVisitApprovedDeclined_accepted
+                else R.string.body_NotificationVisitApprovedDeclined_declined
             }
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
-                TODO("Not yet implemented")
+                val date = formatToDateTime(
+                    details?.get("date")?.jsonPrimitive?.content ?: "",
+                    "dd-MM-yyyy"
+                )
+
+                return arrayOf(
+                    details?.get("restaurantName")?.jsonPrimitive?.content ?: "",
+                    date
+                )
             }
 
         },
@@ -189,7 +201,7 @@ data class NotificationDTO(
 
             override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 val date = formatToDateTime(
-                    details?.get("numberOfPeople")?.jsonPrimitive?.content ?: "",
+                    details?.get("date")?.jsonPrimitive?.content ?: "",
                     "dd-MM-yyyy"
                 )
 

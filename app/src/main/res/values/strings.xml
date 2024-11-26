@@ -345,7 +345,10 @@
     <string name="title_NotificationParticipationRequestResponse_declined">Your join request has been declined</string>
     <string name="body_NotificationParticipationRequestResponse_accepted">%1s accepted your join request to an event - %2s</string>
     <string name="body_NotificationParticipationRequestResponse_declined">%1s declined your join request to an event - %2s</string>
-    <string name="label_NotificationVisitApprovedDeclined">Restaurant responded to your visit</string>
+    <string name="title_NotificationVisitApprovedDeclined_accepted">Restaurant accepted to your visit</string>
+    <string name="title_NotificationVisitApprovedDeclined_declined">Restaurant declined to your visit</string>
+    <string name="body_NotificationVisitApprovedDeclined_accepted">%1s accepted your visit for %2s</string>
+    <string name="body_NotificationVisitApprovedDeclined_declined">%1s declined your visit for %2s</string>
     <string name="title_NotificationNewMessage">You have a new message</string>
     <string name="body_NotificationNewMessage" translatable="false">%1s: %2s</string>
     <string name="title_NotificationNewReservation">Someone made a reservation at your restaurant</string>
