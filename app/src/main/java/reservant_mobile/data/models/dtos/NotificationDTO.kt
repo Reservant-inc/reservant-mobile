@@ -31,8 +31,8 @@ data class NotificationDTO(
         val bodyResourceId: Int
     ) {
         NotificationRestaurantVerified(
-            R.string.label_NotificationRestaurantVerified,
-            R.string.content_NotificationRestaurantVerified
+            R.string.title_NotificationRestaurantVerified,
+            R.string.body_NotificationRestaurantVerified
         ){
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf()
@@ -44,8 +44,8 @@ data class NotificationDTO(
 
         },
         NotificationNewRestaurantReview(
-            R.string.label_NotificationNewRestaurantReview,
-            R.string.content_NotificationNewRestaurantReview
+            R.string.title_NotificationNewRestaurantReview,
+            R.string.body_NotificationNewRestaurantReview
         ){
             override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
