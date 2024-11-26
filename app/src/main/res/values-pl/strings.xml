@@ -428,4 +428,7 @@
     <string name="label_event_history">Wydarzenia</string>
     <string name="error_loading_friends">Błąd podczas wczytywania znajomych</string>
     <string name="error_loading_more_friends">Błąd podczas wczytywania reszty znajomych</string>
+    <string name="label_registered_at">Zarejestrowany</string>
+    <string name="label_roles">Role</string>
+    <string name="label_no_join_requests">Brak próśb o dołączenie</string>
 </resources>

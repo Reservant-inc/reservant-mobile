@@ -440,4 +440,7 @@
     <string name="label_event_history">Events</string>
     <string name="error_loading_friends">Error while loading friends</string>
     <string name="error_loading_more_friends">Error while loading more friends</string>
+    <string name="label_registered_at">Registered at</string>
+    <string name="label_roles">Roles</string>
+    <string name="label_no_join_requests">No join requests</string>
 </resources>
