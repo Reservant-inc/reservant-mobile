@@ -16,6 +16,7 @@ import io.ktor.websocket.close
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.NotificationDTO
@@ -174,36 +175,37 @@ class NotificationHandler (
         details?.let {
             when {
                 this == NotificationDTO.NotificationType.NotificationRestaurantVerified ->
-                    "${details["restaurantName"]} has been verified"
+                    "${details["restaurantName"]?.string()} has been verified"
                 this == NotificationDTO.NotificationType.NotificationNewRestaurantReview ->
-                    "${details["authorName"]} has reviewed your restaurant - ${details["restaurantName"]}"
+                    "${details["authorName"]?.string()} has reviewed your restaurant - ${details["restaurantName"]?.string()}"
                 this == NotificationDTO.NotificationType.NotificationNewFriendRequest ->
-                    "${details["senderName"]} sent you a friend request"
+                    "${details["senderName"]?.string()} sent you a friend request"
                 this == NotificationDTO.NotificationType.NotificationFriendRequestAccepted ->
-                    "${details["acceptingUserFullName"]} accepted your friend request"
+                    "${details["acceptingUserFullName"]?.string()} accepted your friend request"
                 this == NotificationDTO.NotificationType.NotificationNewParticipationRequest ->
-                    "${details["senderName"]} wants to join your event - ${details["eventName"]}"
+                    "${details["senderName"]?.string()} wants to join your event - ${details["eventName"]?.string()}"
                 this == NotificationDTO.NotificationType.NotificationParticipationRequestResponse ->
                     if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
-                        "${details["creatorName"]} accepted you to an event - ${details["name"]}"
+                        "${details["creatorName"]?.string()} accepted you to an event - ${details["name"]?.string()}"
                     else
-                        "${details["creatorName"]} rejected you from an event - ${details["name"]}"
+                        "${details["creatorName"]?.string()} rejected you from an event - ${details["name"]?.string()}"
                 this == NotificationDTO.NotificationType.NotificationVisitApprovedDeclined ->
                     if (details["isAccepted"]?.jsonPrimitive?.boolean == true)
-                        "${details["restaurantName"]} accepted your visit on " +
+                        "${details["restaurantName"]?.string()} accepted your visit on " +
                                 formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
                     else
-                        "${details["restaurantName"]} rejected your visit on " +
+                        "${details["restaurantName"]?.string()} rejected your visit on " +
                                 formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy")
                 this == NotificationDTO.NotificationType.NotificationNewMessage ->
-                    "${details["authorName"]}: ${details["contents"]}"
+                    "${details["authorName"]?.string()}: ${details["contents"]?.string()}"
                 this == NotificationDTO.NotificationType.NotificationNewReservation ->
-                    "There's a new reservation at ${details["restaurantName"]} on " +
+                    "There's a new reservation at ${details["restaurantName"]?.string()} on " +
                             formatToDateTime(details["date"]?.jsonPrimitive.toString(), "dd-MM-yyyy") +
                             " for ${details["numberOfPeople"]}"
                 else -> ""
             }
         } ?: ""
 
+    private fun JsonElement.string() : String = this.jsonPrimitive.content
 }
 
