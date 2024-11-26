@@ -51,7 +51,6 @@ class ProfileViewModel(
             loadSimpleUser()
             fetchFriends()
             fetchUserEvents()
-            isLoading = false
         }
     }
     
