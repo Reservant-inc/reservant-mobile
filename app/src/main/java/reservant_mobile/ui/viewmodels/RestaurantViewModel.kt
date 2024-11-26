@@ -416,7 +416,7 @@ class RestaurantViewModel(
         val maxResMinutesInt = maxReservationMinutes.value.toIntOrNull()
 
         return maxResMinutesInt == null ||
-                maxResMinutesInt <= 30 ||
+                maxResMinutesInt < 30 ||
                 getFieldError(resultRegistration, maxReservationMinutes.name) != -1
     }
 

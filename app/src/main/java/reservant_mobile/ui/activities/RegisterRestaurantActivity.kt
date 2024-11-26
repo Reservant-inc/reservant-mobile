@@ -589,6 +589,15 @@ fun RegisterRestaurantActivity(
 
                 ProgressBar(currentStep = 4, maxStep = 4)
 
+                Spacer(modifier = Modifier.height(30.dp))
+                
+                if (restaurantViewModel.selectedTags.isEmpty()){
+                    Text(
+                        text = stringResource(id = R.string.error_no_tags_selected),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
                 TagList(
                     tags = restaurantViewModel.selectedTags,
                     onRemoveTag = { tag ->

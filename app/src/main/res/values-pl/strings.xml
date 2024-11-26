@@ -56,7 +56,7 @@
     <string name="error_registerRestaurant_invalid_file">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
-    <string name="error_registerRestaurant_invalid_max_duration">Niepoprawny czas trwania rezerwacji</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Maksymalny czas trwania rezerwacji musi być >= 30 minut</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
@@ -65,12 +65,13 @@
     <string name="label_uploadFiles">Wyślij potrzebne pliki:</string>
     <string name="label_restaurant_delivery">Dostawa</string>
     <string name="label_restaurant_description">Opis</string>
-    <string name="label_restaurant_maxReservationDuration">Maksymalny czas trwania rezerwacji</string>
+    <string name="label_restaurant_maxReservationDuration">Maksymalny czas trwania rezerwacji (minuty)</string>
     <string name="label_restaurant_tables">Stoliki</string>
     <string name="label_restaurant_delivery_available">Dostępna</string>
     <string name="label_restaurant_delivery_not_available">Nie Dostępna</string>
     <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
+    <string name="error_no_tags_selected">Nie wybrano tagów</string>
     <string name="label_group">Grupa</string>
     <string name="label_new_restaurant">Nowa Restauracja</string>
     <string name="confirm_delete_title">Czy napewno chcesz usunąć tą pozycję?</string>
