@@ -128,7 +128,7 @@ class NotificationHandler (
                 notification.value.notificationType?.let {
 
                     val pair = it.getContent(notification.value.details)
-                    
+
                     showBasicNotification(
                         pair.first,
                         pair.second,
@@ -174,9 +174,9 @@ class NotificationHandler (
     private fun NotificationDTO.NotificationType.getContent(details: Map<String, JsonElement>?) : Pair<String, String> =
         details?.let {
             return context.getString(
-                this.titleResourceId, this.getTitleArguments()
+                this.titleResourceId, this.getTitleArguments(details)
             ) to context.getString(
-                this.bodyResourceId, this.getBodyArguments()
+                this.bodyResourceId, this.getBodyArguments(details)
             )
         } ?: ("" to "")
 

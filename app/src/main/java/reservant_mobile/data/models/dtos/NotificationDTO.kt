@@ -32,11 +32,9 @@ data class NotificationDTO(
             R.string.label_NotificationRestaurantVerified,
             R.string.content_NotificationRestaurantVerified
         ){
-            override fun getTitleArguments(): Array<Any> {
-                TODO("Not yet implemented")
-            }
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -45,11 +43,11 @@ data class NotificationDTO(
             R.string.label_NotificationNewRestaurantReview,
             R.string.content_NotificationNewRestaurantReview
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -58,11 +56,11 @@ data class NotificationDTO(
             R.string.label_NotificationNewFriendRequest,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -71,11 +69,11 @@ data class NotificationDTO(
             R.string.label_NotificationFriendRequestAccepted,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -84,11 +82,11 @@ data class NotificationDTO(
             R.string.label_NotificationNewParticipationRequest,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -97,11 +95,11 @@ data class NotificationDTO(
             R.string.label_NotificationParticipationRequestResponse,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -110,11 +108,11 @@ data class NotificationDTO(
             R.string.label_NotificationVisitApprovedDeclined,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -123,11 +121,11 @@ data class NotificationDTO(
             R.string.label_NotificationNewMessage,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
@@ -136,18 +134,18 @@ data class NotificationDTO(
             R.string.label_NotificationNewReservation,
             0
         ){
-            override fun getTitleArguments(): Array<Any> {
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
-            override fun getBodyArguments(): Array<Any> {
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
                 TODO("Not yet implemented")
             }
 
         };
 
-        abstract fun getTitleArguments(): Array<Any>
-        abstract fun getBodyArguments(): Array<Any>
+        abstract fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any>
+        abstract fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any>
     }
 }
 
