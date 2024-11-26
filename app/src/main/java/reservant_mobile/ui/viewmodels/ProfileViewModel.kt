@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.models.dtos.fields.Result
@@ -26,7 +27,8 @@ class ProfileViewModel(
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
-    var profileUser: UserSummaryDTO? by mutableStateOf(null)
+    var simpleProfileUser: UserSummaryDTO? by mutableStateOf(null)
+    var fullProfileUser: UserDTO? by mutableStateOf(null)
 
     var isLoading: Boolean by mutableStateOf(false)
     var isCurrentUser: Boolean by mutableStateOf(false)
@@ -40,23 +42,40 @@ class ProfileViewModel(
 
     init {
         viewModelScope.launch {
-            loadUser(userId = profileUserId)
+            isLoading = true
             if (UserObject.userId == profileUserId) {
                 isCurrentUser = true
+                loadFullUser()
+                println("LOADED USER: $fullProfileUser")
             }
+
+            loadSimpleUser()
             fetchFriends()
             fetchUserEvents()
+            isLoading = false
         }
     }
     
-    private suspend fun loadUser(userId: String): Boolean {
-        isLoading = true
-        val resultUser = userService.getUserSimpleInfo(userId)
+    private suspend fun loadSimpleUser(): Boolean {
+
+        val resultUser = userService.getUserSimpleInfo(profileUserId)
         if (resultUser.isError) {
             isLoading = false
             return false
         }
-        profileUser = resultUser.value
+        simpleProfileUser = resultUser.value
+
+        return true
+    }
+
+    private suspend fun loadFullUser(): Boolean {
+        isLoading = true
+        val resultUser = userService.getUserInfo()
+        if (resultUser.isError) {
+            isLoading = false
+            return false
+        }
+        fullProfileUser = resultUser.value
         isLoading = false
         return true
     }
@@ -91,12 +110,12 @@ class ProfileViewModel(
 
     fun sendFriendRequest() {
         viewModelScope.launch {
-            profileUser?.userId?.let { userId ->
+            simpleProfileUser?.userId?.let { userId ->
                 val result = friendsService.sendFriendRequest(userId)
                 if (result.isError) {
                     friendRequestError = "Nie udało się wysłać zaproszenia"
                 } else {
-                    profileUser = profileUser?.copy(friendStatus = FriendStatus.OutgoingRequest)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.OutgoingRequest)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -106,12 +125,12 @@ class ProfileViewModel(
 
     fun cancelFriendRequest() {
         viewModelScope.launch {
-            profileUser?.userId?.let { userId ->
+            simpleProfileUser?.userId?.let { userId ->
                 val result = friendsService.deleteFriendOrRequest(userId)
                 if (result.isError) {
                     friendRequestError = "Nie udało się anulować zaproszenia"
                 } else {
-                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Stranger)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -121,12 +140,12 @@ class ProfileViewModel(
 
     fun removeFriend() {
         viewModelScope.launch {
-            profileUser?.userId?.let { userId ->
+            simpleProfileUser?.userId?.let { userId ->
                 val result = friendsService.deleteFriendOrRequest(userId)
                 if (result.isError) {
                     friendRequestError = "Nie udało się usunąć znajomego"
                 } else {
-                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Stranger)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -136,12 +155,12 @@ class ProfileViewModel(
 
     fun acceptFriendRequest() {
         viewModelScope.launch {
-            profileUser?.userId?.let { userId ->
+            simpleProfileUser?.userId?.let { userId ->
                 val result = friendsService.acceptFriendRequest(userId)
                 if (result.isError) {
                     friendRequestError = "Nie udało się zaakceptować zaproszenia"
                 } else {
-                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Friend)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Friend)
                     friendRequestError = null
                     fetchFriends()
                 }
@@ -151,12 +170,12 @@ class ProfileViewModel(
 
     fun rejectFriendRequest() {
         viewModelScope.launch {
-            profileUser?.userId?.let { userId ->
+            simpleProfileUser?.userId?.let { userId ->
                 val result = friendsService.deleteFriendOrRequest(userId)
                 if (result.isError) {
                     friendRequestError = "Nie udało się odrzucić zaproszenia"
                 } else {
-                    profileUser = profileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Stranger)
                     friendRequestError = null
                     fetchFriends()
                 }

@@ -3,7 +3,6 @@ package reservant_mobile.ui.activities
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,15 +15,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -62,11 +66,12 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.UserDTO
-import reservant_mobile.data.services.UserService
+import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 
 @Composable
@@ -130,7 +135,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     contentScale = ContentScale.Crop
                 )
                 Text(
-                    text = "${profileViewModel.profileUser?.firstName ?: ""} ${profileViewModel.profileUser?.lastName ?: ""}",
+                    text = "${profileViewModel.simpleProfileUser?.firstName ?: ""} ${profileViewModel.simpleProfileUser?.lastName ?: ""}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 )
@@ -140,13 +145,92 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Cake,
-                        contentDescription = stringResource(R.string.label_birthday),
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = stringResource(R.string.label_rating),
                         tint = Color.Gray
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    profileViewModel.profileUser?.birthDate?.let {
-                        Text(text = it, color = Color.Gray)
+                    Text(text = "5.0", color = Color.Gray)
+                }
+            }
+
+            if (!profileViewModel.isCurrentUser) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    when (profileViewModel.simpleProfileUser?.friendStatus) {
+                        FriendStatus.Friend -> {
+                            Button(
+                                onClick = { profileViewModel.removeFriend() },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            ) {
+                                Text(text = stringResource(R.string.label_remove_friend))
+                            }
+                        }
+
+                        FriendStatus.OutgoingRequest -> {
+                            Button(
+                                onClick = { profileViewModel.cancelFriendRequest() },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            ) {
+                                Text(text = stringResource(R.string.label_cancel))
+                            }
+                        }
+
+                        FriendStatus.IncomingRequest -> {
+                            Row {
+                                Button(
+                                    onClick = { profileViewModel.acceptFriendRequest() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                ) {
+                                    Text(text = stringResource(R.string.label_accept_request))
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = { profileViewModel.rejectFriendRequest() },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                ) {
+                                    Text(text = stringResource(R.string.label_cancel_request))
+                                }
+                            }
+                        }
+
+                        FriendStatus.Stranger -> {
+                            Button(
+                                onClick = { profileViewModel.sendFriendRequest() },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                                )
+                                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                Text(text = stringResource(R.string.label_add_friend))
+                            }
+                        }
+
+                        null -> {
+                            // Obsługa przypadku null, jeśli konieczne
+                        }
+                    }
+
+                    profileViewModel.friendRequestError?.let { error ->
+                        Text(text = error, color = MaterialTheme.colorScheme.error)
+                    }
+
+                    Button(
+                        onClick = { /* TODO: Wyślij wiadomość */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = null,
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
                     }
                 }
             }
@@ -154,7 +238,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
             if (profileViewModel.isCurrentUser) {
                 FloatingTabSwitch(
                     pages = listOf(
-                        stringResource(R.string.label_info) to { InfoTab() },
+                        stringResource(R.string.label_info) to { InfoTab(profileViewModel.fullProfileUser) },
                         stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems) },
                         stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
                         stringResource(R.string.label_orders) to { CurrentOrdersTab() },
@@ -169,130 +253,135 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
 
 @Composable
-fun InfoTab() {
-    val profileUser = UserService.UserObject
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(64.dp))
-
-        // Profile Card
-        Card(
+fun InfoTab(
+    profileUser: UserDTO?
+) {
+    if(profileUser != null){
+        Column(
             modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Spacer(modifier = Modifier.height(64.dp))
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(8.dp)
             ) {
-                // Profile Picture and Name
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Profile Picture
-                    Image(
-                        painter = painterResource(id = R.drawable.jd), // Replace with actual image
-                        contentDescription = stringResource(R.string.label_profile_picture),
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    // Name and Roles
-                    Column {
-                        Text(
-                            text = "${profileUser.firstName} ${profileUser.lastName}",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                    // Profile Picture and Name
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Profile Picture
+                        Image(
+                            painter = painterResource(id = R.drawable.jd), // Replace with actual image
+                            contentDescription = stringResource(R.string.label_profile_picture),
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
                         )
-                        profileUser.roles?.let {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        // Name and Roles
+                        Column {
                             Text(
-                                text = it.joinToString(", "),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
+                                text = "${profileUser!!.firstName} ${profileUser.lastName}",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold
                             )
+                            profileUser.roles?.let {
+                                Text(
+                                    text = it.joinToString(", "),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+
+                    HorizontalDivider()
+
+                    // Contact Information
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Email
+                        profileUser!!.email.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                if (it != null) {
+                                    Text(
+                                        text = it,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        }
+
+                        // Phone Number
+                        profileUser.phoneNumber?.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Phone,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = it.code+" "+it.number,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+
+                        // Birth Date
+                        profileUser.birthDate?.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Cake,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+
+                        // Registered At
+                        profileUser.registeredAt?.let {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Event,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = formatToDateTime(it, "dd MMM yyyy HH:mm"),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
                         }
                     }
                 }
-
-                HorizontalDivider()
-
-//                // Contact Information
-//                Column(
-//                    verticalArrangement = Arrangement.spacedBy(8.dp)
-//                ) {
-//                    // Email
-//                    profileUser.email?.let {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Icon(
-//                                imageVector = Icons.Default.Email,
-//                                contentDescription = null,
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = it,
-//                                style = MaterialTheme.typography.bodyLarge
-//                            )
-//                        }
-//                    }
-//
-//                    // Phone Number
-//                    profileUser.phoneNumber?.let {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Icon(
-//                                imageVector = Icons.Default.Phone,
-//                                contentDescription = null,
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = it,
-//                                style = MaterialTheme.typography.bodyLarge
-//                            )
-//                        }
-//                    }
-//
-//                    // Birth Date
-//                    profileUser.birthDate?.let {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Icon(
-//                                imageVector = Icons.Default.Cake,
-//                                contentDescription = null,
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = formatToDateTime(it, "dd MMM yyyy"),
-//                                style = MaterialTheme.typography.bodyLarge
-//                            )
-//                        }
-//                    }
-//
-//                    // Registered At
-//                    profileUser.registeredAt?.let {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Icon(
-//                                imageVector = Icons.Default.Event,
-//                                contentDescription = null,
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = formatToDateTime(it, "dd MMM yyyy HH:mm"),
-//                                style = MaterialTheme.typography.bodyLarge
-//                            )
-//                        }
-//                    }
-//                }
             }
         }
+    }else{
+        MissingPage()
     }
 }
 
@@ -327,7 +416,7 @@ fun JoinRequestsTab() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(top = 64.dp, start = 16.dp, end = 16.dp)
     ) {
         items(sampleEvents.size) { id ->
             val event = sampleEvents[id]
@@ -348,7 +437,7 @@ fun JoinRequestsTab() {
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (event.joinRequests.isNotEmpty()) {
@@ -428,7 +517,7 @@ fun CurrentOrdersTab() {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 64.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .padding(top = 64.dp, start = 16.dp, end = 16.dp)
         ) {
             items(orders.size) { index ->
                 val order = orders[index]
@@ -455,7 +544,7 @@ fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 64.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
+                .padding(top = 64.dp, start = 16.dp, end = 16.dp)
         ) {
             items(eventPagingItems.itemCount) { index ->
                 val event = eventPagingItems[index]
@@ -528,7 +617,7 @@ fun FriendsTab(friendsPagingItems: LazyPagingItems<FriendRequestDTO>?) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         if (friendsPagingItems == null) {
             item {
