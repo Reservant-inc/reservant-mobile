@@ -155,28 +155,6 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
 
 
             val pages: List<Pair<String, @Composable () -> Unit>> = listOfNotNull(
-                Pair<String, @Composable () -> Unit>(
-                    first = stringResource(id = R.string.label_login_action),
-                    second = {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Logo()
-
-                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Login) }, label = stringResource(
-                                id = R.string.label_login_action
-                            ))
-
-                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Register) }, label = stringResource(
-                                id = R.string.label_signup
-                            ))
-                        }
-                    }
-                ).takeIf { !isUserLoggedIn },
                 stringResource(id = R.string.label_restaurants) to {
                     Column {
                         Row(
@@ -346,7 +324,29 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                             }
                         }
                     }
-                }
+                },
+                Pair<String, @Composable () -> Unit>(
+                    first = stringResource(id = R.string.label_login_action),
+                    second = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Logo()
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Login) }, label = stringResource(
+                                id = R.string.label_login_action
+                            ))
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Register) }, label = stringResource(
+                                id = R.string.label_signup
+                            ))
+                        }
+                    }
+                ).takeIf { !isUserLoggedIn }
             )
 
             BottomSheetScaffold(
@@ -695,7 +695,7 @@ fun RestaurantDetailPreview(
                                         )
                                     }
                                 }
-                                if(restaurant.rating != null){
+                                if(restaurant.rating != null && restaurant.numberReviews!! > 0){
                                     val rating = restaurant.rating.toFloat()
                                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                                         RatingBar(rating = rating)
