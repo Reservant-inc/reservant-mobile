@@ -300,8 +300,10 @@ fun UserListItem(
                         contentDescription = stringResource(R.string.label_accept)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(stringResource(R.string.label_accept))
+                    //Text(stringResource(R.string.label_accept))
                 }
+
+                VerticalDivider(modifier = Modifier.padding(8.dp))
 
                 Button(
                     onClick = { onRejectClick?.invoke() },
@@ -313,7 +315,7 @@ fun UserListItem(
                         contentDescription = stringResource(R.string.label_reject)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(stringResource(R.string.label_reject))
+                    //Text(stringResource(R.string.label_reject))
                 }
             }
         } else if (deletable) {
