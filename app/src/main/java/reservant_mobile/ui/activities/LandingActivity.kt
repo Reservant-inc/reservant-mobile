@@ -26,39 +26,23 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @Composable
-fun LandingActivity() {
+fun LandingActivity(startDestination : Any? = null) {
 
     val isSystemInDarkMode = isSystemInDarkTheme()
 
     val darkTheme = remember {
         mutableStateOf(isSystemInDarkMode)
     }
+
+    val sd = startDestination?: AuthRoutes.Landing
     AppTheme (darkTheme = darkTheme.value) {
         val landingNavController = rememberNavController()
         NavHost(
             navController = landingNavController,
-            startDestination = AuthRoutes.Landing
+            startDestination = sd
         ) {
             composable<AuthRoutes.Landing> {
-                Surface {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Logo()
-
-                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Login) }, label = stringResource(
-                            id = R.string.label_login_action
-                        ))
-
-                        ButtonComponent(onClick = { landingNavController.navigate(AuthRoutes.Register) }, label = stringResource(
-                            id = R.string.label_signup
-                        ))
-                    }
-                }
+                MapActivity(isUserLoggedIn = false)
             }
             composable<AuthRoutes.Login> {
                 LoginActivity(navController = landingNavController)
