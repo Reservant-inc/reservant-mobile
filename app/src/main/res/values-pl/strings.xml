@@ -431,4 +431,8 @@
     <string name="label_registered_at">Zarejestrowany</string>
     <string name="label_roles">Role</string>
     <string name="label_no_join_requests">Brak próśb o dołączenie</string>
+    <string name="label_order_date">Data zamówienia</string>
+    <string name="label_confirm_arrival">Potwierdź przybycie</string>
+    <string name="label_arrival_confirmed">Przybycie potwierdzone</string>
+    <string name="label_no_current_orders">Brak obecnych zamówień</string>
 </resources>

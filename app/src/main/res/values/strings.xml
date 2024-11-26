@@ -443,4 +443,8 @@
     <string name="label_registered_at">Registered at</string>
     <string name="label_roles">Roles</string>
     <string name="label_no_join_requests">No join requests</string>
+    <string name="label_order_date">Order date</string>
+    <string name="label_confirm_arrival">Confirm arrival</string>
+    <string name="label_arrival_confirmed">Arrival confirmed</string>
+    <string name="label_no_current_orders">No current orders</string>
 </resources>
