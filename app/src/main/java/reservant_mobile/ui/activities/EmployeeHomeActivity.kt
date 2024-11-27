@@ -229,7 +229,9 @@ fun EmployeeHomeActivity() {
                                 CircularProgressIndicator()
                             }
                         } else if (empHomeVM.isError) {
-                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                            Column(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)) {
                                 MissingPage(
                                     modifier = Modifier
                                         .align(alignment = Alignment.CenterHorizontally)
@@ -378,8 +380,15 @@ fun EmployeeHomeActivity() {
                     WarehouseActivity(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
-                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
+                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles,
+                        navHostController = innerNavController
                     )
+                }
+
+                composable<RestaurantRoutes.IngredientHistory> {
+                    IngredientDetailsActivity(
+                        ingredientId = it.toRoute<RestaurantRoutes.IngredientHistory>().ingredientId,
+                        onReturnClick = { innerNavController.popBackStack() })
                 }
             }
         }

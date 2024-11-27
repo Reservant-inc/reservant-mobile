@@ -3,7 +3,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -202,6 +205,21 @@ class WarehouseViewModel(
         } else {
             // Jeśli tylko edycja danych składnika
             editIngredient(updatedIngredient.ingredientId ?: 0, updatedIngredient)
+        }
+    }
+
+    private val _ingredientHistoryFlow = MutableStateFlow<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>(null)
+    val ingredientHistoryFlow: Flow<PagingData<IngredientDTO.CorrectionDTO>>?
+        get() = _ingredientHistoryFlow.value
+
+    fun loadIngredientHistory(ingredientId: Int) {
+        viewModelScope.launch {
+            val result = restaurantService.getIngredientHistory(ingredientId)
+            if (!result.isError && result.value != null) {
+                _ingredientHistoryFlow.value = result.value!!.cachedIn(viewModelScope)
+            } else {
+                _ingredientHistoryFlow.value = null
+            }
         }
     }
 }

@@ -435,4 +435,8 @@
     <string name="label_closing_soon">Closing soon</string>
     <string name="label_open">Open</string>
     <string name="error_openTimeBeforeCloseTime">Opening time must be before closing time</string>
+    <string name="error_loading_ingredient">Error loading ingredient</string>
+    <string name="delivery">delivery</string>
+    <string name="manual_change">manual change</string>
+    <string name="order">order</string>
 </resources>

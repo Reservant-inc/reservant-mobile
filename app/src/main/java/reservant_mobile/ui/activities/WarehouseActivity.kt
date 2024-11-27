@@ -1,4 +1,5 @@
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
@@ -55,6 +57,7 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.navigation.RestaurantRoutes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +65,8 @@ import reservant_mobile.ui.components.IconWithHeader
 fun WarehouseActivity(
     onReturnClick: () -> Unit,
     restaurantId: Int,
-    isEmployee: Boolean
+    isEmployee: Boolean,
+    navHostController: NavHostController
 ) {
     val viewModel: WarehouseViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -128,7 +132,8 @@ fun WarehouseActivity(
                         unit = ingredient.unitOfMeasurement ?: UnitOfMeasurement.Unit,
                         defaultOrderQuantity = ingredient.amountToOrder,
                         onAddClick = { viewModel.showAddDeliveryDialog(ingredient) },
-                        onEditClick = { viewModel.showEditIngredientDialog(ingredient) } // Obsługa kliknięcia edycji
+                        onEditClick = { viewModel.showEditIngredientDialog(ingredient) },
+                        onClick = {navHostController.navigate(RestaurantRoutes.IngredientHistory(ingredientId = ingredient.ingredientId ?: 0))}
                     )
                 }
             }
@@ -271,7 +276,8 @@ fun ProductCard(
     unit: UnitOfMeasurement,
     defaultOrderQuantity: Double?,
     onAddClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val unitAbbreviation = when (unit) {
         UnitOfMeasurement.Gram -> "g"
@@ -285,6 +291,7 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

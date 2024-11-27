@@ -424,4 +424,8 @@
     <string name="label_closing_soon">Wkrótce zamknięte</string>
     <string name="label_open">Otwarte</string>
     <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
+    <string name="error_loading_ingredient">Błąd ładowania składnika</string>
+    <string name="delivery">dostawa</string>
+    <string name="manual_change">ręczna zmiana</string>
+    <string name="order">zamówienie</string>
 </resources>
