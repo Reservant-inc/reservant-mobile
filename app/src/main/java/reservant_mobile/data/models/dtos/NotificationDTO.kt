@@ -1,25 +1,16 @@
 package reservant_mobile.data.models.dtos
 
 import com.example.reservant_mobile.R
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import reservant_mobile.data.models.dtos.NotificationDTO.NotificationType
+import reservant_mobile.data.utils.formatToDateTime
 
 @Serializable()
 data class NotificationDTO(
@@ -37,14 +28,199 @@ data class NotificationDTO(
     val details: Map<String, JsonElement>? = null
 ){
     @Serializable
-    enum class NotificationType(val resId: Int) {
-        NotificationRestaurantVerified(R.string.label_NotificationRestaurantVerified),
-        NotificationNewRestaurantReview(R.string.label_NotificationNewRestaurantReview),
-        NotificationNewFriendRequest(R.string.label_NotificationNewFriendRequest),
-        NotificationFriendRequestAccepted(R.string.label_NotificationFriendRequestAccepted),
-        NotificationNewParticipationRequest(R.string.label_NotificationNewParticipationRequest),
-        NotificationParticipationRequestResponse(R.string.label_NotificationParticipationRequestResponse),
-        NotificationVisitApprovedDeclined(R.string.label_NotificationVisitApprovedDeclined)
+    enum class NotificationType {
+        NotificationRestaurantVerified{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationRestaurantVerified
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationRestaurantVerified
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
+            }
+
+        },
+        NotificationNewRestaurantReview{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewRestaurantReview
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewRestaurantReview
+            }
+
+            override fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(details?.get("restaurantName")?.jsonPrimitive?.content ?: "")
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                val starCount = details?.get("stars")?.jsonPrimitive?.intOrNull ?: 0
+
+                val stars = "★".repeat(starCount) + "☆".repeat(5 - starCount)
+
+                return arrayOf(
+                    stars,
+                    details?.get("authorName")?.jsonPrimitive?.content ?: "",
+                    details?.get("contents")?.jsonPrimitive?.content ?: ""
+                )
+            }
+
+        },
+        NotificationNewFriendRequest{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewFriendRequest
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewFriendRequest
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(
+                    details?.get("senderName")?.jsonPrimitive?.content ?: ""
+                )
+            }
+
+        },
+        NotificationFriendRequestAccepted{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationFriendRequestAccepted
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationFriendRequestAccepted
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(
+                    details?.get("acceptingUserFullName")?.jsonPrimitive?.content ?: ""
+                )
+            }
+
+        },
+        NotificationNewParticipationRequest{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewParticipationRequest
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewParticipationRequest
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(
+                    details?.get("senderName")?.jsonPrimitive?.content ?: "",
+                    details?.get("eventName")?.jsonPrimitive?.content ?: "",
+                )
+            }
+
+        },
+        NotificationParticipationRequestResponse{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.title_NotificationParticipationRequestResponse_accepted
+                else R.string.title_NotificationParticipationRequestResponse_declined
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.body_NotificationParticipationRequestResponse_accepted
+                else R.string.body_NotificationParticipationRequestResponse_declined
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(
+                    details?.get("creatorName")?.jsonPrimitive?.content ?: "",
+                    details?.get("name")?.jsonPrimitive?.content ?: ""
+                )
+            }
+
+        },
+        NotificationVisitApprovedDeclined{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.title_NotificationVisitApprovedDeclined_accepted
+                else R.string.title_NotificationVisitApprovedDeclined_declined
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                val isAccepted =  details?.get("isAccepted")?.jsonPrimitive?.booleanOrNull == true
+
+                return if (isAccepted)
+                    R.string.body_NotificationVisitApprovedDeclined_accepted
+                else R.string.body_NotificationVisitApprovedDeclined_declined
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                val date = formatToDateTime(
+                    details?.get("date")?.jsonPrimitive?.content ?: "",
+                    "dd-MM-yyyy"
+                )
+
+                return arrayOf(
+                    details?.get("restaurantName")?.jsonPrimitive?.content ?: "",
+                    date
+                )
+            }
+
+        },
+        NotificationNewMessage{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewMessage
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewMessage
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                return arrayOf(
+                    details?.get("authorName")?.jsonPrimitive?.content ?: "",
+                    details?.get("contents")?.jsonPrimitive?.content ?: "",
+                )
+            }
+
+        },
+        NotificationNewReservation{
+            override fun getTitleResource(details: Map<String, JsonElement>?): Int {
+                return R.string.title_NotificationNewReservation
+            }
+
+            override fun getBodyResource(details: Map<String, JsonElement>?): Int {
+                return R.string.body_NotificationNewReservation
+            }
+
+            override fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> {
+                val date = formatToDateTime(
+                    details?.get("date")?.jsonPrimitive?.content ?: "",
+                    "dd-MM-yyyy"
+                )
+
+                val numOfPeople = details?.get("numberOfPeople")?.jsonPrimitive?.intOrNull ?: 0
+
+                return arrayOf(
+                    details?.get("restaurantName")?.jsonPrimitive?.content ?: "",
+                    date,
+                    numOfPeople,
+                )
+            }
+
+        };
+
+        abstract fun getTitleResource(details: Map<String, JsonElement>?): Int
+        abstract fun getBodyResource(details: Map<String, JsonElement>?): Int
+
+        open fun getTitleArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
+        open fun getBodyArguments(details: Map<String, JsonElement>?): Array<Any> = arrayOf()
     }
 }
 
