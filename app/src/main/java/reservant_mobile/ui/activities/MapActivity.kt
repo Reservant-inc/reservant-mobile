@@ -219,7 +219,8 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                             name = item.name,
                                             location = item.address,
                                             city = item.city,
-                                            image = item.logo?.asImageBitmap()
+                                            image = item.logo?.asImageBitmap(),
+                                            availableHours = item.availableHours
                                         )
                                         mapViewModel.addRestaurantMarker(item) { _, _ ->
                                             showRestaurantId = item.restaurantId

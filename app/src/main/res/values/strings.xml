@@ -33,6 +33,7 @@
     <string name="label_restaurant_address">Address</string>
     <string name="label_restaurant_postal">Postal code</string>
     <string name="label_restaurant_description">Description</string>
+    <string name="label_restaurant_maxReservationDuration">Maximum duration of a reservation (minutes)</string>
     <string name="label_restaurant_city">City</string>
     <string name="label_register_restaurant">Register Restaurant</string>
     <string name="label_restaurant_lease">Lease agreement</string>
@@ -59,6 +60,7 @@
     <string name="error_registerRestaurant_invalid_file">Invalid file - max size %1$dKB</string>
     <string name="label_optional">" - optional"</string>
     <string name="error_registerRestaurant_invalid_description">Invalid description</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Reservation duration has to be >= 30 minutes</string>
     <string name="label_restaurant_logo" translatable="false">Logo</string>
     <string name="label_registerRestaurant_delivery">Delivery by us:</string>
     <string name="label_registerRestaurant_choseTags">Choose tags for your premises</string>
@@ -72,6 +74,7 @@
     <string name="label_restaurant_delivery_not_available">Not Available</string>
     <string name="label_restaurant_tags">Tags</string>
     <string name="error_not_found">Could not find resource</string>
+    <string name="error_no_tags_selected">No tags selected</string>
     <string name="label_group">Group</string>
     <string name="label_new_restaurant">New Restaurant</string>
     <string name="confirm_delete_title">Are you sure you want do delete the item?</string>
@@ -172,6 +175,7 @@
     <string name="errorCode_AccessDenied">You do not have the authority to perform this action</string>
     <string name="errorCode_Duplicate">There is already such thing</string>
     <string name="errorCode_NotFound">Not found</string>
+    <string name="errorCode_GreaterThanOrEqualValidator">%1s must be greater than or equal to %2s</string>
     <string name="label_ticket">New ticket</string>
     <string name="label_ticket_history">Ticket History</string>
     <string name="label_add_friend">Add friend</string>
@@ -426,4 +430,9 @@
     <string name="label_choose_time">Choose Time</string>
     <string name="error_select_restaurant">Select a restaurant</string>
     <string name="message_login_required">You have to be logged in</string>
+    <string name="label_closing_at">Closing at</string>
+    <string name="label_closed">Closed</string>
+    <string name="label_closing_soon">Closing soon</string>
+    <string name="label_open">Open</string>
+    <string name="error_openTimeBeforeCloseTime">Opening time must be before closing time</string>
 </resources>

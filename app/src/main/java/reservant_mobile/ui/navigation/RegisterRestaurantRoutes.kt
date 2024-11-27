@@ -13,5 +13,8 @@ data object RegisterRestaurantRoutes{
     object Files
 
     @Serializable
+    object OpeningHours
+
+    @Serializable
     object Description
 }
