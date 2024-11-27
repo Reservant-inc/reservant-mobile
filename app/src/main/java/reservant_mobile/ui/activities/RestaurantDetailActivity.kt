@@ -390,7 +390,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                     icon = Icons.Default.ShoppingBag,
                     contentDescription = stringResource(id = R.string.cart),
                     itemCount = addedItems.size,
-                    onClick = { navController.navigate(RestaurantRoutes.Reservation(restaurantId = restaurantId)) }
+                    onClick = { navController.navigate(RestaurantRoutes.Reservation) }
                 )
             }
 
@@ -412,7 +412,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
             }
         }
         composable<RestaurantRoutes.Reservation> {
-            RestaurantReservationActivity(restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId, navController = navController)
+            RestaurantReservationActivity(navController = navController)
         }
 
         composable<RestaurantRoutes.AddReview> {

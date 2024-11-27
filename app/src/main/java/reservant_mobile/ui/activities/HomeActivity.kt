@@ -23,7 +23,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
@@ -92,7 +91,7 @@ fun HomeActivity() {
                     SettingsActivity(homeNavController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
                 composable<RestaurantRoutes.Reservation>{
-                    RestaurantReservationActivity(restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId, navController = innerNavController)
+                    RestaurantReservationActivity(navController = innerNavController)
                 }
                 composable<MainRoutes.ChatList> {
                     ChatListActivity()

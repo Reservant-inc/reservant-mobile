@@ -553,7 +553,7 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
             RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
         }
         composable<RestaurantRoutes.Reservation>{
-            RestaurantReservationActivity(restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId, navController = navController)
+            RestaurantReservationActivity(navController = navController)
         }
         composable<EventRoutes.Details>{
             EventDetailActivity(
