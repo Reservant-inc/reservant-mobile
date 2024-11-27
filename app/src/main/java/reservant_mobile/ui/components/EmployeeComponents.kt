@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
@@ -168,131 +169,146 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
         onDismissRequest = onDismiss,
         title = { Text(stringResource(id = R.string.label_employee_add)) },
         text = {
-            Column {
-                FormInput(
-                    inputText = vm.login.value,
-                    onValueChange = { vm.login.value = it },
-                    label = stringResource(id = R.string.label_login),
-                    optional = false,
-                    isError = vm.isLoginInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLoginError() != -1)
-                            vm.getLoginError()
-                        else
-                            R.string.error_login_invalid
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.firstName.value,
-                    onValueChange = { vm.firstName.value = it },
-                    label = stringResource(id = R.string.label_name),
-                    optional = false,
-                    isError = vm.isFirstNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getFirstNameError() != -1)
-                            vm.getFirstNameError()
-                        else
-                            R.string.error_register_invalid_name
-                    ),
-                    formSent = formSent
-                )
-                FormInput(
-                    inputText = vm.lastName.value,
-                    onValueChange = { vm.lastName.value = it },
-                    label = stringResource(id = R.string.label_lastname),
-                    optional = false,
-                    isError = vm.isLastNameInvalid(),
-                    errorText = stringResource(
-                        if (vm.getLastNameError() != -1)
-                            vm.getLastNameError()
-                        else
-                            R.string.error_register_invalid_lastname
-                    ),
-                    formSent = formSent
-                )
-
-                MyDatePickerDialog(onDateChange = { birthday -> vm.birthday.value = birthday })
-
-                FormInput(
-                    inputText = vm.phoneNum.value,
-                    onValueChange = { vm.phoneNum.value = it },
-                    label = stringResource(id = R.string.label_phone),
-                    optional = false,
-                    leadingIcon = {
-                        CountryPickerView(
-                            countries = vm.countriesList,
-                            selectedCountry = getCountryDetailsByCode(vm.mobileCountry.value)!!,
-                            onSelection = { selectedCountry ->
-                                vm.mobileCountry.value = selectedCountry.code
-                            },
+            LazyColumn {
+                item {
+                    FormInput(
+                        inputText = vm.login.value,
+                        onValueChange = { vm.login.value = it },
+                        label = stringResource(id = R.string.label_login),
+                        optional = false,
+                        isError = vm.isLoginInvalid(),
+                        errorText = stringResource(
+                            if (vm.getLoginError() != -1)
+                                vm.getLoginError()
+                            else
+                                R.string.error_login_invalid
+                        ),
+                        formSent = formSent,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next
                         )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
-                    isError = vm.isPhoneInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPhoneError() != -1)
-                            vm.getPhoneError()
-                        else
-                            R.string.error_register_invalid_phone
-                    ),
-                    formSent = formSent
-                )
-
-                FormInput(
-                    inputText = vm.password.value,
-                    onValueChange = { vm.password.value = it },
-                    label = stringResource(id = R.string.label_password),
-                    leadingIcon = {
-                        androidx.compose.material3.IconButton(onClick = {
-                            isPasswordVisible = !isPasswordVisible
-                        }) {
-                            Icon(
-                                imageVector = if (isPasswordVisible)
-                                    Icons.Filled.Visibility
-                                else
-                                    Icons.Filled.VisibilityOff,
-                                contentDescription = stringResource(R.string.label_password_visibility)
-                            )
-                        }
-                    },
-                    visualTransformation = if (isPasswordVisible)
-                        VisualTransformation.None
-                    else
-                        PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Next
-                    ),
-                    isError = vm.isPasswordInvalid(),
-                    errorText = stringResource(
-                        if (vm.getPasswordError() != -1)
-                            vm.getPasswordError()
-                        else
-                            R.string.error_register_invalid_password
-                    ),
-                    formSent = formSent
-                )
-
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
                     )
-                    Text(stringResource(id = R.string.label_employee_hall))
+                }
+                item {
+                    FormInput(
+                        inputText = vm.firstName.value,
+                        onValueChange = { vm.firstName.value = it },
+                        label = stringResource(id = R.string.label_name),
+                        optional = false,
+                        isError = vm.isFirstNameInvalid(),
+                        errorText = stringResource(
+                            if (vm.getFirstNameError() != -1)
+                                vm.getFirstNameError()
+                            else
+                                R.string.error_register_invalid_name
+                        ),
+                        formSent = formSent,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                }
+                item {
+                    FormInput(
+                        inputText = vm.lastName.value,
+                        onValueChange = { vm.lastName.value = it },
+                        label = stringResource(id = R.string.label_lastname),
+                        optional = false,
+                        isError = vm.isLastNameInvalid(),
+                        errorText = stringResource(
+                            if (vm.getLastNameError() != -1)
+                                vm.getLastNameError()
+                            else
+                                R.string.error_register_invalid_lastname
+                        ),
+                        formSent = formSent,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                }
+                item {
+                    MyDatePickerDialog(onDateChange = { birthday -> vm.birthday.value = birthday })
+                }
+                item {
+                    FormInput(
+                        inputText = vm.phoneNum.value,
+                        onValueChange = { vm.phoneNum.value = it },
+                        label = stringResource(id = R.string.label_phone),
+                        optional = false,
+                        leadingIcon = {
+                            CountryPickerView(
+                                countries = vm.countriesList,
+                                selectedCountry = getCountryDetailsByCode(vm.mobileCountry.value)!!,
+                                onSelection = { selectedCountry ->
+                                    vm.mobileCountry.value = selectedCountry.code
+                                },
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next
+                        ),
+                        isError = vm.isPhoneInvalid(),
+                        errorText = stringResource(
+                            if (vm.getPhoneError() != -1)
+                                vm.getPhoneError()
+                            else
+                                R.string.error_register_invalid_phone
+                        ),
+                        formSent = formSent
+                    )
+                }
+                item {
+                    FormInput(
+                        inputText = vm.password.value,
+                        onValueChange = { vm.password.value = it },
+                        label = stringResource(id = R.string.label_password),
+                        leadingIcon = {
+                            androidx.compose.material3.IconButton(onClick = {
+                                isPasswordVisible = !isPasswordVisible
+                            }) {
+                                Icon(
+                                    imageVector = if (isPasswordVisible)
+                                        Icons.Filled.Visibility
+                                    else
+                                        Icons.Filled.VisibilityOff,
+                                    contentDescription = stringResource(R.string.label_password_visibility)
+                                )
+                            }
+                        },
+                        visualTransformation = if (isPasswordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password
+                        ),
+                        isError = vm.isPasswordInvalid(),
+                        errorText = stringResource(
+                            if (vm.getPasswordError() != -1)
+                                vm.getPasswordError()
+                            else
+                                R.string.error_register_invalid_password
+                        ),
+                        formSent = formSent
+                    )
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
+                item {
+                    RoleSelection(
+                        isHallEmployee = vm.isHallEmployee,
+                        isBackdoorEmployee = vm.isBackdoorEmployee,
+                        onHallEmployeeChange = { isChecked ->
+                            vm.isHallEmployee = isChecked
+                        },
+                        onBackdoorEmployeeChange = { isChecked ->
                             vm.isBackdoorEmployee = isChecked
-                        }
+                        },
+                        isError = vm.isRoleInvalid(),
+                        errorText = stringResource(id = R.string.error_at_least_one_role_required),
+                        formSent = formSent
                     )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
                 }
             }
         },
@@ -388,7 +404,7 @@ fun EditEmployeeDialog(
                             },
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     optional = false,
                     isError = vm.isPhoneInvalid(),
                     errorText = stringResource(
@@ -399,25 +415,19 @@ fun EditEmployeeDialog(
                     ),
                     formSent = formSent
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isHallEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isHallEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_hall))
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = vm.isBackdoorEmployee,
-                        onCheckedChange = { isChecked ->
-                            vm.isBackdoorEmployee = isChecked
-                        }
-                    )
-                    Text(stringResource(id = R.string.label_employee_backdoor))
-                }
+                RoleSelection(
+                    isHallEmployee = vm.isHallEmployee,
+                    isBackdoorEmployee = vm.isBackdoorEmployee,
+                    onHallEmployeeChange = { isChecked ->
+                        vm.isHallEmployee = isChecked
+                    },
+                    onBackdoorEmployeeChange = { isChecked ->
+                        vm.isBackdoorEmployee = isChecked
+                    },
+                    isError = vm.isRoleInvalid(),
+                    errorText = stringResource(id = R.string.error_at_least_one_role_required),
+                    formSent = formSent
+                )
             }
         },
         confirmButton = {
@@ -441,4 +451,56 @@ fun EditEmployeeDialog(
             ButtonComponent(onClick = onDismiss, label = stringResource(id = R.string.label_cancel))
         }
     )
+}
+
+@Composable
+fun RoleSelection(
+    modifier: Modifier = Modifier,
+    isHallEmployee: Boolean,
+    isBackdoorEmployee: Boolean,
+    onHallEmployeeChange: (Boolean) -> Unit,
+    onBackdoorEmployeeChange: (Boolean) -> Unit,
+    isError: Boolean = false,
+    errorText: String = "",
+    formSent: Boolean = false
+) {
+    var beginValidation by remember { mutableStateOf(false) }
+
+    if (isHallEmployee || isBackdoorEmployee) beginValidation = true
+
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = isHallEmployee,
+                onCheckedChange = { isChecked ->
+                    onHallEmployeeChange(isChecked)
+                }
+            )
+            Text(
+                text = stringResource(id = R.string.label_employee_hall),
+                color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            )
+
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = isBackdoorEmployee,
+                onCheckedChange = { isChecked ->
+                    onBackdoorEmployeeChange(isChecked)
+                }
+            )
+            Text(
+                text = stringResource(id = R.string.label_employee_backdoor),
+                color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        if (isError && (beginValidation || formSent)) {
+            Text(
+                text = errorText,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
 }

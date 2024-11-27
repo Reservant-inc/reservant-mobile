@@ -174,14 +174,16 @@ class EmployeeViewModel(
                 isLastNameInvalid() ||
                 isPhoneInvalid() ||
                 isPasswordInvalid() ||
-                isBirthDateInvalid()
+                isBirthDateInvalid() ||
+                isRoleInvalid()
     }
 
     private fun isEditInvalid(): Boolean {
         return  isFirstNameInvalid() ||
                 isLastNameInvalid() ||
                 isPhoneInvalid() ||
-                isBirthDateInvalid()
+                isBirthDateInvalid() ||
+                isRoleInvalid()
     }
 
     fun isLoginInvalid(): Boolean {
@@ -213,6 +215,10 @@ class EmployeeViewModel(
     fun isPasswordInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
                 getFieldError(result, password.name) != -1
+    }
+
+    fun isRoleInvalid(): Boolean {
+        return !isBackdoorEmployee && !isHallEmployee
     }
 
     fun getLoginError(): Int {
