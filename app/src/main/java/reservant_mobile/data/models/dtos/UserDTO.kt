@@ -7,7 +7,7 @@ class UserDTO (
     val userId: String? = null,
     val login: String? = null,
     val email: String? = null,
-    val phoneNumber: String? = null,
+    val phoneNumber: PhoneNumberDTO? = null,
     val firstName: String,
     val lastName: String,
     /***

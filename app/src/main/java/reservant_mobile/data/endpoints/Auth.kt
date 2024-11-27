@@ -20,5 +20,7 @@ class Auth {
     class RegisterFirebaseToken(val parent: Auth = Auth())
     @Resource("unregister-firebase-token")
     class UnregisterFirebaseToken(val parent: Auth = Auth())
+    @Resource("change-password")
+    class ChangePassword(val parent: Auth = Auth())
 
 }

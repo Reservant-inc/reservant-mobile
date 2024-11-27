@@ -9,6 +9,6 @@ data class RegisterUserDTO(
     val lastName: String,
     val birthDate: String,
     val email: String,
-    var phoneNumber: String = "",
+    var phoneNumber: PhoneNumberDTO? = null,
     val password: String
 )

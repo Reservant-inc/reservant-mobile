@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
+import reservant_mobile.data.models.dtos.PhoneNumberDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -101,7 +102,11 @@ class EmployeeViewModel(
             firstName = firstName.value,
             lastName = lastName.value,
             birthDate = birthday.value,
-            phoneNumber = phoneNum.value
+            // fixme: proper phone number handling
+            phoneNumber = PhoneNumberDTO(
+                code = "+48",
+                number = phoneNum.value
+            )
         )
         val response = employee.employeeId?.let { restaurantService.editEmployee(it, newEmployee) }
 
@@ -136,7 +141,11 @@ class EmployeeViewModel(
             firstName = firstName.value,
             lastName = lastName.value,
             birthDate = birthday.value,
-            phoneNumber = phoneNum.value,
+            // fixme: proper phone number handling
+            phoneNumber = PhoneNumberDTO(
+                code = "+48",
+                number = phoneNum.value
+            ),
             password = password.value
         )
 
