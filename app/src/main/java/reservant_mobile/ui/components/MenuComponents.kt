@@ -365,36 +365,3 @@ fun MenuTypeButton(
         Text(menuType)
     }
 }
-
-@Composable
-@Preview
-fun Preview(){
-    var name = FormField("name")
-    var altName = FormField("altName")
-    var menuType = FormField("menuType")
-    var menuTypes = FormField("menuTypes")
-    var dateFrom = FormField("dateFrom")
-    var dateUntil = FormField("dateUntil")
-
-
-
-    MenuCard(
-        name = name,
-        altName = altName,
-        menuType = menuType,
-        menuTypes = listOf(""),
-        dateFrom = dateFrom,
-        dateUntil = dateUntil,
-        menu = RestaurantMenuDTO(
-            name = "Menu jedzeniowe",
-            alternateName = "Food menu",
-            menuType = "",
-            dateFrom = "10.06",
-            dateUntil = "10.01"
-            //photo = ""
-        ),
-        onEditClick = { /*TODO*/ },
-        onDeleteClick = { /*TODO*/ },
-        clearFields = { /*TODO*/ },
-        onClick = { /*TODO*/ })
-}
