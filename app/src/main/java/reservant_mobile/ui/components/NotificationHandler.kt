@@ -14,7 +14,9 @@ import io.ktor.utils.io.core.Closeable
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.NotificationDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.NotificationService
@@ -123,16 +125,17 @@ class NotificationHandler (
                     fileService.getImage(it)
                 } ?: Result(isError = true, value = null)
 
+                notification.value.notificationType?.let {
 
-                val title = notification.value.notificationType?.let {
-                    context.getString(it.resId)
+                    val pair = it.getContent(notification.value.details)
+
+                    showBasicNotification(
+                        pair.first,
+                        pair.second,
+                        photo.value
+                    )
                 }
 
-                showBasicNotification(
-                    title ?: "",
-                    (notification.value.details?.get("contents") ?: "").toString(),
-                    photo.value
-                )
             }
 
         }
@@ -166,6 +169,16 @@ class NotificationHandler (
 
         session = null
     }
+
+
+    private fun NotificationDTO.NotificationType.getContent(details: Map<String, JsonElement>?) : Pair<String, String> =
+        details?.let {
+            return context.getString(
+                this.getTitleResource(details), *this.getTitleArguments(details)
+            ) to context.getString(
+                this.getBodyResource(details), *this.getBodyArguments(details)
+            )
+        } ?: ("" to "")
 
 }
 
