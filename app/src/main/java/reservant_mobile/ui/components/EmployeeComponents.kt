@@ -282,7 +282,8 @@ fun AddEmployeeDialog(onDismiss: () -> Unit, vm: EmployeeViewModel) {
                         else
                             PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
                         ),
                         isError = vm.isPasswordInvalid(),
                         errorText = stringResource(
@@ -404,7 +405,7 @@ fun EditEmployeeDialog(
                             },
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
                     optional = false,
                     isError = vm.isPhoneInvalid(),
                     errorText = stringResource(
@@ -478,7 +479,7 @@ fun RoleSelection(
             )
             Text(
                 text = stringResource(id = R.string.label_employee_hall),
-                color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                color = if (isError && (beginValidation || formSent)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
 
         }
@@ -491,7 +492,7 @@ fun RoleSelection(
             )
             Text(
                 text = stringResource(id = R.string.label_employee_backdoor),
-                color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                color = if (isError && (beginValidation || formSent)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
         }
 
