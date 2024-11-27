@@ -65,8 +65,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
+import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.UserDTO
-import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch

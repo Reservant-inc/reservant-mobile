@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
+import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
-import reservant_mobile.data.models.dtos.UserSummaryDTO.FriendStatus
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IFriendsService
@@ -46,7 +46,6 @@ class ProfileViewModel(
             if (UserObject.userId == profileUserId) {
                 isCurrentUser = true
                 loadFullUser()
-                println("LOADED USER: $fullProfileUser")
             }
 
             loadSimpleUser()
