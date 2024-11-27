@@ -130,9 +130,9 @@ fun CorrectionCard(
     val changeAmount = correction.newAmount - (correction.oldAmount ?: 0.0)
     val amountText = "${if (changeAmount > 0) "+" else ""}${changeAmount}g"
     val color = when {
-        changeAmount > 0 -> Color.Green
+        changeAmount > 0 -> Color(0xFF4CAF50)
         correction.comment != null -> Color.Red
-        else -> Color.Red
+        else -> Color.Yellow
     }
 
     val actionType = when {
