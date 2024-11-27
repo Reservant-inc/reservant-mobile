@@ -79,7 +79,7 @@ fun HomeActivity() {
                 }
 
                 composable<MainRoutes.Home>{
-                    MapActivity()
+                    MapActivity(isUserLoggedIn = true)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
                     RestaurantManagementActivity(navControllerHome = innerNavController)
