@@ -44,17 +44,14 @@ class WarehouseViewModel(
     var isEditIngredientDialogVisible by mutableStateOf(false)
     var ingredientToEdit: IngredientDTO? by mutableStateOf(null)
 
-    fun loadIngredients(
-        restaurantId: Int,
-        orderBy: GetIngredientsSort? = null
-    ) {
+    fun loadIngredients(restaurantId: Int, orderBy: GetIngredientsSort? = null) {
         viewModelScope.launch {
             val result = restaurantService.getIngredients(
                 restaurantId = restaurantId,
                 orderBy = orderBy
             )
             if (!result.isError && result.value != null) {
-                _ingredients.value = result.value
+                _ingredients.value = result.value.items
             } else {
                 _ingredients.value = emptyList()
             }
