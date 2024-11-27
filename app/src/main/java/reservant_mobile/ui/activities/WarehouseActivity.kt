@@ -133,7 +133,7 @@ fun WarehouseActivity(
                         defaultOrderQuantity = ingredient.amountToOrder,
                         onAddClick = { viewModel.showAddDeliveryDialog(ingredient) },
                         onEditClick = { viewModel.showEditIngredientDialog(ingredient) },
-                        onClick = {navHostController.navigate(RestaurantRoutes.IngredientHistory(ingredientId = ingredient.ingredientId ?: 0))}
+                        onClick = {navHostController.navigate(RestaurantRoutes.IngredientHistory(ingredient = ingredient))}
                     )
                 }
             }

@@ -45,15 +45,12 @@ import reservant_mobile.ui.components.IconWithHeader
 
 @Composable
 fun IngredientDetailsActivity(
-    ingredientId: Int,
+    ingredient: IngredientDTO,
     onReturnClick: () -> Unit,
     warehouseViewModel: WarehouseViewModel = viewModel()
 ) {
-    var ingredient by remember { mutableStateOf<IngredientDTO?>(null) }
-
-    LaunchedEffect(ingredientId) {
-        //TODO ingredient =
-        warehouseViewModel.loadIngredientHistory(ingredientId)
+    LaunchedEffect(ingredient) {
+        warehouseViewModel.loadIngredientHistory(ingredient.ingredientId ?: 0)
     }
 
     val ingredientHistoryFlow = warehouseViewModel.ingredientHistoryFlow
@@ -66,7 +63,7 @@ fun IngredientDetailsActivity(
     ) {
         IconWithHeader(
             icon = Icons.Default.History,
-            text = ingredient?.publicName ?: stringResource(id = R.string.no_name),
+            text = ingredient.publicName ?: stringResource(id = R.string.no_name),
             showBackButton = true,
             onReturnClick = onReturnClick
         )
@@ -75,7 +72,7 @@ fun IngredientDetailsActivity(
         Text(
             text = stringResource(
                 id = R.string.quantity_colon,
-                "${ingredient?.amount ?: 0.0}${ingredient?.unitOfMeasurement?.name ?: ""}"
+                "${ingredient.amount ?: 0.0} ${ingredient.unitOfMeasurement?.name ?: ""}"
             ),
             fontSize = 16.sp
         )

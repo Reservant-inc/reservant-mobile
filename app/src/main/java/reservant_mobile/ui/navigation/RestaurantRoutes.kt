@@ -2,6 +2,7 @@ package reservant_mobile.ui.navigation
 
 import kotlinx.serialization.Serializable
 import reservant_mobile.data.endpoints.Ingredients
+import reservant_mobile.data.models.dtos.IngredientDTO
 
 data object RestaurantRoutes {
 
@@ -57,6 +58,6 @@ data object RestaurantRoutes {
 
     @Serializable
     data class IngredientHistory(
-        val ingredientId: Int
+        val ingredient: IngredientDTO
     )
 }

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("plugin.serialization") version "2.0.0"
     id("com.google.gms.google-services")
 }
 
@@ -77,6 +77,7 @@ dependencies {
     androidTestImplementation("com.google.truth:truth:1.0.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.3")
+    implementation("com.eygraber:uri-kmp:0.0.18")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     val ktorVersion: String by project
