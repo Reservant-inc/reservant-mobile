@@ -428,4 +428,6 @@
     <string name="delivery">dostawa</string>
     <string name="manual_change">ręczna zmiana</string>
     <string name="order">zamówienie</string>
+    <string name="ingredient_old_amount">Ilość przed: %.1fg</string>
+    <string name="ingredient_new_amount">Ilość po: %.1fg</string>
 </resources>

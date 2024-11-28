@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -141,7 +142,6 @@ fun CorrectionCard(
         else -> stringResource(R.string.order)
     }
 
-    val isManualChange = !correction.comment.isNullOrEmpty()
     val formattedDate = formatToDateTime(correction.correctionDate ?: "", "dd.MM.yyyy HH:mm")
 
     val textStyle = TextStyle(
@@ -179,19 +179,33 @@ fun CorrectionCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (isManualChange) {
+            Text(
+                text = correction.comment ?: "",
+                style = TextStyle(color = color, fontSize = 14.sp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = correction.comment ?: "",
-                    style = TextStyle(color = color, fontSize = 14.sp)
+                    text = stringResource(R.string.ingredient_old_amount, correction.oldAmount ?: 0.0),
+                    style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                )
+                Text(
+                    text = stringResource(R.string.ingredient_new_amount, correction.newAmount),
+                    style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                 )
             }
-
             Spacer(modifier = Modifier.height(8.dp))
 
             correction.user?.let { user ->
                 Text(
                     text = "${user.firstName} ${user.lastName}",
-                    style = TextStyle(fontSize = 14.sp)
+                    style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                 )
             }
 

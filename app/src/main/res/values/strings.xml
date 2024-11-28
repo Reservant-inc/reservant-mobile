@@ -439,4 +439,6 @@
     <string name="delivery">delivery</string>
     <string name="manual_change">manual change</string>
     <string name="order">order</string>
+    <string name="ingredient_old_amount">Old amount: %.1fg</string>
+    <string name="ingredient_new_amount">New amount: %.1fg</string>
 </resources>
