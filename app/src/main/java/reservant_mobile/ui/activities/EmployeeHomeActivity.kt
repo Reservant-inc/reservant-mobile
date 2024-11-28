@@ -72,6 +72,7 @@ import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
+import reservant_mobile.data.utils.toCustomNavType
 import reservant_mobile.ui.components.BottomNavigation
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
@@ -389,28 +390,8 @@ fun EmployeeHomeActivity() {
                     )
                 }
 
-                val CustomNavType = object : NavType<IngredientDTO>(
-                    isNullableAllowed = false,
-                ) {
-                    override fun get(bundle: Bundle, key: String): IngredientDTO? {
-                        return Json.decodeFromString(bundle.getString(key) ?: return null)
-                    }
-
-                    override fun parseValue(value: String): IngredientDTO {
-                        return Json.decodeFromString(UriCodec.decode(value))
-                    }
-
-                    override fun put(bundle: Bundle, key: String, value: IngredientDTO) {
-                        bundle.putString(key, Json.encodeToString(value))
-                    }
-
-                    override fun serializeAsValue(value: IngredientDTO): String {
-                        return UriCodec.encode(Json.encodeToString(value))
-                    }
-                }
-
                 composable<RestaurantRoutes.IngredientHistory>(
-                    typeMap = mapOf(typeOf<IngredientDTO>() to CustomNavType),
+                    typeMap = mapOf(typeOf<IngredientDTO>() to toCustomNavType(IngredientDTO.serializer())),
                 ) {
                     val item = it.toRoute<RestaurantRoutes.IngredientHistory>().ingredient
                     IngredientDetailsActivity(onReturnClick = { innerNavController.popBackStack() }, ingredient = item)
