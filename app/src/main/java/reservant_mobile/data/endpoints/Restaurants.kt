@@ -75,6 +75,6 @@ class Restaurants(
         @Resource("employees")
         class Employees(val parent: Id, val hallOnly: Boolean? = null, val backdoorOnly: Boolean? = null)
         @Resource("tables")
-        class Tables(val parent: Id)
+        class Tables(val parent: Id,  val orderBy: String? = null)
     }
 }
