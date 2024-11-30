@@ -22,4 +22,10 @@ class Reports(
 
     @Resource("report-lost-item")
     class ReportLostItem(val parent: Reports = Reports())
+
+    @Resource("{reportId}")
+    class ReportId(val parent: Reports = Reports(), val reportId: String) {
+        @Resource("resolution")
+        class Resolution(val parent: ReportId)
+    }
 }

@@ -9,5 +9,11 @@ class Users(val name: String? = null, val filter: String? = null, val page: Int?
     class Id(val parent: Users = Users(), val employeeId: String)
 
     @Resource("{userId}")
-    class UserId(val parent: Users = Users(), val userId: String)
+    class UserId(val parent: Users = Users(), val userId: String){
+        @Resource("ban")
+        class Ban(val parent: UserId)
+
+        @Resource("unban")
+        class Unban(val parent: UserId)
+    }
 }
