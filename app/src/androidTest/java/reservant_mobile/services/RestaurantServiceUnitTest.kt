@@ -296,4 +296,10 @@ class RestaurantServiceUnitTest: ServiceTest() {
     fun get_tables_return_not_null()= runTest{
         assertThat(ser.getCurrentTables(restaurantId).value).isNotNull()
     }
+
+    @Test
+    fun get_reports_return_not_null()= runTest{
+        val date = LocalDateTime.now()
+        assertThat(ser.getUserRestaurantReports(restaurantId, dateUntil = date).value).isNotNull()
+    }
 }
