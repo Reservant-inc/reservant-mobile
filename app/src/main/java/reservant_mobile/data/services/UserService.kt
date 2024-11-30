@@ -10,6 +10,7 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.endpoints.Auth
+import reservant_mobile.data.endpoints.Reports
 import reservant_mobile.data.endpoints.User
 import reservant_mobile.data.endpoints.Users
 import reservant_mobile.data.endpoints.Wallet
@@ -20,6 +21,7 @@ import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.models.dtos.PageDTO
 import reservant_mobile.data.models.dtos.RegisterUserDTO
+import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSettingsDTO
@@ -67,6 +69,11 @@ interface IUserService{
     suspend fun getUserSettings(): Result<UserSettingsDTO?>
     suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?>
     suspend fun changePassword(oldPassword: String, newPassword: String): Result<Boolean>
+    suspend fun getReports(dateFrom: LocalDateTime? = null,
+                           dateUntil: LocalDateTime? = null,
+                           category: ReportDTO.ReportCategory? = null,
+                           reportedUserId: String? = null,
+                           restaurantId: Int? = null): Result<List<ReportDTO>?>
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -325,6 +332,24 @@ class UserService(): ServiceUtil(), IUserService {
         )
         val res = api.post(Auth.ChangePassword(), obj)
         return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
+    }
+
+    override suspend fun getReports(
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        category: ReportDTO.ReportCategory?,
+        reportedUserId: String?,
+        restaurantId: Int?
+    ): Result<List<ReportDTO>?> {
+        val res  = api.get(User.Reports(
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            category = category?.name,
+            reportedUserId = reportedUserId,
+            restaurantId = restaurantId
+            )
+        )
+        return complexResultWrapper(res)
     }
 
 }

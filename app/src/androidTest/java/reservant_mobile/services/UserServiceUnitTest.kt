@@ -8,8 +8,10 @@ import org.junit.Before
 import org.junit.Test
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.MoneyDTO
+import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.UserSettingsDTO
 import reservant_mobile.data.utils.GetUserEventsCategory
+import java.time.LocalDateTime
 import kotlin.random.Random
 
 class UserServiceUnitTest: ServiceTest(){
@@ -180,5 +182,15 @@ class UserServiceUnitTest: ServiceTest(){
     fun change_password_return_true()= runTest{
         val res = userService.changePassword(oldPassword = "Pa${"$"}${"$"}w0rd", newPassword = "P@ssw0rd")
         assertThat(res.value).isTrue()
+    }
+
+    @Test
+    fun get_reports_return_not_null()= runTest{
+        val date = LocalDateTime.now()
+        val category = ReportDTO.ReportCategory.LostItem
+        assertThat(userService.getReports(
+            dateUntil = date,
+            category = category
+        ).value).isNotNull()
     }
 }
