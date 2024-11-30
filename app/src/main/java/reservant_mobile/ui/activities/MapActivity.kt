@@ -214,6 +214,8 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                             onClick = {
                                                 if(isUserLoggedIn){
                                                     navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
+                                                } else{
+                                                    navController.navigate(AuthRoutes.Login)
                                                 }
                                             },
                                             name = item.name,
@@ -306,6 +308,8 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                                         navController.navigate(
                                                             EventRoutes.Details(eventId = item.eventId)
                                                         )
+                                                    } else {
+                                                        navController.navigate(AuthRoutes.Login)
                                                     }
                                                 }
                                             )
@@ -579,11 +583,10 @@ fun RestaurantDetailPreview(
     isUserLoggedIn: Boolean = false
 ){
     val modalBottomSheetState = rememberModalBottomSheetState()
-    val sheetHeight = if(isUserLoggedIn) 450.dp else 350.dp
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
-        modifier = Modifier.height(sheetHeight)
+        modifier = Modifier.height(450.dp)
     ) {
         val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
             factory = object : ViewModelProvider.Factory {
@@ -706,19 +709,22 @@ fun RestaurantDetailPreview(
                                 }
                             }
 
-                            if(isUserLoggedIn){
                                 ButtonComponent(
                                     modifier = Modifier
                                         .padding(10.dp)
                                         .wrapContentHeight(align = Alignment.CenterVertically),
                                     onClick = {
                                         onDismiss()
-                                        navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
+                                        if(isUserLoggedIn){
+                                            navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
+                                        } else{
+                                            navController.navigate(AuthRoutes.Login)
+                                        }
+
                                     },
 
                                     label = stringResource(id = R.string.label_show_more_details)
                                 )
-                            }
                         }
                     }
                 }
