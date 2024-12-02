@@ -46,11 +46,11 @@ class ProfileViewModel(
             if (UserObject.userId == profileUserId) {
                 isCurrentUser = true
                 loadFullUser()
+                fetchFriends()
+                fetchUserEvents()
             }
 
             loadSimpleUser()
-            fetchFriends()
-            fetchUserEvents()
             isLoading = false
         }
     }
@@ -59,7 +59,6 @@ class ProfileViewModel(
 
         val resultUser = userService.getUserSimpleInfo(profileUserId)
         if (resultUser.isError) {
-            isLoading = false
             return false
         }
         simpleProfileUser = resultUser.value
@@ -71,11 +70,9 @@ class ProfileViewModel(
         isLoading = true
         val resultUser = userService.getUserInfo()
         if (resultUser.isError) {
-            isLoading = false
             return false
         }
         fullProfileUser = resultUser.value
-        isLoading = false
         return true
     }
 
