@@ -435,4 +435,5 @@
     <string name="label_confirm_arrival">Potwierdź przybycie</string>
     <string name="label_arrival_confirmed">Przybycie potwierdzone</string>
     <string name="label_no_current_orders">Brak obecnych zamówień</string>
+    <string name="label_no_friends">Brak znajomych :(</string>
 </resources>

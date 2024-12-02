@@ -447,4 +447,5 @@
     <string name="label_confirm_arrival">Confirm arrival</string>
     <string name="label_arrival_confirmed">Arrival confirmed</string>
     <string name="label_no_current_orders">No current orders</string>
+    <string name="label_no_friends">No friends</string>
 </resources>
