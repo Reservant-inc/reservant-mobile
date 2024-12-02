@@ -30,8 +30,8 @@ abstract class ServiceTest {
             localBearer.saveData(PrefsKeys.BEARER_TOKEN,existingToken)
     }
 
-    suspend fun loginUser(){
-        userService.loginUser(loginUser)
+    suspend fun loginUser(user: LoginCredentialsDTO = loginUser){
+        userService.loginUser(user)
     }
 
 

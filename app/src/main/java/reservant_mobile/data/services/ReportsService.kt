@@ -3,12 +3,14 @@ package reservant_mobile.data.services
 import reservant_mobile.data.endpoints.Reports
 import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import java.time.LocalDateTime
 
 interface IReportsService{
     suspend fun reportCustomer(description: String, reportedUserId: String, visitId: Int ): Result<ReportDTO?>
     suspend fun reportEmployee(description: String, reportedUserId: String, visitId: Int ): Result<ReportDTO?>
     suspend fun reportLostItem(description: String, visitId: Int ): Result<ReportDTO?>
     suspend fun reportBug(description: String): Result<ReportDTO?>
+
 }
 
 class ReportsService(): ServiceUtil(), IReportsService {

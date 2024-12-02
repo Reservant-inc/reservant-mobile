@@ -17,6 +17,13 @@ class MyRestaurants {
 
         @Resource("menu-items")
         class MenuItems(val parent: Id)
+
+        @Resource("reports")
+        class Reports(val parent: Id,
+                      val dateFrom: String? = null,
+                      val dateUntil: String? = null,
+                      val category: String? = null,
+                      val reportedUserId: String? = null)
     }
 
     @Resource("validate-first-step")

@@ -52,3 +52,7 @@ enum class GetReservationStatus(val stringId: Int){
     ApprovedByRestaurant(R.string.label_reservation_status_approved),
     DeclinedByRestaurant(R.string.label_reservation_status_declined)
 }
+
+enum class GetRestaurantTablesSort{
+    StatusAsc, StatusDesc
+}

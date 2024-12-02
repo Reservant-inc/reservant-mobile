@@ -36,4 +36,14 @@ class User {
 
     @Resource("settings")
     class Settings(val parent: User = User())
+
+    @Resource("reports")
+    class Reports(
+        val parent: User = User(),
+        val dateFrom: String? = null,
+        val dateUntil: String? = null,
+        val category: String? = null,
+        val reportedUserId: String? = null,
+        val restaurantId: Int? = null,
+    )
 }

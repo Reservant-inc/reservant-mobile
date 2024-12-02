@@ -35,6 +35,7 @@ import reservant_mobile.data.utils.GetIngredientsSort
 import reservant_mobile.data.utils.GetReservationStatus
 import reservant_mobile.data.utils.GetRestaurantOrdersSort
 import reservant_mobile.data.utils.GetRestaurantReviewsSort
+import reservant_mobile.data.utils.GetRestaurantTablesSort
 import reservant_mobile.data.utils.GetVisitsSort
 import java.time.LocalDateTime
 
@@ -125,7 +126,12 @@ interface IRestaurantService{
                                      dateUntil: LocalDateTime? = null,
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
-    suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?>
+    suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort?): Result<List<TableDTO>?>
+    suspend fun getUserRestaurantReports(restaurantId: Any,
+                                         dateFrom: LocalDateTime? = null,
+                                         dateUntil: LocalDateTime? = null,
+                                         category: ReportDTO.ReportCategory? = null,
+                                         reportedUserId: String? = null, ): Result<List<ReportDTO>?>
 
 }
 
@@ -508,9 +514,27 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return pagingResultWrapper(sps)
     }
 
-    override suspend fun getCurrentTables(restaurantId: Any): Result<List<TableDTO>?> {
+    override suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort?): Result<List<TableDTO>?> {
         val res  = api.get(Restaurants.Id.Tables(
             parent = Restaurants.Id(restaurantId = restaurantId.toString()),
+            orderBy = orderBy?.name
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getUserRestaurantReports(
+        restaurantId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        category: ReportDTO.ReportCategory?,
+        reportedUserId: String?
+    ): Result<List<ReportDTO>?> {
+        val res  = api.get(MyRestaurants.Id.Reports(
+            parent = MyRestaurants.Id(restaurantId = restaurantId.toString()),
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            category = category?.name,
+            reportedUserId = reportedUserId,
         ))
         return complexResultWrapper(res)
     }
