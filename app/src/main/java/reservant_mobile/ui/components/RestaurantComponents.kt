@@ -1,6 +1,8 @@
 package reservant_mobile.ui.components
 
 import android.graphics.Bitmap
+import androidx.annotation.FloatRange
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,32 +19,52 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.data.utils.getRestaurantOpeningTime
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @Composable
 fun RestaurantCard(
@@ -50,7 +72,8 @@ fun RestaurantCard(
     name: String,
     location: String,
     city: String,
-    image: ImageBitmap?
+    image: ImageBitmap?,
+    availableHours: List<RestaurantDTO.AvailableHours>?
 ) {
     Card(
         modifier = Modifier
@@ -93,18 +116,69 @@ fun RestaurantCard(
 
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
+
             ) {
                 Text(
+                    modifier = Modifier.padding(top = 8.dp),
                     text = name,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
+                    modifier = Modifier.padding(top = 4.dp),
                     text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
+
+                availableHours?.let {
+
+                    var openingTime by remember {
+                        mutableStateOf(it.getRestaurantOpeningTime())
+                    }
+
+                    var closingTime by remember {
+                        mutableStateOf(it.getRestaurantOpeningTime(opening = false))
+                    }
+
+                    var currentTime by remember {
+                        mutableStateOf(LocalTime.now())
+                    }
+
+                    val isOpen = openingTime != null && closingTime != null && currentTime > openingTime && currentTime < closingTime
+
+                    closingTime?.let {
+                        if (isOpen){
+                            val isNearClosing = closingTime!!.minusHours(1) < currentTime
+
+                            if (isNearClosing) {
+                                Text(
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                                    text = "${stringResource(id = R.string.label_closing_soon)}: $it",
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            } else {
+                                Text(
+                                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                                    text = "${stringResource(id = R.string.label_closing_at)}: $it",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+                        } else {
+                            Text(
+                                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                                text = "${stringResource(id = R.string.label_closed)}: $it",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+
+                        }
+                    }
+
+                }
             }
         }
     }
@@ -256,5 +330,169 @@ fun MenuContent(
             )
         }
 
+    }
+}
+
+@Composable
+fun OpeningHours(
+    openingHours: List<RestaurantDTO.AvailableHours>
+){
+
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+
+    val openingTime by remember {
+        mutableStateOf(openingHours.getRestaurantOpeningTime())
+    }
+    
+    val closingTime by remember {
+        mutableStateOf(openingHours.getRestaurantOpeningTime(opening = false))
+    }
+
+    val currentTime by remember {
+        mutableStateOf(LocalTime.now())
+    }
+
+    val currentDay by remember {
+        mutableIntStateOf(LocalDate.now().dayOfWeek.value - 1)
+    }
+    
+    val isOpen = openingTime != null && closingTime != null && currentTime > openingTime && currentTime < closingTime
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .animateContentSize(),
+            text = buildAnnotatedString {
+                if (isExpanded) {
+
+                    openingHours.forEachIndexed { index, availableHours ->
+
+                        val date by remember {
+                            mutableStateOf(
+                                LocalDate.now()
+                                    .with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+                                    .plusDays(index.toLong())
+                            )
+                        }
+
+                        if (index == currentDay) {
+                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        }
+
+                        append(date.format(DateTimeFormatter.ofPattern("E", Locale.getDefault())))
+
+                        if (index == currentDay) {
+                            pop()
+                        }
+
+                        append(" • ")
+
+                        //if (availableHours.from == null && availableHours.until == null){ TODO
+                        if (date.dayOfWeek == DayOfWeek.SUNDAY){
+                            withStyle(SpanStyle(color = MaterialTheme.colorScheme.error)){
+                                append(stringResource(id = R.string.label_closed))
+                            }
+                        } else {
+                            append("${availableHours.from} - ${availableHours.until}\n")
+                        }
+
+
+                    }
+
+                } else {
+                    pushStyle(SpanStyle(color = if (isOpen) Color.Green else Color.Red))
+                    append(stringResource(id = if (isOpen) R.string.label_open else R.string.label_closed ))
+                    pop()
+                    append(" • $openingTime - $closingTime")
+                }
+            },
+            maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+        )
+        Icon(
+            Icons.Rounded.KeyboardArrowDown,
+            contentDescription = "Expand icon",
+            modifier = Modifier
+                .clip(CircleShape)
+                .padding(horizontal = 4.dp)
+                .rotate(if (isExpanded) 180f else 0f)
+                .clickable {
+                    isExpanded = !isExpanded
+                }
+        )
+
+    }
+}
+
+@Composable
+fun OpeningHourDayInput(
+    dayOfWeek: String,
+    isOpen: Boolean,
+    onOpenChange: (Boolean) -> Unit,
+    startTime: String,
+    onStartTimeChange: (String) -> Unit,
+    endTime: String,
+    onEndTimeChange: (String) -> Unit,
+){
+    val mod = if (isOpen) Modifier else Modifier.background(Color.Gray)
+
+    Row (
+        modifier = mod
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(0.4f)
+                .align(Alignment.CenterVertically)
+        ){
+            Checkbox(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                checked = !isOpen,
+                onCheckedChange = onOpenChange
+            )
+            Text(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                text = dayOfWeek,
+                textDecoration = if (isOpen) TextDecoration.None else TextDecoration.LineThrough
+            )
+        }
+
+
+        if (isOpen) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                MyTimePickerDialog(
+                    initialTime = startTime,
+                    onTimeSelected = onStartTimeChange,
+                    modifier = Modifier.weight(0.5f).padding(end = 4.dp)
+                )
+                MyTimePickerDialog(
+                    initialTime = endTime,
+                    onTimeSelected = onEndTimeChange,
+                    modifier = Modifier.weight(0.5f).padding(start = 4.dp)
+                )
+            }
+
+        } else {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = "Closed",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
     }
 }

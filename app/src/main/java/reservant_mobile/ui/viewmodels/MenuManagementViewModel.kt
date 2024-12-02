@@ -59,9 +59,9 @@ class MenuManagementViewModel(
     }
 
     /*suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
-        val result = fileService.getImage(menu.photo)
-        if (!result.isError){
-            return result.value!!
+        val resultFirstStep = fileService.getImage(menu.photo)
+        if (!resultFirstStep.isError){
+            return resultFirstStep.value!!
         }
         return null
     }*/

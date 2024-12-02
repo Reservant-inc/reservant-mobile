@@ -164,7 +164,8 @@ class MapViewModel : ReservantViewModel() {
                             address = dto.address,
                             city = dto.city,
                             logo = getPhoto(dto.logo!!),
-                            location = dto.location
+                            location = dto.location,
+                            availableHours = dto.openingHours
                         )
                     }
                 }
@@ -331,8 +332,9 @@ data class RestaurantOnMap(
     val address: String,
     val city: String,
     val logo: Bitmap?,
-    val location: LocationDTO?
-    )
+    val location: LocationDTO?,
+    val availableHours: List<RestaurantDTO.AvailableHours>?
+)
 
 data class EventOnMap(
     val eventId: Int,

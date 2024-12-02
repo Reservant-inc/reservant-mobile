@@ -33,6 +33,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -84,6 +85,7 @@ import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MenuContent
 import reservant_mobile.ui.components.MissingPage
+import reservant_mobile.ui.components.OpeningHours
 import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
@@ -237,23 +239,36 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                     }
                                 }
 
-                                Text(
-                                    text = restaurant.restaurantType,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                ) {
+                                    Text(
+                                        text = restaurant.restaurantType,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
 
-                                Text(
-                                    text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
+                                    Text(
+                                        text = stringResource(R.string.label_restaurant_address) + ": ${restaurant.address}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
 
-                                Text(
-                                    text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
+                                    Text(
+                                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+
+                                    restaurant.openingHours?.let {
+
+                                        HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
+
+                                        OpeningHours(openingHours = restaurant.openingHours)
+                                    }
+                                }
+
+
 
                                 if (restaurant.photos.size > 1) {
                                     var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }

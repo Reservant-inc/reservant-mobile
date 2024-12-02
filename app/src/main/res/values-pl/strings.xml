@@ -56,6 +56,7 @@
     <string name="error_registerRestaurant_invalid_file">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Maksymalny czas trwania rezerwacji musi być >= 30 minut</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
@@ -64,11 +65,13 @@
     <string name="label_uploadFiles">Wyślij potrzebne pliki:</string>
     <string name="label_restaurant_delivery">Dostawa</string>
     <string name="label_restaurant_description">Opis</string>
+    <string name="label_restaurant_maxReservationDuration">Maksymalny czas trwania rezerwacji (minuty)</string>
     <string name="label_restaurant_tables">Stoliki</string>
     <string name="label_restaurant_delivery_available">Dostępna</string>
     <string name="label_restaurant_delivery_not_available">Nie Dostępna</string>
     <string name="label_restaurant_tags">Tagi</string>
     <string name="error_not_found">Nie znaleziono zasobu</string>
+    <string name="error_no_tags_selected">Nie wybrano tagów</string>
     <string name="label_group">Grupa</string>
     <string name="label_new_restaurant">Nowa Restauracja</string>
     <string name="confirm_delete_title">Czy napewno chcesz usunąć tą pozycję?</string>
@@ -167,6 +170,7 @@
     <string name="errorCode_AccessDenied">Nie masz uprawnień do wykonania tej czynności</string>
     <string name="errorCode_Duplicate">Istnieje już taki obiekt</string>
     <string name="errorCode_NotFound">Nie znaleziono</string>
+    <string name="errorCode_GreaterThanOrEqualValidator">%1s musi być większe lub równe %2s</string>
     <string name="label_ticket">Nowe zgłoszenie</string>
     <string name="label_ticket_history">Historia zgłoszeń</string>
     <string name="label_add_friend">Dodaj znajomego</string>
@@ -322,13 +326,26 @@
     <string name="select_status">Wybierz Status</string>
     <string name="submit">Zatwierdź</string>
     <string name="cancel">Anuluj</string>
-    <string name="label_NotificationRestaurantVerified">Twoja restauracja została zweryfikowana</string>
-    <string name="label_NotificationNewRestaurantReview">Nowa opinia o restauracji</string>
-    <string name="label_NotificationNewFriendRequest">Nowe zaproszenie do znajomych</string>
-    <string name="label_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
-    <string name="label_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>
-    <string name="label_NotificationParticipationRequestResponse">Ktoś odpowiedział na twoją prośbę dołączenia do wydarzenia</string>
-    <string name="label_NotificationVisitApprovedDeclined">Restauracja odpowiedziała na twoją wizytę</string>
+    <string name="title_NotificationRestaurantVerified">Twoja restauracja została zweryfikowana</string>
+    <string name="body_NotificationRestaurantVerified">Zweryfikowano restaurację %1s</string>
+    <string name="title_NotificationNewRestaurantReview">Nowa opinia o restauracji</string>
+    <string name="title_NotificationNewFriendRequest">Nowe zaproszenie do znajomych</string>
+    <string name="body_NotificationNewFriendRequest">%1s wysłał Ci zaproszenie do znajomych</string>
+    <string name="title_NotificationFriendRequestAccepted">Zaproszenie do znajomych zaakceptowane</string>
+    <string name="body_NotificationFriendRequestAccepted">%1s zaakceptował Twoje zaproszenie do znajomych</string>
+    <string name="title_NotificationNewParticipationRequest">Ktoś chce dołączyć do twojego wydarzenia</string>
+    <string name="body_NotificationNewParticipationRequest">%1s chce dołączyć do Twojego wydarzenia - %2s</string>
+    <string name="title_NotificationParticipationRequestResponse_accepted">Twoja prośba dołączenia do wydarzenia została zatwierdzona</string>
+    <string name="title_NotificationParticipationRequestResponse_declined">Twoja prośba dołączenia do wydarzenia została odrzucona</string>
+    <string name="body_NotificationParticipationRequestResponse_accepted">%1s zatwiedził Twoją prośbę dołączenia do wydarzenia - %2s</string>
+    <string name="body_NotificationParticipationRequestResponse_declined">%1s odrzucił Twoją prośbę dołączenia do wydarzenia - %2s</string>
+    <string name="title_NotificationVisitApprovedDeclined_accepted">Restauracja zaakceptowałą Twoją wizytę</string>
+    <string name="title_NotificationVisitApprovedDeclined_declined">Restauracja odrzuciła Twoją wizytę</string>
+    <string name="body_NotificationVisitApprovedDeclined_accepted">Restauracja %1s zaakceptowałą Twoją wizytę na %2s</string>
+    <string name="body_NotificationVisitApprovedDeclined_declined">Restauracja %1s odrzuciła Twoją wizytę na %2s</string>
+    <string name="title_NotificationNewMessage">Masz nową wiadomość</string>
+    <string name="title_NotificationNewReservation">Ktoś złożył rezerwację w Twojej restauracji</string>
+    <string name="body_NotificationNewReservation">Nowa rezerwacja w %1s, na %2s, dla %3d</string>
     <string name="label_report_category_technical">Techniczny</string>
     <string name="label_report_category_lost_item">Zgubiony przedmiot</string>
     <string name="label_report_category_restaurant_employee">Pracownik restuaracji</string>
@@ -401,4 +418,10 @@
     <string name="error_invalid_number">Nieprawidłowa liczba</string>
     <string name="label_choose_time">Wybierz godzinę</string>
     <string name="error_select_restaurant">Wybierz restaurację</string>
+    <string name="message_login_required">Musisz być zalogowany</string>
+    <string name="label_closing_at">Zamknięte o</string>
+    <string name="label_closed">Zamknięte</string>
+    <string name="label_closing_soon">Wkrótce zamknięte</string>
+    <string name="label_open">Otwarte</string>
+    <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
 </resources>

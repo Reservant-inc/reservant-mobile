@@ -112,7 +112,7 @@ class RegisterViewModel(
         return true
 //        phoneNumberWithCountryCode = "+${mobileCountry?.code}${phoneNum.value}"
 //        return isInvalidWithRegex(Regex.PHONE_REG, phoneNumberWithCountryCode) ||
-//                getFieldError(result, phoneNum.name) != -1
+//                getFieldError(resultFirstStep, phoneNum.name) != -1
     }
 
     fun isPasswordInvalid() : Boolean{

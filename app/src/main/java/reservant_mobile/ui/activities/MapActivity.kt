@@ -85,6 +85,7 @@ import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
+import reservant_mobile.ui.components.Logo
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyDatePickerDialog
@@ -96,23 +97,22 @@ import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.RestaurantCard
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.SwitchWithLabel
+import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.MapViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import java.time.LocalDate
+import kotlin.math.round
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun MapActivity(){
-
+fun MapActivity(isUserLoggedIn: Boolean = false){
     val navController = rememberNavController()
+    val mapViewModel = viewModel<MapViewModel>()
     NavHost(navController = navController, startDestination = RestaurantRoutes.Map){
         composable<RestaurantRoutes.Map> {
-            val mapViewModel = viewModel<MapViewModel>()
-
-
 
             var showRestaurantBottomSheet by remember { mutableStateOf(false) }
             var showRestaurantId by remember { mutableIntStateOf(0) }
@@ -145,13 +145,16 @@ fun MapActivity(){
                 mv = mapViewModel.initMapView(context, startPoint)
             }
             if (showRestaurantBottomSheet) {
-                RestaurantDetailPreview(navController, showRestaurantId) {
-                    showRestaurantBottomSheet = false
-                }
+                RestaurantDetailPreview(
+                    navController = navController,
+                    restaurantId = showRestaurantId,
+                    onDismiss =  { showRestaurantBottomSheet = false },
+                    isUserLoggedIn = isUserLoggedIn
+                )
             }
 
 
-            val pages: List<Pair<String, @Composable () -> Unit>> = listOf(
+            val pages: List<Pair<String, @Composable () -> Unit>> = listOfNotNull(
                 stringResource(id = R.string.label_restaurants) to {
                     Column {
                         Row(
@@ -209,12 +212,17 @@ fun MapActivity(){
                                     if (item != null) {
                                         RestaurantCard(
                                             onClick = {
-                                                navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
+                                                if(isUserLoggedIn){
+                                                    navController.navigate(RestaurantRoutes.Details(restaurantId = item.restaurantId))
+                                                } else{
+                                                    navController.navigate(AuthRoutes.Login)
+                                                }
                                             },
                                             name = item.name,
                                             location = item.address,
                                             city = item.city,
-                                            image = item.logo?.asImageBitmap()
+                                            image = item.logo?.asImageBitmap(),
+                                            availableHours = item.availableHours
                                         )
                                         mapViewModel.addRestaurantMarker(item) { _, _ ->
                                             showRestaurantId = item.restaurantId
@@ -296,26 +304,54 @@ fun MapActivity(){
                                                 interestedCount = item.numberInterested,
                                                 takePartCount = item.numberParticipants,
                                                 onClick = {
-                                                    navController.navigate(
-                                                        EventRoutes.Details(eventId = item.eventId)
-                                                    )
+                                                    if(isUserLoggedIn){
+                                                        navController.navigate(
+                                                            EventRoutes.Details(eventId = item.eventId)
+                                                        )
+                                                    } else {
+                                                        navController.navigate(AuthRoutes.Login)
+                                                    }
                                                 }
                                             )
                                         }
                                     }
                                 }
-                                MyFloatingActionButton(
-                                    onClick = {
-                                        navController.navigate(EventRoutes.AddEvent)
-                                    },
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(16.dp)
-                                )
+                                if(isUserLoggedIn){
+                                    MyFloatingActionButton(
+                                        onClick = {
+                                            navController.navigate(EventRoutes.AddEvent)
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .padding(16.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
+                },
+                Pair<String, @Composable () -> Unit>(
+                    first = stringResource(id = R.string.label_login_action),
+                    second = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Logo()
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Login) }, label = stringResource(
+                                id = R.string.label_login_action
+                            ))
+
+                            ButtonComponent(onClick = { navController.navigate(AuthRoutes.Register) }, label = stringResource(
+                                id = R.string.label_signup
+                            ))
+                        }
+                    }
+                ).takeIf { !isUserLoggedIn }
             )
 
             BottomSheetScaffold(
@@ -326,10 +362,10 @@ fun MapActivity(){
                     Box(
                         modifier = Modifier.fillMaxSize()
                     ){
-
                         FloatingTabSwitch(
                             pages = pages,
-                            color = MaterialTheme.colorScheme.surface)
+                            color = MaterialTheme.colorScheme.surface
+                        )
                     }
                 },
                 content = { innerPadding -> OsmMapView(mv, startPoint,
@@ -528,11 +564,14 @@ fun MapActivity(){
         composable<EventRoutes.AddEvent>{
             AddEventActivity(navController = navController)
         }
+        composable<AuthRoutes.Login>{
+            LandingActivity(startDestination = AuthRoutes.Login)
+        }
+        composable<AuthRoutes.Register>{
+            LandingActivity(startDestination = AuthRoutes.Register)
+
+        }
     }
-
-
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -540,7 +579,8 @@ fun MapActivity(){
 fun RestaurantDetailPreview(
     navController: NavHostController,
     restaurantId: Int,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isUserLoggedIn: Boolean = false
 ){
     val modalBottomSheetState = rememberModalBottomSheetState()
     ModalBottomSheet(
@@ -651,32 +691,40 @@ fun RestaurantDetailPreview(
                                         )
                                     }
 
-
-                                    Text(
-                                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(horizontal = 16.dp)
-                                    )
+                                    if(restaurant.provideDelivery){
+                                        Text(
+                                            text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(horizontal = 16.dp)
+                                        )
+                                    }
                                 }
-
-                                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    RatingBar(rating = 3.9f)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("3.9 (200+ opinii)")
+                                if(restaurant.rating != null && restaurant.numberReviews!! > 0){
+                                    val rating = restaurant.rating.toFloat()
+                                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                        RatingBar(rating = rating)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("${String.format("%.1f", rating)} (${restaurant.numberReviews} opinii)")
+                                    }
                                 }
                             }
 
-                            ButtonComponent(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .wrapContentHeight(align = Alignment.CenterVertically),
-                                onClick = {
-                                    onDismiss()
-                                    navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
-                                },
+                                ButtonComponent(
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .wrapContentHeight(align = Alignment.CenterVertically),
+                                    onClick = {
+                                        onDismiss()
+                                        if(isUserLoggedIn){
+                                            navController.navigate(RestaurantRoutes.Details(restaurantId =  restaurant.restaurantId))
+                                        } else{
+                                            navController.navigate(AuthRoutes.Login)
+                                        }
 
-                                label = stringResource(id = R.string.label_show_more_details)
-                            )
+                                    },
+
+                                    label = stringResource(id = R.string.label_show_more_details)
+                                )
                         }
                     }
                 }
