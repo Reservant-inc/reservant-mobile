@@ -260,12 +260,14 @@ fun UserListItem(
     deletable: Boolean = false,
     onApproveClick: (() -> Unit)? = null,
     onRejectClick: (() -> Unit)? = null,
-    onDeleteClick: (() -> Unit)? = null
+    onDeleteClick: (() -> Unit)? = null,
+    onCardClick: (() -> Unit)? = null,
+    modifier: Modifier? = null
 ) {
     var showPopup by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier
+        modifier = modifier ?: Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -284,7 +286,11 @@ fun UserListItem(
         Text(
             text = "${user.firstName} ${user.lastName}",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    onCardClick?.invoke()
+                }
         )
 
         if (showButtons) {
@@ -300,7 +306,6 @@ fun UserListItem(
                         contentDescription = stringResource(R.string.label_accept)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    //Text(stringResource(R.string.label_accept))
                 }
 
                 VerticalDivider(modifier = Modifier.padding(8.dp))
@@ -315,7 +320,6 @@ fun UserListItem(
                         contentDescription = stringResource(R.string.label_reject)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    //Text(stringResource(R.string.label_reject))
                 }
             }
         } else if (deletable) {
