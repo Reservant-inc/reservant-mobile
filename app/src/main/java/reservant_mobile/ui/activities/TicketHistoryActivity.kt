@@ -72,17 +72,22 @@ fun TicketHistoryActivity(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(bottom = 16.dp)
     ) {
         IconWithHeader(
             icon = Icons.Rounded.History,
             text = stringResource(id = R.string.label_ticket_history),
+            showBackButton = true,
+            onReturnClick = {
+                navController.popBackStack()
+            }
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .padding(start = 16.dp, end = 16.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Zakładki FloatingTabSwitch

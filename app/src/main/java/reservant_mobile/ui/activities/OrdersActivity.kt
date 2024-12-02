@@ -17,13 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.OrderItem
 import reservant_mobile.ui.components.SearchBarWithFilter
 
 @Composable
-fun OrdersActivity() {
+fun OrdersActivity(navController: NavHostController) {
     val ordersViewModel = viewModel<OrdersViewModel>()
     val orders by ordersViewModel.filteredOrders.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -34,10 +35,16 @@ fun OrdersActivity() {
         "Anulowano"
     )
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier.padding(bottom = 16.dp)
+    ) {
         IconWithHeader(
             icon = Icons.Rounded.History,
             text = stringResource(id = R.string.label_orders),
+            showBackButton = true,
+            onReturnClick = {
+                navController.popBackStack()
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -53,12 +60,15 @@ fun OrdersActivity() {
                 ordersViewModel.filterOrders(selectedFilter)
             },
             currentFilter = selectedFilter,
-            filterOptions = filterOptions
+            filterOptions = filterOptions,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+        ) {
             items(orders) { order ->
                 OrderItem(order = order)
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
