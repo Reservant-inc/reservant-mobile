@@ -168,7 +168,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 ProfileActivity(navController = navController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
             }
             composable<UserRoutes.Orders>{
-                OrdersActivity()
+                OrdersActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
                 NewTicketActivity()
