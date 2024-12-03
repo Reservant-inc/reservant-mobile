@@ -16,14 +16,18 @@ import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.FriendsService
+import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.UserService.UserObject
+import reservant_mobile.data.utils.GetUserEventsCategory
 
 class ProfileViewModel(
     private val userService: IUserService = UserService(),
+    private val eventService: IEventService = EventService(),
     private val friendsService: IFriendsService = FriendsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
@@ -40,6 +44,11 @@ class ProfileViewModel(
     private val _eventsFlow = MutableStateFlow<Flow<PagingData<EventDTO>>?>(null)
     val eventsFlow: StateFlow<Flow<PagingData<EventDTO>>?> = _eventsFlow
 
+    private val _ownedEventsFlow = MutableStateFlow<Flow<PagingData<EventDTO>>?>(null)
+    val ownedEventsFlow: StateFlow<Flow<PagingData<EventDTO>>?> = _ownedEventsFlow
+
+    private val _interestedUsersFlows = mutableMapOf<String, Flow<PagingData<EventDTO.Participant>>>()
+
     init {
         viewModelScope.launch {
             isLoading = true
@@ -48,26 +57,24 @@ class ProfileViewModel(
                 loadFullUser()
                 fetchFriends()
                 fetchUserEvents()
+                fetchOwnedEvents()
             }
 
             loadSimpleUser()
             isLoading = false
         }
     }
-    
-    private suspend fun loadSimpleUser(): Boolean {
 
+    private suspend fun loadSimpleUser(): Boolean {
         val resultUser = userService.getUserSimpleInfo(profileUserId)
         if (resultUser.isError) {
             return false
         }
         simpleProfileUser = resultUser.value
-
         return true
     }
 
     private suspend fun loadFullUser(): Boolean {
-        isLoading = true
         val resultUser = userService.getUserInfo()
         if (resultUser.isError) {
             return false
@@ -82,8 +89,54 @@ class ProfileViewModel(
 
             if (!result.isError) {
                 _friendsFlow.value = result.value?.cachedIn(viewModelScope)
-            } else {
-                val errors = result.errors
+            }
+        }
+    }
+
+    private fun fetchOwnedEvents() {
+        viewModelScope.launch {
+            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserEvents(
+                category = GetUserEventsCategory.CreatedBy
+            )
+
+            if (!result.isError) {
+                _ownedEventsFlow.value = result.value?.cachedIn(viewModelScope)
+            }
+        }
+    }
+
+    fun getInterestedUsersFlow(eventId: String): Flow<PagingData<EventDTO.Participant>>? {
+        return _interestedUsersFlows[eventId]
+    }
+
+    fun fetchInterestedUsers(eventId: String) {
+        if (_interestedUsersFlows.containsKey(eventId)) return
+
+        viewModelScope.launch {
+            val result = eventService.getInterestedUser(eventId)
+            if (!result.isError) {
+                val flow = result.value?.cachedIn(viewModelScope)
+                if (flow != null) {
+                    _interestedUsersFlows[eventId] = flow
+                }
+            }
+        }
+    }
+
+    fun acceptUser(eventId: String, userId: String) {
+        viewModelScope.launch {
+            val result = eventService.acceptUser(eventId, userId)
+            if (!result.isError) {
+                fetchInterestedUsers(eventId)
+            }
+        }
+    }
+
+    fun rejectUser(eventId: String, userId: String) {
+        viewModelScope.launch {
+            val result = eventService.rejectUser(eventId, userId)
+            if (!result.isError) {
+                fetchInterestedUsers(eventId)
             }
         }
     }
@@ -96,8 +149,6 @@ class ProfileViewModel(
 
             if (!result.isError) {
                 _eventsFlow.value = result.value?.cachedIn(viewModelScope)
-            } else {
-                // Obsługa błędów
             }
             isLoading = false
         }

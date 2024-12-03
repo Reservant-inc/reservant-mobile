@@ -91,6 +91,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     val eventsFlow by profileViewModel.eventsFlow.collectAsState()
     val eventPagingItems = eventsFlow?.collectAsLazyPagingItems()
 
+    val ownedEventsFlow by profileViewModel.ownedEventsFlow.collectAsState()
+    val ownedEventsPagingItems = ownedEventsFlow?.collectAsLazyPagingItems()
+
     Scaffold(
         topBar = {
             IconWithHeader(
@@ -318,7 +321,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     FloatingTabSwitch(
                         pages = listOf(
                             stringResource(R.string.label_orders) to { CurrentOrdersTab() },
-                            stringResource(R.string.label_join_requests) to { JoinRequestsTab() },
+                            stringResource(R.string.label_join_requests) to {
+                                JoinRequestsTab(
+                                    ownedEventsPagingItems,
+                                    profileViewModel
+                                )
+                            },
                             stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
                             stringResource(R.string.label_event_history) to { HistoryTab(eventPagingItems) }
                         )
@@ -338,85 +346,130 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 }
 
 @Composable
-fun JoinRequestsTab() {
-    val context = LocalContext.current
+fun JoinRequestsTab(
+    ownedEventsPagingItems: LazyPagingItems<EventDTO>?,
+    profileViewModel: ProfileViewModel
+) {
+    if (ownedEventsPagingItems == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 80.dp, start = 16.dp, end = 16.dp)
+        ) {
+            items(ownedEventsPagingItems.itemCount) { index ->
+                val event = ownedEventsPagingItems[index]
+                if (event != null) {
 
-    // Sample events data
-    val sampleEvents = listOf(
-        Event(
-            eventId = 1,
-            eventName = "Community Meetup",
-            joinRequests = listOf(
-                EventDTO.Participant(userId = "user1", firstName = "Alice", lastName = "Smith"),
-                EventDTO.Participant(userId = "user2", firstName = "Bob", lastName = "Johnson")
-            )
-        ),
-        Event(
-            eventId = 2,
-            eventName = "Hackathon",
-            joinRequests = listOf(
-                EventDTO.Participant(userId = "user3", firstName = "Charlie", lastName = "Brown"),
-                EventDTO.Participant(userId = "user4", firstName = "Diana", lastName = "Prince"),
-                EventDTO.Participant(userId = "user5", firstName = "Ethan", lastName = "Hunt")
-            )
-        )
-    )
+                    profileViewModel.fetchInterestedUsers(event.eventId.toString())
+                    val interestedUsersFlow = profileViewModel.getInterestedUsersFlow(event.eventId.toString())
+                    val interestedUsersPagingItems = interestedUsersFlow?.collectAsLazyPagingItems()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp)
-    ) {
-        items(sampleEvents.size) { id ->
-            val event = sampleEvents[id]
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                elevation = CardDefaults.cardElevation(4.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = event.eventName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (event.joinRequests.isNotEmpty()) {
-                        event.joinRequests.forEach { participant ->
-                            UserListItem(
-                                user = participant,
-                                showButtons = true,
-                                onApproveClick = {
-                                    Toast.makeText(
-                                        context,
-                                        "${participant.firstName} approved for ${event.eventName}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                onRejectClick = {
-                                    Toast.makeText(
-                                        context,
-                                        "${participant.firstName} rejected from ${event.eventName}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = event.name ?: "",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            HorizontalDivider()
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (interestedUsersPagingItems == null) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            } else {
+                                if (interestedUsersPagingItems.itemCount == 0) {
+                                    Text(
+                                        text = stringResource(R.string.label_no_join_requests),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.Gray,
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
+                                } else {
+                                    interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
+                                        UserListItem(
+                                            user = participant,
+                                            showButtons = true,
+                                            onApproveClick = {
+                                                profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                            },
+                                            onRejectClick = {
+                                                profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                            }
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                }
+                            }
                         }
-                    } else {
-                        Text(
-                            text = stringResource(R.string.label_no_join_requests),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
+                    }
+                }
+            }
+
+            ownedEventsPagingItems.apply {
+                when {
+                    loadState.refresh is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.append is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+                    loadState.refresh is LoadState.Error -> {
+                        val e = ownedEventsPagingItems.loadState.refresh as LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                    loadState.append is LoadState.Error -> {
+                        val e = ownedEventsPagingItems.loadState.append as LoadState.Error
+                        item {
+                            Text(
+                                text = stringResource(R.string.error_loading_more_events),
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
