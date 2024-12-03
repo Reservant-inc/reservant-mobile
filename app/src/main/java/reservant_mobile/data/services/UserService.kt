@@ -68,6 +68,7 @@ interface IUserService{
     suspend fun getUserSimpleInfo(userId: Any): Result<UserSummaryDTO?>
     suspend fun getUserSettings(): Result<UserSettingsDTO?>
     suspend fun updateUserSettings(settings: UserSettingsDTO): Result<UserSettingsDTO?>
+    suspend fun updateUserProfile(user: UserDTO): Result<Boolean>
     suspend fun changePassword(oldPassword: String, newPassword: String): Result<Boolean>
     suspend fun getReports(dateFrom: LocalDateTime? = null,
                            dateUntil: LocalDateTime? = null,
@@ -117,6 +118,11 @@ class UserService(): ServiceUtil(), IUserService {
 
     override suspend fun registerUser(user: RegisterUserDTO): Result<Boolean> {
         val res = api.post(Auth.RegisterCustomer(), user)
+        return booleanResultWrapper(res)
+    }
+
+    override suspend fun updateUserProfile(user: UserDTO): Result<Boolean> {
+        val res = api.put(User, user)
         return booleanResultWrapper(res)
     }
 
