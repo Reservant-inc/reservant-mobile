@@ -56,6 +56,8 @@ class ProfileViewModel(
 
     private val _interestedUsersFlows = mutableMapOf<String, Flow<PagingData<EventDTO.Participant>>>()
 
+    var updateProfileResult by mutableStateOf<Result<Boolean>?>(null)
+
     init {
         viewModelScope.launch {
             isLoading = true
@@ -128,6 +130,16 @@ class ProfileViewModel(
 
             if (!result.isError) {
                 _ownedEventsFlow.value = result.value?.cachedIn(viewModelScope)
+            }
+        }
+    }
+
+    fun updateProfile(user: UserDTO) {
+        viewModelScope.launch {
+            val result = userService.updateUserProfile(user)
+            updateProfileResult = result
+            if (!result.isError) {
+                loadFullUser()
             }
         }
     }

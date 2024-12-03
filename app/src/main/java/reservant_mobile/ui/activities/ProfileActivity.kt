@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +30,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,19 +40,25 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -57,17 +68,26 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import com.google.i18n.phonenumbers.PhoneNumberUtil
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
+import reservant_mobile.data.models.dtos.PhoneNumberDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.CountryPickerView
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
+import reservant_mobile.ui.components.FormFileInput
+import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 import java.time.LocalDateTime
+import java.util.Locale
 
 @Composable
 fun ProfileActivity(navController: NavHostController, userId: String) {
@@ -77,6 +97,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 ProfileViewModel(profileUserId = userId) as T
         }
     )
+
+    val context = LocalContext.current
+    var showEditDialog by remember { mutableStateOf(false) }
 
     val friendsFlow by profileViewModel.friendsFlow.collectAsState()
     val friendsPagingItems = friendsFlow?.collectAsLazyPagingItems()
@@ -103,7 +126,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 actions = if (profileViewModel.isCurrentUser) {
                     {
                         IconButton(onClick = {
-                            // TODO: Edycja profilu
+                            showEditDialog = true
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
@@ -116,6 +139,20 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
             )
         }
     ) { paddingValues ->
+
+        if(showEditDialog){
+            profileViewModel.fullProfileUser?.let { fullUser ->
+                EditProfileDialog(
+                    user = fullUser,
+                    onSave = {
+                        profileViewModel.updateProfile(it)
+                    },
+                    onDismiss = { showEditDialog = false },
+                    context = context
+                )
+            }
+        }
+
         if(!profileViewModel.isLoading){
             Column(
                 modifier = Modifier
@@ -866,4 +903,134 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
             }
         }
     }
+}
+
+fun getCountriesList(): List<Country> {
+    val phoneNumberUtil = PhoneNumberUtil.getInstance()
+    val countries = mutableListOf<Country>()
+
+    for (regionCode in phoneNumberUtil.supportedRegions) {
+        val countryCode = phoneNumberUtil.getCountryCodeForRegion(regionCode).toString()
+        val countryName = Locale("", regionCode).getDisplayCountry(Locale.ENGLISH)
+        countries.add(Country(regionCode.lowercase(Locale.getDefault()), countryCode, countryName))
+    }
+
+    return countries.sortedBy { it.fullName }
+}
+@Composable
+fun EditProfileDialog(
+    user: UserDTO,
+    onDismiss: () -> Unit,
+    onSave: (UserDTO) -> Unit,
+    context: Context
+) {
+    var firstName by remember { mutableStateOf(user.firstName) }
+    var lastName by remember { mutableStateOf(user.lastName) }
+    var phoneNum by remember { mutableStateOf(user.phoneNumber?.number ?: "") }
+
+    val countriesList = getCountriesList()
+    var mobileCountry by remember {
+        mutableStateOf(
+            countriesList.firstOrNull { "+${it.code}" == user.phoneNumber?.code }
+                ?: countriesList.firstOrNull { it.nameCode == "pl" }
+        )
+    }
+
+    var birthDate by remember { mutableStateOf(user.birthDate ?: "") }
+    var photo by remember { mutableStateOf(user.photo ?: "") }
+    var formSent by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                formSent = true
+                    val updatedUser = UserDTO(
+                        firstName = firstName,
+                        lastName = lastName,
+                        birthDate = birthDate,
+                        photo = photo,
+                        phoneNumber = PhoneNumberDTO(
+                            code = "+${mobileCountry?.code}",
+                            number = phoneNum
+                        )
+                    )
+                    onSave(updatedUser)
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Edit Profile") },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                // First Name Input
+                OutlinedTextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("First Name") },
+                    isError = firstName.isBlank() && formSent,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // Last Name Input
+                OutlinedTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("Last Name") },
+                    isError = lastName.isBlank() && formSent,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // Phone Number Input with Country Picker
+                FormInput(
+                    inputText = phoneNum,
+                    onValueChange = { phoneNum = it },
+                    label = stringResource(R.string.label_phone),
+                    leadingIcon = {
+                        mobileCountry?.let {
+                            CountryPickerView(
+                                countries = countriesList,
+                                selectedCountry = it,
+                                onSelection = { selectedCountry ->
+                                    mobileCountry = selectedCountry
+                                },
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    ),
+                    optional = true,
+                )
+                // Birth Date Picker
+                MyDatePickerDialog(
+                    label = { Text("Birth Date") },
+                    onDateChange = { selectedDate ->
+                        birthDate = selectedDate
+                    },
+                    allowFutureDates = false,
+                    startDate = birthDate
+                )
+                // Photo Input
+                FormFileInput(
+                    label = "Profile Photo",
+                    onFilePicked = { file ->
+                        photo = file.toString()
+                    },
+                    context = context,
+                )
+            }
+        }
+    )
 }
