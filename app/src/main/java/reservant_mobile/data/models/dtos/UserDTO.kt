@@ -25,10 +25,4 @@ class UserDTO (
     val token: String? = null,
     val photo: String? = null,
     val friendStatus: FriendStatus? = null
-){
-    @Serializable
-    data class Phone(
-        val code: String,
-        val number: String
-    )
-}
+)
