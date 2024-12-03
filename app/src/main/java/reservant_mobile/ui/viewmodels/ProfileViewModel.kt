@@ -15,20 +15,24 @@ import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IUserService
+import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.UserService.UserObject
+import reservant_mobile.data.services.VisitsService
 import reservant_mobile.data.utils.GetUserEventsCategory
 
 class ProfileViewModel(
     private val userService: IUserService = UserService(),
     private val eventService: IEventService = EventService(),
     private val friendsService: IFriendsService = FriendsService(),
+    private val visitsService: IVisitsService = VisitsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
     var simpleProfileUser: UserSummaryDTO? by mutableStateOf(null)
@@ -47,6 +51,9 @@ class ProfileViewModel(
     private val _ownedEventsFlow = MutableStateFlow<Flow<PagingData<EventDTO>>?>(null)
     val ownedEventsFlow: StateFlow<Flow<PagingData<EventDTO>>?> = _ownedEventsFlow
 
+    private val _visitsFlow = MutableStateFlow<Flow<PagingData<VisitDTO>>?>(null)
+    val visitsFlow: StateFlow<Flow<PagingData<VisitDTO>>?> = _visitsFlow
+
     private val _interestedUsersFlows = mutableMapOf<String, Flow<PagingData<EventDTO.Participant>>>()
 
     init {
@@ -58,6 +65,7 @@ class ProfileViewModel(
                 fetchFriends()
                 fetchUserEvents()
                 fetchOwnedEvents()
+                fetchUserVisits()
             }
 
             loadSimpleUser()
@@ -89,6 +97,25 @@ class ProfileViewModel(
 
             if (!result.isError) {
                 _friendsFlow.value = result.value?.cachedIn(viewModelScope)
+            }
+        }
+    }
+
+    private fun fetchUserVisits() {
+        viewModelScope.launch {
+            val result: Result<Flow<PagingData<VisitDTO>>?> = userService.getUserVisits()
+
+            if (!result.isError) {
+                _visitsFlow.value = result.value?.cachedIn(viewModelScope)
+            }
+        }
+    }
+
+    fun confirmArrival(visitId: String) {
+        viewModelScope.launch {
+            val result = visitsService.confirmStart(visitId)
+            if (!result.isError) {
+                fetchUserVisits()
             }
         }
     }

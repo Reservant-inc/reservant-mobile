@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -67,15 +66,14 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
-import reservant_mobile.data.models.dtos.UserDTO
-import reservant_mobile.data.services.UserService
+import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
+import java.time.LocalDateTime
 
 @Composable
 fun ProfileActivity(navController: NavHostController, userId: String) {
@@ -94,6 +92,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
     val ownedEventsFlow by profileViewModel.ownedEventsFlow.collectAsState()
     val ownedEventsPagingItems = ownedEventsFlow?.collectAsLazyPagingItems()
+
+    val visitsFlow by profileViewModel.visitsFlow.collectAsState()
+    val visitsPagingItems = visitsFlow?.collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -321,7 +322,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 if (profileViewModel.isCurrentUser) {
                     FloatingTabSwitch(
                         pages = listOf(
-                            stringResource(R.string.label_orders) to { CurrentOrdersTab() },
+                            stringResource(R.string.label_orders) to {
+                                CurrentOrdersTab(
+                                    visitsPagingItems = visitsPagingItems,
+                                    profileViewModel = profileViewModel
+                                )
+                            },
                             stringResource(R.string.label_join_requests) to {
                                 JoinRequestsTab(
                                     ownedEventsPagingItems,
@@ -358,8 +364,8 @@ fun JoinRequestsTab(
             CircularProgressIndicator()
         }
     } else {
-        val context = LocalContext.current
         val listState = rememberLazyListState()
+        val currentDateTime = LocalDateTime.now()
 
         LazyColumn(
             state = listState,
@@ -369,8 +375,8 @@ fun JoinRequestsTab(
         ) {
             items(ownedEventsPagingItems.itemCount) { index ->
                 val event = ownedEventsPagingItems[index]
-                if (event != null) {
-                    // Fetch interested users for this event
+                if (event != null && LocalDateTime.parse(event.mustJoinUntil).isAfter(currentDateTime)) {
+
                     profileViewModel.fetchInterestedUsers(event.eventId.toString())
                     val interestedUsersFlow = profileViewModel.getInterestedUsersFlow(event.eventId.toString())
                     val interestedUsersPagingItems = interestedUsersFlow?.collectAsLazyPagingItems()
@@ -378,7 +384,7 @@ fun JoinRequestsTab(
                     if (interestedUsersPagingItems != null) {
                         when (interestedUsersPagingItems.loadState.refresh) {
                             is LoadState.Loading -> {
-                                 CircularProgressIndicator()
+                                 //CircularProgressIndicator()
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
@@ -401,32 +407,30 @@ fun JoinRequestsTab(
                                             HorizontalDivider()
                                             Spacer(modifier = Modifier.height(8.dp))
 
-                                            // Display interested users
                                             interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
-                                                if (participant != null) {
-                                                    UserListItem(
-                                                        user = participant,
-                                                        showButtons = true,
-                                                        onApproveClick = {
-                                                            profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
-                                                        },
-                                                        onRejectClick = {
-                                                            profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
-                                                        },
-                                                        onCardClick = {
-                                                            navController.navigate(UserRoutes.UserProfile(userId = participant.userId))
-                                                        }
-                                                    )
-                                                    Spacer(modifier = Modifier.height(8.dp))
-                                                }
+                                                UserListItem(
+                                                    user = participant,
+                                                    showButtons = true,
+                                                    onApproveClick = {
+                                                        profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                                    },
+                                                    onRejectClick = {
+                                                        profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                                    },
+                                                    onCardClick = {
+                                                        navController.navigate(UserRoutes.UserProfile(userId = participant.userId))
+                                                    }
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
                                             }
 
                                             interestedUsersPagingItems.apply {
-                                                when {
-                                                    loadState.append is LoadState.Loading -> {
+                                                when (loadState.append) {
+                                                    is LoadState.Loading -> {
                                                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                                                     }
-                                                    loadState.append is LoadState.Error -> {
+
+                                                    is LoadState.Error -> {
                                                         val e = interestedUsersPagingItems.loadState.append as LoadState.Error
                                                         Text(
                                                             text = stringResource(R.string.error_loading_more_requests),
@@ -434,6 +438,8 @@ fun JoinRequestsTab(
                                                             modifier = Modifier.padding(16.dp)
                                                         )
                                                     }
+
+                                                    is LoadState.NotLoading -> null
                                                 }
                                             }
                                         }
@@ -444,6 +450,14 @@ fun JoinRequestsTab(
                                 val e = interestedUsersPagingItems.loadState.refresh as LoadState.Error
                             }
                         }
+                    }
+                }
+            }
+
+            item {
+                if(ownedEventsPagingItems.itemCount == 0){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = stringResource(R.string.label_no_join_requests))
                     }
                 }
             }
@@ -502,57 +516,90 @@ fun JoinRequestsTab(
 
 
 @Composable
-fun CurrentOrdersTab() {
-
-    // Sample orders data
-    val orders = remember {
-        mutableStateListOf(
-            Order(
-                orderId = 1,
-                restaurantName = "Pizzeria Bella Italia",
-                orderDate = "2023-10-10T19:30:00.000Z",
-                items = listOf(
-                    OrderItem(name = "Margherita Pizza", quantity = 2),
-                    OrderItem(name = "Garlic Bread", quantity = 1)
-                ),
-                isConfirmed = false
-            ),
-            Order(
-                orderId = 2,
-                restaurantName = "Sushi Master",
-                orderDate = "2023-10-12T12:00:00.000Z",
-                items = listOf(
-                    OrderItem(name = "California Roll", quantity = 3),
-                    OrderItem(name = "Miso Soup", quantity = 2)
-                ),
-                isConfirmed = false
-            )
-        )
-    }
-
-
-
-    if (orders.isEmpty()) {
+fun CurrentOrdersTab(
+    visitsPagingItems: LazyPagingItems<VisitDTO>?,
+    profileViewModel: ProfileViewModel
+) {
+    if (visitsPagingItems == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = stringResource(R.string.label_no_current_orders))
+            CircularProgressIndicator()
         }
     } else {
+        if (visitsPagingItems.itemCount == 0) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = stringResource(R.string.label_no_current_orders))
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 80.dp, start = 16.dp, end = 16.dp)
+            ) {
+                items(visitsPagingItems.itemCount) { index ->
+                    val visit = visitsPagingItems[index]
+                    if (visit != null) {
+                        OrderCard(
+                            visit = visit,
+                            onConfirmArrival = {
+                                profileViewModel.confirmArrival(visit.visitId.toString())
+                            }
+                        )
+                    }
+                }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 80.dp, start = 16.dp, end = 16.dp)
-        ) {
-            items(orders.size) { index ->
-                val order = orders[index]
-                OrderCard(order = order, onConfirmArrival = {
-                    // Simulate confirming arrival
-                    orders[index] = order.copy(isConfirmed = true)
-                })
+                visitsPagingItems.apply {
+                    when {
+                        loadState.refresh is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+                        loadState.append is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+                        loadState.refresh is LoadState.Error -> {
+                            val e = visitsPagingItems.loadState.refresh as LoadState.Error
+                            item {
+                                Text(
+                                    text = stringResource(R.string.error_loading_visits),
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        loadState.append is LoadState.Error -> {
+                            val e = visitsPagingItems.loadState.append as LoadState.Error
+                            item {
+                                Text(
+                                    text = stringResource(R.string.error_loading_more_visits),
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
@@ -744,29 +791,10 @@ fun FriendsTab(
     }
 }
 
-
-// TODO: BACKEND INSTEAD OF EXAMPLES BELOW
-data class Event(
-    val eventId: Int,
-    val eventName: String,
-    val joinRequests: List<EventDTO.Participant>
-)
-
-data class OrderItem(
-    val name: String,
-    val quantity: Int
-)
-
-data class Order(
-    val orderId: Int,
-    val restaurantName: String,
-    val orderDate: String,
-    val items: List<OrderItem>,
-    var isConfirmed: Boolean = false
-)
-
 @Composable
-fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
+fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
+    val isConfirmed = visit.actualStartTime != null
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -775,9 +803,7 @@ fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Restaurant Info
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Restaurant Image/Icon
                 Image(
                     painter = painterResource(id = R.drawable.restaurant_photo),
                     contentDescription = null,
@@ -791,12 +817,16 @@ fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
                 // Restaurant Name and Date
                 Column {
                     Text(
-                        text = order.restaurantName,
+                        text = visit.restaurant?.name ?: "",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${stringResource(R.string.label_order_date)}: ${formatToDateTime(order.orderDate)}",
+                        text = "${stringResource(R.string.label_visit_date)}: ${visit.date?.let {
+                            formatToDateTime(
+                                it
+                            )
+                        }}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -807,31 +837,25 @@ fun OrderCard(order: Order, onConfirmArrival: () -> Unit) {
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Order Items
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                order.items.forEach { item ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = item.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "x${item.quantity}",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
+                Text(
+                    text = "${stringResource(R.string.label_number_of_guests)}: ${visit.numberOfGuests}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                visit.orders?.forEach { order ->
+                    Text(
+                        text = "${stringResource(R.string.label_order)} #${order.orderId}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Confirm Arrival Button or Confirmation Text
-            if (!order.isConfirmed) {
+            if (!isConfirmed) {
                 Button(
                     onClick = { onConfirmArrival() },
                     modifier = Modifier.align(Alignment.End)
