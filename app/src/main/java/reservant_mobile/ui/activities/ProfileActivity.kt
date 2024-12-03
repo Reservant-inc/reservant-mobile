@@ -26,13 +26,11 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,19 +40,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -336,7 +330,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 )
                             },
                             stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
-                            stringResource(R.string.label_event_history) to { HistoryTab(eventPagingItems) }
+                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems) }
                         )
                     )
                 }
@@ -602,7 +596,7 @@ fun CurrentOrdersTab(
 
 
 @Composable
-fun HistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
+fun EventHistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
 
     if (eventPagingItems == null) {
         Box(
