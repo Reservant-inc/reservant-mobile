@@ -448,4 +448,5 @@
     <string name="label_arrival_confirmed">Arrival confirmed</string>
     <string name="label_no_current_orders">No current orders</string>
     <string name="label_no_friends">No friends</string>
+    <string name="error_loading_more_requests">Error while loading more requests</string>
 </resources>

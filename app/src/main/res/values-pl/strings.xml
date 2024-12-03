@@ -436,4 +436,5 @@
     <string name="label_arrival_confirmed">Przybycie potwierdzone</string>
     <string name="label_no_current_orders">Brak obecnych zamówień</string>
     <string name="label_no_friends">Brak znajomych :(</string>
+    <string name="error_loading_more_requests">Błąd podczas wczytywania reszty zamówień</string>
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -324,7 +325,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             stringResource(R.string.label_join_requests) to {
                                 JoinRequestsTab(
                                     ownedEventsPagingItems,
-                                    profileViewModel
+                                    profileViewModel,
+                                    navController
                                 )
                             },
                             stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
@@ -348,14 +350,19 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 @Composable
 fun JoinRequestsTab(
     ownedEventsPagingItems: LazyPagingItems<EventDTO>?,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    navController: NavHostController
 ) {
     if (ownedEventsPagingItems == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     } else {
+        val context = LocalContext.current
+        val listState = rememberLazyListState()
+
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 80.dp, start = 16.dp, end = 16.dp)
@@ -363,62 +370,78 @@ fun JoinRequestsTab(
             items(ownedEventsPagingItems.itemCount) { index ->
                 val event = ownedEventsPagingItems[index]
                 if (event != null) {
-
+                    // Fetch interested users for this event
                     profileViewModel.fetchInterestedUsers(event.eventId.toString())
                     val interestedUsersFlow = profileViewModel.getInterestedUsersFlow(event.eventId.toString())
                     val interestedUsersPagingItems = interestedUsersFlow?.collectAsLazyPagingItems()
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = event.name ?: "",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            HorizontalDivider()
-                            Spacer(modifier = Modifier.height(8.dp))
+                    if (interestedUsersPagingItems != null) {
+                        when (interestedUsersPagingItems.loadState.refresh) {
+                            is LoadState.Loading -> {
+                                 CircularProgressIndicator()
+                            }
+                            is LoadState.NotLoading -> {
+                                if (interestedUsersPagingItems.itemCount > 0) {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        elevation = CardDefaults.cardElevation(4.dp),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(16.dp)
+                                        ) {
+                                            Text(
+                                                text = event.name ?: "",
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            HorizontalDivider()
+                                            Spacer(modifier = Modifier.height(8.dp))
 
-                            if (interestedUsersPagingItems == null) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            } else {
-                                if (interestedUsersPagingItems.itemCount == 0) {
-                                    Text(
-                                        text = stringResource(R.string.label_no_join_requests),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray,
-                                        modifier = Modifier.padding(vertical = 4.dp)
-                                    )
-                                } else {
-                                    interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
-                                        UserListItem(
-                                            user = participant,
-                                            showButtons = true,
-                                            onApproveClick = {
-                                                profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
-                                            },
-                                            onRejectClick = {
-                                                profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                            // Display interested users
+                                            interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
+                                                if (participant != null) {
+                                                    UserListItem(
+                                                        user = participant,
+                                                        showButtons = true,
+                                                        onApproveClick = {
+                                                            profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                                        },
+                                                        onRejectClick = {
+                                                            profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                                        },
+                                                        onCardClick = {
+                                                            navController.navigate(UserRoutes.UserProfile(userId = participant.userId))
+                                                        }
+                                                    )
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                }
                                             }
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                            interestedUsersPagingItems.apply {
+                                                when {
+                                                    loadState.append is LoadState.Loading -> {
+                                                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                                                    }
+                                                    loadState.append is LoadState.Error -> {
+                                                        val e = interestedUsersPagingItems.loadState.append as LoadState.Error
+                                                        Text(
+                                                            text = stringResource(R.string.error_loading_more_requests),
+                                                            color = MaterialTheme.colorScheme.error,
+                                                            modifier = Modifier.padding(16.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                            }
+                            is LoadState.Error -> {
+                                val e = interestedUsersPagingItems.loadState.refresh as LoadState.Error
                             }
                         }
                     }
