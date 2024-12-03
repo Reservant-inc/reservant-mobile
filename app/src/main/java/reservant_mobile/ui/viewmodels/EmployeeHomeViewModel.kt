@@ -24,7 +24,7 @@ class EmployeeHomeViewModel(
 
     suspend fun getEmployeeRestaurants(){
         isLoading = true
-        val res = restaurantService.getRestaurant(1);
+        val res = restaurantService.getRestaurant(5);
         if(!res.isError){
             restaurants = listOf(res.value!!)
         }
