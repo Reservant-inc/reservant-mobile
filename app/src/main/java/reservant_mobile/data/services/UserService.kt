@@ -122,7 +122,7 @@ class UserService(): ServiceUtil(), IUserService {
     }
 
     override suspend fun updateUserProfile(user: UserDTO): Result<Boolean> {
-        val res = api.put(User, user)
+        val res = api.put(User(), user)
         return booleanResultWrapper(res)
     }
 
