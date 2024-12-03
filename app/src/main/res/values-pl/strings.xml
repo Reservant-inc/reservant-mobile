@@ -437,4 +437,7 @@
     <string name="label_no_current_orders">Brak obecnych zamówień</string>
     <string name="label_no_friends">Brak znajomych :(</string>
     <string name="error_loading_more_requests">Błąd podczas wczytywania reszty zamówień</string>
+    <string name="error_loading_more_visits">Błąd podczas wczytywania reszty wizyt</string>
+    <string name="label_order">Zamówienie</string>
+    <string name="label_visit_date">Data wizyty</string>
 </resources>
