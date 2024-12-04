@@ -465,4 +465,7 @@
     <string name="label_toggle_dark_theme">Przełącz ciemny motyw</string>
     <string name="message_logout">Czy chcesz sie wylogować?</string>
     <string name="message_delete_account">Czy chcesz usunąc swoje konto?</string>
+    <string name="label_no_items_in_cart">Brak przedmiotów w koszyku</string>
+    <string name="proceed_to_checkout">Przejdź do kasy</string>
+    <string name="quantity">Ilość</string>
 </resources>

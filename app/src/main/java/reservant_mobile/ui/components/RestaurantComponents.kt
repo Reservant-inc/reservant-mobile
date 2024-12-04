@@ -291,7 +291,8 @@ fun MenuContent(
     menus: List<RestaurantMenuDTO>,
     menuItems: List<RestaurantMenuItemDTO>?,
     onMenuClick: (Int) -> Unit,
-    getMenuPhoto: suspend (String) -> Bitmap?
+    getMenuPhoto: suspend (String) -> Bitmap?,
+    onAddClick: (RestaurantMenuItemDTO) -> Unit
 ) {
 
     Column(
@@ -326,7 +327,9 @@ fun MenuContent(
                 role = Roles.CUSTOMER,
                 photo = menuPhoto,
                 onInfoClick = { /* TODO: Handle info */ },
-                onAddClick = { /* TODO: Handle add */ }
+                onAddClick = {
+                    onAddClick(menuItem)
+                }
             )
         }
 

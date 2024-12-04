@@ -477,4 +477,7 @@
     <string name="label_toggle_dark_theme">Toggle dark theme</string>
     <string name="message_logout">Are you sure you want to log out?</string>
     <string name="message_delete_account">Are you sure you want to delete your account?</string>
+    <string name="label_no_items_in_cart">No items in cart</string>
+    <string name="proceed_to_checkout">Proceed to Checkout</string>
+    <string name="quantity">Quantity</string>
 </resources>
