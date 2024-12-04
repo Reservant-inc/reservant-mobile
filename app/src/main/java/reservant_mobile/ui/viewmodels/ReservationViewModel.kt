@@ -3,6 +3,9 @@ package reservant_mobile.ui.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -19,6 +23,10 @@ import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.VisitsService
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
@@ -33,10 +41,14 @@ class ReservationViewModel(
 
 
     var visitDate: FormField = FormField(VisitDTO::reservationDate.name)
+    var endTime: FormField = FormField(VisitDTO::endTime.name)
     var numberOfGuests by mutableIntStateOf(1)
+    var tip by mutableDoubleStateOf(0.0)
     var seats by mutableIntStateOf(1)
+    val addedItems = mutableStateListOf<Pair<RestaurantMenuItemDTO, Int>>()
+    var participantIds: MutableList<String> = mutableListOf()
 
-
+    var isTakeaway by mutableStateOf(false)
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableDoubleStateOf(0.0)
 
@@ -49,6 +61,79 @@ class ReservationViewModel(
 
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
+
+    // Functions to manage cart items
+    fun addItemToCart(menuItem: RestaurantMenuItemDTO) {
+        val existingItem = addedItems.find { it.first.menuItemId == menuItem.menuItemId }
+        if (existingItem != null) {
+            val index = addedItems.indexOf(existingItem)
+            addedItems[index] = existingItem.copy(second = existingItem.second + 1)
+        } else {
+            addedItems.add(menuItem to 1)
+        }
+    }
+
+    fun removeItemFromCart(item: Pair<RestaurantMenuItemDTO, Int>) {
+        addedItems.remove(item)
+    }
+
+    fun increaseItemQuantity(item: Pair<RestaurantMenuItemDTO, Int>) {
+        val index = addedItems.indexOfFirst { it.first.menuItemId == item.first.menuItemId }
+        if (index >= 0) {
+            addedItems[index] = item.copy(second = item.second + 1)
+        }
+    }
+
+    fun decreaseItemQuantity(item: Pair<RestaurantMenuItemDTO, Int>) {
+        val index = addedItems.indexOfFirst { it.first.menuItemId == item.first.menuItemId }
+        if (index >= 0) {
+            val newQuantity = item.second - 1
+            if (newQuantity > 0) {
+                addedItems[index] = item.copy(second = newQuantity)
+            } else {
+                addedItems.removeAt(index)
+            }
+        }
+    }
+
+    fun createVisitAndOrder(
+        restaurantId: Int,
+        isTakeaway: Boolean,
+        isDelivery: Boolean
+    ) {
+        viewModelScope.launch {
+            val visit = VisitDTO(
+                date = visitDate.value,
+                endTime = endTime.value,
+                numberOfGuests = numberOfGuests,
+                tip = tip,
+                takeaway = isTakeaway,
+                restaurantId = restaurantId,
+                participantIds = participantIds
+            )
+            val visitResult = visitsService.createVisit(visit)
+            if (!visitResult.isError && visitResult.value != null) {
+                val visitId = visitResult.value!!.visitId
+                // Now create order
+                val orderItems = addedItems.map { (menuItem, quantity) ->
+                    OrderDTO.OrderItemDTO(
+                        menuItemId = menuItem.menuItemId,
+                        amount = quantity
+                    )
+                }
+                val order = OrderDTO(
+                    visitId = visitId,
+                    note = note.value,
+                    items = orderItems
+                )
+                val orderResult = ordersService.createOrder(order)
+                _orderResult.value = orderResult
+            } else {
+                // Handle error
+                _visitResult.value = visitResult
+            }
+        }
+    }
 
     // Functions to handle orders
     fun createOrder() {

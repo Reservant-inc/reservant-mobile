@@ -430,4 +430,7 @@
     <string name="order">zamówienie</string>
     <string name="ingredient_old_amount">Ilość przed: %.1fg</string>
     <string name="ingredient_new_amount">Ilość po: %.1fg</string>
+    <string name="label_no_items_in_cart">Brak przedmiotów w koszyku</string>
+    <string name="proceed_to_checkout">Przejdź do kasy</string>
+    <string name="quantity">Ilość</string>
 </resources>
