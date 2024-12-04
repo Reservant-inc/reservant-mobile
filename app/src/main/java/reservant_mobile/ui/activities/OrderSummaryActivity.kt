@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,7 +30,14 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navController: NavHostController) {
+fun OrderSummaryActivity(
+    reservationViewModel: ReservationViewModel,
+    navController: NavHostController,
+    restaurantId: Int
+) {
+    val errorMessage = reservationViewModel.errorMessage
+    var context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,24 +64,53 @@ fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navControll
                 fontWeight = FontWeight.Bold
             )
 
-            // Display the summary of the order
-            Text(text = "Order Note: ${reservationViewModel.note.value}")
-            Text(text = "Order Total: ${reservationViewModel.orderCost}")
-            // Add more details about the order as needed
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Display ordered items
+            reservationViewModel.addedItems.forEach { (menuItem, quantity) ->
+                Text(text = "${menuItem.name}: $quantity x ${String.format("%.2f", menuItem.price)} zł")
+            }
+
+            // Display total cost
+            val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                (menuItem.price ?: 0.0) * quantity
+            } + reservationViewModel.tip
+            Text(
+                text = "${stringResource(id = R.string.label_total_cost)}: ${String.format("%.2f", totalCost)} zł",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Display other details
+            Text(text = "Date: ${reservationViewModel.visitDate.value}")
+            Text(text = "Time: ${reservationViewModel.startTime.value} - ${reservationViewModel.endTime.value}")
+            Text(text = "Note: ${reservationViewModel.note.value}")
+            Text(text = "Tip: ${String.format("%.2f", reservationViewModel.tip)} zł")
 
             Spacer(modifier = Modifier.height(16.dp))
 
             ButtonComponent(
                 onClick = {
                     reservationViewModel.viewModelScope.launch {
-                        // Finalize the order by creating it
-                        reservationViewModel.createOrder()
+                        reservationViewModel.createVisitAndOrder(
+                            restaurantId = restaurantId,
+                            isTakeaway = reservationViewModel.isTakeaway,
+                            isDelivery = reservationViewModel.isDelivery
+                        )
+                        if (reservationViewModel.isOrderError() || reservationViewModel.isVisitError()) {
+                            // Display error message
+                                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Clear the cart
+                            reservationViewModel.addedItems.clear()
+                            navController.popBackStack()
+                        }
                     }
-                    navController.popBackStack()
                 },
                 label = stringResource(id = R.string.label_confirm_order),
                 modifier = Modifier.fillMaxWidth()
             )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 

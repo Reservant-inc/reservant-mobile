@@ -39,18 +39,21 @@ class ReservationViewModel(
     var promoCode: FormField = FormField("promoCode") // Assuming promoCode is a custom field
     var orderCost by mutableDoubleStateOf(0.0)
 
-
-    var visitDate: FormField = FormField(VisitDTO::reservationDate.name)
+    var visitDate: FormField = FormField("VisitDate")
+    var startTime: FormField = FormField(VisitDTO::reservationDate.name)
     var endTime: FormField = FormField(VisitDTO::endTime.name)
     var numberOfGuests by mutableIntStateOf(1)
     var tip by mutableDoubleStateOf(0.0)
-    var seats by mutableIntStateOf(1)
     val addedItems = mutableStateListOf<Pair<RestaurantMenuItemDTO, Int>>()
     var participantIds: MutableList<String> = mutableListOf()
 
     var isTakeaway by mutableStateOf(false)
+    var isDelivery by mutableStateOf(false)
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableDoubleStateOf(0.0)
+
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
 
     // Results
     private val _orderResult = MutableStateFlow<Result<OrderDTO?>>(Result(isError = false, value = null))
@@ -103,8 +106,8 @@ class ReservationViewModel(
     ) {
         viewModelScope.launch {
             val visit = VisitDTO(
-                date = visitDate.value,
-                endTime = endTime.value,
+                date = "${visitDate.value}T${startTime.value}",
+                endTime = "${visitDate.value}T${endTime.value}",
                 numberOfGuests = numberOfGuests,
                 tip = tip,
                 takeaway = isTakeaway,
@@ -128,9 +131,18 @@ class ReservationViewModel(
                 )
                 val orderResult = ordersService.createOrder(order)
                 _orderResult.value = orderResult
+
+                if (orderResult.isError) {
+                    errorMessage = "Failed to place order. Please try again."
+                } else {
+                    // Clear the cart and reset error message
+                    addedItems.clear()
+                    errorMessage = null
+                }
             } else {
                 // Handle error
                 _visitResult.value = visitResult
+                errorMessage = "Failed to create visit. Please try again."
             }
         }
     }
