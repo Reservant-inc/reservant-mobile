@@ -121,6 +121,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -1095,13 +1096,14 @@ fun FloatingTabSwitch(
     val coroutineScope = rememberCoroutineScope()
     val cornerShape = RoundedCornerShape(50)
 
-
     val indicator = @Composable { tabPositions: List<TabPosition> ->
         CustomIndicator(tabPositions, pagerState)
     }
 
+    val textSize = if (pages.size >= 4) 12.sp else 16.sp
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         HorizontalPager(
             state = pagerState,
@@ -1116,18 +1118,21 @@ fun FloatingTabSwitch(
                 .padding(20.dp)
                 .clip(cornerShape),
             indicator = indicator,
-            divider = {}
+            divider = {},
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ) {
             pages.forEachIndexed { index, tabItem ->
                 val selected = pagerState.currentPage == index
                 Tab(
                     modifier = Modifier.zIndex(6f),
                     text = {
-                        if (selected) {
-                            Text(text = tabItem.first, color = MaterialTheme.colorScheme.background)
-                        } else {
-                            Text(text = tabItem.first)
-                        }
+                        Text(
+                            text = tabItem.first,
+                            color = if (selected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = textSize,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
                     selected = selected,
                     onClick = {
@@ -1140,6 +1145,7 @@ fun FloatingTabSwitch(
         }
     }
 }
+
 
 @Composable
 fun ImageCard(
