@@ -102,7 +102,7 @@ fun OrderSummaryActivity(
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                         } else {
                             // Clear the cart
-                            reservationViewModel.addedItems.clear()
+//                            reservationViewModel.addedItems.clear()
                             navController.popBackStack()
                         }
                     }
