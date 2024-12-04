@@ -31,11 +31,10 @@ class EmployeeViewModel(
     val lastName: FormField = FormField(RestaurantEmployeeDTO::lastName.name)
     val birthday: FormField = FormField(RestaurantEmployeeDTO::birthDate.name)
     val password: FormField = FormField(RestaurantEmployeeDTO::password.name)
-    val phoneNum: FormField = FormField(RestaurantEmployeeDTO::phoneNumber.name)
+    val phoneNum: FormField = FormField(PhoneNumberDTO::number.name)
+    val mobileCountry: FormField = FormField(PhoneNumberDTO::code.name)
 
-    var mobileCountry by mutableStateOf(getCountriesList().firstOrNull { it.nameCode == "pl" })
-
-    private var phoneNumberWithCountryCode: String = "+${mobileCountry!!.code}${phoneNum.value}"
+    val countriesList = getCountriesList()
 
     val id: FormField = FormField(RestaurantEmployeeDTO::employeeId.name)
     var isHallEmployee by mutableStateOf(false)
@@ -71,6 +70,7 @@ class EmployeeViewModel(
         birthday.value = ""
         password.value = ""
         phoneNum.value = ""
+        mobileCountry.value = "48"
         id.value = ""
         isHallEmployee = false
         isBackdoorEmployee = false
@@ -102,9 +102,8 @@ class EmployeeViewModel(
             firstName = firstName.value,
             lastName = lastName.value,
             birthDate = birthday.value,
-            // fixme: proper phone number handling
             phoneNumber = PhoneNumberDTO(
-                code = "+48",
+                code = "+" + mobileCountry.value,
                 number = phoneNum.value
             )
         )
@@ -141,9 +140,8 @@ class EmployeeViewModel(
             firstName = firstName.value,
             lastName = lastName.value,
             birthDate = birthday.value,
-            // fixme: proper phone number handling
             phoneNumber = PhoneNumberDTO(
-                code = "+48",
+                code = "+" + mobileCountry.value,
                 number = phoneNum.value
             ),
             password = password.value
@@ -176,14 +174,16 @@ class EmployeeViewModel(
                 isLastNameInvalid() ||
                 isPhoneInvalid() ||
                 isPasswordInvalid() ||
-                isBirthDateInvalid()
+                isBirthDateInvalid() ||
+                isRoleInvalid()
     }
 
     private fun isEditInvalid(): Boolean {
         return  isFirstNameInvalid() ||
                 isLastNameInvalid() ||
                 isPhoneInvalid() ||
-                isBirthDateInvalid()
+                isBirthDateInvalid() ||
+                isRoleInvalid()
     }
 
     fun isLoginInvalid(): Boolean {
@@ -215,6 +215,10 @@ class EmployeeViewModel(
     fun isPasswordInvalid(): Boolean {
         return isInvalidWithRegex(Regex.PASSWORD_REG, password.value) ||
                 getFieldError(result, password.name) != -1
+    }
+
+    fun isRoleInvalid(): Boolean {
+        return !isBackdoorEmployee && !isHallEmployee
     }
 
     fun getLoginError(): Int {
