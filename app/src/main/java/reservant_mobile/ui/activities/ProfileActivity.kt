@@ -937,7 +937,7 @@ fun EditProfileDialog(
     }
 
     var birthDate by remember { mutableStateOf(user.birthDate ?: "") }
-    var photo by remember { mutableStateOf(user.photo ?: "") }
+    var photo by remember { mutableStateOf(user.photo) }
     var formSent by remember { mutableStateOf(false) }
 
     AlertDialog(
