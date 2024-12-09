@@ -436,4 +436,5 @@
     <string name="label_open">Open</string>
     <string name="error_openTimeBeforeCloseTime">Opening time must be before closing time</string>
     <string name="error_at_least_one_role_required">At least one role must be selected</string>
+    <string name="label_restaurant_stats">Restaurant statistics</string>
 </resources>

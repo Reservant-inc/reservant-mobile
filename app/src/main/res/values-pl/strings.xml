@@ -425,4 +425,5 @@
     <string name="label_open">Otwarte</string>
     <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
     <string name="error_at_least_one_role_required">Musi być wybrana co najmniej jedna rola</string>
+    <string name="label_restaurant_stats">Statystyki restauracji</string>
 </resources>
