@@ -11,6 +11,9 @@ data object RestaurantManagementRoutes {
     object RestaurantPreview
 
     @Serializable
+    object Stats
+
+    @Serializable
     data class Menu(
         val restaurantId: Int
     )
