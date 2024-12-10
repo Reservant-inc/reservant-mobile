@@ -32,6 +32,7 @@ class RestaurantViewModel(
     var resultFileUploads by mutableStateOf(Result(isError = false, value = false))
     var resultGroup by mutableStateOf(Result(isError = false, value = false))
     var resultRegistration by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
+    var resultMove by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
@@ -41,6 +42,7 @@ class RestaurantViewModel(
     val postalCode: FormField = FormField(RestaurantDTO::postalIndex.name)
     val city: FormField = FormField(RestaurantDTO::city.name)
     val description: FormField = FormField(RestaurantDTO::description.name)
+
 
     // Pliki do załączenia
     val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
@@ -153,6 +155,14 @@ class RestaurantViewModel(
         }
 
         return true
+    }
+
+    suspend fun moveToGroup(newGroupId: Int): Boolean {
+        val restaurant = getRestaurantData()
+
+        resultMove = restaurantService.moveToGroup(restaurant.restaurantId, newGroupId)
+
+        return !resultMove.isError
     }
 
     suspend fun validateFirstStep(): Boolean {
