@@ -19,7 +19,9 @@ class RestaurantManagementViewModel(
 ) : ReservantViewModel() {
 
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
+    var isGroupSelected: Boolean by mutableStateOf(false)
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
+    var selectedGroup: RestaurantGroupDTO? by mutableStateOf(null)
     var selectedRestaurantLogo: Bitmap? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
 
@@ -38,9 +40,16 @@ class RestaurantManagementViewModel(
 
     suspend fun getGroup(groupId: Int): RestaurantGroupDTO? {
         isLoading = true
-        val group =  restaurantService.getGroup(groupId).value
+        selectedGroup =  restaurantService.getGroup(groupId).value
+        isGroupSelected = true
         isLoading = false
-        return group
+        return selectedGroup
+    }
+
+    suspend fun deleteGroup(groupId: Int): Boolean {
+        val result = restaurantService.deleteGroup(groupId)
+
+        return !result.isError
     }
 
     suspend fun getPhoto(restaurant: RestaurantDTO): Bitmap? {
@@ -55,10 +64,6 @@ class RestaurantManagementViewModel(
         return null
     }
 
-
-    suspend fun getSingleRestaurant(id: Int): RestaurantDTO? {
-        return restaurantService.getUserRestaurant(id).value
-    }
 
     suspend fun deleteRestaurant(id: Int) {
         restaurantService.deleteRestaurant(id)
