@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +28,7 @@ class SocialViewModel(
 
     init {
         viewModelScope.launch {
-            getThreads(threadQuery.value)
+            getThreads()
             getUsers(userQuery.value)
         }
     }
@@ -54,7 +53,7 @@ class SocialViewModel(
         }
     }
 
-    suspend fun getThreads(query: String) {
+    suspend fun getThreads() {
         val res = userService.getUserThreads()
 
         if (res.isError || res.value == null){
@@ -62,12 +61,7 @@ class SocialViewModel(
         }
 
         res.value.cachedIn(viewModelScope).collect {
-            _threads.value = it.filter { thread ->
-                thread.title?.contains(query) ?: false ||
-                thread.participants?.any { participant ->
-                    participant.firstName.contains(query)
-                } ?: false
-            }
+            _threads.value = it
         }
     }
 
