@@ -66,6 +66,7 @@ class RestaurantViewModel(
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
     var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
     var maxReservationMinutes = FormField(RestaurantDTO::maxReservationDurationMinutes.name)
+    var selectedToGroup = mutableStateOf<RestaurantGroupDTO?>(null)
 
     var restaurantId by mutableStateOf<Int?>(null)
 
@@ -139,6 +140,11 @@ class RestaurantViewModel(
         }
 
         val restaurant = getRestaurantData()
+        if(selectedToGroup.value!!.restaurantGroupId != restaurant.groupId){
+            selectedToGroup.value!!.restaurantGroupId?.let {
+                moveToGroup(it)
+            }
+        }
 
         resultRegistration = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
 
@@ -147,17 +153,17 @@ class RestaurantViewModel(
         }
 
         if(newGroup.value.isNotBlank()){
-                resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
-                    name = newGroup.value,
-                    restaurantIds = listOf(restaurantId!!)
-                ))
-                return !resultFirstStep.isError
+            resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
+                name = newGroup.value,
+                restaurantIds = listOf(restaurantId!!)
+            ))
+            return !resultFirstStep.isError
         }
 
         return true
     }
 
-    suspend fun moveToGroup(newGroupId: Int): Boolean {
+    private suspend fun moveToGroup(newGroupId: Int): Boolean {
         val restaurant = getRestaurantData()
 
         resultMove = restaurantService.moveToGroup(restaurant.restaurantId, newGroupId)
