@@ -79,7 +79,7 @@ fun RegisterRestaurantActivity(
     var formSent2 by remember { mutableStateOf(false) }
     var formSent3 by remember { mutableStateOf(false) }
     var addGroup by remember { mutableStateOf(false) }
-    var selectedGroup = restaurantViewModel.selectedGroup
+    var selectedGroup = restaurantViewModel.selectedToGroup.value ?: restaurantViewModel.selectedGroup
     var groups = restaurantViewModel.groups
     val context = LocalContext.current
     val maxSize = 1024
@@ -721,10 +721,7 @@ fun RegisterRestaurantActivity(
                                         expanded = expandedState,
                                         value = selectedGroup?.name ?: "",
                                         onValueChange = { name ->
-                                            restaurantViewModel.viewModelScope.launch {
-                                                restaurantViewModel.selectedGroup =
-                                                    newGroups.find { it.name == name }
-                                            }
+                                            restaurantViewModel.selectedToGroup.value = newGroups.find { it.name == name }
                                         },
                                         options = newGroups.map { it.name },
                                         label = stringResource(R.string.label_add_to_group),
