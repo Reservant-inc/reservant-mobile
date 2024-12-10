@@ -424,5 +424,21 @@
     <string name="label_closing_soon">Wkrótce zamknięte</string>
     <string name="label_open">Otwarte</string>
     <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
+    <string name="label_join_requests">Prośby</string>
+    <string name="label_event_history">Wydarzenia</string>
+    <string name="error_loading_friends">Błąd podczas wczytywania znajomych</string>
+    <string name="error_loading_more_friends">Błąd podczas wczytywania reszty znajomych</string>
+    <string name="label_registered_at">Zarejestrowany</string>
+    <string name="label_roles">Role</string>
+    <string name="label_no_join_requests">Brak próśb o dołączenie</string>
+    <string name="label_order_date">Data zamówienia</string>
+    <string name="label_confirm_arrival">Potwierdź przybycie</string>
+    <string name="label_arrival_confirmed">Przybycie potwierdzone</string>
+    <string name="label_no_current_orders">Brak obecnych zamówień</string>
+    <string name="label_no_friends">Brak znajomych :(</string>
+    <string name="error_loading_more_requests">Błąd podczas wczytywania reszty zamówień</string>
+    <string name="error_loading_more_visits">Błąd podczas wczytywania reszty wizyt</string>
+    <string name="label_order">Zamówienie</string>
+    <string name="label_visit_date">Data wizyty</string>
     <string name="error_at_least_one_role_required">Musi być wybrana co najmniej jedna rola</string>
 </resources>
