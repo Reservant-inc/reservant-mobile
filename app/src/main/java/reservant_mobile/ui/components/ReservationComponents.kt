@@ -1,5 +1,6 @@
 package reservant_mobile.ui.components
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,7 +62,9 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun OrderFormContent(
     navController: NavHostController,
@@ -112,6 +115,11 @@ fun OrderFormContent(
             )
         }
 
+        val now = LocalTime.now()
+        val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
+
+        val isToday = reservationViewModel.visitDate.value == LocalDate.now().toString()
+
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -123,9 +131,9 @@ fun OrderFormContent(
                         onTimeSelected = { time ->
                             reservationViewModel.startTime.value = time
                         },
-                        modifier = Modifier
-                            .scale(0.85f),
-                        onlyHalfHours = true
+                        modifier = Modifier.scale(0.85f),
+                        onlyHalfHours = true, // Zawsze wybieramy co 30 min
+                        minTime = if (isToday) nowFormatted else null
                     )
                 }
                 Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
@@ -134,14 +142,14 @@ fun OrderFormContent(
                         onTimeSelected = { time ->
                             reservationViewModel.endTime.value = time
                         },
-                        modifier = Modifier
-                            .scale(0.85f),
-                        onlyHalfHours = true,
-                        minTime = reservationViewModel.startTime.value
+                        modifier = Modifier.scale(0.85f),
+                        onlyHalfHours = true, // Zawsze co 30 min
+                        minTime = reservationViewModel.startTime.value // Musi być ściśle większy niż startTime
                     )
                 }
             }
         }
+
 
         item {
             Text(

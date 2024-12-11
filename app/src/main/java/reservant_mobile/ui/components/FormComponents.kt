@@ -156,13 +156,14 @@ fun MyTimePickerDialog(
 ) {
     val context = LocalContext.current
     val currentTime = Calendar.getInstance()
+
     val initialHour = if (initialTime.isNotEmpty()) initialTime.substringBefore(":").toInt() else currentTime.get(Calendar.HOUR_OF_DAY)
     val initialMinute = if (initialTime.isNotEmpty()) initialTime.substringAfter(":").toInt() else currentTime.get(Calendar.MINUTE)
 
     val timePickerState = rememberTimePickerState(
         initialHour = initialHour,
         initialMinute = initialMinute,
-        is24Hour = true,
+        is24Hour = true
     )
 
     var showDialog by remember { mutableStateOf(false) }
@@ -201,19 +202,33 @@ fun MyTimePickerDialog(
                         var hour = timePickerState.hour
                         var minute = timePickerState.minute
 
-                        if (onlyHalfHours) {
-                            minute = if (minute < 15) 0 else if (minute < 45) 30 else 0
-                            if (minute == 0 && timePickerState.minute >= 45) {
+                        // Logika half hours
+                        // Jeśli minTime != null, zawsze używamy half hours
+                        // Jeśli minTime == null, używamy half hours tylko jeśli onlyHalfHours = true
+                        val enforceHalfHours = minTime != null || onlyHalfHours
+
+                        if (enforceHalfHours) {
+                            // Zaokrąglamy do najbliższej pół godziny
+                            // Zasada: jeśli minute <30 → 00 lub 30, jeśli >=30 → kolejna godzina pełna lub 30
+                            // Przyjmijmy prostą zasadę:
+                            // Jeśli minute <30 → minute=30
+                            // Jeśli minute >=30 → minute=0 i hour=hour+1
+                            if (minute < 30) {
+                                minute = 30
+                            } else {
+                                minute = 0
                                 hour = (hour + 1) % 24
                             }
                         }
 
                         val chosenTime = String.format("%02d:%02d", hour, minute)
 
+                        // Jeśli minTime != null, sprawdzamy czy chosenTime > minTime
                         if (minTime != null) {
                             val chosenMinutes = parseTimeToMinutes(chosenTime)
-                            val minMinutes = parseTimeToMinutes(minTime) + 30
-                            if (chosenMinutes < minMinutes) {
+                            val minMinutes = parseTimeToMinutes(minTime)
+                            if (chosenMinutes <= minMinutes) {
+                                // Musi być ściśle większy
                                 showToast(context.getString(R.string.time_too_early))
                                 return@TextButton
                             }
