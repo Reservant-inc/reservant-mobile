@@ -71,6 +71,33 @@ fun OrderSummaryActivity(
                 Text(text = "${menuItem.name}: $quantity x ${String.format("%.2f", menuItem.price)} zł")
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+            // Display other details
+            Text(
+                text = stringResource(
+                    id = R.string.label_date_order,
+                    reservationViewModel.visitDate.value
+                )
+            )
+            Text(
+                text = stringResource(
+                    id = R.string.label_time,
+                    reservationViewModel.startTime.value,
+                    reservationViewModel.endTime.value
+                )
+            )
+            Text(
+                text = stringResource(
+                    id = R.string.label_note,
+                    reservationViewModel.note.value
+                )
+            )
+            Text(
+                text = stringResource(
+                    id = R.string.label_tip,
+                    reservationViewModel.tip
+                )
+            )
             // Display total cost
             val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
                 (menuItem.price ?: 0.0) * quantity
@@ -80,12 +107,6 @@ fun OrderSummaryActivity(
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
-
-            // Display other details
-            Text(text = "Date: ${reservationViewModel.visitDate.value}")
-            Text(text = "Time: ${reservationViewModel.startTime.value} - ${reservationViewModel.endTime.value}")
-            Text(text = "Note: ${reservationViewModel.note.value}")
-            Text(text = "Tip: ${String.format("%.2f", reservationViewModel.tip)} zł")
 
             Spacer(modifier = Modifier.height(16.dp))
 
