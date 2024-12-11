@@ -88,6 +88,7 @@ import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.CartItemCard
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
@@ -468,7 +469,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
             RestaurantReservationActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId,
                 navController = navController,
-                reservationViewModel = reservationViewModel)
+                reservationViewModel = reservationViewModel,
+                restaurantDetailVM = restaurantDetailVM)
         }
 
         composable<RestaurantRoutes.AddReview> {
@@ -530,158 +532,6 @@ fun CartContent(
             onClick = onSubmitOrder,
             label = stringResource(id = R.string.proceed_to_checkout)
         )
-    }
-}
-
-@Composable
-fun CartItemCard(
-    item: Pair<RestaurantMenuItemDTO, Int>,
-    photo: Bitmap? = null,
-    onInfoClick: () -> Unit = {},
-    onIncreaseQuantity: () -> Unit = {},
-    onDecreaseQuantity: () -> Unit = {},
-    onRemove: () -> Unit = {}
-) {
-    val (menuItem, quantity) = item
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            // Górna część: nazwa, alternatywna nazwa, cena, procent alkoholu
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = menuItem.name,
-                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    menuItem.alternateName?.let {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    menuItem.alcoholPercentage?.let {
-                        Text(
-                            text = "Alcohol Percentage: ${it}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-
-                if (photo != null) {
-                    Image(
-                        bitmap = photo.asImageBitmap(),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(start = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.unknown_image),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(start = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
-                }
-            }
-
-            // Dolna część: przyciski Info, Decrease, Increase, Remove
-            Row(
-                modifier = Modifier
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Info Button
-                IconButton(
-                    onClick = onInfoClick,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = "Info",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                // Decrease Quantity
-                IconButton(
-                    onClick = onDecreaseQuantity,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = stringResource(R.string.label_decrease_quantity),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                // Ilość w środku aby pokazać użytkownikowi aktualną liczbę
-                Text(
-                    text = quantity.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-
-                // Increase Quantity
-                IconButton(
-                    onClick = onIncreaseQuantity,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.label_increase_quantity),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                // Remove Entire Item
-                IconButton(
-                    onClick = onRemove,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .padding(start = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.remove),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
     }
 }
 

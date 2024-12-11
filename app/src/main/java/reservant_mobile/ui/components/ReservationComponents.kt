@@ -1,5 +1,7 @@
 package reservant_mobile.ui.components
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,22 +20,31 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,7 +63,8 @@ import java.time.format.DateTimeFormatter
 fun OrderFormContent(
     navController: NavHostController,
     reservationViewModel: ReservationViewModel,
-    restaurantId: Int
+    restaurantId: Int,
+    getMenuPhoto: suspend (String) -> Bitmap?,
 ) {
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
@@ -134,16 +146,19 @@ fun OrderFormContent(
 
         if (reservationViewModel.addedItems.isNotEmpty()) {
             items(reservationViewModel.addedItems) { item ->
-                OrderCard(
-                    itemName = item.first.name ?: "",
-                    itemCount = item.second,
-                    itemCost = item.first.price ?: 0.0,
-                    onIncreaseClick = {
-                        reservationViewModel.increaseItemQuantity(item)
-                    },
-                    onDecreaseClick = {
-                        reservationViewModel.decreaseItemQuantity(item)
+                var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                LaunchedEffect(item.first.photo) {
+                    item.first.photo?.let { photo ->
+                        menuPhoto = getMenuPhoto(photo)
                     }
+                }
+                CartItemCard(
+                    item = item,
+                    onIncreaseQuantity = { reservationViewModel.increaseItemQuantity(item) },
+                    onDecreaseQuantity = { reservationViewModel.decreaseItemQuantity(item) },
+                    onRemove = { reservationViewModel.removeItemFromCart(item) },
+                    photo = menuPhoto
                 )
             }
         } else {
@@ -244,64 +259,154 @@ fun OrderFormContent(
     }
 }
 
-
 @Composable
-fun OrderCard(
-    itemName: String,
-    itemCount: Int,
-    itemCost: Double,
-    onIncreaseClick: () -> Unit,
-    onDecreaseClick: () -> Unit,
-    modifier: Modifier = Modifier
+fun CartItemCard(
+    item: Pair<RestaurantMenuItemDTO, Int>,
+    photo: Bitmap? = null,
+    onInfoClick: () -> Unit = {},
+    onIncreaseQuantity: () -> Unit = {},
+    onDecreaseQuantity: () -> Unit = {},
+    onRemove: () -> Unit = {}
 ) {
-    Box(
-        modifier = modifier
+    val (menuItem, quantity) = item
+
+    Card(
+        modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, shape = RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp)
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column {
-            // Row for item details and quantity controls
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Górna część: nazwa, alternatywna nazwa, cena, procent alkoholu
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = itemName, style = MaterialTheme.typography.bodyLarge)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "${stringResource(R.string.label_quantity)}: $itemCount",
-                        style = MaterialTheme.typography.bodyLarge
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
-                    IconButton(
-                        onClick = onDecreaseClick,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = stringResource(R.string.label_decrease_quantity)
+                    menuItem.alternateName?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    IconButton(
-                        onClick = onIncreaseClick,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.label_increase_quantity)
+                    Text(
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    menuItem.alcoholPercentage?.let {
+                        Text(
+                            text = "Alcohol Percentage: ${it}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
+
+                if (photo != null) {
+                    Image(
+                        bitmap = photo.asImageBitmap(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.unknown_image),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
+                    )
+                }
             }
-            // Text for item cost
-            Text(
-                text = "${stringResource(R.string.label_cost)}: ${itemCost}zł",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+
+            // Dolna część: przyciski Info, Decrease, Increase, Remove
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Info Button
+                IconButton(
+                    onClick = onInfoClick,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                // Decrease Quantity
+                IconButton(
+                    onClick = onDecreaseQuantity,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.label_decrease_quantity),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                // Ilość w środku aby pokazać użytkownikowi aktualną liczbę
+                Text(
+                    text = quantity.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                // Increase Quantity
+                IconButton(
+                    onClick = onIncreaseQuantity,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.label_increase_quantity),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                // Remove Entire Item
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(start = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.remove),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
