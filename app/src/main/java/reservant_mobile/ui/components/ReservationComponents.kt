@@ -65,23 +65,14 @@ fun OrderFormContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            // Delivery Switch
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(id = R.string.label_delivery))
-                Switch(
-                    checked = isDelivery,
-                    onCheckedChange = {
-                        isDelivery = it
-                        // Handle delivery-specific logic
-                    }
-                )
-            }
+            Spacer(modifier = Modifier.height(36.dp))
         }
-
         item {
-            // Takeaway Switch
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(id = R.string.label_takeaway))
+                Text(
+                    text = stringResource(id = R.string.label_takeaway),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
                 Switch(
                     checked = isTakeaway,
                     onCheckedChange = {
@@ -91,6 +82,7 @@ fun OrderFormContent(
                 )
             }
         }
+
 
         item {
             // Date Picker
