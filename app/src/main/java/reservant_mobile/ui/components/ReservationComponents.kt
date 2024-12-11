@@ -107,7 +107,8 @@ fun OrderFormContent(
                     reservationViewModel.visitDate.value = selectedDate
                 },
                 startDate = LocalDate.now().toString(),
-                allowFutureDates = true
+                allowFutureDates = true,
+                allowPastDates = false
             )
         }
 
