@@ -87,7 +87,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         UnderlinedItem(
                             icon = Icons.Filled.AccountBalanceWallet,
                             text = stringResource(id = R.string.label_wallet),
-                            onClick = { /* Navigate to Wallet */ }
+                            onClick = { navController.navigate(UserRoutes.Wallet) }
                         )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
@@ -175,6 +175,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
             }
             composable<UserRoutes.TicketHistory>{
                 TicketHistoryActivity(navController = navController)
+            }
+            composable<UserRoutes.Wallet>{
+                WalletActivity()
             }
 
         }

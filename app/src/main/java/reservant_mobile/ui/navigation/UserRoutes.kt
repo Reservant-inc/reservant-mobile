@@ -29,4 +29,7 @@ data object UserRoutes {
 
     @Serializable
     object FindFriends
+
+    @Serializable
+    object Wallet
 }
