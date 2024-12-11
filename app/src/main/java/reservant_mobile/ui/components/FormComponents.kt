@@ -313,7 +313,6 @@ fun FormFileInput(
     }
 }
 
-
 @Composable
 fun MyDatePickerDialog(
     modifier: Modifier = Modifier,
@@ -321,6 +320,7 @@ fun MyDatePickerDialog(
     label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
     startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
     allowFutureDates: Boolean = false,
+    allowPastDates: Boolean = true,
     startDate: String = (LocalDate.now().year - 28).toString() + "-06-15",
     shape: RoundedCornerShape = RoundedCornerShape(8.dp)
 ) {
@@ -331,6 +331,7 @@ fun MyDatePickerDialog(
         onDateSelected: (String) -> Unit,
         onDismiss: () -> Unit,
         allowFutureDates: Boolean,
+        allowPastDates: Boolean,
         startDate: String
     ) {
         fun convertMillisToDate(millis: Long): String {
@@ -355,10 +356,17 @@ fun MyDatePickerDialog(
             initialSelectedDateMillis = convertDateToMillis(startDate),
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return if (allowFutureDates) {
-                        true
-                    } else {
-                        utcTimeMillis <= System.currentTimeMillis()
+                    val today = System.currentTimeMillis()
+                    val startOfToday = LocalDate.now()
+                        .atStartOfDay()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+
+                    return when {
+                        !allowFutureDates && utcTimeMillis > today -> false
+                        !allowPastDates && utcTimeMillis < startOfToday -> false
+                        else -> true
                     }
                 }
             }
@@ -389,7 +397,6 @@ fun MyDatePickerDialog(
             )
         }
     }
-
 
     var date by remember { mutableStateOf(startStringValue) }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -423,12 +430,10 @@ fun MyDatePickerDialog(
             },
             onDismiss = { showDatePicker = false },
             allowFutureDates = allowFutureDates,
+            allowPastDates = allowPastDates,
             startDate = startDate
         )
-
     }
-
-
 }
 
 @Composable
