@@ -481,4 +481,5 @@
     <string name="proceed_to_checkout">Proceed to Checkout</string>
     <string name="quantity">Quantity</string>
     <string name="item_added_to_cart">Dish successfully added to the cart</string>
+    <string name="label_order_cost">Order cost</string>
 </resources>

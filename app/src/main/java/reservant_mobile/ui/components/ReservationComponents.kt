@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -47,6 +48,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -210,7 +213,8 @@ fun OrderFormContent(
             FormInput(
                 inputText = if (reservationViewModel.tip == 0.0) "" else String.format("%.2f", reservationViewModel.tip),
                 onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
-                label = stringResource(id = R.string.tip_label)
+                label = stringResource(id = R.string.tip_label),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
             )
         }
 
@@ -220,16 +224,7 @@ fun OrderFormContent(
             FormInput(
                 inputText = reservationViewModel.note.value,
                 onValueChange = { reservationViewModel.note.value = it },
-                label = stringResource(id = R.string.label_write_note)
-            )
-        }
-
-        item {
-            // Promo Code Input
-            FormInput(
-                inputText = reservationViewModel.promoCode.value,
-                onValueChange = { reservationViewModel.promoCode.value = it },
-                label = stringResource(id = R.string.label_enter_promo_code)
+                label = stringResource(id = R.string.label_write_note),
             )
         }
 
@@ -241,7 +236,7 @@ fun OrderFormContent(
             val formattedPrice = String.format("%.2f", totalCost)
 
             Text(
-                text = "${stringResource(id = R.string.label_total_cost)}: $formattedPrice zł",
+                text = "${stringResource(id = R.string.label_order_cost)}: $formattedPrice zł",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )

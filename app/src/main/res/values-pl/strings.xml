@@ -469,4 +469,5 @@
     <string name="proceed_to_checkout">Przejdź do kasy</string>
     <string name="quantity">Ilość</string>
     <string name="item_added_to_cart">Danie pomyślnie dodano do koszyka</string>
+    <string name="label_order_cost">Koszt zamówienia</string>
 </resources>
