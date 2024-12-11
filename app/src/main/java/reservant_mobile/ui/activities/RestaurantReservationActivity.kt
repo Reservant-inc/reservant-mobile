@@ -20,6 +20,7 @@ import com.example.reservant_mobile.R
 import reservant_mobile.ui.components.OrderFormContent
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
+import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +28,8 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 fun RestaurantReservationActivity(
     restaurantId: Int,
     navController: NavHostController,
-    reservationViewModel: ReservationViewModel
+    reservationViewModel: ReservationViewModel,
+    restaurantDetailVM: RestaurantDetailViewModel
 ) {
     val navControllerSummary = rememberNavController()
 
@@ -54,7 +56,10 @@ fun RestaurantReservationActivity(
                 OrderFormContent(
                     navController = navControllerSummary,
                     reservationViewModel = reservationViewModel,
-                    restaurantId = restaurantId
+                    restaurantId = restaurantId,
+                    getMenuPhoto = { photoString ->
+                        restaurantDetailVM.getPhoto(photoString)
+                    }
                 )
             }
         }
