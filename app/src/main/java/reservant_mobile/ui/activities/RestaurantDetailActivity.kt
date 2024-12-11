@@ -420,7 +420,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 BadgeFloatingButton(
                     icon = Icons.Default.ShoppingBag,
                     contentDescription = stringResource(id = R.string.cart),
-                    itemCount = reservationViewModel.addedItems.size,
+                    itemCount = reservationViewModel.addedItems.sumOf { it.second },
                     onClick = { isCartVisible = true }
                 )
             }
