@@ -124,7 +124,8 @@ fun OrderFormContent(
                             reservationViewModel.startTime.value = time
                         },
                         modifier = Modifier
-                            .scale(0.85f)
+                            .scale(0.85f),
+                        onlyHalfHours = true
                     )
                 }
                 Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
@@ -134,7 +135,9 @@ fun OrderFormContent(
                             reservationViewModel.endTime.value = time
                         },
                         modifier = Modifier
-                            .scale(0.85f)
+                            .scale(0.85f),
+                        onlyHalfHours = true,
+                        minTime = reservationViewModel.startTime.value
                     )
                 }
             }

@@ -2,6 +2,7 @@ package reservant_mobile.ui.components
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -148,8 +150,11 @@ fun MyTimePickerDialog(
     initialTime: String = "",
     onTimeSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onlyHalfHours: Boolean = false,
+    minTime: String? = null
 ) {
+    val context = LocalContext.current
     val currentTime = Calendar.getInstance()
     val initialHour = if (initialTime.isNotEmpty()) initialTime.substringBefore(":").toInt() else currentTime.get(Calendar.HOUR_OF_DAY)
     val initialMinute = if (initialTime.isNotEmpty()) initialTime.substringAfter(":").toInt() else currentTime.get(Calendar.MINUTE)
@@ -162,6 +167,15 @@ fun MyTimePickerDialog(
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(String.format("%02d:%02d", initialHour, initialMinute)) }
+
+    fun parseTimeToMinutes(time: String): Int {
+        val (h, m) = time.split(":").map { it.toInt() }
+        return h * 60 + m
+    }
+
+    fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
     Column(modifier = modifier) {
         OutlinedButton(
@@ -184,9 +198,28 @@ fun MyTimePickerDialog(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        val hour = timePickerState.hour
-                        val minute = timePickerState.minute
-                        selectedTime = String.format("%02d:%02d", hour, minute)
+                        var hour = timePickerState.hour
+                        var minute = timePickerState.minute
+
+                        if (onlyHalfHours) {
+                            minute = if (minute < 15) 0 else if (minute < 45) 30 else 0
+                            if (minute == 0 && timePickerState.minute >= 45) {
+                                hour = (hour + 1) % 24
+                            }
+                        }
+
+                        val chosenTime = String.format("%02d:%02d", hour, minute)
+
+                        if (minTime != null) {
+                            val chosenMinutes = parseTimeToMinutes(chosenTime)
+                            val minMinutes = parseTimeToMinutes(minTime) + 30
+                            if (chosenMinutes < minMinutes) {
+                                showToast(context.getString(R.string.time_too_early))
+                                return@TextButton
+                            }
+                        }
+
+                        selectedTime = chosenTime
                         onTimeSelected(selectedTime)
                         showDialog = false
                     }) {
