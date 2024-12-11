@@ -11,9 +11,10 @@ data class EmploymentDTO(
     /***
      * Date in 'yyyy-MM-dd' format
      */
-    val dateUntill: String? = null,
+    val dateUntil: String? = null,
     /***
      * Date in 'yyyy-MM-dd' format
      */
-    val dateFrom: String? = null
+    val dateFrom: String? = null,
+    val restaurantName: String? = null
 )
