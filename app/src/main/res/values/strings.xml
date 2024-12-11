@@ -483,4 +483,8 @@
     <string name="item_added_to_cart">Dish successfully added to the cart</string>
     <string name="label_order_cost">Order cost</string>
     <string name="time_too_early">Too early time</string>
+    <string name="label_date_order">Date: %1$s</string>
+    <string name="label_time">Time: %1$s - %2$s</string>
+    <string name="label_note">Note: %1$s</string>
+    <string name="label_tip">Tip: %.2f zł</string>
 </resources>

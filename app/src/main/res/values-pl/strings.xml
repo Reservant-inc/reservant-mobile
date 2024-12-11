@@ -471,4 +471,8 @@
     <string name="item_added_to_cart">Danie pomyślnie dodano do koszyka</string>
     <string name="label_order_cost">Koszt zamówienia</string>
     <string name="time_too_early">Zbyt wczesna godzina</string>
+    <string name="label_date_order">Data: %1$s</string>
+    <string name="label_time">Godzina: %1$s - %2$s</string>
+    <string name="label_note">Notatka: %1$s</string>
+    <string name="label_tip">Napiwek: %.2f zł</string>
 </resources>
