@@ -1,25 +1,48 @@
 package reservant_mobile.ui.activities
 
 import WalletViewModel
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Wallet
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.MoneyDTO
+import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.FormInput
+import reservant_mobile.ui.components.IconWithHeader
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WalletActivity(
+    onReturnClick: () -> Unit = {}
 ) {
     val viewModel: WalletViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -28,44 +51,66 @@ fun WalletActivity(
             }
         }
     )
+
     val balance by viewModel.balance
     val errorMessage by viewModel.errorMessage
 
-    val walletHistory = viewModel.walletHistoryFlow?.collectAsLazyPagingItems()
+    val walletHistoryFlow = viewModel.walletHistoryFlow
+    val walletHistory = walletHistoryFlow?.collectAsLazyPagingItems()
 
     var showAddDialog by remember { mutableStateOf(false) }
     var amountText by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Wallet") },
-                actions = {
-                    IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Money")
-                    }
-                }
+            IconWithHeader(
+                icon = Icons.Rounded.Wallet,
+                text = "Wallet",
+                showBackButton = true,
+                onReturnClick = onReturnClick
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             if (errorMessage != null) {
                 Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error)
             }
 
-            Text(text = "Balance: ${balance ?: "Loading..."} zł", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(16.dp))
+            Text(
+                text = "Balance: ${balance ?: "Loading..."} zł",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
 
-            walletHistory?.let { lazyItems ->
+            ButtonComponent(
+                onClick = { showAddDialog = true },
+                label = "Add Money",
+                icon = Icons.Default.Add
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Transaction History",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            if (walletHistory != null) {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-                    items(lazyItems.itemCount) { index ->
-                        val transaction = lazyItems[index]
+                    items(walletHistory.itemCount) { index ->
+                        val transaction = walletHistory[index]
                         transaction?.let {
-                            TransactionItem(transaction = it)
+                            TransactionCard(transaction = it)
                         }
                     }
 
-                    lazyItems.apply {
+                    walletHistory.apply {
                         when {
                             loadState.refresh is androidx.paging.LoadState.Loading -> {
                                 item { Text("Loading...") }
@@ -82,7 +127,7 @@ fun WalletActivity(
                         }
                     }
                 }
-            } ?: run {
+            } else {
                 Text("No history found or still loading...", modifier = Modifier.padding(16.dp))
             }
         }
@@ -94,11 +139,10 @@ fun WalletActivity(
             title = { Text("Add Money") },
             text = {
                 Column {
-                    OutlinedTextField(
-                        value = amountText,
+                    FormInput(
+                        inputText = amountText,
                         onValueChange = { amountText = it },
-                        label = { Text("Amount") },
-                        singleLine = true,
+                        label = "Amount",
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
@@ -108,11 +152,11 @@ fun WalletActivity(
                     val amount = amountText.toDoubleOrNull()
                     if (amount != null && amount > 0) {
                         viewModel.addMoneyToWallet(amount) {
+                            walletHistory?.refresh()
                             showAddDialog = false
                             amountText = ""
                         }
                     } else {
-                        // nieprawidłowa kwota
                     }
                 }) {
                     Text("OK")
@@ -131,10 +175,23 @@ fun WalletActivity(
 }
 
 @Composable
-fun TransactionItem(transaction: MoneyDTO) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = transaction.title, style = MaterialTheme.typography.bodyLarge)
-        Text(text = "${transaction.amount} zł", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Time: ${transaction.time}", style = MaterialTheme.typography.bodySmall)
+fun TransactionCard(transaction: MoneyDTO) {
+    val formattedTime = transaction.time?.let {
+        formatToDateTime(it, "dd.MM.yyyy HH:mm")
+    } ?: ""
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = transaction.title, style = MaterialTheme.typography.titleMedium)
+            Text(text = "${transaction.amount} zł", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
+            Text(text = "Time: $formattedTime", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
+        }
     }
 }
+

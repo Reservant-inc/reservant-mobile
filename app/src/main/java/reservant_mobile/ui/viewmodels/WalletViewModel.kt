@@ -9,8 +9,8 @@ import reservant_mobile.data.services.UserService
 import reservant_mobile.ui.viewmodels.ReservantViewModel
 
 class WalletViewModel(
-    private val userService: UserService = UserService(),
-) : ReservantViewModel() {
+    private val userService: UserService = UserService()
+): ReservantViewModel() {
 
     var balance = mutableStateOf<Double?>(null)
         private set
@@ -19,7 +19,8 @@ class WalletViewModel(
         private set
 
     private var _walletHistoryFlow: Flow<PagingData<MoneyDTO>>? = null
-    val walletHistoryFlow: Flow<PagingData<MoneyDTO>>? get() = _walletHistoryFlow
+    val walletHistoryFlow: Flow<PagingData<MoneyDTO>>?
+        get() = _walletHistoryFlow
 
     init {
         getWalletBalance()
@@ -28,7 +29,7 @@ class WalletViewModel(
             if (result.isError || result.value == null) {
                 errorMessage.value = "Failed to load history"
             } else {
-                _walletHistoryFlow = result.value.cachedIn(viewModelScope)
+                _walletHistoryFlow = result.value!!.cachedIn(viewModelScope)
             }
         }
     }
@@ -54,7 +55,6 @@ class WalletViewModel(
             if (res.isError || res.value == false) {
                 errorMessage.value = "Failed to add money"
             } else {
-                // Odśwież saldo
                 getWalletBalance()
                 onSuccess()
             }
