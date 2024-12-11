@@ -2,6 +2,7 @@ package reservant_mobile.ui.components
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -104,6 +106,8 @@ fun MenuItemCard(
         }
     }
 
+    val localContext = context ?: LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -168,7 +172,14 @@ fun MenuItemCard(
                                     )
                                 }
                                 IconButton(
-                                    onClick = onAddClick,
+                                    onClick = {
+                                        onAddClick()
+                                        Toast.makeText(
+                                            localContext,
+                                            localContext.getString(R.string.item_added_to_cart),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    },
                                     modifier = Modifier.size(36.dp)
                                 ) {
                                     Icon(
