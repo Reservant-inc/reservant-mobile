@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FoundUserDTO
 import reservant_mobile.data.models.dtos.ThreadDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.UserService
 
@@ -19,19 +19,19 @@ class SocialViewModel(
     private val userService: IUserService = UserService()
 ): ReservantViewModel() {
 
-    private val _users = MutableStateFlow<PagingData<FoundUserDTO>>(PagingData.empty())
-    val users: StateFlow<PagingData<FoundUserDTO>> = _users.asStateFlow()
+    private val _users = MutableStateFlow<PagingData<UserDTO>>(PagingData.empty())
+    val users: StateFlow<PagingData<UserDTO>> = _users.asStateFlow()
     private val _threads = MutableStateFlow<PagingData<ThreadDTO>>(PagingData.empty())
     var threads: StateFlow<PagingData<ThreadDTO>> = _threads.asStateFlow()
 
-    var threadQuery = mutableStateOf("")
     var userQuery = mutableStateOf("")
 
     init {
         viewModelScope.launch {
-            getThreads(threadQuery.value)
-            getUsers(userQuery.value)
+            getThreads()
+
         }
+        getUsers()
     }
 
     suspend fun getPhoto(url: String): Bitmap?{
@@ -42,33 +42,26 @@ class SocialViewModel(
         return null
     }
 
-    suspend fun getUsers(query: String){
-        val res = userService.getUsers(name = query)
-
-        if (res.isError || res.value == null){
-            throw Exception()
-        }
-
-        res.value.cachedIn(viewModelScope).collect{
-            _users.value = it
+    fun getUsers(){
+        viewModelScope.launch {
+            val res = userService.getUsers(name = userQuery.value)
+            if (!res.isError && res.value != null){
+                res.value.cachedIn(viewModelScope).collect{
+                    _users.value = it
+                }
+            }
         }
     }
 
-    suspend fun getThreads(query: String) {
+    suspend fun getThreads() {
         val res = userService.getUserThreads()
 
-        if (res.isError || res.value == null){
-            throw Exception()
-        }
-
-        res.value.cachedIn(viewModelScope).collect {
-            _threads.value = it.filter { thread ->
-                thread.title?.contains(query) ?: false ||
-                thread.participants?.any { participant ->
-                    participant.firstName.contains(query)
-                } ?: false
+        if (!res.isError && res.value != null){
+            res.value.cachedIn(viewModelScope).collect {
+                _threads.value = it
             }
         }
+
     }
 
 }

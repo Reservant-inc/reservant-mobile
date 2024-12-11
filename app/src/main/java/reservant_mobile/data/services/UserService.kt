@@ -49,7 +49,7 @@ interface IUserService{
      * Return users by name. Returned UserDTO also contains friendStatus attribute.
      * Available filter values : see GetUsersFilter class
      */
-    suspend fun getUsers(name: String, filter: GetUsersFilter? = null): Result<Flow<PagingData<FoundUserDTO>>?>
+    suspend fun getUsers(name: String, filter: GetUsersFilter? = null): Result<Flow<PagingData<UserDTO>>?>
     suspend fun getUserInfo(): Result<UserDTO?>
     suspend fun editUserInfo(user: UserDTO): Result<UserDTO?>
     suspend fun getUserVisits(): Result<Flow<PagingData<VisitDTO>>?>
@@ -194,7 +194,7 @@ class UserService(): ServiceUtil(), IUserService {
 
         return res.value!!.status == HttpStatusCode.OK    }
 
-    override suspend fun getUsers(name: String, filter: GetUsersFilter?): Result<Flow<PagingData<FoundUserDTO>>?> {
+    override suspend fun getUsers(name: String, filter: GetUsersFilter?): Result<Flow<PagingData<UserDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Users(
                 name = name,
@@ -204,7 +204,7 @@ class UserService(): ServiceUtil(), IUserService {
             )
         )}
 
-        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(FoundUserDTO::class.serializer()))
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(UserDTO::class.serializer()))
         return pagingResultWrapper(sps)
     }
 

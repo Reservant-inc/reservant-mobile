@@ -65,10 +65,6 @@ fun FindFriendsActivity(navController: NavHostController){
                     .padding(16.dp)
             ) {
 
-                var query by remember {
-                    viewmodel.userQuery
-                }
-
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -85,12 +81,10 @@ fun FindFriendsActivity(navController: NavHostController){
                         )
 
                         OutlinedTextField(
-                            value = query,
+                            value = viewmodel.userQuery.value,
                             onValueChange = {
-                                query = it
-                                viewmodel.viewModelScope.launch {
-                                    viewmodel.getUsers(query)
-                                }
+                                viewmodel.userQuery.value = it
+                                viewmodel.getUsers()
                             },
                             placeholder = { Text(text = "Search...") },
                             modifier = Modifier
@@ -107,7 +101,7 @@ fun FindFriendsActivity(navController: NavHostController){
                     }
 
                     
-                    if (query == ""){
+                    if (viewmodel.userQuery.value == ""){
                         item {
                             Column(
                                 modifier = Modifier.fillMaxSize(),
