@@ -1,6 +1,8 @@
 package reservant_mobile.data.services
 
 import androidx.paging.PagingData
+import com.example.reservant_mobile.R
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -126,7 +128,7 @@ interface IRestaurantService{
                                      dateUntil: LocalDateTime? = null,
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
-    suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort?): Result<List<TableDTO>?>
+    suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort? = null): Result<List<TableDTO>?>
     suspend fun getUserRestaurantReports(restaurantId: Any,
                                          dateFrom: LocalDateTime? = null,
                                          dateUntil: LocalDateTime? = null,
