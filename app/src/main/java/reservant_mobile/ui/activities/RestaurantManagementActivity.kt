@@ -420,7 +420,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
-                                RestaurantManagementRoutes.Employee(restaurantId = restaurant.restaurantId)
+                                RestaurantManagementRoutes.Stats
                             )},
                             icon = Icons.Outlined.BarChart,
                             titleStringId = R.string.label_stats
@@ -459,6 +459,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             EmployeeManagementActivity(
                 onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Employee>().restaurantId
+            )
+        }
+        composable<RestaurantManagementRoutes.Stats> {
+            RestaurantStatsActivity(
+                onReturnClick = { navController.popBackStack() },
             )
         }
 
