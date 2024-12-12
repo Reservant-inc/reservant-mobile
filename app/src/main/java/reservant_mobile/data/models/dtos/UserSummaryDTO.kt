@@ -14,12 +14,4 @@ data class UserSummaryDTO (
     val employments: List<Employments>? = null,
     val photo: String? = null,
     val friendStatus: FriendStatus? = null
-) {
-    @Serializable
-    enum class FriendStatus{
-        Stranger,
-        OutgoingRequest,
-        IncomingRequest,
-        Friend
-    }
-}
+)
