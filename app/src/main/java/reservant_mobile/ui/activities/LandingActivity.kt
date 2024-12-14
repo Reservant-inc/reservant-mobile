@@ -26,7 +26,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @Composable
-fun LandingActivity(startDestination : Any? = null, onReturnClick: () -> Unit = {} ) {
+fun LandingActivity(startDestination : Any? = null, onReturnClick: (() -> Unit)? = null ) {
 
     val isSystemInDarkMode = isSystemInDarkTheme()
 
