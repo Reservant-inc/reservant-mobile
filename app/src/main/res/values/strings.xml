@@ -441,4 +441,23 @@
     <string name="order">order</string>
     <string name="ingredient_old_amount">Old amount: %.1fg</string>
     <string name="ingredient_new_amount">New amount: %.1fg</string>
+    <string name="label_info" translatable="false">Info</string>
+    <string name="label_join_requests">Requests</string>
+    <string name="label_event_history">Events</string>
+    <string name="error_loading_friends">Error while loading friends</string>
+    <string name="error_loading_more_friends">Error while loading more friends</string>
+    <string name="label_registered_at">Registered at</string>
+    <string name="label_roles">Roles</string>
+    <string name="label_no_join_requests">No join requests</string>
+    <string name="label_order_date">Order date</string>
+    <string name="label_confirm_arrival">Confirm arrival</string>
+    <string name="label_arrival_confirmed">Arrival confirmed</string>
+    <string name="label_no_current_orders">No current orders</string>
+    <string name="label_no_friends">No friends</string>
+    <string name="error_loading_more_requests">Error while loading more requests</string>
+    <string name="error_loading_more_visits">Error while loading more visits</string>
+    <string name="label_order">Order</string>
+    <string name="label_visit_date">Visit date</string>
+    <string name="error_at_least_one_role_required">At least one role must be selected</string>
+    <string name="label_restaurant_stats">Restaurant statistics</string>
 </resources>

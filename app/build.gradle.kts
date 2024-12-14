@@ -113,4 +113,11 @@ dependencies {
     // Image caching
     implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
     implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.0-rc01")
+
+
+    // Charts
+    val vicoVersion = "1.15.0"
+    implementation("com.patrykandpatrick.vico:compose:$vicoVersion")
+    implementation("com.patrykandpatrick.vico:compose-m2:$vicoVersion")
+    implementation("com.patrykandpatrick.vico:compose-m3:$vicoVersion")
 }

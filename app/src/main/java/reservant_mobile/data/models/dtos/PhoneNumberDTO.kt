@@ -6,4 +6,8 @@ import kotlinx.serialization.Serializable
 data class PhoneNumberDTO(
     val code: String,
     val number: String
-)
+) {
+    override fun toString(): String {
+        return "$code$number"
+    }
+}

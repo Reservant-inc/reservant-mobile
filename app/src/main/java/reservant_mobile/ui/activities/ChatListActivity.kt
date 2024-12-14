@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.PersonAdd
@@ -18,7 +20,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -37,12 +38,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.endpoints.User
 import reservant_mobile.ui.components.ThreadListItem
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
-import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.SocialViewModel
 
@@ -67,38 +66,6 @@ fun ChatListActivity() {
                     icon = Icons.AutoMirrored.Rounded.Chat,
                     text = stringResource(id = R.string.label_chats)
                 )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    var query by remember {
-                        viewmodel.threadQuery
-                    }
-
-                    OutlinedTextField(
-                        value = query,
-                        onValueChange = {
-                            query = it
-                            viewmodel.viewModelScope.launch {
-                                viewmodel.getThreads(query)
-                            }
-                        },
-                        placeholder = { Text(text = "Search...") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        trailingIcon = {
-                            IconButton(onClick = {}){
-                                Icon(imageVector = Icons.Rounded.Search, contentDescription = "Send")
-                            }
-                        },
-                        singleLine = true
-                    )
-                }
 
                 LazyColumn {
                     if (threads.loadState.refresh is LoadState.Loading){
