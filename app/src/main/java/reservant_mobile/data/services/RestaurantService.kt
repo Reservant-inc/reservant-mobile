@@ -108,7 +108,7 @@ interface IRestaurantService{
     /***
      * Available order values : see GetIngredientsSort class
      */
-    suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<PageDTO<IngredientDTO>?>
+    suspend fun getIngredients(restaurantId: Any, orderBy: GetIngredientsSort? = null): Result<List<IngredientDTO>?>
 
     /***
      * Available order values : see GetDeliveriesSort class
@@ -423,7 +423,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     override suspend fun getIngredients(
         restaurantId: Any,
         orderBy: GetIngredientsSort?
-    ): Result<PageDTO<IngredientDTO>?> {
+    ): Result<List<IngredientDTO>?> {
         val res = api.get(
             Restaurants.Id.Ingredients(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
