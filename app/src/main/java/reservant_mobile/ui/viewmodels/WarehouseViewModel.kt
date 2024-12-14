@@ -54,7 +54,7 @@ class WarehouseViewModel(
                 orderBy = orderBy
             )
             if (!result.isError && result.value != null) {
-                _ingredients.value = result.value.items
+                _ingredients.value = result.value
             } else {
                 _ingredients.value = emptyList()
             }
