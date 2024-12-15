@@ -454,4 +454,5 @@
     <string name="label_visit_date">Visit date</string>
     <string name="error_at_least_one_role_required">At least one role must be selected</string>
     <string name="label_restaurant_stats">Restaurant statistics</string>
+    <string name="label_toggle_dark_theme">Toggle dark theme</string>
 </resources>

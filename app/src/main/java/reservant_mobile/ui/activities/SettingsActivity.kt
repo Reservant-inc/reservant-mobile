@@ -132,8 +132,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
 
                     UnderlinedItem(
                         icon = Icons.Filled.Brightness4,
-                        text = "Temporary theme changer",
-                        onClick = { themeChange() }
+                        text = stringResource(id = R.string.label_toggle_dark_theme),
+                        onClick = { themeChange() },
+                        actionIcon = null
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
@@ -142,7 +143,8 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             text = stringResource(id = R.string.label_delete_account),
                             onClick = {
                                 //navController.navigate()
-                            }
+                            },
+                            actionIcon = null
                         )
 
                     UnderlinedItem(
@@ -161,7 +163,8 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                                     popUpTo(0)
                                 }
                             }
-                        }
+                        },
+                        actionIcon = null
                     )
                 }
             }
