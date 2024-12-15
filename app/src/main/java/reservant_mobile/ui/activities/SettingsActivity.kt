@@ -200,7 +200,12 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         confirmText = stringResource(R.string.label_yes_capital),
                         dismissText = stringResource(R.string.label_cancel),
                         onDismissRequest = { showDeleteAccountPopup = false },
-                        onConfirm = {logoutAction()}
+                        onConfirm = {
+                            loginViewModel.viewModelScope.launch {
+                                loginViewModel.userService.deleteAccount()
+                            }
+                            logoutAction()
+                        }
                     )
                 }
             }
