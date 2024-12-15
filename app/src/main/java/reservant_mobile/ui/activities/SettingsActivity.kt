@@ -116,17 +116,24 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         }
                     )
 
-                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                        UnderlinedItem(
-                            icon = Icons.Filled.CardGiftcard,
-                            text = stringResource(id = R.string.label_promo_codes),
-                            onClick = { /* Navigate to Promo Codes */ }
-                        )
+//                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+//                        UnderlinedItem(
+//                            icon = Icons.Filled.CardGiftcard,
+//                            text = stringResource(id = R.string.label_promo_codes),
+//                            onClick = {  Navigate to Promo Codes  }
+//                        )
+//
+//
+//                    UnderlinedItem(
+//                        icon = Icons.Filled.Settings,
+//                        text = stringResource(id = R.string.label_app_settings),
+//                        onClick = { }
+//                    )
 
                     UnderlinedItem(
-                        icon = Icons.Filled.Settings,
-                        text = stringResource(id = R.string.label_app_settings),
-                        onClick = { }
+                        icon = Icons.Filled.Brightness4,
+                        text = "Temporary theme changer",
+                        onClick = { themeChange() }
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
@@ -155,12 +162,6 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                                 }
                             }
                         }
-                    )
-
-                    UnderlinedItem(
-                        icon = Icons.Filled.Brightness4,
-                        text = "Temporary theme changer",
-                        onClick = { themeChange() }
                     )
                 }
             }
