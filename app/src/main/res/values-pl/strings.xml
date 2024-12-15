@@ -443,4 +443,6 @@
     <string name="error_at_least_one_role_required">Musi być wybrana co najmniej jedna rola</string>
     <string name="label_restaurant_stats">Statystyki restauracji</string>
     <string name="label_toggle_dark_theme">Przełącz ciemny motyw</string>
+    <string name="message_logout">Czy chcesz sie wylogować?</string>
+    <string name="message_delete_account">Czy chcesz usunąc swoje konto?</string>
 </resources>

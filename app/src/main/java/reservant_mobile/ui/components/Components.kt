@@ -596,6 +596,9 @@ fun DeleteCountdownPopup(
             allowConfirm = timer == 0
         }
     }
+    else {
+        allowConfirm = true
+    }
 
     DeletePopup(
         icon = icon,
