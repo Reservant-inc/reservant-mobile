@@ -64,7 +64,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.constants.ThemePrefsKeys
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -86,9 +88,12 @@ fun EmployeeHomeActivity() {
 
 
     val isSystemInDarkMode = isSystemInDarkTheme()
-
     var darkTheme by remember {
         mutableStateOf(isSystemInDarkMode)
+    }
+    LaunchedEffect(key1 = Unit) {
+        val tmp = empHomeVM.localDataService.getData(PrefsKeys.APP_THEME)
+        darkTheme = if(tmp.isEmpty()) isSystemInDarkMode else tmp == ThemePrefsKeys.DARK.themeValue
     }
 
     val items = listOfNotNull(
@@ -345,7 +350,13 @@ fun EmployeeHomeActivity() {
                 composable<MainRoutes.Settings> {
                     SettingsActivity(
                         homeNavController = innerNavController,
-                        themeChange = { darkTheme = !darkTheme },
+                        themeChange = {
+                            darkTheme = !darkTheme
+                            empHomeVM.viewModelScope.launch {
+                                val tmp = if(darkTheme) ThemePrefsKeys.DARK else ThemePrefsKeys.LIGHT
+                                empHomeVM.localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
+                            }
+                                      },
                         withBackButton = true
                     )
                 }

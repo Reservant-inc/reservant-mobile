@@ -26,7 +26,10 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.constants.ThemePrefsKeys
+import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.components.BottomNavigation
@@ -45,12 +48,17 @@ import kotlin.coroutines.coroutineContext
 fun HomeActivity() {
     val innerNavController = rememberNavController()
     val bottomBarState = remember { (mutableStateOf(true)) }
-    val isSystemInDarkMode = isSystemInDarkTheme()
     val viewmodel = viewModel<ReservantViewModel>()
+    val localDataService = LocalDataService()
     val notificationHandler = NotificationHandler(LocalContext.current, primaryColor = MaterialTheme.colorScheme.primary)
 
+    val isSystemInDarkMode = isSystemInDarkTheme()
     var darkTheme by remember {
         mutableStateOf(isSystemInDarkMode)
+    }
+    LaunchedEffect(key1 = Unit) {
+        val tmp = localDataService.getData(PrefsKeys.APP_THEME)
+        darkTheme = if(tmp.isEmpty()) isSystemInDarkMode else tmp == ThemePrefsKeys.DARK.themeValue
     }
 
     val items = listOfNotNull(
@@ -88,7 +96,16 @@ fun HomeActivity() {
                     RegisterRestaurantActivity(navControllerHome = innerNavController)
                 }
                 composable<MainRoutes.Settings>{
-                    SettingsActivity(homeNavController = innerNavController, themeChange = { darkTheme = !darkTheme } )
+                    SettingsActivity(
+                        homeNavController = innerNavController,
+                        themeChange = {
+                            darkTheme = !darkTheme
+                            viewmodel.viewModelScope.launch {
+                                val tmp = if(darkTheme) ThemePrefsKeys.DARK else ThemePrefsKeys.LIGHT
+                                localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
+                            }
+                        }
+                    )
                 }
                 composable<RestaurantRoutes.Reservation>{
                     RestaurantReservationActivity(navController = innerNavController)
