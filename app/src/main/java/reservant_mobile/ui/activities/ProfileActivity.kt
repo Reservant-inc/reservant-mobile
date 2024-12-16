@@ -69,6 +69,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
@@ -143,9 +144,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
         if(showEditDialog){
             profileViewModel.fullProfileUser?.let { fullUser ->
                 EditProfileDialog(
+                    viewModel = profileViewModel,
                     user = fullUser,
                     onSave = {
                         profileViewModel.updateProfile(it)
+                        showEditDialog = false
+                        navController.popBackStack()
                     },
                     onDismiss = { showEditDialog = false },
                     context = context
@@ -919,6 +923,7 @@ fun getCountriesList(): List<Country> {
 }
 @Composable
 fun EditProfileDialog(
+    viewModel: ProfileViewModel,
     user: UserDTO,
     onDismiss: () -> Unit,
     onSave: (UserDTO) -> Unit,
@@ -926,8 +931,7 @@ fun EditProfileDialog(
 ) {
     var firstName by remember { mutableStateOf(user.firstName) }
     var lastName by remember { mutableStateOf(user.lastName) }
-    var phoneNum by remember { mutableStateOf(user.phoneNumber?.number ?: "") }
-
+    var phoneNum by remember { mutableStateOf(user.phoneNumber?.number) }
     val countriesList = getCountriesList()
     var mobileCountry by remember {
         mutableStateOf(
@@ -940,23 +944,33 @@ fun EditProfileDialog(
     var photo by remember { mutableStateOf(user.photo) }
     var formSent by remember { mutableStateOf(false) }
 
+    // Dodajemy stan dla błędu numeru telefonu
+    var phoneError by remember { mutableStateOf(false) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
                 onClick = {
-                formSent = true
-                    val updatedUser = UserDTO(
-                        firstName = firstName,
-                        lastName = lastName,
-                        birthDate = birthDate,
-                        photo = photo,
-                        phoneNumber = PhoneNumberDTO(
-                            code = "+${mobileCountry?.code}",
-                            number = phoneNum
+                    formSent = true
+                    // Sprawdzamy poprawność numeru telefonu przed zapisem
+                    phoneError = phoneNum?.let { viewModel.isPhoneInvalid(it) } == true
+
+                    if (!phoneError && firstName.isNotBlank() && lastName.isNotBlank()) {
+                        val updatedUser = UserDTO(
+                            firstName = firstName,
+                            lastName = lastName,
+                            birthDate = birthDate,
+                            photo = photo,
+                            phoneNumber = mobileCountry?.let {
+                                PhoneNumberDTO(
+                                    code = "+${it.code}",
+                                    number = phoneNum ?: ""
+                                )
+                            }
                         )
-                    )
-                    onSave(updatedUser)
+                        onSave(updatedUser)
+                    }
                 }
             ) {
                 Text("Save")
@@ -973,7 +987,6 @@ fun EditProfileDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                // First Name Input
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -982,7 +995,6 @@ fun EditProfileDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // Last Name Input
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
@@ -991,10 +1003,15 @@ fun EditProfileDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // Phone Number Input with Country Picker
+
                 FormInput(
-                    inputText = phoneNum,
-                    onValueChange = { phoneNum = it },
+                    inputText = phoneNum ?: "",
+                    onValueChange = {
+                        phoneNum = it
+                        if (formSent) {
+                            phoneError = viewModel.isPhoneInvalid(it)
+                        }
+                    },
                     label = stringResource(R.string.label_phone),
                     leadingIcon = {
                         mobileCountry?.let {
@@ -1012,8 +1029,10 @@ fun EditProfileDialog(
                         imeAction = ImeAction.Next
                     ),
                     optional = true,
+                    isError = (formSent && phoneError),
+                    errorText = stringResource(R.string.error_register_invalid_phone)
                 )
-                // Birth Date Picker
+
                 MyDatePickerDialog(
                     label = { Text("Birth Date") },
                     onDateChange = { selectedDate ->
@@ -1022,7 +1041,7 @@ fun EditProfileDialog(
                     allowFutureDates = false,
                     startDate = birthDate
                 )
-                // Photo Input
+
                 FormFileInput(
                     label = "Profile Photo",
                     onFilePicked = { file ->

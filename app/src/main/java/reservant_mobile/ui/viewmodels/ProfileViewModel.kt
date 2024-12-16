@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
@@ -135,6 +136,11 @@ class ProfileViewModel(
     }
 
     fun updateProfile(user: UserDTO) {
+
+        if(user.phoneNumber != null && isPhoneInvalid(user.phoneNumber.number)){
+            return
+        }
+
         viewModelScope.launch {
             val result = userService.editUserInfo(user)
             updateProfileResult = result
@@ -142,6 +148,11 @@ class ProfileViewModel(
                 loadFullUser()
             }
         }
+
+    }
+
+    fun isPhoneInvalid(phoneNum: String): Boolean {
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum)
     }
 
     fun getInterestedUsersFlow(eventId: String): Flow<PagingData<EventDTO.Participant>>? {
