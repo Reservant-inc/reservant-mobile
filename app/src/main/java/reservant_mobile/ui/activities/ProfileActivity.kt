@@ -274,82 +274,89 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 }
 
                 if (!profileViewModel.isCurrentUser) {
-                    Column(
+                    Box(
                         modifier = Modifier
-                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        when (profileViewModel.simpleProfileUser?.friendStatus) {
-                            FriendStatus.Friend -> {
-                                Button(
-                                    onClick = { profileViewModel.removeFriend() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                ) {
-                                    Text(text = stringResource(R.string.label_remove_friend))
-                                }
-                            }
-
-                            FriendStatus.OutgoingRequest -> {
-                                Button(
-                                    onClick = { profileViewModel.cancelFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                ) {
-                                    Text(text = stringResource(R.string.label_cancel))
-                                }
-                            }
-
-                            FriendStatus.IncomingRequest -> {
-                                Row {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            when (profileViewModel.simpleProfileUser?.friendStatus) {
+                                FriendStatus.Friend -> {
                                     Button(
-                                        onClick = { profileViewModel.acceptFriendRequest() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                    ) {
-                                        Text(text = stringResource(R.string.label_accept_request))
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        onClick = { profileViewModel.rejectFriendRequest() },
+                                        onClick = { profileViewModel.removeFriend() },
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                                     ) {
-                                        Text(text = stringResource(R.string.label_cancel_request))
+                                        Text(text = stringResource(R.string.label_remove_friend))
                                     }
                                 }
-                            }
 
-                            FriendStatus.Stranger -> {
-                                Button(
-                                    onClick = { profileViewModel.sendFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Add,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(ButtonDefaults.IconSize)
-                                    )
-                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                    Text(text = stringResource(R.string.label_add_friend))
+                                FriendStatus.OutgoingRequest -> {
+                                    Button(
+                                        onClick = { profileViewModel.cancelFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                    ) {
+                                        Text(text = stringResource(R.string.label_cancel))
+                                    }
+                                }
+
+                                FriendStatus.IncomingRequest -> {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Button(
+                                            onClick = { profileViewModel.acceptFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_accept_request))
+                                        }
+
+                                        Button(
+                                            onClick = { profileViewModel.rejectFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_cancel_request))
+                                        }
+                                    }
+                                }
+
+                                FriendStatus.Stranger -> {
+                                    Button(
+                                        onClick = { profileViewModel.sendFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Add,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                                        )
+                                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                        Text(text = stringResource(R.string.label_add_friend))
+                                    }
+                                }
+
+                                null -> {
+                                    // Obsługa przypadku null, jeśli konieczne
                                 }
                             }
 
-                            null -> {
-                                // Obsługa przypadku null, jeśli konieczne
+                            profileViewModel.friendRequestError?.let { error ->
+                                Text(text = error, color = MaterialTheme.colorScheme.error)
                             }
-                        }
 
-                        profileViewModel.friendRequestError?.let { error ->
-                            Text(text = error, color = MaterialTheme.colorScheme.error)
-                        }
-
-                        Button(
-                            onClick = { /* TODO: Wyślij wiadomość */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Send,
-                                contentDescription = null,
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
-                            )
+                            Button(
+                                onClick = { /* TODO: Wyślij wiadomość */ },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                                )
+                            }
                         }
                     }
                 }
