@@ -402,6 +402,8 @@ fun JoinRequestsTab(
         val listState = rememberLazyListState()
         val currentDateTime = LocalDateTime.now()
 
+        var isEmpty by remember { mutableStateOf(true) }
+
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -423,6 +425,7 @@ fun JoinRequestsTab(
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
+                                    isEmpty = false
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -490,8 +493,13 @@ fun JoinRequestsTab(
             }
 
             item {
-                if(ownedEventsPagingItems.itemCount == 0){
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if(isEmpty){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 128.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(text = stringResource(R.string.label_no_join_requests))
                     }
                 }
