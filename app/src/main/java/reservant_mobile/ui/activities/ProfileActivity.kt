@@ -85,6 +85,7 @@ import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 import java.time.LocalDateTime
@@ -378,7 +379,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 )
                             },
                             stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
-                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems) }
+                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems, navController) }
                         )
                     )
                 }
@@ -652,7 +653,10 @@ fun CurrentOrdersTab(
 
 
 @Composable
-fun EventHistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
+fun EventHistoryTab(
+    eventPagingItems: LazyPagingItems<EventDTO>?,
+    navController: NavHostController
+) {
 
     if (eventPagingItems == null) {
         Box(
@@ -676,7 +680,11 @@ fun EventHistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
                         eventLocation = event.restaurant?.name ?: "",
                         interestedCount = event.numberInterested ?: 0,
                         takePartCount = event.numberParticipants ?: 0,
-                        onClick = {}
+                        onClick = {
+                            navController.navigate(
+                                EventRoutes.Details(eventId = event.eventId!!)
+                            )
+                        }
                     )
                 }
             }
