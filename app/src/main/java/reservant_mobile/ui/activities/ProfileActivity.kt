@@ -62,6 +62,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
@@ -69,13 +70,17 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.PhoneNumberDTO
+import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.CountryPickerView
@@ -114,6 +119,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
     val visitsFlow by profileViewModel.visitsFlow.collectAsState()
     val visitsPagingItems = visitsFlow?.collectAsLazyPagingItems()
+
+    val lazyThreads = profileViewModel.getUserThreads().collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -349,7 +356,31 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             }
 
                             Button(
-                                onClick = { /* TODO: Wyślij wiadomość */ },
+                                onClick = {
+                                    val targetUserId = profileViewModel.simpleProfileUser?.userId ?: return@Button
+                                    val myUserId = UserService.UserObject.userId
+
+                                    val threadList = lazyThreads.itemSnapshotList.items
+
+                                    val targetThread = threadList.firstOrNull { thread ->
+                                        val participants = thread.participants ?: emptyList()
+                                        participants.size == 2 &&
+                                                participants.any { it.userId == targetUserId } &&
+                                                participants.any { it.userId == myUserId }
+                                    }
+
+                                    if (targetThread?.threadId != null) {
+                                        navController.navigate(UserRoutes.Chat(threadId = targetThread.threadId, threadTitle = targetThread.title!!))
+                                    } else {
+                                        profileViewModel.createThreadWithUser(targetUserId) { newThread ->
+                                            if (newThread != null) {
+                                                navController.navigate(UserRoutes.Chat(threadId = newThread.threadId!!, threadTitle = newThread.title!!))
+                                            } else {
+                                                // error
+                                            }
+                                        }
+                                    }
+                                          },
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                             ) {
                                 Icon(
