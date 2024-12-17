@@ -34,9 +34,9 @@ interface IThreadsService{
 @OptIn(InternalSerializationApi::class)
 class ThreadsService: ServiceUtil(), IThreadsService {
     override suspend fun createThread(title: String, participantIds: List<String>): Result<ThreadDTO?> {
-        val thread = mapOf(
-            "title" to title,
-            "participantIds" to participantIds
+        val thread = ThreadDTO.CreateThreadRequest(
+            title = title,
+            participantIds = participantIds
         )
         val res = api.post(Threads(), thread)
         return complexResultWrapper(res)
