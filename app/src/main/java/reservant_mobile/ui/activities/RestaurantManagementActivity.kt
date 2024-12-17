@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import WarehouseActivity
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.RestaurantMenu
+import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -76,6 +78,7 @@ import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -466,6 +469,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             titleStringId = R.string.label_stats
                         ),
                         Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Warehouse(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.Warehouse,
+                            titleStringId = R.string.label_warehouse
+                        ),
+                        Option(
                             onClick = {
                                 showDeleteRestaurantPopup = true
                             },
@@ -512,6 +522,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 navControllerHome = navController,
                 group = selectedGroup,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
+            )
+        }
+        composable<RestaurantRoutes.Warehouse> {
+            WarehouseActivity(
+                onReturnClick = { navController.popBackStack() },
+                restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
+                isEmployee = true
             )
         }
     }
