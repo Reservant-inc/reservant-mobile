@@ -38,7 +38,7 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantReservationActivity(navController: NavHostController) {
+fun RestaurantReservationActivity(restaurantId: Int, navController: NavHostController) {
     val reservationViewModel = viewModel<ReservationViewModel>()
 
 
@@ -46,7 +46,7 @@ fun RestaurantReservationActivity(navController: NavHostController) {
 
     NavHost(
         navController = navControllerSummary,
-        startDestination = RestaurantRoutes.Reservation
+        startDestination = RestaurantRoutes.Reservation(restaurantId = restaurantId)
     ) {
         composable<RestaurantRoutes.Reservation> {
             Scaffold(
@@ -124,14 +124,11 @@ fun RestaurantReservationActivity(navController: NavHostController) {
                 }
             }
         }
-        composable<RestaurantRoutes.Summary>{
-            OrderSummaryActivity(reservationViewModel=reservationViewModel, navController = navController)
+        composable<RestaurantRoutes.Summary> {
+            OrderSummaryActivity(
+                reservationViewModel = reservationViewModel,
+                navController = navController
+            )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewRestaurantReservation() {
-    RestaurantReservationActivity(navController = rememberNavController())
 }

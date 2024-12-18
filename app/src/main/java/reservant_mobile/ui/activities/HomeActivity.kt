@@ -90,9 +90,6 @@ fun HomeActivity() {
                 composable<MainRoutes.Settings>{
                     SettingsActivity(homeNavController = innerNavController, themeChange = { darkTheme = !darkTheme } )
                 }
-                composable<RestaurantRoutes.Reservation>{
-                    RestaurantReservationActivity(navController = innerNavController)
-                }
                 composable<MainRoutes.ChatList> {
                     ChatListActivity()
                 }
