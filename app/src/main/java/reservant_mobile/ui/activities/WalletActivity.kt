@@ -1,44 +1,22 @@
-package reservant_mobile.ui.activities
-
-import WalletViewModel
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Wallet
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 fun WalletActivity(
@@ -46,6 +24,7 @@ fun WalletActivity(
 ) {
     val viewModel: WalletViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return WalletViewModel() as T
             }
@@ -54,8 +33,7 @@ fun WalletActivity(
 
     val balance by viewModel.balance
     val errorMessage by viewModel.errorMessage
-
-    val walletHistoryFlow = viewModel.walletHistoryFlow
+    val walletHistoryFlow = viewModel.walletHistoryFlow.value
     val walletHistory = walletHistoryFlow?.collectAsLazyPagingItems()
 
     var showAddDialog by remember { mutableStateOf(false) }
@@ -142,8 +120,7 @@ fun WalletActivity(
                     FormInput(
                         inputText = amountText,
                         onValueChange = { amountText = it },
-                        label = "Amount",
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        label = "Amount"
                     )
                 }
             },
@@ -152,7 +129,6 @@ fun WalletActivity(
                     val amount = amountText.toDoubleOrNull()
                     if (amount != null && amount > 0) {
                         viewModel.addMoneyToWallet(amount) {
-                            walletHistory?.refresh()
                             showAddDialog = false
                             amountText = ""
                         }
@@ -194,4 +170,3 @@ fun TransactionCard(transaction: MoneyDTO) {
         }
     }
 }
-

@@ -1,4 +1,5 @@
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -6,11 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.MoneyDTO
 import reservant_mobile.data.services.UserService
-import reservant_mobile.ui.viewmodels.ReservantViewModel
 
 class WalletViewModel(
     private val userService: UserService = UserService()
-): ReservantViewModel() {
+) : ViewModel() {
 
     var balance = mutableStateOf<Double?>(null)
         private set
@@ -18,20 +18,12 @@ class WalletViewModel(
     var errorMessage = mutableStateOf<String?>(null)
         private set
 
-    private var _walletHistoryFlow: Flow<PagingData<MoneyDTO>>? = null
-    val walletHistoryFlow: Flow<PagingData<MoneyDTO>>?
-        get() = _walletHistoryFlow
+    var walletHistoryFlow = mutableStateOf<Flow<PagingData<MoneyDTO>>?>(null)
+        private set
 
     init {
         getWalletBalance()
-        viewModelScope.launch {
-            val result = userService.getWalletHistory()
-            if (result.isError || result.value == null) {
-                errorMessage.value = "Failed to load history"
-            } else {
-                _walletHistoryFlow = result.value!!.cachedIn(viewModelScope)
-            }
-        }
+        refreshWalletHistory()
     }
 
     fun getWalletBalance() {
@@ -41,6 +33,17 @@ class WalletViewModel(
                 errorMessage.value = "Failed to load balance"
             } else {
                 balance.value = res.value
+            }
+        }
+    }
+
+    fun refreshWalletHistory() {
+        viewModelScope.launch {
+            val result = userService.getWalletHistory()
+            if (result.isError || result.value == null) {
+                errorMessage.value = "Failed to load history"
+            } else {
+                      walletHistoryFlow.value = result.value!!.cachedIn(viewModelScope)
             }
         }
     }
@@ -56,6 +59,7 @@ class WalletViewModel(
                 errorMessage.value = "Failed to add money"
             } else {
                 getWalletBalance()
+                refreshWalletHistory()
                 onSuccess()
             }
         }

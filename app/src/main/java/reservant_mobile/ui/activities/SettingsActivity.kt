@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import OrdersActivity
+import WalletActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
