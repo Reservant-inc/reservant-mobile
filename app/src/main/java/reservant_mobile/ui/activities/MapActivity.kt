@@ -562,10 +562,16 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
             AddEventActivity(navController = navController)
         }
         composable<AuthRoutes.Login>{
-            LandingActivity(startDestination = AuthRoutes.Login)
+            LandingActivity(
+                startDestination = AuthRoutes.Login,
+                onReturnClick = {navController.popBackStack()}
+            )
         }
         composable<AuthRoutes.Register>{
-            LandingActivity(startDestination = AuthRoutes.Register)
+            LandingActivity(
+                startDestination = AuthRoutes.Register,
+                onReturnClick = {navController.popBackStack()}
+            )
 
         }
     }
