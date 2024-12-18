@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.serializer
@@ -49,7 +50,7 @@ class ThreadsService: ServiceUtil(), IThreadsService {
 
     override suspend fun deleteThread(threadId: Any): Result<Boolean> {
         val res = api.delete(Threads.ThreadId(threadId = threadId.toString()))
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
     }
 
     override suspend fun getThread(threadId: Any): Result<ThreadDTO?> {
