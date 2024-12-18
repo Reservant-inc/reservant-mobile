@@ -18,8 +18,11 @@ import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.reservant_mobile.R
+import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @Composable
 fun WalletActivity(
@@ -27,7 +30,6 @@ fun WalletActivity(
 ) {
     val viewModel: WalletViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return WalletViewModel() as T
             }
@@ -47,7 +49,7 @@ fun WalletActivity(
         topBar = {
             IconWithHeader(
                 icon = Icons.Rounded.Wallet,
-                text = "Wallet",
+                text = stringResource(id = R.string.wallet_title),
                 showBackButton = true,
                 onReturnClick = onReturnClick
             )
@@ -64,21 +66,21 @@ fun WalletActivity(
             }
 
             Text(
-                text = "Balance: ${balance ?: "Loading..."} zł",
+                text = stringResource(R.string.wallet_balance, balance ?: stringResource(R.string.loading)),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
             ButtonComponent(
                 onClick = { showAddDialog = true },
-                label = "Add Money",
+                label = stringResource(R.string.wallet_add_money),
                 icon = Icons.Default.Add
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Transaction History",
+                text = stringResource(R.string.wallet_transaction_history),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -95,22 +97,22 @@ fun WalletActivity(
                     walletHistory.apply {
                         when {
                             loadState.refresh is androidx.paging.LoadState.Loading -> {
-                                item { Text("Loading...") }
+                                item { Text(stringResource(R.string.loading)) }
                             }
                             loadState.append is androidx.paging.LoadState.Loading -> {
-                                item { Text("Loading more...") }
+                                item { Text(stringResource(R.string.loading_more)) }
                             }
                             loadState.refresh is androidx.paging.LoadState.Error -> {
-                                item { Text("Error loading data") }
+                                item { Text(stringResource(R.string.error_loading_data)) }
                             }
                             loadState.append is androidx.paging.LoadState.Error -> {
-                                item { Text("Error loading more data") }
+                                item { Text(stringResource(R.string.error_loading_more_data)) }
                             }
                         }
                     }
                 }
             } else {
-                Text("No history found or still loading...", modifier = Modifier.padding(16.dp))
+                Text(stringResource(R.string.no_history_found), modifier = Modifier.padding(16.dp))
             }
         }
     }
@@ -118,15 +120,15 @@ fun WalletActivity(
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
-            title = { Text("Add Money") },
+            title = { Text(stringResource(R.string.wallet_add_money_title)) },
             text = {
                 Column {
                     FormInput(
                         inputText = amountText,
                         onValueChange = { amountText = it },
-                        label = "Amount",
+                        label = stringResource(R.string.amount_label),
                         isError = isError,
-                        errorText = "Wrong amount, has to be number above 0",
+                        errorText = stringResource(R.string.amount_error),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
                     )
                 }
@@ -143,7 +145,7 @@ fun WalletActivity(
                         isError = true
                     }
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
@@ -151,7 +153,7 @@ fun WalletActivity(
                     showAddDialog = false
                     amountText = ""
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -173,8 +175,16 @@ fun TransactionCard(transaction: MoneyDTO) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = transaction.title, style = MaterialTheme.typography.titleMedium)
-            Text(text = "${transaction.amount} zł", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
-            Text(text = "Time: $formattedTime", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
+            Text(
+                text = stringResource(R.string.amount_with_currency, transaction.amount),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = stringResource(R.string.time_label, formattedTime),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

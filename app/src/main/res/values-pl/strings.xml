@@ -442,4 +442,18 @@
     <string name="label_visit_date">Data wizyty</string>
     <string name="error_at_least_one_role_required">Musi być wybrana co najmniej jedna rola</string>
     <string name="label_restaurant_stats">Statystyki restauracji</string>
+    <string name="wallet_title">Portfel</string>
+    <string name="wallet_balance">Saldo: %1$s zł</string>
+    <string name="loading">Ładowanie...</string>
+    <string name="wallet_add_money">Dodaj pieniądze</string>
+    <string name="wallet_transaction_history">Historia transakcji</string>
+    <string name="loading_more">Ładowanie więcej...</string>
+    <string name="error_loading_data">Błąd podczas ładowania danych</string>
+    <string name="error_loading_more_data">Błąd podczas ładowania więcej danych</string>
+    <string name="no_history_found">Nie znaleziono historii lub trwa ładowanie...</string>
+    <string name="wallet_add_money_title">Dodaj pieniądze</string>
+    <string name="amount_label">Kwota</string>
+    <string name="amount_error">Nieprawidłowa kwota, musi być większa niż 0</string>
+    <string name="amount_with_currency">%1$s zł</string>
+    <string name="time_label">Czas: %1$s</string>
 </resources>

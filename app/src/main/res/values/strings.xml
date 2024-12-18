@@ -454,4 +454,18 @@
     <string name="label_visit_date">Visit date</string>
     <string name="error_at_least_one_role_required">At least one role must be selected</string>
     <string name="label_restaurant_stats">Restaurant statistics</string>
+    <string name="wallet_title">Wallet</string>
+    <string name="wallet_balance">Balance: %1$s zł</string>
+    <string name="loading">Loading...</string>
+    <string name="wallet_add_money">Add Money</string>
+    <string name="wallet_transaction_history">Transaction History</string>
+    <string name="loading_more">Loading more...</string>
+    <string name="error_loading_data">Error loading data</string>
+    <string name="error_loading_more_data">Error loading more data</string>
+    <string name="no_history_found">No history found or still loading...</string>
+    <string name="wallet_add_money_title">Add Money</string>
+    <string name="amount_label">Amount</string>
+    <string name="amount_error">Invalid amount, must be greater than 0</string>
+    <string name="amount_with_currency">%1$s zł</string>
+    <string name="time_label">Time: %1$s</string>
 </resources>
