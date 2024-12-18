@@ -4,7 +4,6 @@ package reservant_mobile.ui.activities
 
 import WarehouseActivity
 import android.graphics.Bitmap
-import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -58,17 +57,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
-import com.eygraber.uri.UriCodec
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.constants.ThemePrefsKeys
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
@@ -91,9 +88,12 @@ fun EmployeeHomeActivity() {
 
 
     val isSystemInDarkMode = isSystemInDarkTheme()
-
     var darkTheme by remember {
         mutableStateOf(isSystemInDarkMode)
+    }
+    LaunchedEffect(key1 = Unit) {
+        val tmp = empHomeVM.localDataService.getData(PrefsKeys.APP_THEME)
+        darkTheme = if(tmp.isEmpty()) isSystemInDarkMode else tmp == ThemePrefsKeys.DARK.themeValue
     }
 
     val items = listOfNotNull(
@@ -352,7 +352,13 @@ fun EmployeeHomeActivity() {
                 composable<MainRoutes.Settings> {
                     SettingsActivity(
                         homeNavController = innerNavController,
-                        themeChange = { darkTheme = !darkTheme },
+                        themeChange = {
+                            darkTheme = !darkTheme
+                            empHomeVM.viewModelScope.launch {
+                                val tmp = if(darkTheme) ThemePrefsKeys.DARK else ThemePrefsKeys.LIGHT
+                                empHomeVM.localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
+                            }
+                                      },
                         withBackButton = true
                     )
                 }

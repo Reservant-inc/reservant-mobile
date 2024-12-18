@@ -74,6 +74,8 @@ interface IUserService{
                            category: ReportDTO.ReportCategory? = null,
                            reportedUserId: String? = null,
                            restaurantId: Int? = null): Result<List<ReportDTO>?>
+    suspend fun deleteAccount(): Result<Boolean>
+
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -350,6 +352,11 @@ class UserService(): ServiceUtil(), IUserService {
             )
         )
         return complexResultWrapper(res)
+    }
+
+    override suspend fun deleteAccount(): Result<Boolean> {
+        val res = api.delete(User())
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
 }
