@@ -221,6 +221,13 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
             composable<UserRoutes.TicketHistory>{
                 TicketHistoryActivity(navController = navController)
             }
+            composable<UserRoutes.Chat>{
+                ChatActivity(
+                    navController = navController,
+                    threadId = it.toRoute<UserRoutes.Chat>().threadId,
+                    title = it.toRoute<UserRoutes.Chat>().threadTitle,
+                )
+            }
 
         }
 
