@@ -449,6 +449,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return Result(true, errorCodesWrapper(res.value), null)
     }
 
+
     override suspend fun getDeliveries(
         restaurantId: Any,
         returnDelivered: Boolean?,
