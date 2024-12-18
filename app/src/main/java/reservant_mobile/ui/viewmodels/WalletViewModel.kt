@@ -43,7 +43,7 @@ class WalletViewModel(
             if (result.isError || result.value == null) {
                 errorMessage.value = "Failed to load history"
             } else {
-                      walletHistoryFlow.value = result.value!!.cachedIn(viewModelScope)
+                      walletHistoryFlow.value = result.value.cachedIn(viewModelScope)
             }
         }
     }

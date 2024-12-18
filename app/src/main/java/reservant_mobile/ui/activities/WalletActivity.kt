@@ -17,6 +17,9 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun WalletActivity(
@@ -35,6 +38,7 @@ fun WalletActivity(
     val errorMessage by viewModel.errorMessage
     val walletHistoryFlow = viewModel.walletHistoryFlow.value
     val walletHistory = walletHistoryFlow?.collectAsLazyPagingItems()
+    var isError by remember { mutableStateOf(false) }
 
     var showAddDialog by remember { mutableStateOf(false) }
     var amountText by remember { mutableStateOf("") }
@@ -120,7 +124,10 @@ fun WalletActivity(
                     FormInput(
                         inputText = amountText,
                         onValueChange = { amountText = it },
-                        label = "Amount"
+                        label = "Amount",
+                        isError = isError,
+                        errorText = "Wrong amount, has to be number above 0",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done)
                     )
                 }
             },
@@ -133,6 +140,7 @@ fun WalletActivity(
                             amountText = ""
                         }
                     } else {
+                        isError = true
                     }
                 }) {
                     Text("OK")
