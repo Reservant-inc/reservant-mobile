@@ -1,7 +1,9 @@
 package reservant_mobile.ui.activities
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -36,7 +40,7 @@ fun OrderSummaryActivity(
     restaurantId: Int
 ) {
     val errorMessage = reservationViewModel.errorMessage
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -53,6 +57,10 @@ fun OrderSummaryActivity(
             )
         }
     ) { paddingValues ->
+        val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+            (menuItem.price ?: 0.0) * quantity
+        } + reservationViewModel.tip
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -66,47 +74,125 @@ fun OrderSummaryActivity(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Display ordered items
-            reservationViewModel.addedItems.forEach { (menuItem, quantity) ->
-                Text(text = "${menuItem.name}: $quantity x ${String.format("%.2f", menuItem.price)} zł")
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.label_item),
+                    modifier = Modifier.weight(2f),
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.label_qty),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.label_price),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            // Display other details
-            Text(
-                text = stringResource(
-                    id = R.string.label_date_order,
-                    reservationViewModel.visitDate.value
+
+            reservationViewModel.addedItems.forEach { (menuItem, quantity) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = menuItem.name,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.Start
+                    )
+                    Text(
+                        text = quantity.toString(),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "${String.format("%.2f", menuItem.price)} zł",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Date:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
                 )
-            )
-            Text(
-                text = stringResource(
-                    id = R.string.label_time,
-                    reservationViewModel.startTime.value,
-                    reservationViewModel.endTime.value
+                Text(
+                    text = reservationViewModel.visitDate.value ?: "",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
                 )
-            )
-            Text(
-                text = stringResource(
-                    id = R.string.label_note,
-                    reservationViewModel.note.value
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Time:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
                 )
-            )
-            Text(
-                text = stringResource(
-                    id = R.string.label_tip,
-                    reservationViewModel.tip
+                Text(
+                    text = "${reservationViewModel.startTime.value} - ${reservationViewModel.endTime.value}",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
                 )
-            )
-            // Display total cost
-            val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-                (menuItem.price ?: 0.0) * quantity
-            } + reservationViewModel.tip
-            Text(
-                text = "${stringResource(id = R.string.label_total_cost)}: ${String.format("%.2f", totalCost)} zł",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Note:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = reservationViewModel.note.value ?: "",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Tip:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = String.format("%.2f", reservationViewModel.tip) + " zł",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Suma zamówienia
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Total:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = String.format("%.2f zł", totalCost),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,11 +205,8 @@ fun OrderSummaryActivity(
                             isDelivery = reservationViewModel.isDelivery
                         )
                         if (reservationViewModel.isOrderError() || reservationViewModel.isVisitError()) {
-                            // Display error message
-                                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                         } else {
-                            // Clear the cart
-//                            reservationViewModel.addedItems.clear()
                             navController.popBackStack()
                         }
                     }
@@ -131,7 +214,6 @@ fun OrderSummaryActivity(
                 label = stringResource(id = R.string.label_confirm_order),
                 modifier = Modifier.fillMaxWidth()
             )
-
 
             Spacer(modifier = Modifier.height(8.dp))
 

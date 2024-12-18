@@ -475,4 +475,6 @@
     <string name="label_time">Godzina: %1$s - %2$s</string>
     <string name="label_note">Notatka: %1$s</string>
     <string name="label_tip">Napiwek: %.2f zł</string>
+    <string name="label_qty">Ilość</string>
+    <string name="label_item">Danie</string>
 </resources>
