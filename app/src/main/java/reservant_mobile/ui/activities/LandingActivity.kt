@@ -26,7 +26,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.theme.AppTheme
 
 @Composable
-fun LandingActivity(startDestination : Any? = null) {
+fun LandingActivity(startDestination : Any? = null, onReturnClick: (() -> Unit)? = null ) {
 
     val isSystemInDarkMode = isSystemInDarkTheme()
 
@@ -45,10 +45,16 @@ fun LandingActivity(startDestination : Any? = null) {
                 MapActivity(isUserLoggedIn = false)
             }
             composable<AuthRoutes.Login> {
-                LoginActivity(navController = landingNavController)
+                LoginActivity(
+                    navController = landingNavController,
+                    onReturnClick = onReturnClick
+                )
             }
             composable<AuthRoutes.Register> {
-                RegisterActivity(navController = landingNavController)
+                RegisterActivity(
+                    navController = landingNavController,
+                    onReturnClick = onReturnClick
+                )
             }
             composable<MainRoutes.Home> {
                 HomeActivity()
@@ -57,13 +63,5 @@ fun LandingActivity(startDestination : Any? = null) {
                 EmployeeHomeActivity()
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewNew() {
-    AppTheme(darkTheme = true) {
-        LandingActivity()
     }
 }
