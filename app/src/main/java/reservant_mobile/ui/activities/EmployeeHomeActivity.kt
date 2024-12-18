@@ -4,7 +4,7 @@ package reservant_mobile.ui.activities
 
 import WarehouseActivity
 import android.graphics.Bitmap
-import android.graphics.Paint.Align
+import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -58,20 +58,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
+import com.eygraber.uri.UriCodec
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.constants.ThemePrefsKeys
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.BottomNavItem
+import reservant_mobile.data.utils.toCustomNavType
 import reservant_mobile.ui.components.BottomNavigation
 import reservant_mobile.ui.components.IconWithHeader
-import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.EmployeeRoutes
@@ -79,7 +85,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.reflect.typeOf
 
 @Composable
 fun EmployeeHomeActivity() {
@@ -234,7 +240,9 @@ fun EmployeeHomeActivity() {
                                 CircularProgressIndicator()
                             }
                         } else if (empHomeVM.isError) {
-                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                            Column(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)) {
                                 MissingPage(
                                     modifier = Modifier
                                         .align(alignment = Alignment.CenterHorizontally)
@@ -389,8 +397,16 @@ fun EmployeeHomeActivity() {
                     WarehouseActivity(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
-                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
+                        isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles,
+                        navHostController = innerNavController
                     )
+                }
+
+                composable<RestaurantRoutes.IngredientHistory>(
+                    typeMap = mapOf(typeOf<IngredientDTO>() to toCustomNavType(IngredientDTO.serializer())),
+                ) {
+                    val item = it.toRoute<RestaurantRoutes.IngredientHistory>().ingredient
+                    IngredientDetailsActivity(onReturnClick = { innerNavController.popBackStack() }, ingredient = item)
                 }
             }
         }

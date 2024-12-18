@@ -107,9 +107,6 @@ fun HomeActivity() {
                         }
                     )
                 }
-                composable<RestaurantRoutes.Reservation>{
-                    RestaurantReservationActivity(navController = innerNavController)
-                }
                 composable<MainRoutes.ChatList> {
                     ChatListActivity()
                 }

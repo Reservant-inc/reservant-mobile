@@ -424,6 +424,12 @@
     <string name="label_closing_soon">Wkrótce zamknięte</string>
     <string name="label_open">Otwarte</string>
     <string name="error_openTimeBeforeCloseTime">Czas otwarcia musi być przed czasem zamknięcia</string>
+    <string name="error_loading_ingredient">Błąd ładowania składnika</string>
+    <string name="delivery">dostawa</string>
+    <string name="manual_change">ręczna zmiana</string>
+    <string name="order">zamówienie</string>
+    <string name="ingredient_old_amount">Ilość przed: %.1fg</string>
+    <string name="ingredient_new_amount">Ilość po: %.1fg</string>
     <string name="label_join_requests">Prośby</string>
     <string name="label_event_history">Wydarzenia</string>
     <string name="error_loading_friends">Błąd podczas wczytywania znajomych</string>
