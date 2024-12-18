@@ -21,6 +21,10 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,18 +43,22 @@ import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
 import reservant_mobile.ui.navigation.MainRoutes
+import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
 fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false) {
     val loginViewModel = viewModel<LoginViewModel>()
+    var showLogoutPopup by remember { mutableStateOf(false) }
+    var showDeleteAccountPopup by remember { mutableStateOf(false) }
 
     Surface {
         val navController = rememberNavController()
@@ -116,17 +124,25 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         }
                     )
 
-                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-                        UnderlinedItem(
-                            icon = Icons.Filled.CardGiftcard,
-                            text = stringResource(id = R.string.label_promo_codes),
-                            onClick = { /* Navigate to Promo Codes */ }
-                        )
+//                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+//                        UnderlinedItem(
+//                            icon = Icons.Filled.CardGiftcard,
+//                            text = stringResource(id = R.string.label_promo_codes),
+//                            onClick = {  Navigate to Promo Codes  }
+//                        )
+//
+//
+//                    UnderlinedItem(
+//                        icon = Icons.Filled.Settings,
+//                        text = stringResource(id = R.string.label_app_settings),
+//                        onClick = { }
+//                    )
 
                     UnderlinedItem(
-                        icon = Icons.Filled.Settings,
-                        text = stringResource(id = R.string.label_app_settings),
-                        onClick = { }
+                        icon = Icons.Filled.Brightness4,
+                        text = stringResource(id = R.string.label_toggle_dark_theme),
+                        onClick = { themeChange() },
+                        actionIcon = null
                     )
 
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
@@ -134,33 +150,62 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             icon = Icons.Filled.Delete,
                             text = stringResource(id = R.string.label_delete_account),
                             onClick = {
-                                //navController.navigate()
-                            }
+                                showDeleteAccountPopup = true
+                            },
+                            actionIcon = null
                         )
 
                     UnderlinedItem(
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
                         text = stringResource(id = R.string.label_logout_action),
                         onClick = {
-                            loginViewModel.viewModelScope.launch {
-                                if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
-                                    LocalDataService().saveData(
-                                        key = PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT,
-                                        data = ""
-                                    )
-                                }
-                                loginViewModel.logout()
-                                homeNavController.navigate(AuthRoutes.Landing) {
-                                    popUpTo(0)
-                                }
-                            }
-                        }
+                            showLogoutPopup = true
+                        },
+                        actionIcon = null
                     )
+                }
+                val logoutAction = {
+                    loginViewModel.viewModelScope.launch {
+                        if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
+                            LocalDataService().saveData(
+                                key = PrefsKeys.EMPLOYEE_CURRENT_RESTAURANT,
+                                data = ""
+                            )
+                        }
+                        loginViewModel.logout()
+                        homeNavController.navigate(AuthRoutes.Landing) {
+                            popUpTo(0)
+                        }
+                    }
+                }
 
-                    UnderlinedItem(
-                        icon = Icons.Filled.Brightness4,
-                        text = "Temporary theme changer",
-                        onClick = { themeChange() }
+                if(showLogoutPopup)  {
+                    DeleteCountdownPopup(
+                        icon = Icons.AutoMirrored.Filled.ExitToApp,
+                        countDownTimer = 0,
+                        title = stringResource(R.string.label_logout_action),
+                        text = stringResource(R.string.message_logout),
+                        confirmText = stringResource(R.string.label_yes_capital),
+                        dismissText = stringResource(R.string.label_cancel),
+                        onDismissRequest = { showLogoutPopup = false },
+                        onConfirm = {logoutAction()}
+                    )
+                }
+
+                if(showDeleteAccountPopup)  {
+                    DeleteCountdownPopup(
+                        icon = Icons.Default.Delete,
+                        title = stringResource(R.string.label_delete_account),
+                        text = stringResource(R.string.message_delete_account),
+                        confirmText = stringResource(R.string.label_yes_capital),
+                        dismissText = stringResource(R.string.label_cancel),
+                        onDismissRequest = { showDeleteAccountPopup = false },
+                        onConfirm = {
+                            loginViewModel.viewModelScope.launch {
+                                loginViewModel.userService.deleteAccount()
+                            }
+                            logoutAction()
+                        }
                     )
                 }
             }
