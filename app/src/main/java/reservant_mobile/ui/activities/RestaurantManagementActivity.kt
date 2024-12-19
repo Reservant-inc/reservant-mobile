@@ -544,6 +544,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             WarehouseActivity(
                 onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
+                navHostController = navControllerHome,
                 isEmployee = true
             )
         }
