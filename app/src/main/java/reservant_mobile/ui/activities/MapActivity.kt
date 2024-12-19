@@ -552,9 +552,6 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
         composable<RestaurantRoutes.Details> {
             RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
         }
-        composable<RestaurantRoutes.Reservation>{
-            RestaurantReservationActivity(navController = navController)
-        }
         composable<EventRoutes.Details>{
             EventDetailActivity(
                 navController = navController,
@@ -565,10 +562,16 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
             AddEventActivity(navController = navController)
         }
         composable<AuthRoutes.Login>{
-            LandingActivity(startDestination = AuthRoutes.Login)
+            LandingActivity(
+                startDestination = AuthRoutes.Login,
+                onReturnClick = {navController.popBackStack()}
+            )
         }
         composable<AuthRoutes.Register>{
-            LandingActivity(startDestination = AuthRoutes.Register)
+            LandingActivity(
+                startDestination = AuthRoutes.Register,
+                onReturnClick = {navController.popBackStack()}
+            )
 
         }
     }

@@ -48,6 +48,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -594,6 +595,9 @@ fun DeleteCountdownPopup(
             timer -= 1
             allowConfirm = timer == 0
         }
+    }
+    else {
+        allowConfirm = true
     }
 
     DeletePopup(
@@ -1219,7 +1223,8 @@ fun MissingPage(
 fun UnderlinedItem(
     icon: ImageVector,
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    actionIcon: ImageVector? = Icons.AutoMirrored.Filled.ArrowForward
 ) {
     Row(
         modifier = Modifier
@@ -1245,11 +1250,13 @@ fun UnderlinedItem(
                 fontWeight = FontWeight.Medium
             )
         }
-        Icon(
-            imageVector = Icons.Filled.ArrowForward,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
+        if(actionIcon != null){
+            Icon(
+                imageVector = actionIcon,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
     HorizontalDivider()
 }

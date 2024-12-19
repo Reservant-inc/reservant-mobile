@@ -62,6 +62,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
@@ -69,12 +70,17 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import com.google.i18n.phonenumbers.PhoneNumberUtil
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.PhoneNumberDTO
+import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.CountryPickerView
@@ -84,6 +90,7 @@ import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
 import java.time.LocalDateTime
@@ -112,6 +119,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
 
     val visitsFlow by profileViewModel.visitsFlow.collectAsState()
     val visitsPagingItems = visitsFlow?.collectAsLazyPagingItems()
+
+    val lazyThreads = profileViewModel.getUserThreads().collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -143,9 +152,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
         if(showEditDialog){
             profileViewModel.fullProfileUser?.let { fullUser ->
                 EditProfileDialog(
+                    viewModel = profileViewModel,
                     user = fullUser,
                     onSave = {
                         profileViewModel.updateProfile(it)
+                        showEditDialog = false
+                        navController.popBackStack()
                     },
                     onDismiss = { showEditDialog = false },
                     context = context
@@ -270,82 +282,113 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 }
 
                 if (!profileViewModel.isCurrentUser) {
-                    Column(
+                    Box(
                         modifier = Modifier
-                            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        when (profileViewModel.simpleProfileUser?.friendStatus) {
-                            FriendStatus.Friend -> {
-                                Button(
-                                    onClick = { profileViewModel.removeFriend() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                ) {
-                                    Text(text = stringResource(R.string.label_remove_friend))
-                                }
-                            }
-
-                            FriendStatus.OutgoingRequest -> {
-                                Button(
-                                    onClick = { profileViewModel.cancelFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                ) {
-                                    Text(text = stringResource(R.string.label_cancel))
-                                }
-                            }
-
-                            FriendStatus.IncomingRequest -> {
-                                Row {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            when (profileViewModel.simpleProfileUser?.friendStatus) {
+                                FriendStatus.Friend -> {
                                     Button(
-                                        onClick = { profileViewModel.acceptFriendRequest() },
-                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                    ) {
-                                        Text(text = stringResource(R.string.label_accept_request))
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        onClick = { profileViewModel.rejectFriendRequest() },
+                                        onClick = { profileViewModel.removeFriend() },
                                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                                     ) {
-                                        Text(text = stringResource(R.string.label_cancel_request))
+                                        Text(text = stringResource(R.string.label_remove_friend))
                                     }
                                 }
-                            }
 
-                            FriendStatus.Stranger -> {
-                                Button(
-                                    onClick = { profileViewModel.sendFriendRequest() },
-                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Add,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(ButtonDefaults.IconSize)
-                                    )
-                                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                                    Text(text = stringResource(R.string.label_add_friend))
+                                FriendStatus.OutgoingRequest -> {
+                                    Button(
+                                        onClick = { profileViewModel.cancelFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                    ) {
+                                        Text(text = stringResource(R.string.label_cancel))
+                                    }
+                                }
+
+                                FriendStatus.IncomingRequest -> {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Button(
+                                            onClick = { profileViewModel.acceptFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_accept_request))
+                                        }
+
+                                        Button(
+                                            onClick = { profileViewModel.rejectFriendRequest() },
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                        ) {
+                                            Text(text = stringResource(R.string.label_cancel_request))
+                                        }
+                                    }
+                                }
+
+                                FriendStatus.Stranger -> {
+                                    Button(
+                                        onClick = { profileViewModel.sendFriendRequest() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Add,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                                        )
+                                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                                        Text(text = stringResource(R.string.label_add_friend))
+                                    }
+                                }
+
+                                null -> {
+                                    // Obsługa przypadku null, jeśli konieczne
                                 }
                             }
 
-                            null -> {
-                                // Obsługa przypadku null, jeśli konieczne
+                            profileViewModel.friendRequestError?.let { error ->
+                                Text(text = error, color = MaterialTheme.colorScheme.error)
                             }
-                        }
 
-                        profileViewModel.friendRequestError?.let { error ->
-                            Text(text = error, color = MaterialTheme.colorScheme.error)
-                        }
+                            Button(
+                                onClick = {
+                                    val targetUserId = profileViewModel.simpleProfileUser?.userId ?: return@Button
+                                    val myUserId = UserService.UserObject.userId
 
-                        Button(
-                            onClick = { /* TODO: Wyślij wiadomość */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Send,
-                                contentDescription = null,
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
-                            )
+                                    val threadList = lazyThreads.itemSnapshotList.items
+
+                                    val targetThread = threadList.firstOrNull { thread ->
+                                        val participants = thread.participants ?: emptyList()
+                                        participants.size == 2 &&
+                                                participants.any { it.userId == targetUserId } &&
+                                                participants.any { it.userId == myUserId }
+                                    }
+
+                                    if (targetThread?.threadId != null) {
+                                        navController.navigate(UserRoutes.Chat(threadId = targetThread.threadId, threadTitle = targetThread.title!!))
+                                    } else {
+                                        profileViewModel.createThreadWithUser(targetUserId) { newThread ->
+                                            if (newThread != null) {
+                                                navController.navigate(UserRoutes.Chat(threadId = newThread.threadId!!, threadTitle = newThread.title!!))
+                                            } else {
+                                                // error
+                                            }
+                                        }
+                                    }
+                                          },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                                )
+                            }
                         }
                     }
                 }
@@ -367,7 +410,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 )
                             },
                             stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
-                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems) }
+                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems, navController) }
                         )
                     )
                 }
@@ -398,6 +441,8 @@ fun JoinRequestsTab(
         val listState = rememberLazyListState()
         val currentDateTime = LocalDateTime.now()
 
+        var isEmpty by remember { mutableStateOf(true) }
+
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -419,6 +464,7 @@ fun JoinRequestsTab(
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
+                                    isEmpty = false
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -486,8 +532,13 @@ fun JoinRequestsTab(
             }
 
             item {
-                if(ownedEventsPagingItems.itemCount == 0){
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if(isEmpty){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 128.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(text = stringResource(R.string.label_no_join_requests))
                     }
                 }
@@ -633,7 +684,10 @@ fun CurrentOrdersTab(
 
 
 @Composable
-fun EventHistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
+fun EventHistoryTab(
+    eventPagingItems: LazyPagingItems<EventDTO>?,
+    navController: NavHostController
+) {
 
     if (eventPagingItems == null) {
         Box(
@@ -657,7 +711,11 @@ fun EventHistoryTab(eventPagingItems: LazyPagingItems<EventDTO>?) {
                         eventLocation = event.restaurant?.name ?: "",
                         interestedCount = event.numberInterested ?: 0,
                         takePartCount = event.numberParticipants ?: 0,
-                        onClick = {}
+                        onClick = {
+                            navController.navigate(
+                                EventRoutes.Details(eventId = event.eventId!!)
+                            )
+                        }
                     )
                 }
             }
@@ -919,6 +977,7 @@ fun getCountriesList(): List<Country> {
 }
 @Composable
 fun EditProfileDialog(
+    viewModel: ProfileViewModel,
     user: UserDTO,
     onDismiss: () -> Unit,
     onSave: (UserDTO) -> Unit,
@@ -926,8 +985,7 @@ fun EditProfileDialog(
 ) {
     var firstName by remember { mutableStateOf(user.firstName) }
     var lastName by remember { mutableStateOf(user.lastName) }
-    var phoneNum by remember { mutableStateOf(user.phoneNumber?.number ?: "") }
-
+    var phoneNum by remember { mutableStateOf(user.phoneNumber?.number) }
     val countriesList = getCountriesList()
     var mobileCountry by remember {
         mutableStateOf(
@@ -940,23 +998,33 @@ fun EditProfileDialog(
     var photo by remember { mutableStateOf(user.photo) }
     var formSent by remember { mutableStateOf(false) }
 
+    // Dodajemy stan dla błędu numeru telefonu
+    var phoneError by remember { mutableStateOf(false) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
                 onClick = {
-                formSent = true
-                    val updatedUser = UserDTO(
-                        firstName = firstName,
-                        lastName = lastName,
-                        birthDate = birthDate,
-                        photo = photo,
-                        phoneNumber = PhoneNumberDTO(
-                            code = "+${mobileCountry?.code}",
-                            number = phoneNum
+                    formSent = true
+                    // Sprawdzamy poprawność numeru telefonu przed zapisem
+                    phoneError = phoneNum?.let { viewModel.isPhoneInvalid(it) } == true
+
+                    if (!phoneError && firstName.isNotBlank() && lastName.isNotBlank()) {
+                        val updatedUser = UserDTO(
+                            firstName = firstName,
+                            lastName = lastName,
+                            birthDate = birthDate,
+                            photo = photo,
+                            phoneNumber = mobileCountry?.let {
+                                PhoneNumberDTO(
+                                    code = "+${it.code}",
+                                    number = phoneNum ?: ""
+                                )
+                            }
                         )
-                    )
-                    onSave(updatedUser)
+                        onSave(updatedUser)
+                    }
                 }
             ) {
                 Text("Save")
@@ -973,7 +1041,6 @@ fun EditProfileDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                // First Name Input
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -982,7 +1049,6 @@ fun EditProfileDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // Last Name Input
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
@@ -991,10 +1057,15 @@ fun EditProfileDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                // Phone Number Input with Country Picker
+
                 FormInput(
-                    inputText = phoneNum,
-                    onValueChange = { phoneNum = it },
+                    inputText = phoneNum ?: "",
+                    onValueChange = {
+                        phoneNum = it
+                        if (formSent) {
+                            phoneError = viewModel.isPhoneInvalid(it)
+                        }
+                    },
                     label = stringResource(R.string.label_phone),
                     leadingIcon = {
                         mobileCountry?.let {
@@ -1012,8 +1083,10 @@ fun EditProfileDialog(
                         imeAction = ImeAction.Next
                     ),
                     optional = true,
+                    isError = (formSent && phoneError),
+                    errorText = stringResource(R.string.error_register_invalid_phone)
                 )
-                // Birth Date Picker
+
                 MyDatePickerDialog(
                     label = { Text("Birth Date") },
                     onDateChange = { selectedDate ->
@@ -1022,7 +1095,7 @@ fun EditProfileDialog(
                     allowFutureDates = false,
                     startDate = birthDate
                 )
-                // Photo Input
+
                 FormFileInput(
                     label = "Profile Photo",
                     onFilePicked = { file ->

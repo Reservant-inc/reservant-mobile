@@ -10,4 +10,10 @@ data class ThreadDTO (
      * UserDTO contains userId, firstName, lastName, photo
      */
     val participants: List<UserDTO>? = null
-)
+){
+    @Serializable
+    data class CreateThreadRequest(
+        val title: String,
+        val participantIds: List<String>
+    )
+}

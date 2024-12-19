@@ -11,8 +11,17 @@ data class ReportDTO(
     val category: ReportCategory? = null,
     val createdBy: ReportParticipant? = null,
     val reportedUser: ReportParticipant? = null,
+    val escalatedBy: ReportParticipant? = null,
+    val escalationComment: String? = null,
+    val resolvedBy: ReportParticipant? = null,
+    /***
+     * Date in 'yyyy-MM-d'T'H:mm:ss.SSS'Z'' format
+     */
+    val resolutionDate: String? = null,
+    val resolutionComment: String? = null,
     val reportedUserId: String? = reportedUser?.userId,
-    val visitId: Int? = null
+    val visit: VisitDTO? = null,
+    val visitId: Int? = visit?.visitId
 ){
     @Serializable
     data class ReportParticipant(

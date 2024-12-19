@@ -30,7 +30,12 @@ class Restaurants(
          * Available order values : DateAsc, DateDesc, StarsAsc, StarsDesc
          */
         @Resource("reviews")
-        class Reviews(val parent: Id, val orderBy: String? = null, val page: Int? = null, val perPage: Int? = null)
+        class Reviews(
+            val parent: Id,
+            val orderBy: String? = null,
+            val authorName: String? = null,
+            val page: Int? = null,
+            val perPage: Int? = null)
 
         /***
          * Available visitSorting values : DateAsc, DateDesc

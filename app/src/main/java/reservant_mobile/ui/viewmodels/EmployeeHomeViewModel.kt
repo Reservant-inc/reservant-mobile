@@ -13,7 +13,7 @@ import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 
 class EmployeeHomeViewModel(
-    private val localDataService: LocalDataService = LocalDataService(),
+    val localDataService: LocalDataService = LocalDataService(),
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val userService: IUserService = UserService()
 ): ReservantViewModel() {

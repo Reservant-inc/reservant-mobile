@@ -11,7 +11,7 @@ import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
 
 class LoginViewModel(
-    private val userService: IUserService = UserService(),
+    val userService: IUserService = UserService(),
 
 ) : ReservantViewModel() {
 
