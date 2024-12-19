@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import WarehouseActivity
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -26,9 +27,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Dining
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.RestaurantMenu
+import androidx.compose.material.icons.outlined.Reviews
+import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -76,6 +80,7 @@ import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -87,10 +92,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
 
-    var showDeletePopup by remember { mutableStateOf(false) }
+    var showDeleteRestaurantPopup by remember { mutableStateOf(false) }
+    var showDeleteGroupPopup by remember { mutableStateOf(false) }
 
 
-    if(showDeletePopup )  {
+    if(showDeleteRestaurantPopup)  {
         val restaurant = restaurantManageVM.selectedRestaurant
         if(restaurant!= null){
             val confirmText = stringResource(R.string.delete_restaurant_message) +
@@ -101,19 +107,42 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 text = confirmText,
                 confirmText = stringResource(R.string.label_yes_capital),
                 dismissText = stringResource(R.string.label_cancel),
-                onDismissRequest = { showDeletePopup = false },
+                onDismissRequest = { showDeleteRestaurantPopup = false },
                 onConfirm = {
                     restaurantManageVM.viewModelScope.launch {
                         if(navController.currentBackStackEntry?.destination?.route == RestaurantManagementRoutes.RestaurantPreview::class.qualifiedName)
                             navController.navigate(RestaurantManagementRoutes.Restaurant)
                         restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
-                        showDeletePopup = false
+                        showDeleteRestaurantPopup = false
                     }
                 }
             )
         }
     }
 
+    if (showDeleteGroupPopup) {
+        val group = restaurantManageVM.selectedGroup
+        if (group != null) {
+            val confirmText = stringResource(R.string.delete_group_message) +
+                    "\n" + group.name + " ?"
+            DeleteCountdownPopup(
+                icon = Icons.Default.Delete,
+                title = stringResource(R.string.label_delete_group),
+                text = confirmText,
+                confirmText = stringResource(R.string.label_yes_capital),
+                dismissText = stringResource(R.string.label_cancel),
+                onDismissRequest = { showDeleteGroupPopup = false },
+                onConfirm = {
+                    restaurantManageVM.viewModelScope.launch {
+                        group.restaurantGroupId?.let {
+                            restaurantManageVM.deleteGroup(it)
+                        }
+                        showDeleteGroupPopup = false
+                    }
+                }
+            )
+        }
+    }
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
         composable<RestaurantManagementRoutes.Restaurant> {
@@ -130,10 +159,26 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.Start
                 ) {
+
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_management_manage)
+                        text = stringResource(R.string.label_management_manage),
+                        actions = {
+                            if (restaurantManageVM.isGroupSelected) {
+                                IconButton(onClick = {
+                                    showDeleteGroupPopup = true
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.label_delete),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                        }
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     if (groups != null) {
                         if (groups.size > 1) {
@@ -246,7 +291,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         .size(24.dp),
                                     onClick = {
                                         restaurantManageVM.selectedRestaurant = restaurant
-                                        showDeletePopup = true
+                                        showDeleteRestaurantPopup = true
                                     }
                                 ) {
                                     Icon(
@@ -420,14 +465,35 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
+                                RestaurantRoutes.ManageOrders(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.Dining,
+                            titleStringId = R.string.label_orders
+                        ),
+                        Option(
+                            onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Stats
                             )},
                             icon = Icons.Outlined.BarChart,
                             titleStringId = R.string.label_stats
                         ),
                         Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Reviews(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.Reviews,
+                            titleStringId = R.string.label_reviews
+                        ),
+                        Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Warehouse(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.Warehouse,
+                            titleStringId = R.string.label_warehouse
+                        ),
+                        Option(
                             onClick = {
-                                showDeletePopup = true
+                                showDeleteRestaurantPopup = true
                             },
                             icon = Icons.Outlined.Delete,
                             titleStringId = R.string.label_delete
@@ -472,6 +538,27 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 navControllerHome = navController,
                 group = selectedGroup,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
+            )
+        }
+        composable<RestaurantRoutes.Warehouse> {
+            WarehouseActivity(
+                onReturnClick = { navController.popBackStack() },
+                restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
+                navHostController = navControllerHome,
+                isEmployee = true
+            )
+        }
+        composable<RestaurantRoutes.Reviews> {
+            ReviewsActivity(
+                restaurantId = it.toRoute<RestaurantRoutes.Reviews>().restaurantId,
+                isOwner = true
+            )
+        }
+        composable<RestaurantRoutes.ManageOrders> {
+            OrderManagementScreen(
+                onReturnClick = { navController.popBackStack() },
+                navHostController = navControllerHome,
+                restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId
             )
         }
     }

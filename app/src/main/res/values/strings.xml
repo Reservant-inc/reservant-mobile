@@ -460,6 +460,11 @@
     <string name="label_visit_date">Visit date</string>
     <string name="error_at_least_one_role_required">At least one role must be selected</string>
     <string name="label_restaurant_stats">Restaurant statistics</string>
+    <string name="delete_group_message">Are you sure you want to delete group</string>
+    <string name="label_delete_group">Delete group</string>
+    <string name="label_reply">Reply</string>
+    <string name="label_owner_reply">Owner reply</string>
+    <string name="label_write_reply">Write reply</string>
     <string name="label_toggle_dark_theme">Toggle dark theme</string>
     <string name="message_logout">Are you sure you want to log out?</string>
     <string name="message_delete_account">Are you sure you want to delete your account?</string>

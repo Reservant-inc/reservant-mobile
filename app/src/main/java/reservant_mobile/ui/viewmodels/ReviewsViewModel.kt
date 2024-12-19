@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantService
@@ -21,6 +22,8 @@ class ReviewsViewModel(
     private val restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService()
 ) : ViewModel() {
+
+    var restaurant: RestaurantDTO? by mutableStateOf(null)
 
     private val _reviewsFlow = MutableStateFlow<Flow<PagingData<ReviewDTO>>?>(null)
     val reviewsFlow: StateFlow<Flow<PagingData<ReviewDTO>>?> = _reviewsFlow
@@ -62,9 +65,8 @@ class ReviewsViewModel(
         }
     }
 
-
     suspend fun addReview(stars: Int, contents: String) {
-        isSaving = true // Ustawienie flagi isSaving na true przed rozpoczęciem zapisu
+        isSaving = true
 
         val newReview = ReviewDTO(
             stars = stars,
@@ -103,12 +105,27 @@ class ReviewsViewModel(
         }
     }
 
-
     fun deleteReview(reviewId: Int) {
         viewModelScope.launch {
             isSaving = true
 
             val result = restaurantService.deleteRestaurantReview(reviewId)
+
+            this@ReviewsViewModel.result.isError = result.isError
+
+            if (!result.isError) {
+                fetchReviews()
+            }
+
+            isSaving = false
+        }
+    }
+
+    fun postReply(reviewId: Int, replyContent: String) {
+        viewModelScope.launch {
+            isSaving = true
+
+            val result = restaurantService.addRestaurantResponse(reviewId, replyContent)
 
             this@ReviewsViewModel.result.isError = result.isError
 
