@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Dining
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.RestaurantMenu
@@ -464,6 +465,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
+                                RestaurantRoutes.ManageOrders(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.Dining,
+                            titleStringId = R.string.label_orders
+                        ),
+                        Option(
+                            onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Stats
                             )},
                             icon = Icons.Outlined.BarChart,
@@ -543,6 +551,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             ReviewsActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.Reviews>().restaurantId,
                 isOwner = true
+            )
+        }
+        composable<RestaurantRoutes.ManageOrders> {
+            OrderManagementScreen(
+                onReturnClick = { navController.popBackStack() },
+                navHostController = navControllerHome,
+                restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId
             )
         }
     }
