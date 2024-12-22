@@ -116,16 +116,9 @@ fun EmployeeHomeActivity() {
                 empHomeVM.findSelectedRestaurants()
             }
 
-
-            val startDestination = if (empHomeVM.selectedRestaurant != null)
-                EmployeeRoutes.Home
-            else
-                EmployeeRoutes.SelectRestaurant
-
-
             NavHost(
                 navController = innerNavController,
-                startDestination = startDestination,
+                startDestination = EmployeeRoutes.SelectRestaurant,
                 modifier = Modifier.padding(it)
             ) {
                 composable<EmployeeRoutes.SelectRestaurant> {
