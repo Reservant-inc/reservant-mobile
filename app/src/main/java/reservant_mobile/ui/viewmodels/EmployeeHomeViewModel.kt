@@ -7,13 +7,16 @@ import androidx.compose.runtime.setValue
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 
 class EmployeeHomeViewModel(
-    private val localDataService: LocalDataService = LocalDataService(),
+    val localDataService: LocalDataService = LocalDataService(),
     private val restaurantService: IRestaurantService = RestaurantService(),
-    ): ReservantViewModel() {
+    private val userService: IUserService = UserService()
+): ReservantViewModel() {
 
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
     var restaurants: List<RestaurantDTO> by mutableStateOf(listOf())
@@ -24,9 +27,11 @@ class EmployeeHomeViewModel(
 
     suspend fun getEmployeeRestaurants(){
         isLoading = true
-        val res = restaurantService.getRestaurant(5);
+        val res = userService.getUserEmployments(false)
         if(!res.isError){
-            restaurants = listOf(res.value!!)
+            restaurants = res.value!!.map {
+                it.restaurant!!
+            }
         }
         isLoading = false
         isError = res.isError

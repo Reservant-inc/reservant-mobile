@@ -1,6 +1,8 @@
 package reservant_mobile.data.services
 
 import androidx.paging.PagingData
+import com.example.reservant_mobile.R
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -85,7 +87,7 @@ interface IRestaurantService{
     /***
      * Available order values : see GetRestaurantReviewsSort class
      */
-    suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null): Result<Flow<PagingData<ReviewDTO>>?>
+    suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort? = null, authorName: String? = null): Result<Flow<PagingData<ReviewDTO>>?>
     suspend fun editRestaurantReview(reviewId: Any, review: ReviewDTO): Result<ReviewDTO?>
     suspend fun deleteRestaurantReview(reviewId: Any): Result<Boolean>
     suspend fun addRestaurantResponse(reviewId: Any, response: String): Result<ReviewDTO?>
@@ -126,7 +128,7 @@ interface IRestaurantService{
                                      dateUntil: LocalDateTime? = null,
                                      userId: String? = null,
                                      comment: String? = null): Result<Flow<PagingData<IngredientDTO.CorrectionDTO>>?>
-    suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort?): Result<List<TableDTO>?>
+    suspend fun getCurrentTables(restaurantId: Any, orderBy: GetRestaurantTablesSort? = null): Result<List<TableDTO>?>
     suspend fun getUserRestaurantReports(restaurantId: Any,
                                          dateFrom: LocalDateTime? = null,
                                          dateUntil: LocalDateTime? = null,
@@ -347,11 +349,12 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         return complexResultWrapper(res)
     }
 
-    override suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort?): Result<Flow<PagingData<ReviewDTO>>?> {
+    override suspend fun getRestaurantReviews(restaurantId: Any, orderBy: GetRestaurantReviewsSort?, authorName: String?): Result<Flow<PagingData<ReviewDTO>>?> {
         val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage -> api.get(
             Restaurants.Id.Reviews(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
                 orderBy = orderBy?.toString(),
+                authorName = authorName,
                 page = page,
                 perPage = perPage
             ))}
@@ -425,11 +428,28 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         val res = api.get(
             Restaurants.Id.Ingredients(
                 parent = Restaurants.Id(restaurantId = restaurantId.toString()),
-                orderBy = orderBy?.toString()
+                orderBy = orderBy?.toString(),
+                perPage = -1
             )
         )
-        return complexResultWrapper(res)
+        if(res.isError)
+            return Result(isError = true, errors = res.errors, value = null)
+
+        if (res.value!!.status == HttpStatusCode.OK){
+            return try {
+                val dto:PageDTO<IngredientDTO> = res.value.body()
+                val r = dto.items
+                Result(isError = false, value = r)
+            }
+            catch (e: Exception){
+                println("SERVICE ERROR: $e")
+                Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            }
+        }
+
+        return Result(true, errorCodesWrapper(res.value), null)
     }
+
 
     override suspend fun getDeliveries(
         restaurantId: Any,

@@ -435,6 +435,12 @@
     <string name="label_closing_soon">Closing soon</string>
     <string name="label_open">Open</string>
     <string name="error_openTimeBeforeCloseTime">Opening time must be before closing time</string>
+    <string name="error_loading_ingredient">Error loading ingredient</string>
+    <string name="delivery">delivery</string>
+    <string name="manual_change">manual change</string>
+    <string name="order">order</string>
+    <string name="ingredient_old_amount">Old amount: %.1fg</string>
+    <string name="ingredient_new_amount">New amount: %.1fg</string>
     <string name="label_info" translatable="false">Info</string>
     <string name="label_join_requests">Requests</string>
     <string name="label_event_history">Events</string>
@@ -468,4 +474,7 @@
     <string name="amount_error">Invalid amount, must be greater than 0</string>
     <string name="amount_with_currency">%1$s zł</string>
     <string name="time_label">Time: %1$s</string>
+    <string name="label_toggle_dark_theme">Toggle dark theme</string>
+    <string name="message_logout">Are you sure you want to log out?</string>
+    <string name="message_delete_account">Are you sure you want to delete your account?</string>
 </resources>

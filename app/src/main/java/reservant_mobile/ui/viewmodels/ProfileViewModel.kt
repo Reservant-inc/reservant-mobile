@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
+import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
@@ -21,8 +23,10 @@ import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IFriendsService
+import reservant_mobile.data.services.IThreadsService
 import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.IVisitsService
+import reservant_mobile.data.services.ThreadsService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.UserService.UserObject
 import reservant_mobile.data.services.VisitsService
@@ -33,8 +37,10 @@ class ProfileViewModel(
     private val eventService: IEventService = EventService(),
     private val friendsService: IFriendsService = FriendsService(),
     private val visitsService: IVisitsService = VisitsService(),
+    private val threadsService: IThreadsService = ThreadsService(),
     private val profileUserId: String
 ) : ReservantViewModel() {
+
     var simpleProfileUser: UserSummaryDTO? by mutableStateOf(null)
     var fullProfileUser: UserDTO? by mutableStateOf(null)
 
@@ -58,6 +64,9 @@ class ProfileViewModel(
 
     private var updateProfileResult by mutableStateOf<Result<UserDTO?>?>(null)
 
+    // Dodajemy stan dla userThreads:
+    private val _userThreadsFlow = MutableStateFlow<Flow<PagingData<ThreadDTO>>?>(null)
+
     init {
         viewModelScope.launch {
             isLoading = true
@@ -71,6 +80,7 @@ class ProfileViewModel(
             }
 
             loadSimpleUser()
+            loadUserThreads()
             isLoading = false
         }
     }
@@ -96,7 +106,6 @@ class ProfileViewModel(
     private fun fetchFriends() {
         viewModelScope.launch {
             val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getFriends()
-
             if (!result.isError) {
                 _friendsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -106,7 +115,6 @@ class ProfileViewModel(
     private fun fetchUserVisits() {
         viewModelScope.launch {
             val result: Result<Flow<PagingData<VisitDTO>>?> = userService.getUserVisits()
-
             if (!result.isError) {
                 _visitsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -135,6 +143,10 @@ class ProfileViewModel(
     }
 
     fun updateProfile(user: UserDTO) {
+        if(user.phoneNumber != null && isPhoneInvalid(user.phoneNumber.number)){
+            return
+        }
+
         viewModelScope.launch {
             val result = userService.editUserInfo(user)
             updateProfileResult = result
@@ -142,6 +154,10 @@ class ProfileViewModel(
                 loadFullUser()
             }
         }
+    }
+
+    fun isPhoneInvalid(phoneNum: String): Boolean {
+        return isInvalidWithRegex(Regex.PHONE_REG, phoneNum)
     }
 
     fun getInterestedUsersFlow(eventId: String): Flow<PagingData<EventDTO.Participant>>? {
@@ -192,7 +208,6 @@ class ProfileViewModel(
             isLoading = false
         }
     }
-
 
     fun sendFriendRequest() {
         viewModelScope.launch {
@@ -268,4 +283,36 @@ class ProfileViewModel(
             }
         }
     }
+
+    private fun loadUserThreads() {
+        viewModelScope.launch {
+            val result = userService.getUserThreads()
+            if (!result.isError && result.value != null) {
+                _userThreadsFlow.value = result.value.cachedIn(viewModelScope)
+            } else {
+                // error
+            }
+        }
+    }
+
+    fun getUserThreads(): Flow<PagingData<ThreadDTO>> {
+        return _userThreadsFlow.value ?: kotlinx.coroutines.flow.flow {
+            emit(PagingData.empty())
+        }
+    }
+
+    fun createThreadWithUser(targetUserId: String, onResult: (ThreadDTO?) -> Unit) {
+        viewModelScope.launch {
+            val result = threadsService.createThread(
+                title = "New Chat",
+                participantIds = listOf(targetUserId)
+            )
+            if (!result.isError && result.value != null) {
+                onResult(result.value)
+            } else {
+                onResult(null)
+            }
+        }
+    }
+
 }

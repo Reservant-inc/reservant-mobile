@@ -1,6 +1,8 @@
 package reservant_mobile.ui.viewmodels
 
+import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.PrefsKeys
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.LoginCredentialsDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -9,7 +11,7 @@ import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
 
 class LoginViewModel(
-    private val userService: IUserService = UserService(),
+    val userService: IUserService = UserService(),
 
 ) : ReservantViewModel() {
 
@@ -30,6 +32,16 @@ class LoginViewModel(
                 rememberMe = true
             )
         )
+
+        if (Roles.CUSTOMER_SUPPORT_AGENT in UserService.UserObject.roles){
+            result = Result(
+                isError = true,
+                errors = mapOf("TOAST" to R.string.error_unauthorized_access),
+                value = false
+            )
+            userService.logoutUser()
+            return false
+        }
 
         return result.value
     }

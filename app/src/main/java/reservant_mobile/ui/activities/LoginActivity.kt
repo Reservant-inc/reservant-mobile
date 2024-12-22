@@ -46,7 +46,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun LoginActivity(navController: NavHostController) {
+fun LoginActivity(navController: NavHostController, onReturnClick: (() -> Unit)? = null) {
 
     val loginViewModel = viewModel<LoginViewModel>()
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -61,7 +61,8 @@ fun LoginActivity(navController: NavHostController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LogoWithReturn { navController.popBackStack() }
+            val onBack = onReturnClick?:{navController.popBackStack()}
+            LogoWithReturn { onBack() }
 
             FormInput(
                 inputText = loginViewModel.login.value,
@@ -136,10 +137,4 @@ fun LoginActivity(navController: NavHostController) {
         }
     }
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewLogin() {
-    LoginActivity(rememberNavController())
 }
