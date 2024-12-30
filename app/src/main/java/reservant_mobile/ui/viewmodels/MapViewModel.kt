@@ -83,8 +83,9 @@ class MapViewModel : ReservantViewModel() {
         val mv = MapView(context).apply {
 
             val customTiles = object : XYTileSource(
-                "openstreetmap.fr", 1, 20, 256, ".png",
-                arrayOf("https://a.tile.openstreetmap.fr/hot/")
+                "CartoDB", 1, 20, 256, ".png",
+//                arrayOf("https://a.tile.openstreetmap.fr/hot/")
+                arrayOf("https://abcd.basemaps.cartocdn.com/rastertiles/voyager/")
             ) {
                 override fun getTileURLString(pMapTileIndex: Long): String {
                     return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" +
