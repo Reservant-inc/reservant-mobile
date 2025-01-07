@@ -56,6 +56,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
@@ -69,7 +70,7 @@ import java.util.Calendar
 fun OrderFormContent(
     navController: NavHostController,
     reservationViewModel: ReservationViewModel,
-    restaurantId: Int,
+    restaurant: RestaurantDTO,
     getMenuPhoto: suspend (String) -> Bitmap?,
 ) {
     var isTakeaway by remember { mutableStateOf(false) }
@@ -283,7 +284,7 @@ fun OrderFormContent(
             // Submit Button
             ButtonComponent(
                 onClick = {
-                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurantId))
+                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
                 },
                 label = stringResource(id = R.string.submit_order)
             )

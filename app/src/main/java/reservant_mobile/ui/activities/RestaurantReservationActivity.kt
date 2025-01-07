@@ -56,7 +56,7 @@ fun RestaurantReservationActivity(
                 OrderFormContent(
                     navController = navControllerSummary,
                     reservationViewModel = reservationViewModel,
-                    restaurantId = restaurantId,
+                    restaurant = restaurantDetailVM.restaurant!!,
                     getMenuPhoto = { photoString ->
                         restaurantDetailVM.getPhoto(photoString)
                     }
