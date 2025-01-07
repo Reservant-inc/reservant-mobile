@@ -208,16 +208,16 @@ fun MyTimePickerDialog(
                         val enforceHalfHours = minTime != null || onlyHalfHours
 
                         if (enforceHalfHours) {
-                            // Zaokrąglamy do najbliższej pół godziny
-                            // Zasada: jeśli minute <30 → 00 lub 30, jeśli >=30 → kolejna godzina pełna lub 30
-                            // Przyjmijmy prostą zasadę:
-                            // Jeśli minute <30 → minute=30
-                            // Jeśli minute >=30 → minute=0 i hour=hour+1
-                            if (minute < 30) {
-                                minute = 30
-                            } else {
-                                minute = 0
-                                hour = (hour + 1) % 24
+                            when {
+                                minute == 0 || minute == 30 -> {
+                                }
+                                minute < 30 -> {
+                                    minute = 30
+                                }
+                                else -> {
+                                    minute = 0
+                                    hour = (hour + 1) % 24
+                                }
                             }
                         }
 

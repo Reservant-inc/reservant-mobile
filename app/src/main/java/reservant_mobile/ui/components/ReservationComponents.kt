@@ -120,6 +120,24 @@ fun OrderFormContent(
 
         val isToday = reservationViewModel.visitDate.value == LocalDate.now().toString()
 
+        // Funkcja, która zaokrągla LocalTime do najbliższej pełnej lub połówki
+        fun roundToNearestHalfHour(time: LocalTime): LocalTime {
+            val minute = time.minute
+            return when {
+                minute == 0 || minute == 30 -> time
+                minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
+                else -> time.withMinute(0).withSecond(0).withNano(0).plusHours(1)
+            }
+        }
+
+        val nearestHalfHour = roundToNearestHalfHour(now)
+        val nextHour = nearestHalfHour.plusHours(1)
+
+        // Jeśli użytkownik wybrał „dzisiaj” (isToday), to minTime będzie wymagać,
+        // aby startTime był nie wcześniejszy niż `nowFormatted`.
+        // Natomiast jeśli to nie dziś, to minTime = null,
+        // więc można spokojnie ustawić startTime na najbliższą pół-/pełną godzinę.
+
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -128,27 +146,34 @@ fun OrderFormContent(
             ) {
                 Box(modifier = Modifier.weight(0.45f)) {
                     MyTimePickerDialog(
+                        initialTime = nearestHalfHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
                             reservationViewModel.startTime.value = time
                         },
                         modifier = Modifier.scale(0.85f),
-                        onlyHalfHours = true, // Zawsze wybieramy co 30 min
+                        onlyHalfHours = true,
                         minTime = if (isToday) nowFormatted else null
                     )
                 }
+
                 Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
+
                 Box(modifier = Modifier.weight(0.45f)) {
                     MyTimePickerDialog(
+                        initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
                             reservationViewModel.endTime.value = time
                         },
                         modifier = Modifier.scale(0.85f),
-                        onlyHalfHours = true, // Zawsze co 30 min
-                        minTime = reservationViewModel.startTime.value // Musi być ściśle większy niż startTime
+                        onlyHalfHours = true,
+                        // endTime musi być ściśle większy niż startTime,
+                        // więc jako minTime przekazujemy startTime z ViewModelu
+                        minTime = reservationViewModel.startTime.value
                     )
                 }
             }
         }
+
 
 
         item {
