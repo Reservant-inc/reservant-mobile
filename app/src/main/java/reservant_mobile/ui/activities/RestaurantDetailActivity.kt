@@ -527,11 +527,13 @@ fun CartContent(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        ButtonComponent(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onSubmitOrder,
-            label = stringResource(id = R.string.proceed_to_checkout)
-        )
+        if (cartItems.isNotEmpty()) {
+            ButtonComponent(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onSubmitOrder,
+                label = stringResource(id = R.string.proceed_to_checkout)
+            )
+        }
     }
 }
 
