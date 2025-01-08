@@ -491,4 +491,21 @@
     <string name="label_item">Dish</string>
     <string name="error_invalid_time">Invalid time. The restaurant is closed during the selected hours.</string>
     <string name="error_invalid_date">Invalid date. The restaurant is closed on the selected day.</string>
+    <string name="error_tip">Tip must be non-negative</string>
+    <string name="restaurant_closed">The restaurant is closed on the selected day</string>
+    <string name="opening_hours">Opening hours: %1$s - %2$s</string>
+    <string name="error_no_date">No date selected</string>
+    <string name="error_date_in_past">The date cannot be earlier than today</string>
+    <string name="error_restaurant_closed">The restaurant is closed on the selected day</string>
+    <string name="error_invalid_date_format">Invalid date format</string>
+    <string name="error_start_time_in_past">Start time cannot be earlier than the current time</string>
+    <string name="error_start_time_outside_opening_hours">Start time is outside opening hours</string>
+    <string name="error_end_time_before_start">End time must be later than start time</string>
+    <string name="error_reservation_too_long">Reservation cannot exceed 1.5 hours</string>
+    <string name="error_end_time_outside_opening_hours">End time is outside opening hours</string>
+    <string name="error_invalid_end_time_format">Invalid end time format</string>
+    <string name="error_tip_negative">Tip must be non-negative</string>
+    <string name="error_cart_empty">Cart cannot be empty</string>
+    <string name="error_place_order">Failed to place the order. Please try again.</string>
+    <string name="error_create_visit">Failed to create visit. Please try again.</string>
 </resources>

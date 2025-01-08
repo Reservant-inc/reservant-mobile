@@ -479,4 +479,21 @@
     <string name="label_item">Danie</string>
     <string name="error_invalid_time">Nieprawidłowy czas. Restauracja jest zamknięta w podanych godzinach.</string>
     <string name="error_invalid_date">Nieprawidłowa data. Restauracja jest zamknięta w wybranym dniu.</string>
+    <string name="error_tip">Napiwek musi być nieujemny</string>
+    <string name="restaurant_closed">Restauracja jest zamknięta w wybranym dniu</string>
+    <string name="opening_hours">Godziny otwarcia: %1$s - %2$s</string>
+    <string name="error_no_date">Nie wybrano daty</string>
+    <string name="error_date_in_past">Data nie może być wcześniejsza niż dziś</string>
+    <string name="error_restaurant_closed">Restauracja jest zamknięta w wybranym dniu</string>
+    <string name="error_invalid_date_format">Nieprawidłowy format daty</string>
+    <string name="error_start_time_in_past">Godzina rozpoczęcia nie może być wcześniejsza niż aktualna</string>
+    <string name="error_start_time_outside_opening_hours">Godzina rozpoczęcia poza godzinami otwarcia</string>
+    <string name="error_end_time_before_start">Czas zakończenia musi być późniejszy niż czas rozpoczęcia</string>
+    <string name="error_reservation_too_long">Rezerwacja nie może przekraczać 1.5 godziny</string>
+    <string name="error_end_time_outside_opening_hours">Godzina zakończenia poza godzinami otwarcia</string>
+    <string name="error_invalid_end_time_format">Nieprawidłowy format godziny zakończenia</string>
+    <string name="error_tip_negative">Napiwek musi być nieujemny</string>
+    <string name="error_cart_empty">Koszyk nie może być pusty</string>
+    <string name="error_place_order">Nie udało się złożyć zamówienia. Spróbuj ponownie.</string>
+    <string name="error_create_visit">Nie udało się utworzyć wizyty. Spróbuj ponownie.</string>
 </resources>

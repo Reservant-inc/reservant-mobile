@@ -109,13 +109,14 @@ fun OrderFormContent(
             if (dayHours != null) {
                 Text(
                     text = "Godziny otwarcia: ${dayHours.from} - ${dayHours.until}",
+                    text = stringResource(id = R.string.opening_hours, dayHours.from?: "-", dayHours.until?: "-"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             } else {
                 Text(
-                    text = "Restauracja jest zamknięta w wybranym dniu.",
+                    text = stringResource(id = R.string.restaurant_closed),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
@@ -163,7 +164,7 @@ fun OrderFormContent(
 
         item {
             Text(
-                text = stringResource(R.string.label_my_basket),
+                text = stringResource(id = R.string.label_my_basket),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -234,7 +235,7 @@ fun OrderFormContent(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
                 optional = true,
                 isError = reservationViewModel.isTipError(),
-                errorText = //TUTAJ DODAJ RESOURCES
+                errorText = stringResource(id = R.string.error_tip)
             )
         }
 
@@ -273,6 +274,7 @@ fun OrderFormContent(
         }
     }
 }
+
 
 @Composable
 fun CartItemCard(
