@@ -108,7 +108,6 @@ fun OrderFormContent(
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
             if (dayHours != null) {
                 Text(
-                    text = "Godziny otwarcia: ${dayHours.from} - ${dayHours.until}",
                     text = stringResource(id = R.string.opening_hours, dayHours.from?: "-", dayHours.until?: "-"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
