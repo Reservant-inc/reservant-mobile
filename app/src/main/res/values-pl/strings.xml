@@ -477,4 +477,6 @@
     <string name="label_tip">Napiwek: %.2f zł</string>
     <string name="label_qty">Ilość</string>
     <string name="label_item">Danie</string>
+    <string name="error_invalid_time">Nieprawidłowy czas. Restauracja jest zamknięta w podanych godzinach.</string>
+    <string name="error_invalid_date">Nieprawidłowa data. Restauracja jest zamknięta w wybranym dniu.</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
@@ -79,7 +80,9 @@ fun FormInput(
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    isDisabled: Boolean = false
+    isDisabled: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    readOnly: Boolean = false
 ) {
 
     var beginValidation: Boolean by remember {
@@ -133,8 +136,10 @@ fun FormInput(
             maxLines = maxLines,
             singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
-            enabled = !isDisabled
-            )
+            enabled = !isDisabled,
+            interactionSource = interactionSource,
+            readOnly = readOnly
+        )
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
@@ -152,7 +157,9 @@ fun MyTimePickerDialog(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onlyHalfHours: Boolean = false,
-    minTime: String? = null
+    minTime: String? = null,
+    isError: Boolean = false,
+    errorText: String? = null
 ) {
     val context = LocalContext.current
     val currentTime = Calendar.getInstance()
@@ -169,9 +176,20 @@ fun MyTimePickerDialog(
     var showDialog by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(String.format("%02d:%02d", initialHour, initialMinute)) }
 
-    fun parseTimeToMinutes(time: String): Int {
-        val (h, m) = time.split(":").map { it.toInt() }
-        return h * 60 + m
+    fun parseTimeToMinutes(timeString: String): Int {
+        if (timeString.isBlank() || !timeString.contains(":")) {
+            // Możesz zwrócić -1, 0, lub inną wartość oznaczającą "błąd/wybierz czas"
+            return -1
+        }
+
+        val parts = timeString.split(":")
+        if (parts.size != 2) {
+            return -1
+        }
+        val hour = parts[0].toIntOrNull() ?: return -1
+        val minute = parts[1].toIntOrNull() ?: return -1
+
+        return hour * 60 + minute
     }
 
     fun showToast(message: String) {
@@ -249,6 +267,14 @@ fun MyTimePickerDialog(
                 text = {
                     TimeInput(state = timePickerState)
                 }
+            )
+        }
+        if (isError) {
+            Text(
+                text = errorText ?: "",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
     }
@@ -365,12 +391,15 @@ fun FormFileInput(
 fun MyDatePickerDialog(
     modifier: Modifier = Modifier,
     onDateChange: (String) -> Unit,
-    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
+    label: String = stringResource(R.string.label_register_birthday_select),
     startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
     allowFutureDates: Boolean = false,
     allowPastDates: Boolean = true,
     startDate: String = (LocalDate.now().year - 28).toString() + "-06-15",
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp)
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    isError: Boolean = false,
+    errorText: String? = null,
+    optional: Boolean = false
 ) {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -449,12 +478,13 @@ fun MyDatePickerDialog(
     var date by remember { mutableStateOf(startStringValue) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = date,
+    FormInput(
+        inputText = date,
         onValueChange = { },
         label = label,
         readOnly = true,
         shape = shape,
+        optional = optional,
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
@@ -467,7 +497,9 @@ fun MyDatePickerDialog(
                         }
                     }
                 }
-            }
+            },
+        isError = isError,
+        errorText = errorText?:""
     )
 
     if (showDatePicker) {

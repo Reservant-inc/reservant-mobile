@@ -70,22 +70,43 @@ import java.util.Calendar
 fun OrderFormContent(
     navController: NavHostController,
     reservationViewModel: ReservationViewModel,
-    restaurant: RestaurantDTO,
+    restaurant: RestaurantDTO,            // <--- Teraz przyjmujemy CAŁĄ restaurację
     getMenuPhoto: suspend (String) -> Bitmap?,
 ) {
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
 
+    // Obliczenia pomocnicze do zaokrąglania godzin itd.
+    val now = LocalTime.now()
+    val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
+    val isToday = reservationViewModel.visitDate.value == LocalDate.now().toString()
+
+    // Funkcja, która zaokrągla LocalTime do najbliższej pełnej lub połówki
+    fun roundToNearestHalfHour(time: LocalTime): LocalTime {
+        val minute = time.minute
+        return when {
+            minute == 0 || minute == 30 -> time
+            minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
+            else -> time.withMinute(0).withSecond(0).withNano(0).plusHours(1)
+        }
+    }
+
+    val nearestHalfHour = roundToNearestHalfHour(now)
+    val nextHour = nearestHalfHour.plusHours(1)
+
     LazyColumn(
-        modifier = Modifier
+        modifier = androidx.compose.ui.Modifier
             .fillMaxSize()
             .padding(16.dp),
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Spacer
         item {
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = androidx.compose.ui.Modifier.height(36.dp))
         }
+
+        // Switch: "Na wynos?"
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -102,43 +123,24 @@ fun OrderFormContent(
             }
         }
 
-
+        // DatePicker
         item {
-            // Date Picker
             MyDatePickerDialog(
-                label = { Text(stringResource(id = R.string.label_reservation_date)) },
+                label = stringResource(id = R.string.label_reservation_date),  // przyjmuje String
                 onDateChange = { selectedDate ->
-                    reservationViewModel.visitDate.value = selectedDate
+                    // Zamiast tutaj walidować, wywołujemy metodę w ViewModelu
+                    reservationViewModel.updateDate(selectedDate, restaurant)
                 },
                 startDate = LocalDate.now().toString(),
                 allowFutureDates = true,
-                allowPastDates = false
+                allowPastDates = false,
+                // Błędy pobieramy z VM
+                isError = reservationViewModel.isDateError,
+                errorText = reservationViewModel.dateErrorText
             )
         }
 
-        val now = LocalTime.now()
-        val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
-
-        val isToday = reservationViewModel.visitDate.value == LocalDate.now().toString()
-
-        // Funkcja, która zaokrągla LocalTime do najbliższej pełnej lub połówki
-        fun roundToNearestHalfHour(time: LocalTime): LocalTime {
-            val minute = time.minute
-            return when {
-                minute == 0 || minute == 30 -> time
-                minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
-                else -> time.withMinute(0).withSecond(0).withNano(0).plusHours(1)
-            }
-        }
-
-        val nearestHalfHour = roundToNearestHalfHour(now)
-        val nextHour = nearestHalfHour.plusHours(1)
-
-        // Jeśli użytkownik wybrał „dzisiaj” (isToday), to minTime będzie wymagać,
-        // aby startTime był nie wcześniejszy niż `nowFormatted`.
-        // Natomiast jeśli to nie dziś, to minTime = null,
-        // więc można spokojnie ustawić startTime na najbliższą pół-/pełną godzinę.
-
+        // TimePicker start + end
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -149,11 +151,14 @@ fun OrderFormContent(
                     MyTimePickerDialog(
                         initialTime = nearestHalfHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
-                            reservationViewModel.startTime.value = time
+                            reservationViewModel.updateStartTime(time, restaurant)
                         },
                         modifier = Modifier.scale(0.85f),
                         onlyHalfHours = true,
-                        minTime = if (isToday) nowFormatted else null
+                        minTime = if (isToday) nowFormatted else null,
+                        // Błędy
+                        isError = reservationViewModel.isStartTimeError,
+                        errorText = reservationViewModel.startTimeErrorText
                     )
                 }
 
@@ -163,20 +168,19 @@ fun OrderFormContent(
                     MyTimePickerDialog(
                         initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
-                            reservationViewModel.endTime.value = time
+                            reservationViewModel.updateEndTime(time, restaurant)
                         },
-                        modifier = Modifier.scale(0.85f),
+                        modifier = androidx.compose.ui.Modifier.scale(0.85f),
                         onlyHalfHours = true,
-                        // endTime musi być ściśle większy niż startTime,
-                        // więc jako minTime przekazujemy startTime z ViewModelu
-                        minTime = reservationViewModel.startTime.value
+                        minTime = reservationViewModel.startTime.value,
+                        isError = reservationViewModel.isEndTimeError,
+                        errorText = reservationViewModel.endTimeErrorText
                     )
                 }
             }
         }
 
-
-
+        // Koszyk
         item {
             Text(
                 text = stringResource(R.string.label_my_basket),
@@ -208,8 +212,8 @@ fun OrderFormContent(
             }
         }
 
+        // Liczba gości
         item {
-            // Number of Guests
             Text(text = stringResource(id = R.string.label_number_of_guests))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -232,6 +236,7 @@ fun OrderFormContent(
             }
         }
 
+        // Napiwek
         item {
             Text(text = stringResource(id = R.string.tip_label))
 
@@ -256,9 +261,8 @@ fun OrderFormContent(
             )
         }
 
-
+        // Notatka
         item {
-            // Note Input
             FormInput(
                 inputText = reservationViewModel.note.value,
                 onValueChange = { reservationViewModel.note.value = it },
@@ -266,8 +270,8 @@ fun OrderFormContent(
             )
         }
 
+        // Suma zamówienia
         item {
-            // Total Cost
             val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
                 (menuItem.price ?: 0.0) * quantity
             }
@@ -280,14 +284,21 @@ fun OrderFormContent(
             )
         }
 
+        // Submit Button
         item {
-            // Submit Button
-            ButtonComponent(
+            Button(
                 onClick = {
-                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
+                    // Sprawdź w VM, czy wszystko jest ok
+                    if (reservationViewModel.isReservationValid()) {
+                        navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
+                    } else {
+                        // np. Toast albo inny komunikat
+                    }
                 },
-                label = stringResource(id = R.string.submit_order)
-            )
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.submit_order))
+            }
         }
     }
 }

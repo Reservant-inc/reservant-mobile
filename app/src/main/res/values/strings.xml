@@ -489,4 +489,6 @@
     <string name="label_tip">Tip: %.2f zł</string>
     <string name="label_qty">Quantity</string>
     <string name="label_item">Dish</string>
+    <string name="error_invalid_time">Invalid time. The restaurant is closed during the selected hours.</string>
+    <string name="error_invalid_date">Invalid date. The restaurant is closed on the selected day.</string>
 </resources>
