@@ -232,6 +232,9 @@ fun OrderFormContent(
                 onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
                 label = stringResource(id = R.string.tip_label),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                optional = true,
+                isError = reservationViewModel.isTipError(),
+                errorText = //TUTAJ DODAJ RESOURCES
             )
         }
 
@@ -240,6 +243,7 @@ fun OrderFormContent(
                 inputText = reservationViewModel.note.value,
                 onValueChange = { reservationViewModel.note.value = it },
                 label = stringResource(id = R.string.label_write_note),
+                optional = true
             )
         }
 

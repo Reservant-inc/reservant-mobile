@@ -208,7 +208,7 @@ class ReservationViewModel(
 
     // Sprawdzenie czy rezerwacja jest poprawna
     fun isReservationValid(): Boolean {
-        return !(isDateError || isStartTimeError || isEndTimeError)
+        return !(isDateError || isStartTimeError || isEndTimeError || isTipError() || isCartEmpty())
     }
 
     // Zarządzanie koszykiem
@@ -362,4 +362,13 @@ class ReservationViewModel(
     fun isOrderError(): Boolean = _orderResult.value.isError
     fun isVisitError(): Boolean = _visitResult.value.isError
     fun isDeliveryError(): Boolean = _deliveryResult.value.isError
+
+    // Walidacja napiwku
+    fun isTipError(): Boolean {
+        return tip < 0
+    }
+
+    fun isCartEmpty(): Boolean {
+        return addedItems.isEmpty()
+    }
 }
