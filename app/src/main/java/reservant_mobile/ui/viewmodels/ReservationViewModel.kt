@@ -119,131 +119,105 @@ class ReservationViewModel(
     // WALIDACJA DATY
     // ------------------
     fun updateDate(dateString: String, restaurant: RestaurantDTO) {
-        visitDate.value = dateString
+        Log.d("DEBUG", "updateDate() called with dateString=$dateString")
 
-        // Reset błędów
+        visitDate.value = dateString
         isDateError = false
         dateErrorText = null
 
-        // Sprawdzamy, czy w ogóle wybrano datę
         if (dateString.isEmpty()) {
             isDateError = true
             dateErrorText = "Nie wybrano daty"
+            Log.d("DEBUG", "Date is empty")
             return
         }
 
         try {
-            val selectedDate = LocalDate.parse(dateString) // Format yyyy-MM-dd
+            val selectedDate = LocalDate.parse(dateString)
             val today = LocalDate.now()
+            Log.d("DEBUG", "Parsed selectedDate=$selectedDate, today=$today")
 
-            // (1) Data nie może być wcześniejsza niż dzisiaj
             if (selectedDate.isBefore(today)) {
                 isDateError = true
                 dateErrorText = "Data nie może być wcześniejsza niż dziś"
-            }
-
-            // (2) Sprawdzenie godzin otwarcia - czy restauracja w ogóle jest czynna w ten dzień
-            val dayIndex = selectedDate.dayOfWeek.value - 1 // Monday->0, Tuesday->1, ...
-            // Jeżeli dayIndex poza zakresem lub restaurant.openingHours jest null/za krótkie
-            if (dayIndex !in 0..6 || restaurant.openingHours.isNullOrEmpty() || restaurant.openingHours.size < 7) {
-                isDateError = true
-                dateErrorText = "Brak danych o godzinach otwarcia"
+                Log.d("DEBUG", "Selected date is before today")
                 return
             }
 
-            val dayHours = restaurant.openingHours[dayIndex]
-            // dayHours będzie np. AvailableHours(from="09:00:00", until="17:00:00")
-            if (dayHours.from == null || dayHours.until == null) {
-                // Zamknięte w ten dzień
+            val dayIndex = selectedDate.dayOfWeek.value - 1
+            val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
+            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
+
+            if (dayHours?.from == null || dayHours.until == null) {
                 isDateError = true
                 dateErrorText = "Restauracja jest zamknięta w wybranym dniu"
+                Log.d("DEBUG", "Restaurant is closed on this day")
+                return
             }
 
         } catch (e: Exception) {
             isDateError = true
             dateErrorText = "Nieprawidłowy format daty"
+            Log.e("DEBUG", "Failed to parse date: ${e.message}")
         }
     }
+
 
     // ------------------
     // WALIDACJA GODZINY STARTU
     // ------------------
     fun updateStartTime(timeString: String, restaurant: RestaurantDTO) {
-
-        // Najpierw usuwamy ewentualne stare błędy
-        isStartTimeError = false
-        startTimeErrorText = null
-
-        // Jeżeli pole jest puste
-        if (timeString.isEmpty()) {
-            isStartTimeError = true
-            startTimeErrorText = "Nie wybrano godziny startu"
-            startTime.value = ""
-            return
-        }
-
-        val dateStr = visitDate.value
-        if (dateStr.isEmpty()) {
-            // Jeśli użytkownik najpierw wpisał godzinę bez wybrania daty,
-            // to nie mamy do czego porównać -> błąd lub wymuszenie wybrania daty wcześniej
-            isStartTimeError = true
-            startTimeErrorText = "Najpierw wybierz datę"
-            startTime.value = ""
-            return
-        }
+        Log.d("DEBUG", "updateStartTime() called with timeString=$timeString, visitDate=${visitDate.value}")
 
         try {
-            // Parsujemy godzinę
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
-            // Zaokrąglamy w górę do pełnej lub połówki
+            Log.d("DEBUG", "Parsed time: $inputTime")
+
             val roundedTime = roundUpToNextHalfHour(inputTime)
-
-            // Ustawiamy w polu startTime już po zaokrągleniu, żeby UI mogło to odzwierciedlić
             startTime.value = roundedTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+            Log.d("DEBUG", "Rounded time: $roundedTime")
 
-            // Sprawdzenie czy data to dzisiaj
-            val selectedDate = LocalDate.parse(dateStr)
-            val today = LocalDate.now()
+            // Sprawdzenie daty
+            val selectedDate = LocalDate.parse(visitDate.value)
+            Log.d("DEBUG", "Selected date: $selectedDate")
+
             val now = LocalTime.now()
-            val isToday = selectedDate.isEqual(today)
-
-            // (1) Jeśli to dzisiaj, to start nie może być w przeszłości
-            if (isToday && roundedTime.isBefore(now)) {
+            if (selectedDate.isEqual(LocalDate.now()) && roundedTime.isBefore(now)) {
                 isStartTimeError = true
                 startTimeErrorText = "Godzina rozpoczęcia nie może być wcześniejsza niż aktualna"
+                Log.d("DEBUG", "Start time is in the past")
+                return
             }
 
-            // (2) Sprawdzenie godzin otwarcia restauracji
+            // Sprawdzenie godzin otwarcia
             val dayIndex = selectedDate.dayOfWeek.value - 1
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
+            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
+
             if (dayHours?.from == null || dayHours.until == null) {
-                // Zamknięte w ten dzień
                 isStartTimeError = true
                 startTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
-            } else {
-                val ohFrom = LocalTime.parse(dayHours.from, DateTimeFormatter.ofPattern("HH:mm:ss"))
-                val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm:ss"))
-
-                if (roundedTime.isBefore(ohFrom) || roundedTime.isAfter(ohUntil)) {
-                    isStartTimeError = true
-                    startTimeErrorText = "Godzina rozpoczęcia poza godzinami otwarcia"
-                }
+                Log.d("DEBUG", "Restaurant is closed on this day")
+                return
             }
 
-            // Jeśli nie ma błędów w starcie, to automatycznie ustawiamy endTime na +1h.
-            // (Jeśli mamy błąd, nie ma sensu ustawiać endTime)
-            if (!isStartTimeError) {
-                val proposedEnd = roundedTime.plusHours(1)
-                val newEndStr = proposedEnd.format(DateTimeFormatter.ofPattern("HH:mm"))
-                updateEndTime(newEndStr, restaurant, skipRounding = true)
+            val ohFrom = LocalTime.parse(dayHours.from, DateTimeFormatter.ofPattern("HH:mm"))
+            val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm"))
+            Log.d("DEBUG", "Opening hours: from=$ohFrom, until=$ohUntil")
+
+            if (roundedTime.isBefore(ohFrom) || roundedTime.isAfter(ohUntil)) {
+                isStartTimeError = true
+                startTimeErrorText = "Godzina rozpoczęcia poza godzinami otwarcia"
+                Log.d("DEBUG", "Start time is outside opening hours")
             }
 
         } catch (e: Exception) {
             isStartTimeError = true
             startTimeErrorText = "Nieprawidłowy format godziny startu"
-            startTime.value = ""
+            Log.e("DEBUG", "Failed to parse startTime: ${e.message}")
         }
     }
+
 
     // ------------------
     // WALIDACJA GODZINY ZAKOŃCZENIA
@@ -253,97 +227,59 @@ class ReservationViewModel(
      *   z już obliczoną godziną. Wtedy nie wykonujemy ponownie rounding-u.
      */
     fun updateEndTime(timeString: String, restaurant: RestaurantDTO, skipRounding: Boolean = false) {
-
-        // Najpierw usuwamy ewentualne stare błędy
-        isEndTimeError = false
-        endTimeErrorText = null
-
-        // Jeżeli pole jest puste
-        if (timeString.isEmpty()) {
-            isEndTimeError = true
-            endTimeErrorText = "Nie wybrano godziny zakończenia"
-            endTime.value = ""
-            return
-        }
-
-        val dateStr = visitDate.value
-        if (dateStr.isEmpty()) {
-            isEndTimeError = true
-            endTimeErrorText = "Najpierw wybierz datę"
-            endTime.value = ""
-            return
-        }
-
-        val startStr = startTime.value
-        if (startStr.isEmpty()) {
-            // Jeśli ktoś ustawia endTime, ale startTime nie jest jeszcze ustawiony (albo jest błędny)
-            isEndTimeError = true
-            endTimeErrorText = "Najpierw ustaw godzinę rozpoczęcia"
-            endTime.value = ""
-            return
-        }
+        Log.d("DEBUG", "updateEndTime() called with timeString=$timeString, visitDate=${visitDate.value}, startTime=${startTime.value}")
 
         try {
-            // Parsujemy "podaną" godzinę zakończenia
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
-
-            // Możliwe, że w środku wywołania chcemy pominąć rounding (np. user właśnie wprowadza),
-            // ale w większości przypadków chcemy zaokrąglić tak samo jak startTime, „w górę”.
-            val finalEndTime = if (skipRounding) {
-                inputTime
-            } else {
-                roundUpToNextHalfHour(inputTime)
-            }
-
-            // Przepisujemy do stanu (z formatowaniem HH:mm)
+            val finalEndTime = if (skipRounding) inputTime else roundUpToNextHalfHour(inputTime)
             endTime.value = finalEndTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+            Log.d("DEBUG", "Rounded endTime: $finalEndTime")
 
-            // Sprawdzenie logiki. Musi być:
-            // (1) koniec > start
-            // (2) max 1.5 godz. różnicy
-            // (3) w godzinach otwarcia
+            val selectedDate = LocalDate.parse(visitDate.value)
+            val start = LocalTime.parse(startTime.value, DateTimeFormatter.ofPattern("HH:mm"))
+            Log.d("DEBUG", "Parsed startTime: $start")
 
-            val selectedDate = LocalDate.parse(dateStr)
-            val st = LocalTime.parse(startStr, DateTimeFormatter.ofPattern("HH:mm"))
-
-            // (1) end > start
-            if (!finalEndTime.isAfter(st)) {
+            if (!finalEndTime.isAfter(start)) {
                 isEndTimeError = true
                 endTimeErrorText = "Czas zakończenia musi być późniejszy niż czas rozpoczęcia"
+                Log.d("DEBUG", "End time is not after start time")
                 return
             }
 
-            // (2) max 1.5 godziny różnicy
-            val diffMinutes = java.time.Duration.between(st, finalEndTime).toMinutes()
+            val diffMinutes = java.time.Duration.between(start, finalEndTime).toMinutes()
             if (diffMinutes > 90) {
                 isEndTimeError = true
-                endTimeErrorText = "Rezerwacja nie może przekraczać 1.5 godziny (90 minut)"
+                endTimeErrorText = "Rezerwacja nie może przekraczać 1.5 godziny"
+                Log.d("DEBUG", "Reservation duration exceeds 1.5 hours")
                 return
             }
 
-            // (3) w godzinach otwarcia
             val dayIndex = selectedDate.dayOfWeek.value - 1
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
+            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
+
             if (dayHours?.from == null || dayHours.until == null) {
                 isEndTimeError = true
                 endTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
+                Log.d("DEBUG", "Restaurant is closed on this day")
                 return
-            } else {
-                val ohFrom = LocalTime.parse(dayHours.from, DateTimeFormatter.ofPattern("HH:mm:ss"))
-                val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm:ss"))
+            }
 
-                if (finalEndTime.isBefore(ohFrom) || finalEndTime.isAfter(ohUntil)) {
-                    isEndTimeError = true
-                    endTimeErrorText = "Godzina zakończenia poza godzinami otwarcia"
-                }
+            val ohFrom = LocalTime.parse(dayHours.from, DateTimeFormatter.ofPattern("HH:mm"))
+            val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm"))
+            if (finalEndTime.isBefore(ohFrom) || finalEndTime.isAfter(ohUntil)) {
+                isEndTimeError = true
+                endTimeErrorText = "Godzina zakończenia poza godzinami otwarcia"
+                Log.d("DEBUG", "End time is outside opening hours")
             }
 
         } catch (e: Exception) {
             isEndTimeError = true
             endTimeErrorText = "Nieprawidłowy format godziny zakończenia"
-            endTime.value = ""
+            Log.e("DEBUG", "Failed to parse endTime: ${e.message}")
         }
     }
+
 
     // ------------------
     // SPRAWDZENIE CZY REZERWACJA (DATA + GODZINY) JEST POPRAWNA

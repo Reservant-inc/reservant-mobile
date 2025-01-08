@@ -2,6 +2,7 @@ package reservant_mobile.ui.components
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -128,6 +129,7 @@ fun OrderFormContent(
             MyDatePickerDialog(
                 label = stringResource(id = R.string.label_reservation_date),  // przyjmuje String
                 onDateChange = { selectedDate ->
+                    Log.d("DEBUG", "onDateChange: $selectedDate")
                     // Zamiast tutaj walidować, wywołujemy metodę w ViewModelu
                     reservationViewModel.updateDate(selectedDate, restaurant)
                 },
@@ -151,6 +153,7 @@ fun OrderFormContent(
                     MyTimePickerDialog(
                         initialTime = nearestHalfHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
+                            Log.d("DEBUG", "onTimeSelected: $time")
                             reservationViewModel.updateStartTime(time, restaurant)
                         },
                         modifier = Modifier.scale(0.85f),
@@ -168,6 +171,7 @@ fun OrderFormContent(
                     MyTimePickerDialog(
                         initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
                         onTimeSelected = { time ->
+                            Log.d("DEBUG", "onTimeSelected: $time")
                             reservationViewModel.updateEndTime(time, restaurant)
                         },
                         modifier = androidx.compose.ui.Modifier.scale(0.85f),
@@ -288,14 +292,13 @@ fun OrderFormContent(
         item {
             Button(
                 onClick = {
-                    // Sprawdź w VM, czy wszystko jest ok
+                    Log.d("DEBUG", "Submit clicked. isReservationValid=${reservationViewModel.isReservationValid()}")
                     if (reservationViewModel.isReservationValid()) {
                         navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
                     } else {
-                        // np. Toast albo inny komunikat
+                        Log.d("DEBUG", "Validation failed: dateError=${reservationViewModel.isDateError}, startTimeError=${reservationViewModel.isStartTimeError}, endTimeError=${reservationViewModel.isEndTimeError}")
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
+                }
             ) {
                 Text(text = stringResource(id = R.string.submit_order))
             }
