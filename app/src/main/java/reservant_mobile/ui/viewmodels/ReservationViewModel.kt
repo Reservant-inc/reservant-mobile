@@ -44,7 +44,9 @@ class ReservationViewModel(
     var promoCode: FormField = FormField("promoCode") // np. pole na kod promocyjny
     var orderCost by mutableStateOf(0.0)
 
-    var visitDate: FormField = FormField("VisitDate")
+    var visitDate: FormField = FormField("VisitDate").apply {
+        value = LocalDate.now().toString() // Ustawienie domyślnej wartości na dzisiejszą datę
+    }
     var startTime: FormField = FormField(VisitDTO::reservationDate.name)
     var endTime: FormField = FormField(VisitDTO::endTime.name)
     var numberOfGuests by mutableStateOf(1)

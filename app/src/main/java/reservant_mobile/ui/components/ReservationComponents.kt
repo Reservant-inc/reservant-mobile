@@ -128,6 +128,7 @@ fun OrderFormContent(
         item {
             MyDatePickerDialog(
                 label = stringResource(id = R.string.label_reservation_date),  // przyjmuje String
+                startStringValue = reservationViewModel.visitDate.value,
                 onDateChange = { selectedDate ->
                     Log.d("DEBUG", "onDateChange: $selectedDate")
                     // Zamiast tutaj walidować, wywołujemy metodę w ViewModelu
@@ -140,6 +141,26 @@ fun OrderFormContent(
                 isError = reservationViewModel.isDateError,
                 errorText = reservationViewModel.dateErrorText
             )
+
+            // Wyświetlanie godzin otwarcia
+            val selectedDate = LocalDate.parse(reservationViewModel.visitDate.value)
+            val dayIndex = selectedDate.dayOfWeek.value - 1
+            val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
+            if (dayHours != null) {
+                Text(
+                    text = "Godziny otwarcia: ${dayHours.from} - ${dayHours.until}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            } else {
+                Text(
+                    text = "Restauracja jest zamknięta w wybranym dniu.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
 
         // TimePicker start + end
