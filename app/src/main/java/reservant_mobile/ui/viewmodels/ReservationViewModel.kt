@@ -1,6 +1,5 @@
 package reservant_mobile.ui.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -25,10 +24,8 @@ import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.VisitsService
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.abs
 
 class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
@@ -36,17 +33,11 @@ class ReservationViewModel(
     private val deliveryService: IDeliveryService = DeliveryService()
 ) : ReservantViewModel() {
 
-    // ------------------
     // Pola powiązane z formularzem
-    // ------------------
-
     var note: FormField = FormField(OrderDTO::note.name)
-    var promoCode: FormField = FormField("promoCode") // np. pole na kod promocyjny
+    var promoCode: FormField = FormField("promoCode")
     var orderCost by mutableStateOf(0.0)
-
-    var visitDate: FormField = FormField("VisitDate").apply {
-        value = LocalDate.now().toString() // Ustawienie domyślnej wartości na dzisiejszą datę
-    }
+    var visitDate: FormField = FormField("VisitDate").apply { value = LocalDate.now().toString() }
     var startTime: FormField = FormField(VisitDTO::reservationDate.name)
     var endTime: FormField = FormField(VisitDTO::endTime.name)
     var numberOfGuests by mutableStateOf(1)
@@ -60,35 +51,23 @@ class ReservationViewModel(
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
 
-    // ------------------
     // Pola stanu błędu
-    // ------------------
-
     var errorMessage by mutableStateOf<String?>(null)
         private set
-
-    // Błędy daty
     var isDateError by mutableStateOf(false)
         private set
     var dateErrorText by mutableStateOf<String?>(null)
         private set
-
-    // Błędy godziny startu
     var isStartTimeError by mutableStateOf(false)
         private set
     var startTimeErrorText by mutableStateOf<String?>(null)
         private set
-
-    // Błędy godziny zakończenia
     var isEndTimeError by mutableStateOf(false)
         private set
     var endTimeErrorText by mutableStateOf<String?>(null)
         private set
 
-    // ------------------
     // Flow na wyniki zapytań
-    // ------------------
-
     private val _orderResult = MutableStateFlow<Result<OrderDTO?>>(Result(isError = false, value = null))
     val orderResult: StateFlow<Result<OrderDTO?>> = _orderResult
 
@@ -98,31 +77,18 @@ class ReservationViewModel(
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
 
-
-    // ------------------
-    // Pomocnicza funkcja do zaokrąglania godzin "w górę" do najbliższej pełnej lub połówki
-    // ------------------
+    // Zaokrąglanie godzin "w górę" do najbliższej pełnej lub połówki
     private fun roundUpToNextHalfHour(time: LocalTime): LocalTime {
         val minute = time.minute
         return when {
-            // Jeśli minuty to dokładnie :00 lub :30 -> nic nie zmieniamy
             minute == 0 || minute == 30 -> time
-            // Jeśli minute < 30 -> zaokrąglamy do :30
             minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
-            // W przeciwnym wypadku do kolejnej pełnej godziny
-            else -> time.plusHours(1)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0)
+            else -> time.plusHours(1).withMinute(0).withSecond(0).withNano(0)
         }
     }
 
-    // ------------------
-    // WALIDACJA DATY
-    // ------------------
+    // Walidacja daty
     fun updateDate(dateString: String, restaurant: RestaurantDTO) {
-        Log.d("DEBUG", "updateDate() called with dateString=$dateString")
-
         visitDate.value = dateString
         isDateError = false
         dateErrorText = null
@@ -130,121 +96,84 @@ class ReservationViewModel(
         if (dateString.isEmpty()) {
             isDateError = true
             dateErrorText = "Nie wybrano daty"
-            Log.d("DEBUG", "Date is empty")
             return
         }
 
         try {
             val selectedDate = LocalDate.parse(dateString)
             val today = LocalDate.now()
-            Log.d("DEBUG", "Parsed selectedDate=$selectedDate, today=$today")
 
             if (selectedDate.isBefore(today)) {
                 isDateError = true
                 dateErrorText = "Data nie może być wcześniejsza niż dziś"
-                Log.d("DEBUG", "Selected date is before today")
                 return
             }
 
             val dayIndex = selectedDate.dayOfWeek.value - 1
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
-            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isDateError = true
                 dateErrorText = "Restauracja jest zamknięta w wybranym dniu"
-                Log.d("DEBUG", "Restaurant is closed on this day")
-                return
             }
 
         } catch (e: Exception) {
             isDateError = true
             dateErrorText = "Nieprawidłowy format daty"
-            Log.e("DEBUG", "Failed to parse date: ${e.message}")
         }
     }
 
-
-    // ------------------
-    // WALIDACJA GODZINY STARTU
-    // ------------------
+    // Walidacja godziny rozpoczęcia
     fun updateStartTime(timeString: String, restaurant: RestaurantDTO) {
-        Log.d("DEBUG", "updateStartTime() called with timeString=$timeString, visitDate=${visitDate.value}")
-
         try {
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
-            Log.d("DEBUG", "Parsed time: $inputTime")
-
             val roundedTime = roundUpToNextHalfHour(inputTime)
             startTime.value = roundedTime.format(DateTimeFormatter.ofPattern("HH:mm"))
-            Log.d("DEBUG", "Rounded time: $roundedTime")
 
-            // Sprawdzenie daty
             val selectedDate = LocalDate.parse(visitDate.value)
-            Log.d("DEBUG", "Selected date: $selectedDate")
-
             val now = LocalTime.now()
             if (selectedDate.isEqual(LocalDate.now()) && roundedTime.isBefore(now)) {
                 isStartTimeError = true
                 startTimeErrorText = "Godzina rozpoczęcia nie może być wcześniejsza niż aktualna"
-                Log.d("DEBUG", "Start time is in the past")
                 return
             }
 
-            // Sprawdzenie godzin otwarcia
             val dayIndex = selectedDate.dayOfWeek.value - 1
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
-            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isStartTimeError = true
                 startTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
-                Log.d("DEBUG", "Restaurant is closed on this day")
                 return
             }
 
             val ohFrom = LocalTime.parse(dayHours.from, DateTimeFormatter.ofPattern("HH:mm"))
             val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm"))
-            Log.d("DEBUG", "Opening hours: from=$ohFrom, until=$ohUntil")
 
             if (roundedTime.isBefore(ohFrom) || roundedTime.isAfter(ohUntil)) {
                 isStartTimeError = true
                 startTimeErrorText = "Godzina rozpoczęcia poza godzinami otwarcia"
-                Log.d("DEBUG", "Start time is outside opening hours")
             }
 
         } catch (e: Exception) {
             isStartTimeError = true
             startTimeErrorText = "Nieprawidłowy format godziny startu"
-            Log.e("DEBUG", "Failed to parse startTime: ${e.message}")
         }
     }
 
-
-    // ------------------
-    // WALIDACJA GODZINY ZAKOŃCZENIA
-    // ------------------
-    /**
-     * [skipRounding] – jeżeli chcemy wywołać `updateEndTime` wewnętrznie (np. po setStartTime)
-     *   z już obliczoną godziną. Wtedy nie wykonujemy ponownie rounding-u.
-     */
+    // Walidacja godziny zakończenia
     fun updateEndTime(timeString: String, restaurant: RestaurantDTO, skipRounding: Boolean = false) {
-        Log.d("DEBUG", "updateEndTime() called with timeString=$timeString, visitDate=${visitDate.value}, startTime=${startTime.value}")
-
         try {
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
             val finalEndTime = if (skipRounding) inputTime else roundUpToNextHalfHour(inputTime)
             endTime.value = finalEndTime.format(DateTimeFormatter.ofPattern("HH:mm"))
-            Log.d("DEBUG", "Rounded endTime: $finalEndTime")
 
             val selectedDate = LocalDate.parse(visitDate.value)
             val start = LocalTime.parse(startTime.value, DateTimeFormatter.ofPattern("HH:mm"))
-            Log.d("DEBUG", "Parsed startTime: $start")
 
             if (!finalEndTime.isAfter(start)) {
                 isEndTimeError = true
                 endTimeErrorText = "Czas zakończenia musi być późniejszy niż czas rozpoczęcia"
-                Log.d("DEBUG", "End time is not after start time")
                 return
             }
 
@@ -252,18 +181,15 @@ class ReservationViewModel(
             if (diffMinutes > 90) {
                 isEndTimeError = true
                 endTimeErrorText = "Rezerwacja nie może przekraczać 1.5 godziny"
-                Log.d("DEBUG", "Reservation duration exceeds 1.5 hours")
                 return
             }
 
             val dayIndex = selectedDate.dayOfWeek.value - 1
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
-            Log.d("DEBUG", "Opening hours for dayIndex=$dayIndex: $dayHours")
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isEndTimeError = true
                 endTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
-                Log.d("DEBUG", "Restaurant is closed on this day")
                 return
             }
 
@@ -272,28 +198,20 @@ class ReservationViewModel(
             if (finalEndTime.isBefore(ohFrom) || finalEndTime.isAfter(ohUntil)) {
                 isEndTimeError = true
                 endTimeErrorText = "Godzina zakończenia poza godzinami otwarcia"
-                Log.d("DEBUG", "End time is outside opening hours")
             }
 
         } catch (e: Exception) {
             isEndTimeError = true
             endTimeErrorText = "Nieprawidłowy format godziny zakończenia"
-            Log.e("DEBUG", "Failed to parse endTime: ${e.message}")
         }
     }
 
-
-    // ------------------
-    // SPRAWDZENIE CZY REZERWACJA (DATA + GODZINY) JEST POPRAWNA
-    // ------------------
+    // Sprawdzenie czy rezerwacja jest poprawna
     fun isReservationValid(): Boolean {
-        // Jeśli którykolwiek z tych błędów jest aktywny, nie można iść dalej
         return !(isDateError || isStartTimeError || isEndTimeError)
     }
 
-    // ------------------
     // Zarządzanie koszykiem
-    // ------------------
     fun addItemToCart(menuItem: RestaurantMenuItemDTO) {
         val existingItem = addedItems.find { it.first.menuItemId == menuItem.menuItemId }
         if (existingItem != null) {
@@ -327,9 +245,7 @@ class ReservationViewModel(
         }
     }
 
-    // ------------------
-    // Tworzenie wizyt i zamówień
-    // ------------------
+    // Tworzenie wizyty i zamówienia
     fun createVisitAndOrder(
         restaurantId: Int,
         isTakeaway: Boolean,
@@ -348,7 +264,6 @@ class ReservationViewModel(
             val visitResult = visitsService.createVisit(visit)
             if (!visitResult.isError && visitResult.value != null) {
                 val visitId = visitResult.value!!.visitId
-                // Now create order
                 val orderItems = addedItems.map { (menuItem, quantity) ->
                     OrderDTO.OrderItemDTO(
                         menuItemId = menuItem.menuItemId,
@@ -366,25 +281,22 @@ class ReservationViewModel(
                 if (orderResult.isError) {
                     errorMessage = "Failed to place order. Please try again."
                 } else {
-                    // Clear the cart and reset error message
                     addedItems.clear()
                     errorMessage = null
                 }
             } else {
-                // Handle error
                 _visitResult.value = visitResult
                 errorMessage = "Failed to create visit. Please try again."
             }
         }
     }
 
-    // Przykładowe metody do obsługi zamówień/odwołań/dostaw – do ewentualnego wykorzystania
+    // Obsługa zamówień i dostaw
     fun createOrder() {
         viewModelScope.launch {
             val order = OrderDTO(
                 cost = orderCost,
                 note = note.value
-                // Inne pola w razie potrzeby
             )
             val result = ordersService.createOrder(order)
             _orderResult.value = result
@@ -416,8 +328,7 @@ class ReservationViewModel(
         viewModelScope.launch {
             val visit = VisitDTO(
                 reservationDate = visitDate.value,
-                numberOfGuests = numberOfGuests,
-                // ...
+                numberOfGuests = numberOfGuests
             )
             val result = visitsService.createVisit(visit)
             _visitResult.value = result
@@ -434,8 +345,7 @@ class ReservationViewModel(
     fun addDelivery() {
         viewModelScope.launch {
             val delivery = DeliveryDTO(
-                cost = deliveryCost,
-                // ...
+                cost = deliveryCost
             )
             val result = deliveryService.addDelivery(delivery)
             _deliveryResult.value = result
