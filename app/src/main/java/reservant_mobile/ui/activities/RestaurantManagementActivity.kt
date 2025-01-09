@@ -564,6 +564,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         }
         composable<RestaurantRoutes.Reviews> {
             ReviewsActivity(
+                navController = navController,
                 restaurantId = it.toRoute<RestaurantRoutes.Reviews>().restaurantId,
                 isOwner = true
             )

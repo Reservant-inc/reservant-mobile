@@ -41,6 +41,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -53,7 +54,7 @@ import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @Composable
 fun ReviewsActivity(
-    navController: NavHostController = rememberNavController(),
+    navController: NavController = rememberNavController(),
     restaurantId: Int,
     isOwner: Boolean
 ) {
