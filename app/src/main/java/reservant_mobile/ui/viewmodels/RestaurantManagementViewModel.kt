@@ -49,6 +49,10 @@ class RestaurantManagementViewModel(
     suspend fun deleteGroup(groupId: Int): Boolean {
         val result = restaurantService.deleteGroup(groupId)
 
+        if(!result.isError){
+            loadGroups()
+        }
+
         return !result.isError
     }
 

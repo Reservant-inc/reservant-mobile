@@ -3,6 +3,7 @@ package reservant_mobile.ui.activities
 import WarehouseActivity
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -91,6 +93,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
     val navController = rememberNavController()
     val groups = restaurantManageVM.groups
     var selectedGroup: RestaurantGroupDTO? by remember { mutableStateOf(null) }
+    val context = LocalContext.current
 
     var showDeleteRestaurantPopup by remember { mutableStateOf(false) }
     var showDeleteGroupPopup by remember { mutableStateOf(false) }
@@ -125,6 +128,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         if (group != null) {
             val confirmText = stringResource(R.string.delete_group_message) +
                     "\n" + group.name + " ?"
+
+            val deleteText = stringResource(R.string.label_delete_group) +" "+ group.name
             DeleteCountdownPopup(
                 icon = Icons.Default.Delete,
                 title = stringResource(R.string.label_delete_group),
@@ -135,7 +140,16 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 onConfirm = {
                     restaurantManageVM.viewModelScope.launch {
                         group.restaurantGroupId?.let {
-                            restaurantManageVM.deleteGroup(it)
+                            val result = restaurantManageVM.deleteGroup(it)
+                            if(result){
+                                Toast.makeText(
+                                    context,
+                                    deleteText,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                restaurantManageVM.selectedGroup = null
+                                restaurantManageVM.isGroupSelected = false
+                            }
                         }
                         showDeleteGroupPopup = false
                     }
