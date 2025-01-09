@@ -942,16 +942,57 @@ fun SearchBarWithFilter(
                 }
             )
 
-            // Ikona filtra
-            IconButton(
-                onClick = { expanded = true },
-                modifier = Modifier.padding(horizontal = 8.dp)
+            // Opakowanie ikony filtra + DropdownMenu w Box wyrównany do prawej
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.TopEnd)
             ) {
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = stringResource(id = R.string.label_filters),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+                IconButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = stringResource(id = R.string.label_filters),
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+                ) {
+                    // Opcja "Wszystkie"
+                    DropdownMenuItem(
+                        text = { Text(text = labelAll) },
+                        onClick = {
+                            onFilterSelected?.invoke(null)
+                            onFilterSelectedInt?.invoke(null)
+                            expanded = false
+                        }
+                    )
+                    // Opcje filtrowania dla stringów
+                    filterOptions?.forEach { filter ->
+                        DropdownMenuItem(
+                            text = { Text(text = filter) },
+                            onClick = {
+                                onFilterSelected?.invoke(filter)
+                                expanded = false
+                            }
+                        )
+                    }
+                    // Opcje filtrowania dla int (gwiazdki)
+                    filterOptionsInt?.forEach { filterInt ->
+                        DropdownMenuItem(
+                            text = { FilterOptionWithStars(stars = filterInt) },
+                            onClick = {
+                                onFilterSelectedInt?.invoke(filterInt)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
             }
 
             // Dodatkowy przycisk, jeśli parametry zostały podane
@@ -960,57 +1001,16 @@ fun SearchBarWithFilter(
                     onClick = additionalButtonOnClick,
                     modifier = Modifier
                         .height(56.dp),
-                    colors = ButtonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = FloatingActionButtonDefaults.containerColor,
                         contentColor = contentColorFor(FloatingActionButtonDefaults.containerColor),
-                        disabledContentColor = ButtonDefaults.buttonColors().disabledContentColor,
-                        disabledContainerColor = ButtonDefaults.buttonColors().disabledContainerColor
                     )
                 ) {
-//                    Text(text = additionalButtonLabel,
-//                        fontSize = 20.sp)
                     Icon(
                         imageVector = additionalButtonIcon,
                         contentDescription = stringResource(id = R.string.label_add_review)
                     )
                 }
-            }
-        }
-
-        // DropdownMenu dla opcji filtra
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text(text = labelAll) },
-                onClick = {
-                    onFilterSelected?.invoke(null)
-                    onFilterSelectedInt?.invoke(null)
-                    expanded = false
-                }
-            )
-
-            // Opcje filtrowania dla stringów
-            filterOptions?.forEach { filter ->
-                DropdownMenuItem(
-                    text = { Text(text = filter) },
-                    onClick = {
-                        onFilterSelected?.invoke(filter)
-                        expanded = false
-                    }
-                )
-            }
-
-            // Opcje filtrowania dla int
-            filterOptionsInt?.forEach { filterInt ->
-                DropdownMenuItem(
-                    text = { FilterOptionWithStars(stars = filterInt) },
-                    onClick = {
-                        onFilterSelectedInt?.invoke(filterInt)
-                        expanded = false
-                    }
-                )
             }
         }
 
