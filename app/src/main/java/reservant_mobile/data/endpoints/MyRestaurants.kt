@@ -24,6 +24,12 @@ class MyRestaurants {
                       val dateUntil: String? = null,
                       val category: String? = null,
                       val reportedUserId: String? = null)
+
+        @Resource("statistics ")
+        class Statistics(val parent: Id,
+                         val dateFrom: String? = null,
+                         val dateUntil: String? = null,
+                         val popularItemMaxCount: String? = null)
     }
 
     @Resource("validate-first-step")
