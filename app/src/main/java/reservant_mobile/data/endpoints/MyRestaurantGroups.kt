@@ -11,7 +11,7 @@ class MyRestaurantGroups {
         class Statistics(val parent: Id,
                          val dateFrom: String? = null,
                          val dateUntil: String? = null,
-                         val popularItemMaxCount: String? = null)
+                         val popularItemMaxCount: Int? = null)
     }
 
 }
