@@ -36,7 +36,8 @@ class MyRestaurants {
     class ValidateFirstStep(val parent: MyRestaurants = MyRestaurants())
 
     @Resource("statistics ")
-    class Statistics(val dateFrom: String? = null,
+    class Statistics(val parent: MyRestaurants = MyRestaurants(),
+                     val dateFrom: String? = null,
                      val dateUntil: String? = null,
                      val popularItemMaxCount: Int? = null)
 
