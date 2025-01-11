@@ -6,6 +6,12 @@ import io.ktor.resources.Resource
 class MyRestaurantGroups {
 
     @Resource("{id}")
-    class Id(val parent: MyRestaurantGroups = MyRestaurantGroups(), val id: String)
+    class Id(val parent: MyRestaurantGroups = MyRestaurantGroups(), val id: String){
+        @Resource("statistics")
+        class Statistics(val parent: Id,
+                         val dateFrom: String? = null,
+                         val dateUntil: String? = null,
+                         val popularItemMaxCount: Int? = null)
+    }
 
 }

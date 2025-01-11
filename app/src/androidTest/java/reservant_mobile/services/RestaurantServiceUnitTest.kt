@@ -302,4 +302,22 @@ class RestaurantServiceUnitTest: ServiceTest() {
         val date = LocalDateTime.now()
         assertThat(ser.getUserRestaurantReports(restaurantId, dateUntil = date).value).isNotNull()
     }
+
+    @Test
+    fun get_all_statistics_not_null()= runTest {
+        val date = LocalDateTime.now()
+        assertThat(ser.getAllStatistics(dateUntil = date).value).isNotNull()
+    }
+
+    @Test
+    fun get_statistics_not_null()= runTest {
+        val date = LocalDateTime.now()
+        assertThat(ser.getStatistics(restaurantId = 10, dateUntil = date).value).isNotNull()
+    }
+
+    @Test
+    fun get_group_statistics_not_null()= runTest {
+        val date = LocalDateTime.now()
+        assertThat(ser.getStatisticsGroup(groupId = 10, dateUntil = date).value).isNotNull()
+    }
 }
