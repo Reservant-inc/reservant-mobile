@@ -135,6 +135,10 @@ interface IRestaurantService{
                                          category: ReportDTO.ReportCategory? = null,
                                          reportedUserId: String? = null, ): Result<List<ReportDTO>?>
 
+    suspend fun getStatistics(dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null)
+
 }
 
 @OptIn(InternalSerializationApi::class)
