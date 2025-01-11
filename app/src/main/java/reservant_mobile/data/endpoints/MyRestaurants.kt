@@ -25,7 +25,7 @@ class MyRestaurants {
                       val category: String? = null,
                       val reportedUserId: String? = null)
 
-        @Resource("statistics ")
+        @Resource("statistics")
         class Statistics(val parent: Id,
                          val dateFrom: String? = null,
                          val dateUntil: String? = null,
@@ -35,7 +35,7 @@ class MyRestaurants {
     @Resource("validate-first-step")
     class ValidateFirstStep(val parent: MyRestaurants = MyRestaurants())
 
-    @Resource("statistics ")
+    @Resource("statistics")
     class Statistics(val parent: MyRestaurants = MyRestaurants(),
                      val dateFrom: String? = null,
                      val dateUntil: String? = null,

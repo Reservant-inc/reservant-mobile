@@ -7,7 +7,7 @@ class MyRestaurantGroups {
 
     @Resource("{id}")
     class Id(val parent: MyRestaurantGroups = MyRestaurantGroups(), val id: String){
-        @Resource("statistics ")
+        @Resource("statistics")
         class Statistics(val parent: Id,
                          val dateFrom: String? = null,
                          val dateUntil: String? = null,
