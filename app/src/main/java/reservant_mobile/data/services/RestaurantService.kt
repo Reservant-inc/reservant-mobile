@@ -136,6 +136,10 @@ interface IRestaurantService{
                                          category: ReportDTO.ReportCategory? = null,
                                          reportedUserId: String? = null, ): Result<List<ReportDTO>?>
 
+    suspend fun getAllStatistics(dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
     suspend fun getStatistics(restaurantId: Any,
                               dateFrom: LocalDateTime? = null,
                               dateUntil: LocalDateTime? = null,
@@ -145,6 +149,8 @@ interface IRestaurantService{
                               dateFrom: LocalDateTime? = null,
                               dateUntil: LocalDateTime? = null,
                               popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
+
 
 }
 
@@ -566,6 +572,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             dateUntil = dateUntil?.toString(),
             category = category?.name,
             reportedUserId = reportedUserId,
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getAllStatistics(
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        popularItemMaxCount: Int?
+    ): Result<StatisticsDTO?> {
+        val res = api.get(MyRestaurants.Statistics(
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            popularItemMaxCount = popularItemMaxCount
         ))
         return complexResultWrapper(res)
     }
