@@ -141,6 +141,11 @@ interface IRestaurantService{
                               dateUntil: LocalDateTime? = null,
                               popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
 
+    suspend fun getStatisticsGroup(groupId: Any,
+                              dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
 }
 
 @OptIn(InternalSerializationApi::class)
@@ -573,6 +578,21 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     ): Result<StatisticsDTO?> {
         val res = api.get(MyRestaurants.Id.Statistics(
             parent = MyRestaurants.Id(restaurantId = restaurantId.toString()),
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            popularItemMaxCount = popularItemMaxCount
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getStatisticsGroup(
+        groupId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        popularItemMaxCount: Int?
+    ): Result<StatisticsDTO?> {
+        val res = api.get(MyRestaurantGroups.Id.Statistics(
+            parent = MyRestaurantGroups.Id(id = groupId.toString()),
             dateFrom = dateFrom?.toString(),
             dateUntil = dateUntil?.toString(),
             popularItemMaxCount = popularItemMaxCount
