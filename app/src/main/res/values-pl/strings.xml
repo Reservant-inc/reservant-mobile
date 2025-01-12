@@ -465,4 +465,9 @@
     <string name="label_toggle_dark_theme">Przełącz ciemny motyw</string>
     <string name="message_logout">Czy chcesz sie wylogować?</string>
     <string name="message_delete_account">Czy chcesz usunąc swoje konto?</string>
+    <string name="delete_group_message">Czy napewno chcesz usunąć grupę</string>
+    <string name="label_delete_group">Usuń grupę</string>
+    <string name="label_reply">Odpowiedz</string>
+    <string name="label_owner_reply">Odopwiedź właściciela</string>
+    <string name="label_write_reply">Napisz odpowiedź</string>
 </resources>
