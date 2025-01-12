@@ -58,6 +58,13 @@ fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navControll
             // Display the summary of the order
             Text(text = "Order Note: ${reservationViewModel.note.value}")
             Text(text = "Order Total: ${reservationViewModel.orderCost}")
+            if(reservationViewModel.restaurant.reservationDeposit != null){
+                Text(text = "Deposit: ${reservationViewModel.restaurant!!.reservationDeposit}")
+                //tutaj
+            }else{
+                Text(text = "No deposit needed!")
+            }
+
             // Add more details about the order as needed
 
             Spacer(modifier = Modifier.height(16.dp))
