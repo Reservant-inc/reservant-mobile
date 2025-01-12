@@ -24,13 +24,13 @@ data class StatisticsDTO(
     @Serializable
     data class RevenueStat(
         val date: String? = null,
-        val revenue: Int? = null
+        val revenue: Double? = null
     )
 
     @Serializable
     data class ReviewsStat(
         val date: String? = null,
         val count: Int? = null,
-        val average: Int? = null
+        val average: Double? = null
     )
 }
