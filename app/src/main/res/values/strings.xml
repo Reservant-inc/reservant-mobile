@@ -540,4 +540,6 @@
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Amount</string>
     <string name="label_stats_show_group_stats">See group stats</string>
+    <string name="label_deposit_amount">Deposit amount</string>
+    <string name="label_want_deposit">Reservation with deposits</string>
 </resources>

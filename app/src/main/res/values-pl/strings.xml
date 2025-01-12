@@ -528,4 +528,6 @@
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Kwota</string>
     <string name="label_stats_show_group_stats">Zobacz statystyki grupy</string>
+    <string name="label_deposit_amount">Kwota kaucji</string>
+    <string name="label_want_deposit">Rezerwacje z kaucją</string>
 </resources>

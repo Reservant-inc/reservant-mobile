@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -666,6 +667,40 @@ fun RegisterRestaurantActivity(
                 }
 
                 Column {
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        var wantDeposit by remember { mutableStateOf(false) }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_want_deposit),
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Checkbox(
+                                checked = wantDeposit,
+                                onCheckedChange = { wantDeposit = it }
+                            )
+                        }
+
+                        if (wantDeposit) {
+                            FormInput(
+                                inputText = if (restaurantViewModel.deposit == 0.0) ""
+                                else restaurantViewModel.deposit.toString(),
+                                onValueChange = { value ->
+                                    restaurantViewModel.deposit = value.toDoubleOrNull() ?: 0.0
+                                },
+                                label = stringResource(R.string.label_deposit_amount),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                optional = true
+                            )
+                        }else{
+                            restaurantViewModel.deposit = 0.0
+                        }
+                    }
+
                     FormInput(
                         inputText = restaurantViewModel.maxReservationMinutes.value,
                         onValueChange = { restaurantViewModel.maxReservationMinutes.value = it },
