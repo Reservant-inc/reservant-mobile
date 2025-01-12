@@ -1,10 +1,13 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,8 +62,9 @@ fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navControll
             Text(text = "Order Note: ${reservationViewModel.note.value}")
             Text(text = "Order Total: ${reservationViewModel.orderCost}")
             if(reservationViewModel.restaurant!!.reservationDeposit != null){
-                Text(text = "Deposit: ${reservationViewModel.restaurant!!.reservationDeposit}")
-                //tutaj
+                Text(
+                    text = "Deposit: ${reservationViewModel.restaurant!!.reservationDeposit}"
+                )
             }else{
                 Text(text = "No deposit needed!")
             }
