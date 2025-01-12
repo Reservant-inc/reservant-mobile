@@ -24,5 +24,6 @@ class UserDTO (
     val employerId: String? = null,
     val token: String? = null,
     val photo: String? = null,
+    val bannedUntil: String? = null,
     val friendStatus: FriendStatus? = null
 )
