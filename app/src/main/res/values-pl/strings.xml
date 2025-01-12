@@ -465,4 +465,13 @@
     <string name="label_toggle_dark_theme">Przełącz ciemny motyw</string>
     <string name="message_logout">Czy chcesz sie wylogować?</string>
     <string name="message_delete_account">Czy chcesz usunąc swoje konto?</string>
+    <string name="error_loading_statistics">Wystąpił błąd podczas ładowania statystyk</string>
+    <string name="label_all_years">Wszystkie lata</string>
+    <string name="label_stats_customers">Klienci</string>
+    <string name="label_stats_revenue">Przychód</string>
+    <string name="label_stats_reviews">Opinie</string>
+    <string name="label_stats_avg_reviews">Śr. Ocen</string>
+    <string name="label_stats_date">Data</string>
+    <string name="label_stats_count">Liczba</string>
+    <string name="label_stats_amount">Kwota</string>
 </resources>

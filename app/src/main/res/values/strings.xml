@@ -477,4 +477,13 @@
     <string name="label_toggle_dark_theme">Toggle dark theme</string>
     <string name="message_logout">Are you sure you want to log out?</string>
     <string name="message_delete_account">Are you sure you want to delete your account?</string>
+    <string name="error_loading_statistics">Error when loading statistics</string>
+    <string name="label_all_years">All years</string>
+    <string name="label_stats_customers">Customers</string>
+    <string name="label_stats_revenue">Revenue</string>
+    <string name="label_stats_reviews">Reviews</string>
+    <string name="label_stats_avg_reviews">Avg. Rate</string>
+    <string name="label_stats_date">Date</string>
+    <string name="label_stats_count">Liczba</string>
+    <string name="label_stats_amount">Amount</string>
 </resources>
