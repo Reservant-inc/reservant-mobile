@@ -482,4 +482,13 @@
     <string name="label_reply">Reply</string>
     <string name="label_owner_reply">Owner reply</string>
     <string name="label_write_reply">Write reply</string>
+    <string name="error_loading_statistics">Error when loading statistics</string>
+    <string name="label_all_years">All years</string>
+    <string name="label_stats_customers">Customers</string>
+    <string name="label_stats_revenue">Revenue</string>
+    <string name="label_stats_reviews">Reviews</string>
+    <string name="label_stats_avg_reviews">Avg. Rate</string>
+    <string name="label_stats_date">Date</string>
+    <string name="label_stats_count">Liczba</string>
+    <string name="label_stats_amount">Amount</string>
 </resources>

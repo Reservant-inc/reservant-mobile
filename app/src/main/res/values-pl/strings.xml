@@ -470,4 +470,13 @@
     <string name="label_reply">Odpowiedz</string>
     <string name="label_owner_reply">Odopwiedź właściciela</string>
     <string name="label_write_reply">Napisz odpowiedź</string>
+    <string name="error_loading_statistics">Wystąpił błąd podczas ładowania statystyk</string>
+    <string name="label_all_years">Wszystkie lata</string>
+    <string name="label_stats_customers">Klienci</string>
+    <string name="label_stats_revenue">Przychód</string>
+    <string name="label_stats_reviews">Opinie</string>
+    <string name="label_stats_avg_reviews">Śr. Ocen</string>
+    <string name="label_stats_date">Data</string>
+    <string name="label_stats_count">Liczba</string>
+    <string name="label_stats_amount">Kwota</string>
 </resources>
