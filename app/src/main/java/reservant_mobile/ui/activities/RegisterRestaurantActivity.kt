@@ -834,7 +834,6 @@ fun RegisterRestaurantActivity(
                             restaurantViewModel.viewModelScope.launch {
                                 isLoading = true
                                 formSent3 = true
-
                                 if (restaurantViewModel.registerRestaurant(context)) {
                                     navControllerHome.navigate(MainRoutes.Home)
                                 }

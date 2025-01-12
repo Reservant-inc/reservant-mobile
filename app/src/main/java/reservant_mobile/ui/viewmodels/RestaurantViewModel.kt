@@ -404,7 +404,7 @@ class RestaurantViewModel(
     }
 
     fun isDepositInvalid(): Boolean {
-        return deposit >= 0.0
+        return deposit < 0.0
     }
 
     fun isRestaurantTypeInvalid(): Boolean {
