@@ -116,9 +116,7 @@ fun AddEventActivity(navController: NavHostController) {
             ) {
                 Column(modifier = Modifier.weight(0.45f)) {
                     MyDatePickerDialog(
-                        label = {
-                            Text(stringResource(R.string.label_start_date))
-                        },
+                        label = stringResource(R.string.label_start_date),
                         onDateChange = {
                             addEventViewModel.eventDate = it
                         },
@@ -162,9 +160,7 @@ fun AddEventActivity(navController: NavHostController) {
             ) {
                 Column(modifier = Modifier.weight(0.45f)) {
                     MyDatePickerDialog(
-                        label = {
-                            Text(stringResource(R.string.label_event_join_until))
-                        },
+                        label = stringResource(R.string.label_event_join_until),
                         onDateChange = {
                             addEventViewModel.mustJoinDate = it
                         },

@@ -95,7 +95,7 @@ fun MenuPopup(
                     errorText = stringResource(id = R.string.error_invalid_menu_type)
                 )
                 MyDatePickerDialog(
-                    label = { Text(text = stringResource(id = R.string.label_date_from)) },
+                    label = stringResource(id = R.string.label_date_from),
                     allowFutureDates = true,
                     startStringValue = dateFrom.value,
                     startDate = dateFrom.value.ifEmpty {
@@ -104,19 +104,8 @@ fun MenuPopup(
                     onDateChange = { dateFrom.value = it }
                 )
                 MyDatePickerDialog(
-                    label = {
-                        Text(text = buildAnnotatedString {
-                            append(stringResource(id = R.string.label_date_to))
-                            pushStyle(
-                                SpanStyle(
-                                    Color.Gray,
-                                    fontWeight = FontWeight.Light,
-                                    fontStyle = FontStyle.Italic
-                                )
-                            )
-                            append(stringResource(id = R.string.label_optional))
-                        })
-                    },
+                    label = stringResource(id = R.string.label_date_to),
+                    optional = true,
                     allowFutureDates = true,
                     startStringValue = dateUntil.value,
                     startDate = dateUntil.value.ifEmpty {

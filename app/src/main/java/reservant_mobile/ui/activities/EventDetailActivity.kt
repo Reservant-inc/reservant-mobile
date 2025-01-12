@@ -433,9 +433,7 @@ fun EditEventDialog(
                         modifier = Modifier.weight(0.45f)
                     ) {
                         MyDatePickerDialog(
-                            label = {
-                                Text(stringResource(R.string.label_start_date))
-                            },
+                            label = stringResource(R.string.label_start_date),
                             onDateChange = {
                                 eventDate = it
                             },
@@ -465,9 +463,7 @@ fun EditEventDialog(
                         modifier = Modifier.weight(0.45f)
                     ){
                         MyDatePickerDialog(
-                            label = {
-                                Text(stringResource(R.string.label_event_join_until))
-                            },
+                            label = stringResource(R.string.label_event_join_until),
                             onDateChange = {
                                 joinUntilDate = it
                             },

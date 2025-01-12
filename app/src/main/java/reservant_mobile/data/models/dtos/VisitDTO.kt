@@ -37,5 +37,6 @@ data class VisitDTO(
      * List of orders containing: orderId, visitId, date, note, cost, status
      */
     val orders: List<OrderDTO>? = null,
-    val isArchived: Boolean? = null
+    val isArchived: Boolean? = null,
+    val restaurantId: Int? = null
 )

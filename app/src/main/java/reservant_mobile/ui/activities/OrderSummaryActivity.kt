@@ -1,6 +1,9 @@
 package reservant_mobile.ui.activities
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -28,7 +34,14 @@ import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navController: NavHostController) {
+fun OrderSummaryActivity(
+    reservationViewModel: ReservationViewModel,
+    navController: NavHostController,
+    restaurantId: Int
+) {
+    val errorMessage = reservationViewModel.errorMessage
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -44,6 +57,10 @@ fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navControll
             )
         }
     ) { paddingValues ->
+        val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+            (menuItem.price ?: 0.0) * quantity
+        } + reservationViewModel.tip
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -55,20 +72,144 @@ fun OrderSummaryActivity(reservationViewModel: ReservationViewModel, navControll
                 fontWeight = FontWeight.Bold
             )
 
-            // Display the summary of the order
-            Text(text = "Order Note: ${reservationViewModel.note.value}")
-            Text(text = "Order Total: ${reservationViewModel.orderCost}")
-            // Add more details about the order as needed
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.label_item),
+                    modifier = Modifier.weight(2f),
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.label_qty),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.label_price),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            reservationViewModel.addedItems.forEach { (menuItem, quantity) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = menuItem.name,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.Start
+                    )
+                    Text(
+                        text = quantity.toString(),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "${String.format("%.2f", menuItem.price)} zł",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Date:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = reservationViewModel.visitDate.value ?: "",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Time:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = "${reservationViewModel.startTime.value} - ${reservationViewModel.endTime.value}",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Note:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = reservationViewModel.note.value ?: "",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Tip:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = String.format("%.2f", reservationViewModel.tip) + " zł",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Suma zamówienia
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Total:",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = String.format("%.2f zł", totalCost),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             ButtonComponent(
                 onClick = {
                     reservationViewModel.viewModelScope.launch {
-                        // Finalize the order by creating it
-                        reservationViewModel.createOrder()
+                        reservationViewModel.createVisitAndOrder(
+                            restaurantId = restaurantId,
+                            isTakeaway = reservationViewModel.isTakeaway,
+                            isDelivery = reservationViewModel.isDelivery
+                        )
+                        if (reservationViewModel.isOrderError() || reservationViewModel.isVisitError()) {
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                        } else {
+                            navController.popBackStack()
+                        }
                     }
-                    navController.popBackStack()
                 },
                 label = stringResource(id = R.string.label_confirm_order),
                 modifier = Modifier.fillMaxWidth()

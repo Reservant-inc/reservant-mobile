@@ -1088,7 +1088,7 @@ fun EditProfileDialog(
                 )
 
                 MyDatePickerDialog(
-                    label = { Text("Birth Date") },
+                    label = "Birth Date",
                     onDateChange = { selectedDate ->
                         birthDate = selectedDate
                     },
