@@ -544,6 +544,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantManagementRoutes.Stats> {
             RestaurantStatsActivity(
                 onReturnClick = { navController.popBackStack() },
+                statsType = StatsType.ALL_RESTAURANTS
             )
         }
 
