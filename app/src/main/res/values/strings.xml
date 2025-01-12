@@ -482,4 +482,6 @@
     <string name="label_reply">Reply</string>
     <string name="label_owner_reply">Owner reply</string>
     <string name="label_write_reply">Write reply</string>
+    <string name="label_deposit_amount">Deposit amount</string>
+    <string name="label_want_deposit">Reservation with deposits</string>
 </resources>

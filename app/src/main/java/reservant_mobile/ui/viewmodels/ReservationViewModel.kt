@@ -3,6 +3,7 @@ package reservant_mobile.ui.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,20 +11,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.OrderDTO
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.IDeliveryService
 import reservant_mobile.data.services.IOrdersService
+import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
+import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.VisitsService
 
 class ReservationViewModel(
+    private val restaurantId: Int = -1,
     private val ordersService: IOrdersService = OrdersService(),
     private val visitsService: IVisitsService = VisitsService(),
-    private val deliveryService: IDeliveryService = DeliveryService()
+    private val deliveryService: IDeliveryService = DeliveryService(),
+    private val restaurantService: IRestaurantService = RestaurantService()
 ) : ReservantViewModel() {
 
 
@@ -49,6 +55,22 @@ class ReservationViewModel(
 
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
+
+    var restaurant: RestaurantDTO? by mutableStateOf(null)
+
+    init {
+        viewModelScope.launch {
+            getRestaurant()
+        }
+    }
+
+    private suspend fun getRestaurant(){
+        val result = restaurantService.getRestaurant(restaurantId)
+
+        if(!result.isError){
+            restaurant = result.value
+        }
+    }
 
     // Functions to handle orders
     fun createOrder() {

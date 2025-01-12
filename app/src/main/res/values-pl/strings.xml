@@ -470,4 +470,6 @@
     <string name="label_reply">Odpowiedz</string>
     <string name="label_owner_reply">Odopwiedź właściciela</string>
     <string name="label_write_reply">Napisz odpowiedź</string>
+    <string name="label_deposit_amount">Kwota kaucji</string>
+    <string name="label_want_deposit">Rezerwacje z kaucją</string>
 </resources>
