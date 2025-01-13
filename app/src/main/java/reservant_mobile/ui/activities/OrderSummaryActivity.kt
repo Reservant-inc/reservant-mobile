@@ -194,16 +194,11 @@ fun OrderSummaryActivity(
         ButtonComponent(
             onClick = {
                 reservationViewModel.viewModelScope.launch {
-                    reservationViewModel.createVisitAndOrder(
-                        restaurantId = restaurantId,
-                        isTakeaway = reservationViewModel.isTakeaway,
-                        isDelivery = reservationViewModel.isDelivery,
-                        isReservation = isReservation
+                    reservationViewModel.createVisit(
+                        restaurantId = restaurantId
                     )
-                    if (reservationViewModel.isOrderError() || reservationViewModel.isVisitError()) {
-                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-                    } else {
-                        navController.popBackStack()
+                    if (!isReservation) {
+                        reservationViewModel.createOrder()
                     }
                 }
             },

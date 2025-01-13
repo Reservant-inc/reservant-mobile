@@ -44,6 +44,7 @@ class ReservationViewModel(
     var endTime: FormField = FormField(VisitDTO::endTime.name)
     var numberOfGuests by mutableStateOf(1)
     var tip by mutableStateOf(0.0)
+    var visitId by mutableStateOf(0)
 
     val addedItems = mutableStateListOf<Pair<RestaurantMenuItemDTO, Int>>()
     var participantIds: MutableList<String> = mutableListOf()
@@ -239,69 +240,29 @@ class ReservationViewModel(
         }
     }
 
-    fun createVisitAndOrder(
-        restaurantId: Int,
-        isTakeaway: Boolean,
-        isDelivery: Boolean,
-        isReservation: Boolean
-    ) {
-        viewModelScope.launch {
-            val visit = VisitDTO(
-                date = "${visitDate.value}T${startTime.value}",
-                endTime = "${visitDate.value}T${endTime.value}",
-                numberOfGuests = numberOfGuests,
-                tip = tip,
-                takeaway = isTakeaway,
-                restaurantId = restaurantId,
-                participantIds = participantIds
-            )
-            val visitResult = visitsService.createVisit(visit)
-
-            if (!visitResult.isError && visitResult.value != null) {
-                if (isReservation) {
-                    // Tylko tworzenie wizyty, jeśli to rezerwacja
-                    _visitResult.value = visitResult
-                    errorMessage = null
-                } else {
-                    // Pełny proces z tworzeniem zamówienia
-                    val visitId = visitResult.value!!.visitId
-                    val orderItems = addedItems.map { (menuItem, quantity) ->
-                        OrderDTO.OrderItemDTO(
-                            menuItemId = menuItem.menuItemId,
-                            amount = quantity
-                        )
-                    }
-                    val order = OrderDTO(
-                        visitId = visitId,
-                        note = note.value,
-                        items = orderItems
-                    )
-                    val orderResult = ordersService.createOrder(order)
-                    _orderResult.value = orderResult
-
-                    if (orderResult.isError) {
-                        errorMessage = "Failed to place order. Please try again."
-                    } else {
-                        addedItems.clear()
-                        errorMessage = null
-                    }
-                }
-            } else {
-                _visitResult.value = visitResult
-                errorMessage = "Failed to create visit. Please try again."
-            }
-        }
-    }
-
-
     fun createOrder() {
         viewModelScope.launch {
+            val orderItems = addedItems.map { (menuItem, quantity) ->
+                OrderDTO.OrderItemDTO(
+                    menuItemId = menuItem.menuItemId,
+                    amount = quantity
+                )
+            }
+            val noteValue = note.value.takeIf { it.isNotBlank() }
             val order = OrderDTO(
-                cost = orderCost,
-                note = note.value
+                visitId = visitId,
+                note = noteValue,
+                items = orderItems
             )
-            val result = ordersService.createOrder(order)
-            _orderResult.value = result
+            val orderResult = ordersService.createOrder(order)
+            _orderResult.value = orderResult
+
+            if (orderResult.isError) {
+                resourceProvider.showToast(resourceProvider.getString(R.string.error_place_order))
+            } else {
+                addedItems.clear()
+                errorMessage = null
+            }
         }
     }
 
@@ -326,14 +287,29 @@ class ReservationViewModel(
         }
     }
 
-    fun createVisit() {
+    fun createVisit(
+        restaurantId: Int
+    ) {
         viewModelScope.launch {
             val visit = VisitDTO(
-                reservationDate = visitDate.value,
-                numberOfGuests = numberOfGuests
+                date = "${visitDate.value}T${startTime.value}",
+                endTime = "${visitDate.value}T${endTime.value}",
+                numberOfGuests = numberOfGuests,
+                tip = tip,
+                takeaway = isTakeaway,
+                restaurantId = restaurantId,
+                participantIds = participantIds
             )
-            val result = visitsService.createVisit(visit)
-            _visitResult.value = result
+            val visitResult = visitsService.createVisit(visit)
+            _visitResult.value = visitResult
+
+            if (visitResult.isError) {
+                resourceProvider.showToast(resourceProvider.getString(R.string.error_create_visit))
+            } else {
+                visitId = visitResult.value!!.visitId!!
+                addedItems.clear()
+                errorMessage = null
+            }
         }
     }
 
