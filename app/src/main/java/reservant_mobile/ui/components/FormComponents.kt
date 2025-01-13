@@ -176,6 +176,10 @@ fun MyTimePickerDialog(
     var showDialog by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(String.format("%02d:%02d", initialHour, initialMinute)) }
 
+    LaunchedEffect(Unit) {
+        onTimeSelected(selectedTime)
+    }
+
     fun parseTimeToMinutes(timeString: String): Int {
         if (timeString.isBlank() || !timeString.contains(":")) {
             // Możesz zwrócić -1, 0, lub inną wartość oznaczającą "błąd/wybierz czas"
