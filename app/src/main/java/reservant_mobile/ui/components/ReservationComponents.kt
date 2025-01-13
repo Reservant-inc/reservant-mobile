@@ -44,6 +44,7 @@ fun OrderFormContent(
     reservationViewModel: ReservationViewModel,
     restaurant: RestaurantDTO,
     getMenuPhoto: suspend (String) -> Bitmap?,
+    isReservation: Boolean
 ) {
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
@@ -161,33 +162,37 @@ fun OrderFormContent(
             }
         }
 
-        item {
-            Text(
-                text = stringResource(id = R.string.label_my_basket),
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
-
-        if (reservationViewModel.addedItems.isNotEmpty()) {
-            items(reservationViewModel.addedItems) { item ->
-                var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
-                LaunchedEffect(item.first.photo) {
-                    item.first.photo?.let { photo ->
-                        menuPhoto = getMenuPhoto(photo)
-                    }
-                }
-                CartItemCard(
-                    item = item,
-                    onIncreaseQuantity = { reservationViewModel.increaseItemQuantity(item) },
-                    onDecreaseQuantity = { reservationViewModel.decreaseItemQuantity(item) },
-                    onRemove = { reservationViewModel.removeItemFromCart(item) },
-                    photo = menuPhoto
+        if(!isReservation) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.label_my_basket),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
-        } else {
-            item { Text(text = stringResource(id = R.string.label_no_items_in_cart)) }
+        }
+
+        if(!isReservation) {
+            if (reservationViewModel.addedItems.isNotEmpty()) {
+                items(reservationViewModel.addedItems) { item ->
+                    var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                    LaunchedEffect(item.first.photo) {
+                        item.first.photo?.let { photo ->
+                            menuPhoto = getMenuPhoto(photo)
+                        }
+                    }
+                    CartItemCard(
+                        item = item,
+                        onIncreaseQuantity = { reservationViewModel.increaseItemQuantity(item) },
+                        onDecreaseQuantity = { reservationViewModel.decreaseItemQuantity(item) },
+                        onRemove = { reservationViewModel.removeItemFromCart(item) },
+                        photo = menuPhoto
+                    )
+                }
+            } else {
+                item { Text(text = stringResource(id = R.string.label_no_items_in_cart)) }
+            }
         }
 
         item {
@@ -263,7 +268,7 @@ fun OrderFormContent(
         item {
             Button(
                 onClick = {
-                    if (reservationViewModel.isReservationValid()) {
+                    if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
                         navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
                     }
                 }

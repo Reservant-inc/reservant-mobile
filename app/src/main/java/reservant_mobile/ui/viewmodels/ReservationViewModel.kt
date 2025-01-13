@@ -202,8 +202,8 @@ class ReservationViewModel(
         }
     }
 
-    fun isReservationValid(): Boolean {
-        return !(isDateError || isStartTimeError || isEndTimeError || isTipError() || isCartEmpty())
+    fun isReservationValid(isReservation: Boolean): Boolean {
+        return !(isDateError || isStartTimeError || isEndTimeError || isTipError() || (!isReservation && isCartEmpty()))
     }
 
     fun addItemToCart(menuItem: RestaurantMenuItemDTO) {

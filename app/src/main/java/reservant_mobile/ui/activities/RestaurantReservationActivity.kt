@@ -29,7 +29,8 @@ fun RestaurantReservationActivity(
     restaurantId: Int,
     navController: NavHostController,
     reservationViewModel: ReservationViewModel,
-    restaurantDetailVM: RestaurantDetailViewModel
+    restaurantDetailVM: RestaurantDetailViewModel,
+    isReservation: Boolean = false
 ) {
     val navControllerSummary = rememberNavController()
 
@@ -59,7 +60,8 @@ fun RestaurantReservationActivity(
                     restaurant = restaurantDetailVM.restaurant!!,
                     getMenuPhoto = { photoString ->
                         restaurantDetailVM.getPhoto(photoString)
-                    }
+                    },
+                    isReservation = isReservation
                 )
             }
         }
