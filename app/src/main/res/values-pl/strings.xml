@@ -496,4 +496,8 @@
     <string name="error_cart_empty">Koszyk nie może być pusty</string>
     <string name="error_place_order">Nie udało się złożyć zamówienia. Spróbuj ponownie.</string>
     <string name="error_create_visit">Nie udało się utworzyć wizyty. Spróbuj ponownie.</string>
+    <string name="error_date_not_selected">Nie wybrano daty</string>
+    <string name="error_date_past">Data nie może być wcześniejsza niż dziś</string>
+    <string name="error_start_time_before_now">Godzina rozpoczęcia nie może być wcześniejsza niż aktualna</string>
+    <string name="error_end_time_exceeded_length">Rezerwacja nie może przekraczać 1.5 godziny</string>
 </resources>

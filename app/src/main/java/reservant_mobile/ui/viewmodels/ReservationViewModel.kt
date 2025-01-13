@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.VisitsService
+import reservant_mobile.data.utils.ResourceProvider
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -30,10 +32,10 @@ import java.time.format.DateTimeFormatter
 class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
     private val visitsService: IVisitsService = VisitsService(),
-    private val deliveryService: IDeliveryService = DeliveryService()
+    private val deliveryService: IDeliveryService = DeliveryService(),
+    private val resourceProvider: ResourceProvider
 ) : ReservantViewModel() {
 
-    // Pola powiązane z formularzem
     var note: FormField = FormField(OrderDTO::note.name)
     var promoCode: FormField = FormField("promoCode")
     var orderCost by mutableStateOf(0.0)
@@ -51,7 +53,6 @@ class ReservationViewModel(
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
 
-    // Pola stanu błędu
     var errorMessage by mutableStateOf<String?>(null)
         private set
     var isDateError by mutableStateOf(false)
@@ -67,7 +68,6 @@ class ReservationViewModel(
     var endTimeErrorText by mutableStateOf<String?>(null)
         private set
 
-    // Flow na wyniki zapytań
     private val _orderResult = MutableStateFlow<Result<OrderDTO?>>(Result(isError = false, value = null))
     val orderResult: StateFlow<Result<OrderDTO?>> = _orderResult
 
@@ -77,7 +77,6 @@ class ReservationViewModel(
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
 
-    // Zaokrąglanie godzin "w górę" do najbliższej pełnej lub połówki
     private fun roundUpToNextHalfHour(time: LocalTime): LocalTime {
         val minute = time.minute
         return when {
@@ -87,7 +86,6 @@ class ReservationViewModel(
         }
     }
 
-    // Walidacja daty
     fun updateDate(dateString: String, restaurant: RestaurantDTO) {
         visitDate.value = dateString
         isDateError = false
@@ -95,7 +93,7 @@ class ReservationViewModel(
 
         if (dateString.isEmpty()) {
             isDateError = true
-            dateErrorText = "Nie wybrano daty"
+            dateErrorText = resourceProvider.getString(R.string.error_date_not_selected)
             return
         }
 
@@ -105,7 +103,7 @@ class ReservationViewModel(
 
             if (selectedDate.isBefore(today)) {
                 isDateError = true
-                dateErrorText = "Data nie może być wcześniejsza niż dziś"
+                dateErrorText = resourceProvider.getString(R.string.error_date_past)
                 return
             }
 
@@ -114,16 +112,15 @@ class ReservationViewModel(
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isDateError = true
-                dateErrorText = "Restauracja jest zamknięta w wybranym dniu"
+                dateErrorText = resourceProvider.getString(R.string.error_restaurant_closed)
             }
 
         } catch (e: Exception) {
             isDateError = true
-            dateErrorText = "Nieprawidłowy format daty"
+            dateErrorText = resourceProvider.getString(R.string.error_invalid_date_format)
         }
     }
 
-    // Walidacja godziny rozpoczęcia
     fun updateStartTime(timeString: String, restaurant: RestaurantDTO) {
         try {
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
@@ -134,7 +131,7 @@ class ReservationViewModel(
             val now = LocalTime.now()
             if (selectedDate.isEqual(LocalDate.now()) && roundedTime.isBefore(now)) {
                 isStartTimeError = true
-                startTimeErrorText = "Godzina rozpoczęcia nie może być wcześniejsza niż aktualna"
+                startTimeErrorText = resourceProvider.getString(R.string.error_start_time_before_now)
                 return
             }
 
@@ -143,7 +140,7 @@ class ReservationViewModel(
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isStartTimeError = true
-                startTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
+                startTimeErrorText = resourceProvider.getString(R.string.error_restaurant_closed)
                 return
             }
 
@@ -152,16 +149,15 @@ class ReservationViewModel(
 
             if (roundedTime.isBefore(ohFrom) || roundedTime.isAfter(ohUntil)) {
                 isStartTimeError = true
-                startTimeErrorText = "Godzina rozpoczęcia poza godzinami otwarcia"
+                startTimeErrorText = resourceProvider.getString(R.string.error_start_time_outside_opening_hours)
             }
 
         } catch (e: Exception) {
             isStartTimeError = true
-            startTimeErrorText = "Nieprawidłowy format godziny startu"
+            startTimeErrorText = resourceProvider.getString(R.string.error_invalid_date_format)
         }
     }
 
-    // Walidacja godziny zakończenia
     fun updateEndTime(timeString: String, restaurant: RestaurantDTO, skipRounding: Boolean = false) {
         try {
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
@@ -173,14 +169,14 @@ class ReservationViewModel(
 
             if (!finalEndTime.isAfter(start)) {
                 isEndTimeError = true
-                endTimeErrorText = "Czas zakończenia musi być późniejszy niż czas rozpoczęcia"
+                endTimeErrorText = resourceProvider.getString(R.string.error_end_time_before_start)
                 return
             }
 
             val diffMinutes = java.time.Duration.between(start, finalEndTime).toMinutes()
             if (diffMinutes > 90) {
                 isEndTimeError = true
-                endTimeErrorText = "Rezerwacja nie może przekraczać 1.5 godziny"
+                endTimeErrorText = resourceProvider.getString(R.string.error_end_time_exceeded_length)
                 return
             }
 
@@ -189,7 +185,7 @@ class ReservationViewModel(
 
             if (dayHours?.from == null || dayHours.until == null) {
                 isEndTimeError = true
-                endTimeErrorText = "Restauracja jest zamknięta w wybranym dniu"
+                endTimeErrorText = resourceProvider.getString(R.string.error_restaurant_closed)
                 return
             }
 
@@ -197,21 +193,19 @@ class ReservationViewModel(
             val ohUntil = LocalTime.parse(dayHours.until, DateTimeFormatter.ofPattern("HH:mm"))
             if (finalEndTime.isBefore(ohFrom) || finalEndTime.isAfter(ohUntil)) {
                 isEndTimeError = true
-                endTimeErrorText = "Godzina zakończenia poza godzinami otwarcia"
+                endTimeErrorText = resourceProvider.getString(R.string.error_end_time_outside_opening_hours)
             }
 
         } catch (e: Exception) {
             isEndTimeError = true
-            endTimeErrorText = "Nieprawidłowy format godziny zakończenia"
+            endTimeErrorText = resourceProvider.getString(R.string.error_invalid_date_format)
         }
     }
 
-    // Sprawdzenie czy rezerwacja jest poprawna
     fun isReservationValid(): Boolean {
         return !(isDateError || isStartTimeError || isEndTimeError || isTipError() || isCartEmpty())
     }
 
-    // Zarządzanie koszykiem
     fun addItemToCart(menuItem: RestaurantMenuItemDTO) {
         val existingItem = addedItems.find { it.first.menuItemId == menuItem.menuItemId }
         if (existingItem != null) {
@@ -245,7 +239,6 @@ class ReservationViewModel(
         }
     }
 
-    // Tworzenie wizyty i zamówienia
     fun createVisitAndOrder(
         restaurantId: Int,
         isTakeaway: Boolean,
@@ -291,7 +284,6 @@ class ReservationViewModel(
         }
     }
 
-    // Obsługa zamówień i dostaw
     fun createOrder() {
         viewModelScope.launch {
             val order = OrderDTO(
@@ -363,7 +355,6 @@ class ReservationViewModel(
     fun isVisitError(): Boolean = _visitResult.value.isError
     fun isDeliveryError(): Boolean = _deliveryResult.value.isError
 
-    // Walidacja napiwku
     fun isTipError(): Boolean {
         return tip < 0
     }

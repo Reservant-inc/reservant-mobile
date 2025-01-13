@@ -69,6 +69,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -85,6 +86,7 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.DefaultResourceProvider
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.ButtonComponent
@@ -111,6 +113,8 @@ import reservant_mobile.ui.viewmodels.ReviewsViewModel
 @Composable
 fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
+    val Context = LocalContext.current
+
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
@@ -129,7 +133,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
     val reservationViewModel: ReservationViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ReservationViewModel() as T
+                return ReservationViewModel(resourceProvider = DefaultResourceProvider(Context)) as T
             }
         }
     )

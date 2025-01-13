@@ -508,4 +508,8 @@
     <string name="error_cart_empty">Cart cannot be empty</string>
     <string name="error_place_order">Failed to place the order. Please try again.</string>
     <string name="error_create_visit">Failed to create visit. Please try again.</string>
+    <string name="error_date_not_selected">No date selected</string>
+    <string name="error_date_past">Date cannot be earlier than today</string>
+    <string name="error_start_time_before_now">Start time cannot be earlier than now</string>
+    <string name="error_end_time_exceeded_length">Reservation cannot exceed 1.5 hours</string>
 </resources>
