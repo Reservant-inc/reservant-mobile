@@ -517,4 +517,12 @@
     <string name="label_reservation_summary">Reservation Summary</string>
     <string name="label_reservation_details">Reservation Details</string>
     <string name="label_confirm_reservation">Confirm Reservation</string>
+    <string name="summary_label_date">Date:</string>
+    <string name="summary_label_time">Time:</string>
+    <string name="summary_label_note">Note:</string>
+    <string name="summary_label_tip">Tip:</string>
+    <string name="summary_label_total">Total:</string>
+    <string name="summary_label_confirm_reservation">Confirm Reservation</string>
+    <string name="summary_label_confirm_order">Confirm Order</string>
+    <string name="summary_label_cancel">Cancel</string>
 </resources>

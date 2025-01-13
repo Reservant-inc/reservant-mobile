@@ -9,16 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +28,6 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderSummaryActivity(
     reservationViewModel: ReservationViewModel,
@@ -46,7 +39,7 @@ fun OrderSummaryActivity(
     val context = LocalContext.current
 
     val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-        (menuItem.price ?: 0.0) * quantity
+        menuItem.price * quantity
     } + reservationViewModel.tip
 
     Column(
@@ -71,7 +64,7 @@ fun OrderSummaryActivity(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        if(!isReservation) {
+        if (!isReservation) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.label_item),
@@ -125,12 +118,12 @@ fun OrderSummaryActivity(
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Date:",
+                text = stringResource(R.string.summary_label_date),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Start
             )
             Text(
-                text = reservationViewModel.visitDate.value ?: "",
+                text = reservationViewModel.visitDate.value,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.End
             )
@@ -138,7 +131,7 @@ fun OrderSummaryActivity(
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Time:",
+                text = stringResource(R.string.summary_label_time),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Start
             )
@@ -149,22 +142,24 @@ fun OrderSummaryActivity(
             )
         }
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Note:",
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Start
-            )
-            Text(
-                text = reservationViewModel.note.value ?: "",
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.End
-            )
+        if (!isReservation) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.summary_label_note),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Start
+                )
+                Text(
+                    text = reservationViewModel.note.value,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
         }
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Tip:",
+                text = stringResource(R.string.summary_label_tip),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Start
             )
@@ -175,13 +170,12 @@ fun OrderSummaryActivity(
             )
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Suma zamówienia
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Total:",
+                    text = stringResource(R.string.summary_label_total),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Start,
                     fontWeight = FontWeight.Bold
@@ -230,4 +224,3 @@ fun OrderSummaryActivity(
         )
     }
 }
-
