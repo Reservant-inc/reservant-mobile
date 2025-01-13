@@ -194,10 +194,9 @@ fun OrderSummaryActivity(
         ButtonComponent(
             onClick = {
                 reservationViewModel.viewModelScope.launch {
-                    reservationViewModel.createVisit(
-                        restaurantId = restaurantId
-                    )
-                    if (!isReservation) {
+                    val visitResult = reservationViewModel.createVisit(restaurantId)
+
+                    if (!visitResult.isError && !isReservation) {
                         reservationViewModel.createOrder()
                     }
                 }

@@ -287,30 +287,26 @@ class ReservationViewModel(
         }
     }
 
-    fun createVisit(
-        restaurantId: Int
-    ) {
-        viewModelScope.launch {
-            val visit = VisitDTO(
-                date = "${visitDate.value}T${startTime.value}",
-                endTime = "${visitDate.value}T${endTime.value}",
-                numberOfGuests = numberOfGuests,
-                tip = tip,
-                takeaway = isTakeaway,
-                restaurantId = restaurantId,
-                participantIds = participantIds
-            )
-            val visitResult = visitsService.createVisit(visit)
-            _visitResult.value = visitResult
+    suspend fun createVisit(restaurantId: Int): Result<VisitDTO?> {
+        val visit = VisitDTO(
+            date = "${visitDate.value}T${startTime.value}",
+            endTime = "${visitDate.value}T${endTime.value}",
+            numberOfGuests = numberOfGuests,
+            tip = tip,
+            takeaway = isTakeaway,
+            restaurantId = restaurantId,
+            participantIds = participantIds
+        )
+        val visitResult = visitsService.createVisit(visit)
+        _visitResult.value = visitResult
 
-            if (visitResult.isError) {
-                resourceProvider.showToast(resourceProvider.getString(R.string.error_create_visit))
-            } else {
-                visitId = visitResult.value!!.visitId!!
-                addedItems.clear()
-                errorMessage = null
-            }
+        if (visitResult.isError) {
+            resourceProvider.showToast(resourceProvider.getString(R.string.error_create_visit))
+        } else {
+            visitId = visitResult.value!!.visitId!!
+            errorMessage = null
         }
+        return visitResult
     }
 
     fun getVisit(visitId: Any) {
