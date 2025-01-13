@@ -242,7 +242,8 @@ class ReservationViewModel(
     fun createVisitAndOrder(
         restaurantId: Int,
         isTakeaway: Boolean,
-        isDelivery: Boolean
+        isDelivery: Boolean,
+        isReservation: Boolean
     ) {
         viewModelScope.launch {
             val visit = VisitDTO(
@@ -255,27 +256,35 @@ class ReservationViewModel(
                 participantIds = participantIds
             )
             val visitResult = visitsService.createVisit(visit)
-            if (!visitResult.isError && visitResult.value != null) {
-                val visitId = visitResult.value!!.visitId
-                val orderItems = addedItems.map { (menuItem, quantity) ->
-                    OrderDTO.OrderItemDTO(
-                        menuItemId = menuItem.menuItemId,
-                        amount = quantity
-                    )
-                }
-                val order = OrderDTO(
-                    visitId = visitId,
-                    note = note.value,
-                    items = orderItems
-                )
-                val orderResult = ordersService.createOrder(order)
-                _orderResult.value = orderResult
 
-                if (orderResult.isError) {
-                    errorMessage = "Failed to place order. Please try again."
-                } else {
-                    addedItems.clear()
+            if (!visitResult.isError && visitResult.value != null) {
+                if (isReservation) {
+                    // Tylko tworzenie wizyty, jeśli to rezerwacja
+                    _visitResult.value = visitResult
                     errorMessage = null
+                } else {
+                    // Pełny proces z tworzeniem zamówienia
+                    val visitId = visitResult.value!!.visitId
+                    val orderItems = addedItems.map { (menuItem, quantity) ->
+                        OrderDTO.OrderItemDTO(
+                            menuItemId = menuItem.menuItemId,
+                            amount = quantity
+                        )
+                    }
+                    val order = OrderDTO(
+                        visitId = visitId,
+                        note = note.value,
+                        items = orderItems
+                    )
+                    val orderResult = ordersService.createOrder(order)
+                    _orderResult.value = orderResult
+
+                    if (orderResult.isError) {
+                        errorMessage = "Failed to place order. Please try again."
+                    } else {
+                        addedItems.clear()
+                        errorMessage = null
+                    }
                 }
             } else {
                 _visitResult.value = visitResult
@@ -283,6 +292,7 @@ class ReservationViewModel(
             }
         }
     }
+
 
     fun createOrder() {
         viewModelScope.launch {

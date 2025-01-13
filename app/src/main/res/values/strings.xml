@@ -512,4 +512,9 @@
     <string name="error_date_past">Date cannot be earlier than today</string>
     <string name="error_start_time_before_now">Start time cannot be earlier than now</string>
     <string name="error_end_time_exceeded_length">Reservation cannot exceed 1.5 hours</string>
+    <string name="reservation_make_reservation">Reserve a table</string>
+    <string name="submit_reservation">Submit Reservation</string>
+    <string name="label_reservation_summary">Reservation Summary</string>
+    <string name="label_reservation_details">Reservation Details</string>
+    <string name="label_confirm_reservation">Confirm Reservation</string>
 </resources>

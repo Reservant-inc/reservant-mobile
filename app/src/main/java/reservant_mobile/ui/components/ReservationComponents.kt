@@ -219,15 +219,18 @@ fun OrderFormContent(
         item {
             Text(text = stringResource(id = R.string.tip_label))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(5, 10, 15).forEach { percentage ->
-                    Button(onClick = {
-                        val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-                            (menuItem.price ?: 0.0) * quantity
+            if(!isReservation) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(5, 10, 15).forEach { percentage ->
+                        Button(onClick = {
+                            val totalCost =
+                                reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                                    (menuItem.price ?: 0.0) * quantity
+                                }
+                            reservationViewModel.tip = totalCost * percentage / 100.0
+                        }) {
+                            Text(text = "$percentage%")
                         }
-                        reservationViewModel.tip = totalCost * percentage / 100.0
-                    }) {
-                        Text(text = "$percentage%")
                     }
                 }
             }
@@ -243,38 +246,40 @@ fun OrderFormContent(
             )
         }
 
-        item {
-            FormInput(
-                inputText = reservationViewModel.note.value,
-                onValueChange = { reservationViewModel.note.value = it },
-                label = stringResource(id = R.string.label_write_note),
-                optional = true
-            )
-        }
-
-        item {
-            val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-                (menuItem.price ?: 0.0) * quantity
+        if(!isReservation) {
+            item {
+                FormInput(
+                    inputText = reservationViewModel.note.value,
+                    onValueChange = { reservationViewModel.note.value = it },
+                    label = stringResource(id = R.string.label_write_note),
+                    optional = true
+                )
             }
-            val formattedPrice = String.format("%.2f", totalCost)
 
-            Text(
-                text = "${stringResource(id = R.string.label_order_cost)}: $formattedPrice zł",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        item {
-            Button(
-                onClick = {
-                    if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
-                        navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId))
-                    }
+            item {
+                val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                    (menuItem.price ?: 0.0) * quantity
                 }
-            ) {
-                Text(text = stringResource(id = R.string.submit_order))
+                val formattedPrice = String.format("%.2f", totalCost)
+
+                Text(
+                    text = "${stringResource(id = R.string.label_order_cost)}: $formattedPrice zł",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
+        }
+
+        item {
+            ButtonComponent(
+                label = stringResource(
+                    id = if (isReservation) R.string.submit_reservation else R.string.submit_order
+                ),
+                onClick = {
+                if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
+                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId, isReservation = isReservation))
+                }
+            })
         }
     }
 }

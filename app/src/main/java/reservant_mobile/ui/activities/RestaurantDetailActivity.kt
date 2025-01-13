@@ -292,6 +292,19 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                         HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
 
                                         OpeningHours(openingHours = restaurant.openingHours)
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        ButtonComponent(
+                                            label = stringResource(id = R.string.reservation_make_reservation),
+                                            onClick = {
+                                            navController.navigate(
+                                                RestaurantRoutes.Reservation(
+                                                    restaurantId = restaurantId,
+                                                    isReservation = true
+                                                )
+                                            )
+                                        })
                                     }
                                 }
 
@@ -459,7 +472,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                         },
                         onSubmitOrder = {
                             // Proceed to Reservation screen
-                            navController.navigate(RestaurantRoutes.Reservation(restaurantId = restaurantId))
+                            navController.navigate(RestaurantRoutes.Reservation(restaurantId = restaurantId, isReservation = false))
                             isCartVisible = false
                         },
                         getMenuPhoto = { photoString ->
@@ -474,7 +487,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId,
                 navController = navController,
                 reservationViewModel = reservationViewModel,
-                restaurantDetailVM = restaurantDetailVM)
+                restaurantDetailVM = restaurantDetailVM,
+                isReservation = it.toRoute<RestaurantRoutes.Reservation>().isReservation)
         }
 
         composable<RestaurantRoutes.AddReview> {

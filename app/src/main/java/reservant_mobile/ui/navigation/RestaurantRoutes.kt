@@ -26,7 +26,8 @@ data object RestaurantRoutes {
 
     @Serializable
     data class Reservation(
-        val restaurantId: Int
+        val restaurantId: Int,
+        val isReservation: Boolean
     )
 
     @Serializable
@@ -34,7 +35,8 @@ data object RestaurantRoutes {
 
     @Serializable
     data class Summary(
-        val restaurantId: Int
+        val restaurantId: Int,
+        val isReservation: Boolean
     )
 
     @Serializable

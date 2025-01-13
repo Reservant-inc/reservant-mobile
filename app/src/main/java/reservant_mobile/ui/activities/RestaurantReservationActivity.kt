@@ -30,13 +30,13 @@ fun RestaurantReservationActivity(
     navController: NavHostController,
     reservationViewModel: ReservationViewModel,
     restaurantDetailVM: RestaurantDetailViewModel,
-    isReservation: Boolean = false
+    isReservation: Boolean
 ) {
     val navControllerSummary = rememberNavController()
 
     NavHost(
         navController = navControllerSummary,
-        startDestination = RestaurantRoutes.Reservation(restaurantId = restaurantId)
+        startDestination = RestaurantRoutes.Reservation(restaurantId = restaurantId, isReservation = isReservation)
     ) {
         composable<RestaurantRoutes.Reservation> {
             Scaffold(
@@ -67,9 +67,10 @@ fun RestaurantReservationActivity(
         }
         composable<RestaurantRoutes.Summary> {
             OrderSummaryActivity(
-                restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId,
+                restaurantId = it.toRoute<RestaurantRoutes.Summary>().restaurantId,
                 reservationViewModel = reservationViewModel,
-                navController = navController
+                navController = navController,
+                isReservation = it.toRoute<RestaurantRoutes.Summary>().isReservation,
             )
         }
     }
