@@ -288,7 +288,8 @@ fun EmployeeHomeActivity() {
                             onClick = {
                                 innerNavController.navigate(
                                     RestaurantRoutes.Reservation(
-                                        restaurantId = restaurant.restaurantId
+                                        restaurantId = restaurant.restaurantId,
+                                        isReservation = true
                                     )
                                 )
                             }

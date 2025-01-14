@@ -2,10 +2,12 @@ package reservant_mobile.ui.components
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
@@ -44,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -77,7 +80,9 @@ fun FormInput(
     maxLines: Int = 1,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
-    isDisabled: Boolean = false
+    isDisabled: Boolean = false,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    readOnly: Boolean = false
 ) {
 
     var beginValidation: Boolean by remember {
@@ -131,8 +136,10 @@ fun FormInput(
             maxLines = maxLines,
             singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
-            enabled = !isDisabled
-            )
+            enabled = !isDisabled,
+            interactionSource = interactionSource,
+            readOnly = readOnly
+        )
         if (isError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
@@ -148,20 +155,50 @@ fun MyTimePickerDialog(
     initialTime: String = "",
     onTimeSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onlyHalfHours: Boolean = false,
+    minTime: String? = null,
+    isError: Boolean = false,
+    errorText: String? = null
 ) {
+    val context = LocalContext.current
     val currentTime = Calendar.getInstance()
+
     val initialHour = if (initialTime.isNotEmpty()) initialTime.substringBefore(":").toInt() else currentTime.get(Calendar.HOUR_OF_DAY)
     val initialMinute = if (initialTime.isNotEmpty()) initialTime.substringAfter(":").toInt() else currentTime.get(Calendar.MINUTE)
 
     val timePickerState = rememberTimePickerState(
         initialHour = initialHour,
         initialMinute = initialMinute,
-        is24Hour = true,
+        is24Hour = true
     )
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf(String.format("%02d:%02d", initialHour, initialMinute)) }
+
+    LaunchedEffect(Unit) {
+        onTimeSelected(selectedTime)
+    }
+
+    fun parseTimeToMinutes(timeString: String): Int {
+        if (timeString.isBlank() || !timeString.contains(":")) {
+            // Możesz zwrócić -1, 0, lub inną wartość oznaczającą "błąd/wybierz czas"
+            return -1
+        }
+
+        val parts = timeString.split(":")
+        if (parts.size != 2) {
+            return -1
+        }
+        val hour = parts[0].toIntOrNull() ?: return -1
+        val minute = parts[1].toIntOrNull() ?: return -1
+
+        return hour * 60 + minute
+    }
+
+    fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 
     Column(modifier = modifier) {
         OutlinedButton(
@@ -184,9 +221,42 @@ fun MyTimePickerDialog(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
                     TextButton(onClick = {
-                        val hour = timePickerState.hour
-                        val minute = timePickerState.minute
-                        selectedTime = String.format("%02d:%02d", hour, minute)
+                        var hour = timePickerState.hour
+                        var minute = timePickerState.minute
+
+                        // Logika half hours
+                        // Jeśli minTime != null, zawsze używamy half hours
+                        // Jeśli minTime == null, używamy half hours tylko jeśli onlyHalfHours = true
+                        val enforceHalfHours = minTime != null || onlyHalfHours
+
+                        if (enforceHalfHours) {
+                            when {
+                                minute == 0 || minute == 30 -> {
+                                }
+                                minute < 30 -> {
+                                    minute = 30
+                                }
+                                else -> {
+                                    minute = 0
+                                    hour = (hour + 1) % 24
+                                }
+                            }
+                        }
+
+                        val chosenTime = String.format("%02d:%02d", hour, minute)
+
+                        // Jeśli minTime != null, sprawdzamy czy chosenTime > minTime
+                        if (minTime != null) {
+                            val chosenMinutes = parseTimeToMinutes(chosenTime)
+                            val minMinutes = parseTimeToMinutes(minTime)
+                            if (chosenMinutes <= minMinutes) {
+                                // Musi być ściśle większy
+                                showToast(context.getString(R.string.time_too_early))
+                                return@TextButton
+                            }
+                        }
+
+                        selectedTime = chosenTime
                         onTimeSelected(selectedTime)
                         showDialog = false
                     }) {
@@ -201,6 +271,14 @@ fun MyTimePickerDialog(
                 text = {
                     TimeInput(state = timePickerState)
                 }
+            )
+        }
+        if (isError) {
+            Text(
+                text = errorText ?: "",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
     }
@@ -313,16 +391,19 @@ fun FormFileInput(
     }
 }
 
-
 @Composable
 fun MyDatePickerDialog(
     modifier: Modifier = Modifier,
     onDateChange: (String) -> Unit,
-    label: @Composable (() -> Unit)? = { Text(stringResource(R.string.label_register_birthday_select)) },
+    label: String = stringResource(R.string.label_register_birthday_select),
     startStringValue: String = stringResource(id = R.string.label_register_birthday_dialog),
     allowFutureDates: Boolean = false,
+    allowPastDates: Boolean = true,
     startDate: String = (LocalDate.now().year - 28).toString() + "-06-15",
-    shape: RoundedCornerShape = RoundedCornerShape(8.dp)
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
+    isError: Boolean = false,
+    errorText: String? = null,
+    optional: Boolean = false
 ) {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -331,6 +412,7 @@ fun MyDatePickerDialog(
         onDateSelected: (String) -> Unit,
         onDismiss: () -> Unit,
         allowFutureDates: Boolean,
+        allowPastDates: Boolean,
         startDate: String
     ) {
         fun convertMillisToDate(millis: Long): String {
@@ -355,10 +437,17 @@ fun MyDatePickerDialog(
             initialSelectedDateMillis = convertDateToMillis(startDate),
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return if (allowFutureDates) {
-                        true
-                    } else {
-                        utcTimeMillis <= System.currentTimeMillis()
+                    val today = System.currentTimeMillis()
+                    val startOfToday = LocalDate.now()
+                        .atStartOfDay()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+
+                    return when {
+                        !allowFutureDates && utcTimeMillis > today -> false
+                        !allowPastDates && utcTimeMillis < startOfToday -> false
+                        else -> true
                     }
                 }
             }
@@ -390,16 +479,16 @@ fun MyDatePickerDialog(
         }
     }
 
-
     var date by remember { mutableStateOf(startStringValue) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = date,
+    FormInput(
+        inputText = date,
         onValueChange = { },
         label = label,
         readOnly = true,
         shape = shape,
+        optional = optional,
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
@@ -412,7 +501,9 @@ fun MyDatePickerDialog(
                         }
                     }
                 }
-            }
+            },
+        isError = isError,
+        errorText = errorText?:""
     )
 
     if (showDatePicker) {
@@ -423,12 +514,10 @@ fun MyDatePickerDialog(
             },
             onDismiss = { showDatePicker = false },
             allowFutureDates = allowFutureDates,
+            allowPastDates = allowPastDates,
             startDate = startDate
         )
-
     }
-
-
 }
 
 @Composable

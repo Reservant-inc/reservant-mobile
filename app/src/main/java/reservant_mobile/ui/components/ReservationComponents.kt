@@ -1,359 +1,428 @@
 package reservant_mobile.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
-import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.RestaurantDTO
+import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
-
+@SuppressLint("DefaultLocale")
 @Composable
-fun DeliveryContent(
+fun OrderFormContent(
     navController: NavHostController,
-    viewModel: ReservationViewModel,
-    modifier: Modifier = Modifier
+    reservationViewModel: ReservationViewModel,
+    restaurant: RestaurantDTO,
+    getMenuPhoto: suspend (String) -> Bitmap?,
+    isReservation: Boolean
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Text(
-            text = stringResource(R.string.label_delivery),
-            style = MaterialTheme.typography.headlineSmall
-        )
+    var isTakeaway by remember { mutableStateOf(false) }
+    var isDelivery by remember { mutableStateOf(false) }
 
-        FormInput(
-            inputText = viewModel.deliveryAddress.value,
-            onValueChange = {
-                viewModel.deliveryAddress.value = it // Update ViewModel
-            },
-            label = stringResource(R.string.label_delivery_address)
-        )
-        
-        Spacer(modifier = Modifier.padding(8.dp))
+    val now = LocalTime.now()
+    val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
+    val isToday = reservationViewModel.visitDate.value == LocalDate.now().toString()
 
-        Text(
-            text = stringResource(R.string.label_my_basket),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(2) {
-                OrderCard(
-                    itemName = "Danie1",
-                    itemCount = 1,
-                    itemCost = 30.0,
-                    onIncreaseClick = { /* TODO: Handle increase item count */ },
-                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
-                )
-            }
+    fun roundToNearestHalfHour(time: LocalTime): LocalTime {
+        val minute = time.minute
+        return when {
+            minute == 0 || minute == 30 -> time
+            minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
+            else -> time.withMinute(0).withSecond(0).withNano(0).plusHours(1)
         }
-
-        FormInput(
-            inputText = viewModel.note.value,
-            onValueChange = {
-                viewModel.note.value = it // Update ViewModel
-            },
-            label = stringResource(R.string.label_write_note)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ButtonComponent(
-            onClick = {
-                navController.navigate(RestaurantRoutes.Summary)
-            },
-            label = stringResource(R.string.label_order_delivery),
-        )
     }
-}
 
-@Composable
-fun TakeawayContent(
-    navController: NavHostController,
-    viewModel: ReservationViewModel,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
+    val nearestHalfHour = roundToNearestHalfHour(now)
+    val nextHour = nearestHalfHour.plusHours(1)
+
+    LazyColumn(
+        modifier = Modifier
             .fillMaxSize()
-            .padding(top = 16.dp, end = 8.dp, start = 8.dp, bottom = 16.dp)
+            .padding(16.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.label_my_basket),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        item { Spacer(modifier = Modifier.height(36.dp)) }
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(2) {
-                OrderCard(
-                    itemName = "Danie1",
-                    itemCount = 1,
-                    itemCost = 30.0,
-                    onIncreaseClick = { /* TODO: Handle increase item count */ },
-                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(id = R.string.label_takeaway),
+                    modifier = Modifier.padding(end = 8.dp)
                 )
-            }
-        }
-
-        FormInput(
-            inputText = viewModel.note.value,
-            onValueChange = {
-                viewModel.note.value = it
-            },
-            label = stringResource(R.string.label_write_note),
-            isError = false
-        )
-
-        FormInput(
-            inputText = viewModel.promoCode.value,
-            onValueChange = {
-                viewModel.promoCode.value = it
-            },
-            label = stringResource(R.string.label_enter_promo_code),
-            isError = false
-        )
-
-        Row{
-            Text(
-                text = stringResource(R.string.label_total_amount),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = " ${viewModel.orderCost} zł",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        ButtonComponent(
-            onClick = {
-                navController.navigate(RestaurantRoutes.Summary)
-            },
-            label = stringResource(R.string.label_order_summary)
-        )
-    }
-}
-
-
-@Composable
-fun DineInContent(
-    navController: NavHostController,
-    viewModel: ReservationViewModel,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.label_reservation),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
-        )
-
-        // Date Picker Dialog
-        MyDatePickerDialog(
-            label = { Text(stringResource(id = R.string.label_reservation_date)) },
-            onDateChange = { selectedDate ->
-                // Handle date change
-                viewModel.visitDate.value = selectedDate
-            },
-            startDate = LocalDate.now().toString(),
-            allowFutureDates = true
-        )
-
-        // Number of Guests
-        Text(
-            text = stringResource(id = R.string.label_number_of_guests),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = { if (viewModel.seats > 1) viewModel.seats-- },
-                color = MaterialTheme.colorScheme.primary,
-                enabled = viewModel.seats > 1,
-                icon = "-"
-            )
-            Text(
-                text = viewModel.seats.toString(),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            IconButton(
-                onClick = { if (viewModel.seats < 10) viewModel.seats++ },
-                color = MaterialTheme.colorScheme.primary,
-                enabled = viewModel.seats < 10,
-                icon = "+"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Order Summary Header
-        Text(
-            text = stringResource(id = R.string.label_order_summary),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(2) {
-                OrderCard(
-                    itemName = "Danie1",
-                    itemCount = 1,
-                    itemCost = 30.0,
-                    onIncreaseClick = { /* TODO: Handle increase item count */ },
-                    onDecreaseClick = { /* TODO: Handle decrease item count */ }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Comment Input
-        FormInput(
-            inputText = viewModel.note.value,
-            onValueChange = {
-                viewModel.note.value = it
-            },
-            label = stringResource(id = R.string.label_write_note),
-            isError = false
-        )
-
-        // Promo Code Input
-        FormInput(
-            inputText = viewModel.promoCode.value,
-            onValueChange = { viewModel.promoCode.value = it },
-            label = stringResource(id = R.string.label_enter_promo_code),
-            isError = false
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Total Cost Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(id = R.string.label_total_cost),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "${viewModel.orderCost} zł", // Example total cost
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Submit Button
-        ButtonComponent(
-            onClick = {
-                navController.navigate(RestaurantRoutes.Summary)
-            },
-            label = stringResource(id = R.string.label_order_summary)
-        )
-    }
-}
-
-@Composable
-fun OrderCard(
-    itemName: String,
-    itemCount: Int,
-    itemCost: Double,
-    onIncreaseClick: () -> Unit,
-    onDecreaseClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White, shape = RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-            .padding(16.dp)
-    ) {
-        Column {
-            // Row for item details and quantity controls
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = itemName, style = MaterialTheme.typography.bodyLarge)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "${stringResource(R.string.label_quantity)}: $itemCount", style = MaterialTheme.typography.bodyLarge)
-                    IconButton(
-                        onClick = onDecreaseClick,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Remove,
-                            contentDescription = stringResource(R.string.label_decrease_quantity)
-                        )
+                Switch(
+                    checked = isTakeaway,
+                    onCheckedChange = {
+                        isTakeaway = it
+                        reservationViewModel.isTakeaway = it
                     }
-                    IconButton(
-                        onClick = onIncreaseClick,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.label_increase_quantity)
-                        )
+                )
+            }
+        }
+
+        item {
+            MyDatePickerDialog(
+                label = stringResource(id = R.string.label_reservation_date),
+                startStringValue = reservationViewModel.visitDate.value,
+                onDateChange = { selectedDate ->
+                    reservationViewModel.updateDate(selectedDate, restaurant)
+                },
+                startDate = LocalDate.now().toString(),
+                allowFutureDates = true,
+                allowPastDates = false,
+                isError = reservationViewModel.isDateError,
+                errorText = reservationViewModel.dateErrorText
+            )
+
+            val selectedDate = LocalDate.parse(reservationViewModel.visitDate.value)
+            val dayIndex = selectedDate.dayOfWeek.value - 1
+            val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
+            if (dayHours != null) {
+                Text(
+                    text = stringResource(id = R.string.opening_hours, dayHours.from?: "-", dayHours.until?: "-"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            } else {
+                Text(
+                    text = stringResource(id = R.string.restaurant_closed),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.weight(0.45f)) {
+                    MyTimePickerDialog(
+                        initialTime = nearestHalfHour.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        onTimeSelected = { time ->
+                            reservationViewModel.updateStartTime(time, restaurant)
+                        },
+                        modifier = Modifier.scale(0.85f),
+                        onlyHalfHours = true,
+                        minTime = if (isToday) nowFormatted else null,
+                        isError = reservationViewModel.isStartTimeError,
+                        errorText = reservationViewModel.startTimeErrorText
+                    )
+                }
+
+                Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
+
+                Box(modifier = Modifier.weight(0.45f)) {
+                    MyTimePickerDialog(
+                        initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        onTimeSelected = { time ->
+                            reservationViewModel.updateEndTime(time, restaurant)
+                        },
+                        modifier = Modifier.scale(0.85f),
+                        onlyHalfHours = true,
+                        minTime = reservationViewModel.startTime.value,
+                        isError = reservationViewModel.isEndTimeError,
+                        errorText = reservationViewModel.endTimeErrorText
+                    )
+                }
+            }
+        }
+
+        if(!isReservation) {
+            item {
+                Text(
+                    text = stringResource(id = R.string.label_my_basket),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+        }
+
+        if(!isReservation) {
+            if (reservationViewModel.addedItems.isNotEmpty()) {
+                items(reservationViewModel.addedItems) { item ->
+                    var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                    LaunchedEffect(item.first.photo) {
+                        item.first.photo?.let { photo ->
+                            menuPhoto = getMenuPhoto(photo)
+                        }
+                    }
+                    CartItemCard(
+                        item = item,
+                        onIncreaseQuantity = { reservationViewModel.increaseItemQuantity(item) },
+                        onDecreaseQuantity = { reservationViewModel.decreaseItemQuantity(item) },
+                        onRemove = { reservationViewModel.removeItemFromCart(item) },
+                        photo = menuPhoto
+                    )
+                }
+            } else {
+                item { Text(text = stringResource(id = R.string.label_no_items_in_cart)) }
+            }
+        }
+
+        item {
+            Text(text = stringResource(id = R.string.label_number_of_guests))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(
+                    onClick = {
+                        if (reservationViewModel.numberOfGuests > reservationViewModel.participantIds.size + 1)
+                            reservationViewModel.numberOfGuests--
+                    }
+                ) {
+                    Icon(Icons.Default.Remove, contentDescription = null)
+                }
+                Text(text = reservationViewModel.numberOfGuests.toString())
+                IconButton(onClick = { reservationViewModel.numberOfGuests++ }) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                }
+            }
+        }
+
+        item {
+            Text(text = stringResource(id = R.string.tip_label))
+
+            if(!isReservation) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(5, 10, 15).forEach { percentage ->
+                        Button(onClick = {
+                            val totalCost =
+                                reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                                    (menuItem.price ?: 0.0) * quantity
+                                }
+                            reservationViewModel.tip = totalCost * percentage / 100.0
+                        }) {
+                            Text(text = "$percentage%")
+                        }
                     }
                 }
             }
-            // Text for item cost
-            Text(
-                text = "${stringResource(R.string.label_cost)}: ${itemCost}zł",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp)
+
+            FormInput(
+                inputText = if (reservationViewModel.tip == 0.0) "" else String.format("%.2f", reservationViewModel.tip),
+                onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
+                label = stringResource(id = R.string.tip_label),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+                optional = true,
+                isError = reservationViewModel.isTipError(),
+                errorText = stringResource(id = R.string.error_tip)
             )
+        }
+
+        if(!isReservation) {
+            item {
+                FormInput(
+                    inputText = reservationViewModel.note.value,
+                    onValueChange = { reservationViewModel.note.value = it },
+                    label = stringResource(id = R.string.label_write_note),
+                    optional = true
+                )
+            }
+
+            item {
+                val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                    (menuItem.price ?: 0.0) * quantity
+                }
+                val formattedPrice = String.format("%.2f", totalCost)
+
+                Text(
+                    text = "${stringResource(id = R.string.label_order_cost)}: $formattedPrice zł",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        item {
+            ButtonComponent(
+                label = stringResource(
+                    id = if (isReservation) R.string.submit_reservation else R.string.submit_order
+                ),
+                onClick = {
+                if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
+                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId, isReservation = isReservation))
+                }
+            })
+        }
+    }
+}
+
+
+@Composable
+fun CartItemCard(
+    item: Pair<RestaurantMenuItemDTO, Int>,
+    photo: Bitmap? = null,
+    onInfoClick: () -> Unit = {},
+    onIncreaseQuantity: () -> Unit = {},
+    onDecreaseQuantity: () -> Unit = {},
+    onRemove: () -> Unit = {}
+) {
+    val (menuItem, quantity) = item
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = menuItem.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    menuItem.alternateName?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.label_menu_price) + ": ${menuItem.price} zł",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    menuItem.alcoholPercentage?.let {
+                        Text(
+                            text = "Alcohol Percentage: ${it}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+
+                if (photo != null) {
+                    Image(
+                        bitmap = photo.asImageBitmap(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.unknown_image),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = onInfoClick,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Info",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                IconButton(
+                    onClick = onDecreaseQuantity,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.label_decrease_quantity),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Text(
+                    text = quantity.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                IconButton(
+                    onClick = onIncreaseQuantity,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.label_increase_quantity),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(start = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.remove),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
