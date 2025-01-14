@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,12 +17,15 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.TableChart
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,6 +84,33 @@ fun EmployeeTablesActivity(
                     title = { Text(text = "Dodawanie stolika") },
                     text = {
                         Column {
+                            
+                            if (tablesViewModel.isEditSelected) {
+                                Button(onClick = {
+                                    tablesViewModel.isEditSelected = false
+                                }, modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
+                                ) {
+                                    Row {
+                                        Icon(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterVertically)
+                                                .padding(4.dp),
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Add table",
+                                            tint = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterVertically)
+                                                .padding(4.dp),
+                                            text = "Delete table"
+                                        )
+                                    }
+                                }
+                            }
+                            
                             FormInput(
                                 label = stringResource(id = R.string.number_of_people_label).removeSuffix(":"),
                                 inputText = (tablesViewModel.numberOfPeople ?: 0).toString(),
@@ -135,7 +167,10 @@ fun EmployeeTablesActivity(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(tables) { table ->
-                TableCard(table = table)
+                TableCard(table = table, onClick = {
+                    tablesViewModel.selectedTable = table
+                    tablesViewModel.isEditSelected = true
+                })
             }
         }
     }
@@ -160,16 +195,14 @@ fun EmployeeTablesActivity(
 }
 
 @Composable
-fun TableCard(table: TableDTO) {
+fun TableCard(
+    table: TableDTO,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .then(
-                if (
-                /**table.status**/
-                    "Available" == "Occupied") Modifier.clickable { /**TODO**/ }
-                else Modifier
-            ),
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = when ( /**table.status**/ "Available") { //TODO
