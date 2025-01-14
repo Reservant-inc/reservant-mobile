@@ -23,6 +23,7 @@ class RestaurantManagementViewModel(
     var selectedRestaurant: RestaurantDTO? by mutableStateOf(null)
     var selectedGroup: RestaurantGroupDTO? by mutableStateOf(null)
     var selectedRestaurantLogo: Bitmap? by mutableStateOf(null)
+    var newGroupName: String by mutableStateOf("")
     var isLoading: Boolean by mutableStateOf(false)
 
 
@@ -44,6 +45,20 @@ class RestaurantManagementViewModel(
         isGroupSelected = true
         isLoading = false
         return selectedGroup
+    }
+
+    suspend fun editGroupName(newGroupName: String): Boolean{
+
+        val result = restaurantService.editGroup(
+            selectedGroup!!.restaurantGroupId.toString(),
+            newGroupName
+        )
+
+        if(!result.isError){
+            loadGroups()
+            return true
+        }
+        return false
     }
 
     suspend fun deleteGroup(groupId: Int): Boolean {
@@ -72,6 +87,10 @@ class RestaurantManagementViewModel(
     suspend fun deleteRestaurant(id: Int) {
         restaurantService.deleteRestaurant(id)
         loadGroups() // Reloading groups
+    }
+
+    fun isGroupNameInvalid(): Boolean{
+        return newGroupName.isBlank()
     }
 
 }

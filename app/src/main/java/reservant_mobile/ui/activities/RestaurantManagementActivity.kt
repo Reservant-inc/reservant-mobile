@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -29,12 +32,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Dining
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material.icons.outlined.Reviews
 import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,7 +47,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -98,7 +106,16 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
     var showDeleteRestaurantPopup by remember { mutableStateOf(false) }
     var showDeleteGroupPopup by remember { mutableStateOf(false) }
+    var showEditGroupPopup by remember { mutableStateOf(false) }
+    var editFormSent by remember { mutableStateOf(false) }
+    var newGroupName by remember { mutableStateOf("") }
 
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.secondary
+        )
+    )
 
     if(showDeleteRestaurantPopup)  {
         val restaurant = restaurantManageVM.selectedRestaurant
@@ -157,6 +174,67 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 }
             )
         }
+    }
+
+    if(showEditGroupPopup){
+        AlertDialog(
+            onDismissRequest = {
+                showEditGroupPopup = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.label_new_group_name),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = newGroupName,
+                        onValueChange = { newGroupName = it },
+                        label = { stringResource(R.string.label_group) },
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = restaurantManageVM.isGroupNameInvalid() && editFormSent
+                    )
+                }
+            },
+            confirmButton = {
+                val groupChangedText = stringResource(R.string.label_group_name_changed)
+                val oldGroupId = restaurantManageVM.selectedGroup!!.restaurantGroupId
+                TextButton(
+                    onClick = {
+                        restaurantManageVM.viewModelScope.launch {
+                            editFormSent = true
+                            val editSucceed = restaurantManageVM.editGroupName(newGroupName)
+
+                            if(editSucceed){
+                                restaurantManageVM.selectedGroup = null
+                                selectedGroup = null
+                                Toast.makeText(
+                                    context,
+                                    groupChangedText,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                showEditGroupPopup = false
+                            }
+
+                        }
+                    }
+                ) {
+                    Text(
+                        stringResource(R.string.label_save)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditGroupPopup = false }) {
+                    Text(
+                        stringResource(R.string.label_cancel)
+                    )
+                }
+            },
+        )
     }
 
     NavHost(navController = navController, startDestination = RestaurantManagementRoutes.Restaurant) {
@@ -242,6 +320,44 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         }
                     }
 
+                    if(selectedGroup != null) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(start = 12.dp)
+                        ) {
+                            ButtonComponent(
+                                onClick = {
+                                    navController.navigate(
+                                        RestaurantManagementRoutes.Stats(
+                                            statsType = StatsType.RESTAURANT_GROUP.nameVal,
+                                            queryId = selectedGroup!!.restaurantGroupId ?: -1
+                                        )
+                                    )
+                                },
+                                label = stringResource(id = R.string.label_stats_show_group_stats),
+                                icon = Icons.Outlined.BarChart,
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(vertical = 8.dp)
+                                    .background(gradientBrush, RoundedCornerShape(16.dp))
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            ButtonComponent(
+                                onClick = {
+                                    showEditGroupPopup = true
+                                },
+                                label = stringResource(id = R.string.label_edit_group_name),
+                                icon = Icons.Outlined.Edit,
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .padding(vertical = 8.dp)
+                                    .background(gradientBrush, RoundedCornerShape(16.dp))
+                            )
+                        }
+                    }
+
                     selectedGroup?.restaurants?.forEach { restaurant ->
                         var img by remember { mutableStateOf<Bitmap?>(null) }
                         LaunchedEffect(key1 = true) {
@@ -318,21 +434,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             }
                         }
                     }
-
-                    if(selectedGroup != null){
-                        ButtonComponent(
-                            onClick = { navController.navigate(
-                                RestaurantManagementRoutes.Stats(
-                                    statsType = StatsType.RESTAURANT_GROUP.nameVal,
-                                    queryId = selectedGroup!!.restaurantGroupId?: -1
-                                )
-                            )},
-                            label = stringResource(id = R.string.label_stats_show_group_stats),
-                            icon = Icons.Outlined.BarChart
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.padding(bottom = 64.dp))
 
                 }
 

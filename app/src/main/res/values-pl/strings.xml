@@ -538,4 +538,8 @@
     <string name="label_visit_created">Stworzono wizytę!</string>
     <string name="label_no_deposit_needed">Nie wymaga kaucji.</string>
     <string name="label_deposit_paid">Kaucja została opłacona</string>
+    <string name="label_edit_group_name">Edytuj nazwę grupy</string>
+    <string name="label_group_name_changed">Zmieniono nazwę grupy!</string>
+    <string name="label_new_group_name">Nowa nazwa grupy:</string>
+    <string name="label_edit_group">Edytuj grupę</string>
 </resources>

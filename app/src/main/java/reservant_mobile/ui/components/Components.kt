@@ -220,7 +220,7 @@ fun ComboBox(
 
 @Composable
 fun ButtonComponent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier? = null,
     onClick: () -> Unit,
     label: String = "",
     isLoading: Boolean = false,
@@ -235,9 +235,11 @@ fun ButtonComponent(
 
     Button(
         modifier = modifier
+            ?:
+        Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .background(gradientBrush, RoundedCornerShape(16.dp)),  // Gradient tła
+            .background(gradientBrush, RoundedCornerShape(16.dp)),
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
