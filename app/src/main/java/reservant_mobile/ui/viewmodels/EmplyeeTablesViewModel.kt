@@ -1,5 +1,8 @@
 package reservant_mobile.ui.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +15,12 @@ import reservant_mobile.data.services.RestaurantService
 class TablesViewModel(private val restaurantId: Int) : ViewModel() {
 
     private val restaurantService: IRestaurantService = RestaurantService()
+
+    var selectedTable: TableDTO? by mutableStateOf(null)
+    var isEditSelected by mutableStateOf(false)
+    var isAddSelected by mutableStateOf(false)
+
+    var numberOfPeople: Int? by mutableStateOf(null)
 
     private val _tables = MutableStateFlow<List<TableDTO>>(emptyList())
     val tables: StateFlow<List<TableDTO>> get() = _tables
