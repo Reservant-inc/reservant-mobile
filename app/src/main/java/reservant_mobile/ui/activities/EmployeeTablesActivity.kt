@@ -81,7 +81,10 @@ fun EmployeeTablesActivity(
                         tablesViewModel.isEditSelected = false
                         tablesViewModel.numberOfPeople = 0
                     },
-                    title = { Text(text = "Dodawanie stolika") },
+                    title = { Text(text = stringResource(id =
+                        if (tablesViewModel.isAddSelected) R.string.label_add_table
+                        else R.string.label_edit_table
+                    )) },
                     text = {
                         Column {
                             
@@ -98,14 +101,14 @@ fun EmployeeTablesActivity(
                                                 .align(Alignment.CenterVertically)
                                                 .padding(4.dp),
                                             imageVector = Icons.Default.Delete,
-                                            contentDescription = "Add table",
+                                            contentDescription = stringResource(id = R.string.label_delete_table),
                                             tint = MaterialTheme.colorScheme.onPrimary
                                         )
                                         Text(
                                             modifier = Modifier
                                                 .align(Alignment.CenterVertically)
                                                 .padding(4.dp),
-                                            text = "Delete table"
+                                            text = stringResource(id = R.string.label_delete_table)
                                         )
                                     }
                                 }
