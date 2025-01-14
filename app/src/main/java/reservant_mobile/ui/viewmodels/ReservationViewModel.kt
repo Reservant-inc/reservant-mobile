@@ -32,7 +32,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class ReservationViewModel(
-    private val restaurantId: Int = -1,
     private val ordersService: IOrdersService = OrdersService(),
     private val visitsService: IVisitsService = VisitsService(),
     private val deliveryService: IDeliveryService = DeliveryService(),
@@ -84,13 +83,7 @@ class ReservationViewModel(
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
 
-    init {
-        viewModelScope.launch {
-            getRestaurant()
-        }
-    }
-
-    private suspend fun getRestaurant(){
+    suspend fun getRestaurant(restaurantId: Int){
         val result = restaurantService.getRestaurant(restaurantId)
 
         if(!result.isError){

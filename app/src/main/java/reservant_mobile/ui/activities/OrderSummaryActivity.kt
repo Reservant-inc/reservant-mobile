@@ -172,6 +172,22 @@ fun OrderSummaryActivity(
             )
         }
 
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.deposit_label),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Start
+            )
+            Text(
+                text = String.format(
+                    "%.2f",
+                    reservationViewModel.restaurant!!.reservationDeposit ?: 0.0
+                ) + " zł",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End
+            )
+        }
+
         if (!isReservation) {
             Spacer(modifier = Modifier.height(8.dp))
 

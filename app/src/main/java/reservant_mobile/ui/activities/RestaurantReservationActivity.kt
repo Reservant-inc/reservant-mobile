@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,16 +35,14 @@ import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 fun RestaurantReservationActivity(
     restaurantId: Int,
     navController: NavHostController,
+    reservationViewModel: ReservationViewModel,
     restaurantDetailVM: RestaurantDetailViewModel,
     isReservation: Boolean
 ) {
 
-    val reservationViewModel = viewModel<ReservationViewModel>(
-            factory = object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    ReservationViewModel(restaurantId) as T
-            }
-        )
+    LaunchedEffect(restaurantId){
+        reservationViewModel.getRestaurant(restaurantId)
+    }
     val navControllerSummary = rememberNavController()
 
     NavHost(
