@@ -24,6 +24,7 @@ import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.PageDTO
+import reservant_mobile.data.models.dtos.PutTableDTO
 import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
@@ -628,7 +629,9 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
     ): Result<RestaurantDTO?> {
         val res = api.put(
             MyRestaurants.Id.Tables(MyRestaurants.Id(restaurantId = restaurantId.toString())),
-            tables
+            PutTableDTO(
+                tables = tables
+            )
         )
         return complexResultWrapper(res)
     }

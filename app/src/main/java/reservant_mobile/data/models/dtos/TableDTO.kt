@@ -17,3 +17,8 @@ data class TableDTO (
         VisitSoon(R.string.visit_soon_label)
     }
 }
+
+@Serializable
+data class PutTableDTO(
+    val tables: List<TableDTO?>? = null
+)
