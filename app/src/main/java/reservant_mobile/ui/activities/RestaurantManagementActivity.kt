@@ -110,13 +110,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
     var editFormSent by remember { mutableStateOf(false) }
     var newGroupName by remember { mutableStateOf("") }
 
-    val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.secondary
-        )
-    )
-
     if(showDeleteRestaurantPopup)  {
         val restaurant = restaurantManageVM.selectedRestaurant
         if(restaurant!= null){
@@ -201,7 +194,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             },
             confirmButton = {
                 val groupChangedText = stringResource(R.string.label_group_name_changed)
-                val oldGroupId = restaurantManageVM.selectedGroup!!.restaurantGroupId
                 TextButton(
                     onClick = {
                         restaurantManageVM.viewModelScope.launch {
@@ -339,7 +331,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(vertical = 8.dp)
-                                    .background(gradientBrush, RoundedCornerShape(16.dp))
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -353,7 +344,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 modifier = Modifier
                                     .wrapContentWidth()
                                     .padding(vertical = 8.dp)
-                                    .background(gradientBrush, RoundedCornerShape(16.dp))
                             )
                         }
                     }
