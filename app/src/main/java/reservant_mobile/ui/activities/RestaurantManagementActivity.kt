@@ -327,7 +327,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     queryId = selectedGroup!!.restaurantGroupId?: -1
                                 )
                             )},
-                            label = "Show group stats",
+                            label = stringResource(id = R.string.label_stats_show_group_stats),
                             icon = Icons.Outlined.BarChart
                         )
                     }

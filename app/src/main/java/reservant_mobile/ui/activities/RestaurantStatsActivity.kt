@@ -283,7 +283,7 @@ fun RestaurantStatsActivity(onReturnClick: () -> Unit, statsType: Int, queryId: 
 
             if(filterAvgReviews.value) {
                 ChartCard(
-                    label = "Reviews rate",
+                    label = stringResource(id = R.string.label_stats_avg_reviews),
                     entryData = reviewsStat.associate { (dateString, yValue, avg) ->
                         LocalDate.parse(dateString) to avg!!.toFloat()
                     },
