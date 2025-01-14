@@ -542,4 +542,11 @@
     <string name="label_stats_show_group_stats">See group stats</string>
     <string name="label_deposit_amount">Deposit amount</string>
     <string name="label_want_deposit">Reservation with deposits</string>
+    <string name="label_reservation_complete">Reservation complete</string>
+    <string name="label_order_complete">Order complete</string>
+    <string name="label_pay_deposit_1">Please pay the deposit of</string>
+    <string name="label_pay_deposit_2">to finalize transaction</string>
+    <string name="label_pay_deposit_button">Pay deposit</string>
+    <string name="label_visit_created">Visit created!</string>
+    <string name="label_no_deposit_needed">No deposit needed.</string>
 </resources>

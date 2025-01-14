@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,14 +7,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Summarize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,6 +42,8 @@ fun OrderSummaryActivity(
 ) {
     val errorMessage = reservationViewModel.errorMessage
     val context = LocalContext.current
+
+    var showDepositDialog by remember { mutableStateOf(false) }
 
     val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
         menuItem.price * quantity
@@ -217,6 +222,11 @@ fun OrderSummaryActivity(
                     if (!visitResult.isError && !isReservation) {
                         reservationViewModel.createOrder()
                     }
+
+                    if(!visitResult.isError){
+                        reservationViewModel.returnedVisit = visitResult.value
+                        showDepositDialog = true
+                    }
                 }
             },
             label = stringResource(
@@ -234,5 +244,87 @@ fun OrderSummaryActivity(
             label = stringResource(id = R.string.label_cancel),
             modifier = Modifier.fillMaxWidth()
         )
+
+        if (showDepositDialog) {
+            val deposit = reservationViewModel.restaurant?.reservationDeposit ?: 0.0
+
+            if (deposit > 0.0) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDepositDialog = false
+                    },
+                    title = {
+                        Text(
+                            text = if(isReservation)
+                                stringResource(R.string.label_reservation_complete)
+                            else
+                                stringResource(R.string.label_order_complete),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.label_pay_deposit_1) +
+                                    String.format("%.2f", deposit) +
+                                    stringResource(R.string.label_pay_deposit_2)
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+
+                                showDepositDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_pay_deposit_button)
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showDepositDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_cancel)
+                            )
+                        }
+                    }
+                )
+            } else {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDepositDialog = false
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(R.string.label_visit_created),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.label_no_deposit_needed)
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showDepositDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ok)
+                            )
+                        }
+                    },
+                    dismissButton = {}
+                )
+            }
+        }
     }
 }

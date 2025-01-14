@@ -57,6 +57,8 @@ class ReservationViewModel(
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
 
+    var returnedVisit by mutableStateOf<VisitDTO?>(null)
+
     var errorMessage by mutableStateOf<String?>(null)
         private set
     var isDateError by mutableStateOf(false)
