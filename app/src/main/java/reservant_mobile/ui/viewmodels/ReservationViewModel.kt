@@ -124,6 +124,7 @@ class ReservationViewModel(
 
     fun updateStartTime(timeString: String, restaurant: RestaurantDTO) {
         try {
+            isStartTimeError = true
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
             val roundedTime = roundUpToNextHalfHour(inputTime)
             startTime.value = roundedTime.format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -161,6 +162,7 @@ class ReservationViewModel(
 
     fun updateEndTime(timeString: String, restaurant: RestaurantDTO, skipRounding: Boolean = false) {
         try {
+            isEndTimeError = false
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
             val finalEndTime = if (skipRounding) inputTime else roundUpToNextHalfHour(inputTime)
             endTime.value = finalEndTime.format(DateTimeFormatter.ofPattern("HH:mm"))
