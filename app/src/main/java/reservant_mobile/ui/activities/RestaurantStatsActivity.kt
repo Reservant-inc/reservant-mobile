@@ -70,6 +70,7 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModel
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
+import kotlinx.serialization.Serializable
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MessageSheet
 import reservant_mobile.ui.components.MissingPage
@@ -78,12 +79,15 @@ import reservant_mobile.ui.viewmodels.RestaurantStatsViewmodel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-enum class StatsType(){
-    RESTAURANT, RESTAURANT_GROUP, ALL_RESTAURANTS
+@Serializable
+enum class StatsType(val nameVal: Int){
+    RESTAURANT(0),
+    RESTAURANT_GROUP(1),
+    ALL_RESTAURANTS(2)
 }
 
 @Composable
-fun RestaurantStatsActivity(onReturnClick: () -> Unit, statsType: StatsType, queryId: Int? = null){
+fun RestaurantStatsActivity(onReturnClick: () -> Unit, statsType: Int, queryId: Int? = null){
     val statsVM = viewModel<RestaurantStatsViewmodel>()
 
     // List of years and months
@@ -108,13 +112,16 @@ fun RestaurantStatsActivity(onReturnClick: () -> Unit, statsType: StatsType, que
     fun getData(){
         statsVM.setDatePeriod(selectedYear.value, selectedMonth.value)
         when(statsType){
-            StatsType.RESTAURANT -> {
+            StatsType.RESTAURANT.nameVal -> {
                 statsVM.getStatistics(queryId!!)
             }
-            StatsType.RESTAURANT_GROUP -> {
+            StatsType.RESTAURANT_GROUP.nameVal -> {
                 statsVM.getStatisticsGroup(queryId!!)
             }
-            StatsType.ALL_RESTAURANTS -> {
+            StatsType.ALL_RESTAURANTS.nameVal -> {
+                statsVM.getAllStatistics()
+            }
+            else -> {
                 statsVM.getAllStatistics()
             }
         }
