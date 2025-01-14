@@ -175,9 +175,14 @@ class ReservationViewModel(
             }
 
             val diffMinutes = java.time.Duration.between(start, finalEndTime).toMinutes()
-            if (diffMinutes > 90) {
+            val maxDuration = restaurant.maxReservationDurationMinutes ?: 90
+
+            if (diffMinutes > maxDuration) {
                 isEndTimeError = true
-                endTimeErrorText = resourceProvider.getString(R.string.error_end_time_exceeded_length)
+                endTimeErrorText = resourceProvider.getString(
+                    R.string.error_end_time_exceeded_length,
+                    maxDuration
+                )
                 return
             }
 
