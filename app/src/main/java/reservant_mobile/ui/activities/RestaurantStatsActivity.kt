@@ -91,9 +91,7 @@ fun RestaurantStatsActivity(onReturnClick: () -> Unit, statsType: Int, queryId: 
     val statsVM = viewModel<RestaurantStatsViewmodel>()
 
     // List of years and months
-//    val tmpYears: List<String> = if(statsVM.years.size > 1) statsVM.years.map { it.toString() } else emptyList()
     val tmpYears: List<String> = statsVM.years.map { it.toString() }
-//    val tmpYears: List<String> = listOf("2025", "2024", "2023")
     val years = listOf(stringResource(id = R.string.label_all_years)) + tmpYears
     val months = statsVM.months
 

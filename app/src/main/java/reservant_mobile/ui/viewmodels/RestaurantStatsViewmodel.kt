@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.StatisticsDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.services.IRestaurantService
@@ -13,12 +12,9 @@ import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 import java.text.DateFormatSymbols
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Locale
 
 class RestaurantStatsViewmodel:ReservantViewModel() {
@@ -26,13 +22,13 @@ class RestaurantStatsViewmodel:ReservantViewModel() {
     var loadingError: Boolean by mutableStateOf(false)
     var statistics: StatisticsDTO? by mutableStateOf(null)
     var user: UserDTO? by mutableStateOf(null)
-    private val currentLocale: Locale = Locale.getDefault()
 
     val months = getShortMonthNames()
     var years by mutableStateOf<List<Int>>(emptyList())
 
-    var filterDateFrom: LocalDateTime? by mutableStateOf(null)
-    var filterDateUntil: LocalDateTime? by mutableStateOf(null)
+    private val currentLocale: Locale = Locale.getDefault()
+    private var filterDateFrom: LocalDateTime? by mutableStateOf(null)
+    private var filterDateUntil: LocalDateTime? by mutableStateOf(null)
 
 
     var restaurantService:IRestaurantService = RestaurantService()
