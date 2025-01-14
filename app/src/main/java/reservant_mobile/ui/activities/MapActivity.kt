@@ -512,7 +512,7 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                         .padding(vertical = 4.dp)
                                         .width(dialogWidth)
                                         .weight(1f),
-                                    label = { Text(stringResource(id = R.string.label_date_from)) },
+                                    label = stringResource(id = R.string.label_date_from),
                                     startDate = (eventSelectedDateFrom ?: LocalDate.now()).toString(),
                                     startStringValue = (eventSelectedDateFrom ?: "").toString(),
                                     onDateChange = { date ->
@@ -526,7 +526,7 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                         .padding(vertical = 4.dp)
                                         .width(dialogWidth)
                                         .weight(1f),
-                                    label = { Text(stringResource(id = R.string.label_date_to)) },
+                                    label = stringResource(id = R.string.label_date_to),
                                     startDate = (eventSelectedDateUntil ?: LocalDate.now()).toString(),
                                     startStringValue = (eventSelectedDateUntil ?: "").toString(),
                                     onDateChange = { date ->

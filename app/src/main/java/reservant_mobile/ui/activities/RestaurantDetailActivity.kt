@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,20 +27,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +57,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -60,6 +69,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -76,8 +86,11 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.DefaultResourceProvider
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.BadgeFloatingButton
+import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.CartItemCard
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
@@ -91,12 +104,16 @@ import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.viewmodels.ReservationViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantDetailActivity(restaurantId: Int = 1) {
+
+    val Context = LocalContext.current
 
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -104,7 +121,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 RestaurantDetailViewModel(restaurantId) as T
         }
     )
-    val addedItems = remember { mutableStateListOf<RestaurantMenuItemDTO>() }
 
     val reviewsViewModel: ReviewsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -114,8 +130,19 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
         }
     )
 
+    val reservationViewModel: ReservationViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ReservationViewModel(resourceProvider = DefaultResourceProvider(Context)) as T
+            }
+        }
+    )
+
     val reviewsFlow =
         reviewsViewModel.reviewsFlow.collectAsState().value?.collectAsLazyPagingItems()
+
+
+    var isCartVisible by remember { mutableStateOf(false) }
 
     val navController = rememberNavController()
 
@@ -265,6 +292,19 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                         HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
 
                                         OpeningHours(openingHours = restaurant.openingHours)
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        ButtonComponent(
+                                            label = stringResource(id = R.string.reservation_make_reservation),
+                                            onClick = {
+                                            navController.navigate(
+                                                RestaurantRoutes.Reservation(
+                                                    restaurantId = restaurantId,
+                                                    isReservation = true
+                                                )
+                                            )
+                                        })
                                     }
                                 }
 
@@ -353,6 +393,16 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                 menuItems = restaurantDetailVM.currentMenu?.menuItems,
                                                 getMenuPhoto = { photoString ->
                                                     restaurantDetailVM.getPhoto(photoString)
+                                                },
+                                                onAddClick = { menuItem ->
+                                                    // Add item to cart with quantity
+                                                    val existingItem = reservationViewModel.addedItems.find { it.first.menuItemId == menuItem.menuItemId }
+                                                    if (existingItem != null) {
+                                                        val index = reservationViewModel.addedItems.indexOf(existingItem)
+                                                        reservationViewModel.addedItems[index] = existingItem.copy(second = existingItem.second + 1)
+                                                    } else {
+                                                        reservationViewModel.addedItems.add(menuItem to 1)
+                                                    }
                                                 }
                                             )
                                         },
@@ -385,12 +435,11 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                     .padding(16.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
-
                 BadgeFloatingButton(
                     icon = Icons.Default.ShoppingBag,
                     contentDescription = stringResource(id = R.string.cart),
-                    itemCount = addedItems.size,
-                    onClick = { navController.navigate(RestaurantRoutes.Reservation(restaurantId = restaurantId)) }
+                    itemCount = reservationViewModel.addedItems.sumOf { it.second },
+                    onClick = { isCartVisible = true }
                 )
             }
 
@@ -410,11 +459,36 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 FullscreenGallery(onDismiss = { showGallery = false }, bitmaps = images)
 
             }
+            if (isCartVisible) {
+                ModalBottomSheet(
+                    onDismissRequest = { isCartVisible = false }
+                ) {
+                    CartContent(
+                        cartItems = reservationViewModel.addedItems,
+                        onRemoveItem = { item -> reservationViewModel.removeItemFromCart(item)},
+                        onIncreaseQuantity = { item -> reservationViewModel.increaseItemQuantity(item)
+                        },
+                        onDecreaseQuantity = { item -> reservationViewModel.decreaseItemQuantity(item)
+                        },
+                        onSubmitOrder = {
+                            // Proceed to Reservation screen
+                            navController.navigate(RestaurantRoutes.Reservation(restaurantId = restaurantId, isReservation = false))
+                            isCartVisible = false
+                        },
+                        getMenuPhoto = { photoString ->
+                            restaurantDetailVM.getPhoto(photoString)
+                        },
+                    )
+                }
+            }
         }
         composable<RestaurantRoutes.Reservation> {
             RestaurantReservationActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.Reservation>().restaurantId,
-                navController = navController)
+                navController = navController,
+                reservationViewModel = reservationViewModel,
+                restaurantDetailVM = restaurantDetailVM,
+                isReservation = it.toRoute<RestaurantRoutes.Reservation>().isReservation)
         }
 
         composable<RestaurantRoutes.AddReview> {
@@ -434,6 +508,53 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
     }
 
 }
+
+@Composable
+fun CartContent(
+    cartItems: List<Pair<RestaurantMenuItemDTO, Int>>,
+    onRemoveItem: (Pair<RestaurantMenuItemDTO, Int>) -> Unit,
+    onIncreaseQuantity: (Pair<RestaurantMenuItemDTO, Int>) -> Unit,
+    onDecreaseQuantity: (Pair<RestaurantMenuItemDTO, Int>) -> Unit,
+    onSubmitOrder: () -> Unit,
+    getMenuPhoto: suspend (String) -> Bitmap?,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(0.8f)
+            .padding(16.dp)
+    ) {
+        Text(text = stringResource(id = R.string.your_cart), style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(8.dp))
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(cartItems.size) { index ->
+                val item = cartItems[index]
+                var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                LaunchedEffect(item.first.photo) {
+                    item.first.photo?.let { photo ->
+                        menuPhoto = getMenuPhoto(photo)
+                    }
+                }
+                CartItemCard(
+                    item = item,
+                    onIncreaseQuantity = { onIncreaseQuantity(item) },
+                    onDecreaseQuantity = { onDecreaseQuantity(item) },
+                    onRemove = { onRemoveItem(item) },
+                    photo = menuPhoto
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        if (cartItems.isNotEmpty()) {
+            ButtonComponent(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onSubmitOrder,
+                label = stringResource(id = R.string.proceed_to_checkout)
+            )
+        }
+    }
+}
+
 
 @Composable
 fun ReviewsContent(
