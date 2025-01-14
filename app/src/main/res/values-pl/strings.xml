@@ -513,4 +513,9 @@
     <string name="summary_label_confirm_reservation">Potwierdź rezerwację</string>
     <string name="summary_label_confirm_order">Potwierdź zamówienie</string>
     <string name="summary_label_cancel">Anuluj</string>
+    <string name="delete_group_message">Czy napewno chcesz usunąć grupę</string>
+    <string name="label_delete_group">Usuń grupę</string>
+    <string name="label_reply">Odpowiedz</string>
+    <string name="label_owner_reply">Odopwiedź właściciela</string>
+    <string name="label_write_reply">Napisz odpowiedź</string>
 </resources>

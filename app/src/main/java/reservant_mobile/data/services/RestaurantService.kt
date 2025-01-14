@@ -29,6 +29,7 @@ import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.StatisticsDTO
 import reservant_mobile.data.models.dtos.TableDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -134,6 +135,22 @@ interface IRestaurantService{
                                          dateUntil: LocalDateTime? = null,
                                          category: ReportDTO.ReportCategory? = null,
                                          reportedUserId: String? = null, ): Result<List<ReportDTO>?>
+
+    suspend fun getAllStatistics(dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
+    suspend fun getStatistics(restaurantId: Any,
+                              dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
+    suspend fun getStatisticsGroup(groupId: Any,
+                              dateFrom: LocalDateTime? = null,
+                              dateUntil: LocalDateTime? = null,
+                              popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
+
+
 
 }
 
@@ -555,6 +572,49 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             dateUntil = dateUntil?.toString(),
             category = category?.name,
             reportedUserId = reportedUserId,
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getAllStatistics(
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        popularItemMaxCount: Int?
+    ): Result<StatisticsDTO?> {
+        val res = api.get(MyRestaurants.Statistics(
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            popularItemMaxCount = popularItemMaxCount
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getStatistics(
+        restaurantId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        popularItemMaxCount: Int?
+    ): Result<StatisticsDTO?> {
+        val res = api.get(MyRestaurants.Id.Statistics(
+            parent = MyRestaurants.Id(restaurantId = restaurantId.toString()),
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            popularItemMaxCount = popularItemMaxCount
+        ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun getStatisticsGroup(
+        groupId: Any,
+        dateFrom: LocalDateTime?,
+        dateUntil: LocalDateTime?,
+        popularItemMaxCount: Int?
+    ): Result<StatisticsDTO?> {
+        val res = api.get(MyRestaurantGroups.Id.Statistics(
+            parent = MyRestaurantGroups.Id(id = groupId.toString()),
+            dateFrom = dateFrom?.toString(),
+            dateUntil = dateUntil?.toString(),
+            popularItemMaxCount = popularItemMaxCount
         ))
         return complexResultWrapper(res)
     }

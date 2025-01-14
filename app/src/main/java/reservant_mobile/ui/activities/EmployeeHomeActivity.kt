@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingBasket
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableBar
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
@@ -306,6 +307,18 @@ fun EmployeeHomeActivity() {
                             }
                         ),
                         EmpMenuOption(
+                            text = stringResource(id = R.string.label_reviews),
+                            icon = Icons.Outlined.Star,
+                            background = painterResource(id = R.drawable.reviews_photo),
+                            onClick = {
+                                innerNavController.navigate(
+                                    RestaurantRoutes.Reviews(
+                                        restaurantId = restaurant.restaurantId
+                                    )
+                                )
+                            }
+                        ),
+                        EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
                             icon = Icons.Outlined.Settings,
                             onClick = { innerNavController.navigate(MainRoutes.Settings) }
@@ -387,6 +400,13 @@ fun EmployeeHomeActivity() {
                         restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
                         isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles,
                         navHostController = innerNavController
+                    )
+                }
+                composable<RestaurantRoutes.Reviews> {
+                    ReviewsActivity(
+                        navController = innerNavController,
+                        restaurantId = it.toRoute<RestaurantRoutes.Reviews>().restaurantId,
+                        isOwner = false
                     )
                 }
 

@@ -24,10 +24,21 @@ class MyRestaurants {
                       val dateUntil: String? = null,
                       val category: String? = null,
                       val reportedUserId: String? = null)
+
+        @Resource("statistics")
+        class Statistics(val parent: Id,
+                         val dateFrom: String? = null,
+                         val dateUntil: String? = null,
+                         val popularItemMaxCount: Int? = null)
     }
 
     @Resource("validate-first-step")
     class ValidateFirstStep(val parent: MyRestaurants = MyRestaurants())
 
+    @Resource("statistics")
+    class Statistics(val parent: MyRestaurants = MyRestaurants(),
+                     val dateFrom: String? = null,
+                     val dateUntil: String? = null,
+                     val popularItemMaxCount: Int? = null)
 
 }

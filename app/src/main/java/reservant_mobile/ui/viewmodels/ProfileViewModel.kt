@@ -64,7 +64,6 @@ class ProfileViewModel(
 
     private var updateProfileResult by mutableStateOf<Result<UserDTO?>?>(null)
 
-    // Dodajemy stan dla userThreads:
     private val _userThreadsFlow = MutableStateFlow<Flow<PagingData<ThreadDTO>>?>(null)
 
     init {

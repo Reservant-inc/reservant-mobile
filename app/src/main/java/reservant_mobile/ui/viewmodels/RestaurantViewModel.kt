@@ -32,6 +32,7 @@ class RestaurantViewModel(
     var resultFileUploads by mutableStateOf(Result(isError = false, value = false))
     var resultGroup by mutableStateOf(Result(isError = false, value = false))
     var resultRegistration by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
+    var resultMove by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
@@ -41,6 +42,7 @@ class RestaurantViewModel(
     val postalCode: FormField = FormField(RestaurantDTO::postalIndex.name)
     val city: FormField = FormField(RestaurantDTO::city.name)
     val description: FormField = FormField(RestaurantDTO::description.name)
+
 
     // Pliki do załączenia
     val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
@@ -64,6 +66,7 @@ class RestaurantViewModel(
     var selectedGroup by mutableStateOf<RestaurantGroupDTO?>(null)
     var newGroup: FormField = FormField(RestaurantDTO::groupName.name)
     var maxReservationMinutes = FormField(RestaurantDTO::maxReservationDurationMinutes.name)
+    var selectedToGroup = mutableStateOf<RestaurantGroupDTO?>(null)
 
     var restaurantId by mutableStateOf<Int?>(null)
 
@@ -137,6 +140,11 @@ class RestaurantViewModel(
         }
 
         val restaurant = getRestaurantData()
+        if(selectedToGroup.value!!.restaurantGroupId != restaurant.groupId){
+            selectedToGroup.value!!.restaurantGroupId?.let {
+                moveToGroup(it)
+            }
+        }
 
         resultRegistration = restaurantService.editRestaurant(restaurant.restaurantId, restaurant)
 
@@ -145,14 +153,22 @@ class RestaurantViewModel(
         }
 
         if(newGroup.value.isNotBlank()){
-                resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
-                    name = newGroup.value,
-                    restaurantIds = listOf(restaurantId!!)
-                ))
-                return !resultFirstStep.isError
+            resultGroup = restaurantService.addGroup(RestaurantGroupDTO(
+                name = newGroup.value,
+                restaurantIds = listOf(restaurantId!!)
+            ))
+            return !resultFirstStep.isError
         }
 
         return true
+    }
+
+    private suspend fun moveToGroup(newGroupId: Int): Boolean {
+        val restaurant = getRestaurantData()
+
+        resultMove = restaurantService.moveToGroup(restaurant.restaurantId, newGroupId)
+
+        return !resultMove.isError
     }
 
     suspend fun validateFirstStep(): Boolean {
