@@ -71,6 +71,7 @@ import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
@@ -318,7 +319,21 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         }
                     }
 
+                    if(selectedGroup != null){
+                        ButtonComponent(
+                            onClick = { navController.navigate(
+                                RestaurantManagementRoutes.Stats(
+                                    statsType = StatsType.RESTAURANT_GROUP.nameVal,
+                                    queryId = selectedGroup!!.restaurantGroupId?: -1
+                                )
+                            )},
+                            label = "Show group stats",
+                            icon = Icons.Outlined.BarChart
+                        )
+                    }
+
                     Spacer(modifier = Modifier.padding(bottom = 64.dp))
+
                 }
 
 
@@ -486,7 +501,10 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
-                                RestaurantManagementRoutes.Stats
+                                RestaurantManagementRoutes.Stats(
+                                    statsType = StatsType.RESTAURANT.nameVal,
+                                    queryId = restaurant.restaurantId
+                                )                               
                             )},
                             icon = Icons.Outlined.BarChart,
                             titleStringId = R.string.label_stats
@@ -544,7 +562,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantManagementRoutes.Stats> {
             RestaurantStatsActivity(
                 onReturnClick = { navController.popBackStack() },
-                statsType = StatsType.ALL_RESTAURANTS
+                statsType = it.toRoute<RestaurantManagementRoutes.Stats>().statsType,
+                queryId = it.toRoute<RestaurantManagementRoutes.Stats>().queryId
             )
         }
 

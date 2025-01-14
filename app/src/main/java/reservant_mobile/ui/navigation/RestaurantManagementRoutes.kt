@@ -11,7 +11,10 @@ data object RestaurantManagementRoutes {
     object RestaurantPreview
 
     @Serializable
-    object Stats
+    data class Stats(
+        val statsType: Int,
+        val queryId: Int = -1
+    )
 
     @Serializable
     data class Menu(
