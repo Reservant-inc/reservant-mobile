@@ -151,6 +151,9 @@ interface IRestaurantService{
                               popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
 
 
+    suspend fun putTables(restaurantId: Any,
+        tables: List<TableDTO>): Result<RestaurantDTO?>
+
 
 }
 
@@ -616,6 +619,17 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             dateUntil = dateUntil?.toString(),
             popularItemMaxCount = popularItemMaxCount
         ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun putTables(
+        restaurantId: Any,
+        tables: List<TableDTO>
+    ): Result<RestaurantDTO?> {
+        val res = api.put(
+            MyRestaurants.Id.Tables(MyRestaurants.Id(restaurantId = restaurantId.toString())),
+            tables
+        )
         return complexResultWrapper(res)
     }
 }
