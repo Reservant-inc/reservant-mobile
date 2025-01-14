@@ -1,5 +1,6 @@
 package reservant_mobile.data.models.dtos
 
+import androidx.datastore.preferences.protobuf.BoolValueOrBuilder
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,5 +39,6 @@ data class VisitDTO(
      */
     val orders: List<OrderDTO>? = null,
     val isArchived: Boolean? = null,
-    val restaurantId: Int? = null
+    val restaurantId: Int? = null,
+    val createdByEmployee: Boolean? = null
 )
