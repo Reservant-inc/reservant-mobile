@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +31,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +61,7 @@ import reservant_mobile.ui.viewmodels.TablesViewModel
 fun EmployeeTablesActivity(
     restaurantId: Int,
     onReturnClick: () -> Unit,
-    isOwner: Boolean = false
+    //isOwner: Boolean = false
 ) {
     val tablesViewModel = viewModel<TablesViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -71,7 +75,7 @@ fun EmployeeTablesActivity(
     Column(modifier = Modifier.fillMaxSize()) {
 
         when {
-            isOwner && (tablesViewModel.isAddSelected || tablesViewModel.isEditSelected) -> {
+            tablesViewModel.isAddSelected || tablesViewModel.isEditSelected -> {
 
                 if (tablesViewModel.isEditSelected) {
                     tablesViewModel.numberOfPeople = tablesViewModel.selectedTable?.capacity
@@ -91,13 +95,16 @@ fun EmployeeTablesActivity(
                         Column {
                             
                             if (tablesViewModel.isEditSelected) {
+                                val context = LocalContext.current
                                 Button(onClick = {
                                     tablesViewModel.removeTable(tablesViewModel.selectedTable!!.tableId)
 
                                     tablesViewModel.viewModelScope.launch {
                                         tablesViewModel.updateTables()
+
                                     }
 
+                                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
                                     tablesViewModel.isEditSelected = false
                                     tablesViewModel.numberOfPeople = null
 
@@ -188,37 +195,29 @@ fun EmployeeTablesActivity(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(tables) { table ->
-
-                if (isOwner) {
-                    TableCard(table = table, onClick = {
-                        tablesViewModel.selectedTable = table
-                        tablesViewModel.isEditSelected = true
-                    })
-                } else {
-                    TableCard(table = table)
-                }
-
+                TableCard(table = table, onClick = {
+                    tablesViewModel.selectedTable = table
+                    tablesViewModel.isEditSelected = true
+                })
             }
         }
     }
-    if (isOwner) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    tablesViewModel.isAddSelected = !tablesViewModel.isAddSelected
-                }
-            ){
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add table",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        FloatingActionButton(
+            onClick = {
+                tablesViewModel.isAddSelected = !tablesViewModel.isAddSelected
             }
+        ){
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add table",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }
