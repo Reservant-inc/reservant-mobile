@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.TableDTO
 import reservant_mobile.data.services.IRestaurantService
@@ -37,4 +38,28 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
             }
         }
     }
+
+    suspend fun updateTables(): Boolean {
+        val result = restaurantService.putTables(restaurantId, tables = tables.value)
+
+        return result.isError
+    }
+
+    fun removeTable(tableId: Int) {
+        _tables.value = tables.value.filter {
+            it.tableId != tableId
+        }
+    }
+
+    fun addTable(tableId: Int) {
+        numberOfPeople?.let {
+            _tables.value = listOf(
+                *tables.value.toTypedArray(),
+                TableDTO(tableId = tableId, capacity = it)
+            )
+        }
+
+    }
+
+
 }

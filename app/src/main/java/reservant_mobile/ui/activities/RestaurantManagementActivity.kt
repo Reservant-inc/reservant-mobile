@@ -33,6 +33,8 @@ import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material.icons.outlined.Reviews
+import androidx.compose.material.icons.outlined.TableBar
+import androidx.compose.material.icons.outlined.TableRestaurant
 import androidx.compose.material.icons.outlined.Warehouse
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.Card
@@ -524,6 +526,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             titleStringId = R.string.label_warehouse
                         ),
                         Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Tables(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.TableBar,
+                            titleStringId = R.string.label_restaurant_tables
+                        ),
+                        Option(
                             onClick = {
                                 showDeleteRestaurantPopup = true
                             },
@@ -594,6 +603,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 onReturnClick = { navController.popBackStack() },
                 navHostController = navControllerHome,
                 restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId
+            )
+        }
+        composable<RestaurantRoutes.Tables> {
+            EmployeeTablesActivity(
+                restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId,
+                onReturnClick = { navController.popBackStack() },
+                isOwner = true
             )
         }
     }

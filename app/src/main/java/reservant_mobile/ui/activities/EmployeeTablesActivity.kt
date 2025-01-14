@@ -25,7 +25,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,8 +42,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.TableDTO
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.FormInput
@@ -55,7 +56,8 @@ import reservant_mobile.ui.viewmodels.TablesViewModel
 @Composable
 fun EmployeeTablesActivity(
     restaurantId: Int,
-    onReturnClick: () -> Unit
+    onReturnClick: () -> Unit,
+    isOwner: Boolean = false
 ) {
     val tablesViewModel = viewModel<TablesViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -69,7 +71,7 @@ fun EmployeeTablesActivity(
     Column(modifier = Modifier.fillMaxSize()) {
 
         when {
-            tablesViewModel.isAddSelected || tablesViewModel.isEditSelected -> {
+            isOwner && (tablesViewModel.isAddSelected || tablesViewModel.isEditSelected) -> {
 
                 if (tablesViewModel.isEditSelected) {
                     tablesViewModel.numberOfPeople = tablesViewModel.selectedTable?.capacity
@@ -79,7 +81,7 @@ fun EmployeeTablesActivity(
                     onDismissRequest = {
                         tablesViewModel.isAddSelected = false
                         tablesViewModel.isEditSelected = false
-                        tablesViewModel.numberOfPeople = 0
+                        tablesViewModel.numberOfPeople = null
                     },
                     title = { Text(text = stringResource(id =
                         if (tablesViewModel.isAddSelected) R.string.label_add_table
@@ -90,7 +92,15 @@ fun EmployeeTablesActivity(
                             
                             if (tablesViewModel.isEditSelected) {
                                 Button(onClick = {
+                                    tablesViewModel.removeTable(tablesViewModel.selectedTable!!.tableId)
+
+                                    tablesViewModel.viewModelScope.launch {
+                                        tablesViewModel.updateTables()
+                                    }
+
                                     tablesViewModel.isEditSelected = false
+                                    tablesViewModel.numberOfPeople = null
+
                                 }, modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(4.dp)
@@ -134,7 +144,7 @@ fun EmployeeTablesActivity(
                             onClick = {
                                 tablesViewModel.isAddSelected = false
                                 tablesViewModel.isEditSelected = false
-                                tablesViewModel.numberOfPeople = 0
+                                tablesViewModel.numberOfPeople = null
                             },
                             label = stringResource(id = R.string.label_cancel)
                         )
@@ -142,7 +152,15 @@ fun EmployeeTablesActivity(
                     confirmButton = {
                         ButtonComponent(
                             onClick = {
-                                //TODO: send data
+
+                                tablesViewModel.addTable(100)
+
+                                tablesViewModel.viewModelScope.launch {
+                                    tablesViewModel.updateTables()
+                                }
+
+                                tablesViewModel.isAddSelected = false
+                                tablesViewModel.isEditSelected = false
                             },
                             label = stringResource(id = R.string.label_save),
                             isLoading = false
@@ -170,29 +188,37 @@ fun EmployeeTablesActivity(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(tables) { table ->
-                TableCard(table = table, onClick = {
-                    tablesViewModel.selectedTable = table
-                    tablesViewModel.isEditSelected = true
-                })
+
+                if (isOwner) {
+                    TableCard(table = table, onClick = {
+                        tablesViewModel.selectedTable = table
+                        tablesViewModel.isEditSelected = true
+                    })
+                } else {
+                    TableCard(table = table)
+                }
+
             }
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        FloatingActionButton(
-            onClick = {
-                tablesViewModel.isAddSelected = !tablesViewModel.isAddSelected
+    if (isOwner) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            FloatingActionButton(
+                onClick = {
+                    tablesViewModel.isAddSelected = !tablesViewModel.isAddSelected
+                }
+            ){
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add table",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
-        ){
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add table",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
         }
     }
 }
