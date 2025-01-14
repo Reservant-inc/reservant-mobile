@@ -537,4 +537,5 @@
     <string name="label_pay_deposit_button">Zapłać kaucję</string>
     <string name="label_visit_created">Stworzono wizytę!</string>
     <string name="label_no_deposit_needed">Nie wymaga kaucji.</string>
+    <string name="label_deposit_paid">Kaucja została opłacona</string>
 </resources>

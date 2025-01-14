@@ -54,6 +54,7 @@ class ReservationViewModel(
 
     var isTakeaway by mutableStateOf(false)
     var isDelivery by mutableStateOf(false)
+    var isDepositPaid by mutableStateOf(false)
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
 
@@ -99,6 +100,14 @@ class ReservationViewModel(
             minute == 0 || minute == 30 -> time
             minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
             else -> time.plusHours(1).withMinute(0).withSecond(0).withNano(0)
+        }
+    }
+
+    suspend fun payDeposit(){
+        val result = visitsService.payDeposit(returnedVisit!!.visitId.toString())
+
+        if(!result.isError){
+            isDepositPaid = true
         }
     }
 

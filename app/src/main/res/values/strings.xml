@@ -549,4 +549,5 @@
     <string name="label_pay_deposit_button">Pay deposit</string>
     <string name="label_visit_created">Visit created!</string>
     <string name="label_no_deposit_needed">No deposit needed.</string>
+    <string name="label_deposit_paid">Deposit has been paid</string>
 </resources>

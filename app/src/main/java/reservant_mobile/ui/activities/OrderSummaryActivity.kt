@@ -44,6 +44,7 @@ fun OrderSummaryActivity(
     val context = LocalContext.current
 
     var showDepositDialog by remember { mutableStateOf(false) }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
     val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
         menuItem.price * quantity
@@ -265,16 +266,22 @@ fun OrderSummaryActivity(
                     },
                     text = {
                         Text(
-                            text = stringResource(R.string.label_pay_deposit_1) +
-                                    String.format("%.2f", deposit) +
+                            text = stringResource(R.string.label_pay_deposit_1) + " " +
+                                    String.format("%.2f zł ", deposit) +
                                     stringResource(R.string.label_pay_deposit_2)
                         )
                     },
                     confirmButton = {
                         TextButton(
                             onClick = {
+                                reservationViewModel.viewModelScope.launch {
+                                    reservationViewModel.payDeposit()
 
-                                showDepositDialog = false
+                                    if(reservationViewModel.isDepositPaid){
+                                        showDepositDialog = false
+                                        showConfirmDialog = true
+                                    }
+                                }
                             }
                         ) {
                             Text(
@@ -325,6 +332,32 @@ fun OrderSummaryActivity(
                     dismissButton = {}
                 )
             }
+        }
+
+        if(reservationViewModel.isDepositPaid && showConfirmDialog){
+            AlertDialog(
+                onDismissRequest = {
+                    showConfirmDialog = false
+                },
+                title = {
+                    Text(
+                        text = stringResource(R.string.label_deposit_paid),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showConfirmDialog = false
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.ok)
+                        )
+                    }
+                }
+            )
         }
     }
 }
