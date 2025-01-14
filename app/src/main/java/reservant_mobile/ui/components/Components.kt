@@ -220,24 +220,24 @@ fun ComboBox(
 
 @Composable
 fun ButtonComponent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp),
     onClick: () -> Unit,
     label: String = "",
     isLoading: Boolean = false,
-    icon: ImageVector? = null // Opcjonalny parametr dla ikony
+    icon: ImageVector? = null
 ) {
-    val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.secondary
-        )
-    )
 
     Button(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(gradientBrush, RoundedCornerShape(16.dp)),  // Gradient tła
+        modifier = modifier.background(
+            Brush.horizontalGradient(
+                colors = listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.secondary
+                )
+            ), RoundedCornerShape(16.dp)
+        ),
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
