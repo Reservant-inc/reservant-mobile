@@ -104,7 +104,7 @@ fun EmployeeTablesActivity(
 
                                     }
 
-                                    Toast.makeText(context, "", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Table removed", Toast.LENGTH_SHORT).show()
                                     tablesViewModel.isEditSelected = false
                                     tablesViewModel.numberOfPeople = null
 
@@ -157,17 +157,30 @@ fun EmployeeTablesActivity(
                         )
                     },
                     confirmButton = {
+                        val context = LocalContext.current
                         ButtonComponent(
                             onClick = {
 
-                                tablesViewModel.addTable(100)
+                                if (tablesViewModel.isEditSelected){
+                                    tablesViewModel.removeTable(tablesViewModel.selectedTable!!.tableId)
+                                    tablesViewModel.addTable(tablesViewModel.selectedTable!!.tableId)
+                                } else {
+                                    tablesViewModel.addTable(100)
+                                }
 
                                 tablesViewModel.viewModelScope.launch {
                                     tablesViewModel.updateTables()
                                 }
 
+                                Toast.makeText(
+                                    context,
+                                    if (tablesViewModel.isEditSelected) "Table edited" else "Table added",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
                                 tablesViewModel.isAddSelected = false
                                 tablesViewModel.isEditSelected = false
+                                tablesViewModel.numberOfPeople = null
                             },
                             label = stringResource(id = R.string.label_save),
                             isLoading = false

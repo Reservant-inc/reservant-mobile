@@ -608,8 +608,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantRoutes.Tables> {
             EmployeeTablesActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId,
-                onReturnClick = { navController.popBackStack() },
-                isOwner = true
+                onReturnClick = { navController.popBackStack() }
             )
         }
     }
