@@ -41,7 +41,9 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
 
     suspend fun updateTables(): Boolean {
         val result = restaurantService.putTables(restaurantId, tables = tables.value)
-
+        if (!result.isError){
+            fetchTables()
+        }
         return result.isError
     }
 
@@ -59,6 +61,12 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
             )
         }
 
+    }
+
+    fun generateTableId(): Int {
+        return tables.value.maxBy {
+            it.tableId
+        }.tableId + 1
     }
 
 

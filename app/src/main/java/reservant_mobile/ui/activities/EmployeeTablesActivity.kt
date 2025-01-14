@@ -165,7 +165,7 @@ fun EmployeeTablesActivity(
                                     tablesViewModel.removeTable(tablesViewModel.selectedTable!!.tableId)
                                     tablesViewModel.addTable(tablesViewModel.selectedTable!!.tableId)
                                 } else {
-                                    tablesViewModel.addTable(100)
+                                    tablesViewModel.addTable(tablesViewModel.generateTableId())
                                 }
 
                                 tablesViewModel.viewModelScope.launch {
