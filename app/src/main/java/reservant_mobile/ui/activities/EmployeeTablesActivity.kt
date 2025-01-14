@@ -137,7 +137,8 @@ fun EmployeeTablesActivity(
                                 onValueChange = {
                                     tablesViewModel.numberOfPeople = it.toIntOrNull()
                                 },
-                                isError = false,
+                                formSent = true,
+                                isError = tablesViewModel.numberOfPeople == null,
                                 errorText = stringResource(id = R.string.error_invalid_number),
                                 keyboardOptions = KeyboardOptions(
                                     imeAction = ImeAction.Done,
@@ -160,6 +161,9 @@ fun EmployeeTablesActivity(
                         val context = LocalContext.current
                         ButtonComponent(
                             onClick = {
+                                if (tablesViewModel.numberOfPeople == null){
+                                    return@ButtonComponent
+                                }
 
                                 if (tablesViewModel.isEditSelected){
                                     tablesViewModel.removeTable(tablesViewModel.selectedTable!!.tableId)
