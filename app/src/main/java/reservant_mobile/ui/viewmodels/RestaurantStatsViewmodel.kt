@@ -18,6 +18,10 @@ import java.time.Month
 import java.util.Locale
 
 class RestaurantStatsViewmodel:ReservantViewModel() {
+    private val currentLocale: Locale = Locale.getDefault()
+    private var filterDateFrom: LocalDateTime? by mutableStateOf(null)
+    private var filterDateUntil: LocalDateTime? by mutableStateOf(null)
+
     var isLoading: Boolean by mutableStateOf(true)
     var loadingError: Boolean by mutableStateOf(false)
     var statistics: StatisticsDTO? by mutableStateOf(null)
@@ -25,11 +29,6 @@ class RestaurantStatsViewmodel:ReservantViewModel() {
 
     val months = getShortMonthNames()
     var years by mutableStateOf<List<Int>>(emptyList())
-
-    private val currentLocale: Locale = Locale.getDefault()
-    private var filterDateFrom: LocalDateTime? by mutableStateOf(null)
-    private var filterDateUntil: LocalDateTime? by mutableStateOf(null)
-
 
     var restaurantService:IRestaurantService = RestaurantService()
     var userService:IUserService = UserService()
