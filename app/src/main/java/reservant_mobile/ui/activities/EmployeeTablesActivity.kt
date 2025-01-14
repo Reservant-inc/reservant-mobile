@@ -116,7 +116,7 @@ fun EmployeeTablesActivity(
                             
                             FormInput(
                                 label = stringResource(id = R.string.number_of_people_label).removeSuffix(":"),
-                                inputText = (tablesViewModel.numberOfPeople ?: 0).toString(),
+                                inputText = (tablesViewModel.numberOfPeople ?: "").toString(),
                                 onValueChange = {
                                     tablesViewModel.numberOfPeople = it.toIntOrNull()
                                 },
