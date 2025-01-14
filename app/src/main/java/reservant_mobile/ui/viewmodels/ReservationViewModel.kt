@@ -124,7 +124,7 @@ class ReservationViewModel(
 
     fun updateStartTime(timeString: String, restaurant: RestaurantDTO) {
         try {
-            isStartTimeError = true
+            isStartTimeError = false
             val inputTime = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"))
             val roundedTime = roundUpToNextHalfHour(inputTime)
             startTime.value = roundedTime.format(DateTimeFormatter.ofPattern("HH:mm"))
