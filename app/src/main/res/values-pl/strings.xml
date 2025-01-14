@@ -479,4 +479,5 @@
     <string name="label_stats_date">Data</string>
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Kwota</string>
+    <string name="label_stats_show_group_stats">Zobacz statystyki grupy</string>
 </resources>

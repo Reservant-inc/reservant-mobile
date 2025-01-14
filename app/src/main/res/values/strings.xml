@@ -491,4 +491,5 @@
     <string name="label_stats_date">Date</string>
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Amount</string>
+    <string name="label_stats_show_group_stats">See group stats</string>
 </resources>
