@@ -540,4 +540,7 @@
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Amount</string>
     <string name="label_stats_show_group_stats">See group stats</string>
+    <string name="label_edit_table">Edit table</string>
+    <string name="label_add_table">Add table</string>
+    <string name="label_delete_table">Delete table</string>
 </resources>

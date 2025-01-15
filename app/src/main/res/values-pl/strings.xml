@@ -528,4 +528,7 @@
     <string name="label_stats_count">Liczba</string>
     <string name="label_stats_amount">Kwota</string>
     <string name="label_stats_show_group_stats">Zobacz statystyki grupy</string>
+    <string name="label_edit_table">Edytuj stolik</string>
+    <string name="label_add_table">Dodaj stolik</string>
+    <string name="label_delete_table">Usuń stolik</string>
 </resources>
