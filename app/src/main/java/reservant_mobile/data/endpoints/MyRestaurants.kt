@@ -30,6 +30,9 @@ class MyRestaurants {
                          val dateFrom: String? = null,
                          val dateUntil: String? = null,
                          val popularItemMaxCount: Int? = null)
+
+        @Resource("tables")
+        class Tables(val parent: Id)
     }
 
     @Resource("validate-first-step")

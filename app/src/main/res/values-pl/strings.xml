@@ -499,7 +499,7 @@
     <string name="error_date_not_selected">Nie wybrano daty</string>
     <string name="error_date_past">Data nie może być wcześniejsza niż dziś</string>
     <string name="error_start_time_before_now">Godzina rozpoczęcia nie może być wcześniejsza niż aktualna</string>
-    <string name="error_end_time_exceeded_length">Rezerwacja nie może przekraczać 1.5 godziny</string>
+    <string name="error_end_time_exceeded_length">Rezerwacja nie może przekraczać %d minut.</string>
     <string name="reservation_make_reservation">Zarezerwuj stolik</string>
     <string name="submit_reservation">Złóż rezerwację</string>
     <string name="label_reservation_summary">Podsumowanie rezerwacji</string>
@@ -542,4 +542,7 @@
     <string name="label_group_name_changed">Zmieniono nazwę grupy!</string>
     <string name="label_new_group_name">Nowa nazwa grupy:</string>
     <string name="label_edit_group">Edytuj grupę</string>
+    <string name="label_edit_table">Edytuj stolik</string>
+    <string name="label_add_table">Dodaj stolik</string>
+    <string name="label_delete_table">Usuń stolik</string>
 </resources>

@@ -24,6 +24,7 @@ import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.PageDTO
+import reservant_mobile.data.models.dtos.PutTableDTO
 import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
@@ -150,6 +151,9 @@ interface IRestaurantService{
                               dateUntil: LocalDateTime? = null,
                               popularItemMaxCount: Int? = null): Result<StatisticsDTO?>
 
+
+    suspend fun putTables(restaurantId: Any,
+        tables: List<TableDTO>): Result<RestaurantDTO?>
 
 
 }
@@ -616,6 +620,19 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
             dateUntil = dateUntil?.toString(),
             popularItemMaxCount = popularItemMaxCount
         ))
+        return complexResultWrapper(res)
+    }
+
+    override suspend fun putTables(
+        restaurantId: Any,
+        tables: List<TableDTO>
+    ): Result<RestaurantDTO?> {
+        val res = api.put(
+            MyRestaurants.Id.Tables(MyRestaurants.Id(restaurantId = restaurantId.toString())),
+            PutTableDTO(
+                tables = tables
+            )
+        )
         return complexResultWrapper(res)
     }
 }
