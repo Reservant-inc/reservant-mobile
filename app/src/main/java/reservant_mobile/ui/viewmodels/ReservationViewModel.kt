@@ -21,8 +21,10 @@ import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.IDeliveryService
 import reservant_mobile.data.services.IOrdersService
+import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
+import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.VisitsService
 import reservant_mobile.data.utils.ResourceProvider
 import java.time.LocalDate
@@ -33,7 +35,8 @@ class ReservationViewModel(
     private val ordersService: IOrdersService = OrdersService(),
     private val visitsService: IVisitsService = VisitsService(),
     private val deliveryService: IDeliveryService = DeliveryService(),
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val restaurantService: IRestaurantService = RestaurantService()
 ) : ReservantViewModel() {
 
     var note: FormField = FormField(OrderDTO::note.name)
@@ -51,8 +54,11 @@ class ReservationViewModel(
 
     var isTakeaway by mutableStateOf(false)
     var isDelivery by mutableStateOf(false)
+    var isDepositPaid by mutableStateOf(false)
     var deliveryAddress: FormField = FormField("deliveryAddress")
     var deliveryCost by mutableStateOf(0.0)
+
+    var returnedVisit by mutableStateOf<VisitDTO?>(null)
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
@@ -78,12 +84,30 @@ class ReservationViewModel(
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
 
+    var restaurant: RestaurantDTO? by mutableStateOf(null)
+
+    suspend fun getRestaurant(restaurantId: Int){
+        val result = restaurantService.getRestaurant(restaurantId)
+
+        if(!result.isError){
+            restaurant = result.value
+        }
+    }
+
     private fun roundUpToNextHalfHour(time: LocalTime): LocalTime {
         val minute = time.minute
         return when {
             minute == 0 || minute == 30 -> time
             minute < 30 -> time.withMinute(30).withSecond(0).withNano(0)
             else -> time.plusHours(1).withMinute(0).withSecond(0).withNano(0)
+        }
+    }
+
+    suspend fun payDeposit(){
+        val result = visitsService.payDeposit(returnedVisit!!.visitId.toString())
+
+        if(!result.isError){
+            isDepositPaid = true
         }
     }
 

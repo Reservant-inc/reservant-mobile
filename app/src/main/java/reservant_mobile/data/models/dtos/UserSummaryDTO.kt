@@ -13,5 +13,6 @@ data class UserSummaryDTO (
     val phoneNumber: PhoneNumberDTO? = null,
     val employments: List<Employments>? = null,
     val photo: String? = null,
+    val bannedUntil: String? = null,
     val friendStatus: FriendStatus? = null
 )
