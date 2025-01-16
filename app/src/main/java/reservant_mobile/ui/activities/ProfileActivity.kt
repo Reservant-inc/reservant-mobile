@@ -443,7 +443,12 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     profileViewModel
                                 )
                             },
-                            stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems, navController) }
+                            stringResource(R.string.label_event_history) to {
+                                EventHistoryTab(
+                                    eventPagingItems,
+                                    navController
+                                )
+                            }
                         )
                     )
                 }
