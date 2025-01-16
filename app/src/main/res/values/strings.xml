@@ -559,4 +559,5 @@
     <string name="label_delete_table">Delete table</string>
     <string name="label_restaurant_register_complete">Restaurant created successfully</string>
     <string name="label_restaurant_saved">Restaurant saved</string>
+    <string name="label_no_gallery">No gallery</string>
 </resources>

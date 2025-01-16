@@ -547,4 +547,5 @@
     <string name="label_delete_table">Usuń stolik</string>
     <string name="label_restaurant_register_complete">Pomyślnie stworzono restaurację</string>
     <string name="label_restaurant_saved">Zapisano restaurację</string>
+    <string name="label_no_gallery">Brak galerii</string>
 </resources>
