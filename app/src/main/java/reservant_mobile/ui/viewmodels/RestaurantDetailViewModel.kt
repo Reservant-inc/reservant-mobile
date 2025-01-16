@@ -5,10 +5,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.EventService
+import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantMenuService
@@ -17,6 +25,7 @@ import reservant_mobile.data.services.RestaurantService
 class RestaurantDetailViewModel(
     private var restaurantId: Int,
     private val restaurantService: IRestaurantService = RestaurantService(),
+    private val eventsService: IEventService = EventService(),
     private val menuService: IRestaurantMenuService = RestaurantMenuService(),
 ) : ReservantViewModel() {
 
@@ -28,13 +37,16 @@ class RestaurantDetailViewModel(
     var currentMenu: RestaurantMenuDTO? by mutableStateOf(null)
     var isLoading: Boolean by mutableStateOf(false)
     var isGalleryLoading: Boolean by mutableStateOf(false)
-    var eventsLoading: Boolean by mutableStateOf(true)
-    //var restaurantLogo: Bitmap? by mutableStateOf(null)
+
+    private val _eventsState = MutableStateFlow<PagingData<EventDTO>>(PagingData.empty())
+    val events: StateFlow<PagingData<EventDTO>> = _eventsState.asStateFlow()
+
 
 
     init {
         viewModelScope.launch {
             loadRestaurantAndMenus(restaurantId)
+            loadEvents()
         }
     }
 
@@ -62,6 +74,21 @@ class RestaurantDetailViewModel(
         }
         restaurant = resultRestaurant.value
         return true
+    }
+
+    suspend fun loadEvents(){
+        val res = eventsService.getEvents(
+            restaurantId = restaurantId
+        )
+
+        if(res.isError || res.value == null){
+            throw Exception()
+        } else {
+            res.value.cachedIn(viewModelScope).collect {
+                _eventsState.value = it
+            }
+        }
+
     }
 
     suspend fun getPhotos(urls: List<String>, limit: Int = urls.size, withLoading:Boolean = true): List<Bitmap>{

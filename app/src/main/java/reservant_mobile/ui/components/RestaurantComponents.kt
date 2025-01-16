@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,13 +54,20 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.data.utils.getRestaurantOpeningTime
+import reservant_mobile.ui.navigation.EventRoutes
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -180,29 +189,6 @@ fun RestaurantCard(
 
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun EventsContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 80.dp, end = 16.dp, bottom = 16.dp)
-    ) {
-        repeat(3) {
-            EventCard(
-                eventName = "Name of event",
-                eventDate = "Saturday, 2024-06-22",
-                eventLocation = "John's Doe - Warsaw",
-                interestedCount = 20,
-                takePartCount = 45,
-                onClick = {
-
-                }
-            )
-            Modifier.padding(bottom = 16.dp)
         }
     }
 }
@@ -333,6 +319,74 @@ fun MenuContent(
             )
         }
 
+    }
+}
+
+@Composable
+fun EventsContent(
+    eventsFlow: LazyPagingItems<EventDTO>?,
+    navController: NavController
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
+    ) {
+        Spacer(modifier = Modifier.height(64.dp))
+
+        eventsFlow?.let { events ->
+            if (events.itemCount == 0 && events.loadState.refresh !is LoadState.Loading) {
+                Text(text = stringResource(R.string.label_restaurant_no_events))
+            } else {
+                Column {
+                    for (index in 0 until events.itemCount) {
+                        val event = events[index]
+                        if (event != null) {
+                            EventCard(
+                                eventName = event.name.orEmpty(),
+                                eventDate = event.time,
+                                eventLocation = event.restaurant?.address.orEmpty(),
+                                interestedCount = event.numberInterested ?: 0,
+                                takePartCount = event.numberParticipants ?: 0,
+                                onClick = {
+                                    navController.navigate(
+                                        EventRoutes.Details(
+                                            eventId = event.eventId ?: return@EventCard
+                                        )
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+
+                    when (events.loadState.append) {
+                        is LoadState.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        is LoadState.Error -> {
+                            MissingPage()
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+        } ?: run {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(id = R.string.label_loading_reviews))
+            }
+        }
     }
 }
 
@@ -475,12 +529,16 @@ fun OpeningHourDayInput(
                 MyTimePickerDialog(
                     initialTime = startTime,
                     onTimeSelected = onStartTimeChange,
-                    modifier = Modifier.weight(0.5f).padding(end = 4.dp)
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(end = 4.dp)
                 )
                 MyTimePickerDialog(
                     initialTime = endTime,
                     onTimeSelected = onEndTimeChange,
-                    modifier = Modifier.weight(0.5f).padding(start = 4.dp)
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(start = 4.dp)
                 )
             }
 
