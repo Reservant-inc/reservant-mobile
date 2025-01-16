@@ -850,8 +850,6 @@ fun RegisterRestaurantActivity(
                                 restaurantViewModel.editRestaurant(context)
                             }
 
-                            //test commit
-
                             Toast.makeText(
                                 context,
                                 successText,
