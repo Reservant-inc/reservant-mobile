@@ -549,18 +549,42 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         .fillMaxWidth()
                                         .padding(vertical = 5.dp)
                                 )
-
-                                Row(
-                                    modifier = Modifier
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    repeat(5) {
-                                        ImageCard(
-                                            painterResource(R.drawable.pizza)
+                                LaunchedEffect(key1 = true) {
+                                    restaurantManageVM.getGallery(restaurant)
+                                }
+                                if(restaurantManageVM.isGalleryLoading){
+                                    CircularProgressIndicator(modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                    )
+                                }
+                                else{
+                                    val gallery = restaurantManageVM.restaurantGallery
+                                    if(gallery.isEmpty()) {
+                                        Text(
+                                            text = stringResource(id = R.string.label_no_gallery),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 5.dp)
                                         )
                                     }
+                                    else{
+                                        Row(
+                                            modifier = Modifier
+                                                .horizontalScroll(rememberScrollState()),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            gallery.forEach {
+                                                ImageCard(
+                                                    it.asImageBitmap()
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
+
+
                             }
 
                         }
