@@ -300,6 +300,38 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     ) {
                                         Text(text = stringResource(R.string.label_remove_friend))
                                     }
+                                    Button(
+                                        onClick = {
+                                            val targetUserId = profileViewModel.simpleProfileUser?.userId ?: return@Button
+                                            val myUserId = UserService.UserObject.userId
+
+                                            val threadList = lazyThreads.itemSnapshotList.items
+
+                                            val targetThread = threadList.firstOrNull { thread ->
+                                                val participants = thread.participants ?: emptyList()
+                                                participants.size == 2 &&
+                                                        participants.any { it.userId == targetUserId } &&
+                                                        participants.any { it.userId == myUserId }
+                                            }
+
+                                            if (targetThread?.threadId != null) {
+                                                navController.navigate(UserRoutes.Chat(threadId = targetThread.threadId, threadTitle = targetThread.title!!))
+                                            } else {
+                                                profileViewModel.createThreadWithUser(targetUserId) { newThread ->
+                                                    if (newThread != null) {
+                                                        navController.navigate(UserRoutes.Chat(threadId = newThread.threadId!!, threadTitle = newThread.title!!))
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.Send,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                                        )
+                                    }
                                 }
 
                                 FriendStatus.OutgoingRequest -> {
@@ -355,40 +387,6 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                 Text(text = error, color = MaterialTheme.colorScheme.error)
                             }
 
-                            Button(
-                                onClick = {
-                                    val targetUserId = profileViewModel.simpleProfileUser?.userId ?: return@Button
-                                    val myUserId = UserService.UserObject.userId
-
-                                    val threadList = lazyThreads.itemSnapshotList.items
-
-                                    val targetThread = threadList.firstOrNull { thread ->
-                                        val participants = thread.participants ?: emptyList()
-                                        participants.size == 2 &&
-                                                participants.any { it.userId == targetUserId } &&
-                                                participants.any { it.userId == myUserId }
-                                    }
-
-                                    if (targetThread?.threadId != null) {
-                                        navController.navigate(UserRoutes.Chat(threadId = targetThread.threadId, threadTitle = targetThread.title!!))
-                                    } else {
-                                        profileViewModel.createThreadWithUser(targetUserId) { newThread ->
-                                            if (newThread != null) {
-                                                navController.navigate(UserRoutes.Chat(threadId = newThread.threadId!!, threadTitle = newThread.title!!))
-                                            } else {
-                                                // error
-                                            }
-                                        }
-                                    }
-                                          },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Send,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                                )
-                            }
                         }
                     }
                 }
