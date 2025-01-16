@@ -90,6 +90,7 @@ import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.MyDatePickerDialog
+import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ProfileViewModel
@@ -106,6 +107,8 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     )
 
     val context = LocalContext.current
+    var showErrorToast by remember { mutableStateOf(false) }
+
     var showEditDialog by remember { mutableStateOf(false) }
 
     val friendsFlow by profileViewModel.friendsFlow.collectAsState()
@@ -300,13 +303,21 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     ) {
                                         Text(text = stringResource(R.string.label_remove_friend))
                                     }
+
+                                    if (showErrorToast) {
+                                        ShowErrorToast(
+                                            context = context,
+                                            id = R.string.error_cant_send_message
+                                        )
+                                        showErrorToast = false
+                                    }
+
                                     Button(
                                         onClick = {
                                             val targetUserId = profileViewModel.simpleProfileUser?.userId ?: return@Button
                                             val myUserId = UserService.UserObject.userId
 
                                             val threadList = lazyThreads.itemSnapshotList.items
-
                                             val targetThread = threadList.firstOrNull { thread ->
                                                 val participants = thread.participants ?: emptyList()
                                                 participants.size == 2 &&
@@ -315,11 +326,25 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                             }
 
                                             if (targetThread?.threadId != null) {
-                                                navController.navigate(UserRoutes.Chat(threadId = targetThread.threadId, threadTitle = targetThread.title!!))
+                                                navController.navigate(
+                                                    UserRoutes.Chat(
+                                                        threadId = targetThread.threadId,
+                                                        threadTitle = targetThread.title!!
+                                                    )
+                                                )
                                             } else {
                                                 profileViewModel.createThreadWithUser(targetUserId) { newThread ->
-                                                    if (newThread != null) {
-                                                        navController.navigate(UserRoutes.Chat(threadId = newThread.threadId!!, threadTitle = newThread.title!!))
+                                                    if (newThread?.threadId == null) {
+
+                                                        showErrorToast = true
+                                                    } else {
+
+                                                        navController.navigate(
+                                                            UserRoutes.Chat(
+                                                                threadId = newThread.threadId,
+                                                                threadTitle = newThread.title!!
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             }
