@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -220,28 +221,36 @@ fun ComboBox(
 
 @Composable
 fun ButtonComponent(
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 8.dp),
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     label: String = "",
     isLoading: Boolean = false,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    fullWidth: Boolean = true
 ) {
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.secondary
+        )
+    )
 
     Button(
-        modifier = modifier.background(
-            Brush.horizontalGradient(
-                colors = listOf(
-                    MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.secondary
-                )
-            ), RoundedCornerShape(16.dp)
-        ),
+        modifier =
+        if(fullWidth)
+            modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(gradientBrush, RoundedCornerShape(16.dp))
+        else
+            modifier
+                .wrapContentWidth()
+                .padding(vertical = 8.dp)
+                .background(gradientBrush, RoundedCornerShape(16.dp)),
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,  // Transparentny, by pokazać gradient
+            containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
     ) {
