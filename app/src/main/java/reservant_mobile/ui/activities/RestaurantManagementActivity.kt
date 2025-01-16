@@ -665,7 +665,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
         composable<RestaurantManagementRoutes.Edit> {
             RegisterRestaurantActivity(
-                navControllerHome = navController,
+                onReturnClick = { navController.popBackStack() },
+                navControllerHome = navControllerHome,
                 group = selectedGroup,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
             )
