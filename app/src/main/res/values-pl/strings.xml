@@ -545,4 +545,6 @@
     <string name="label_edit_table">Edytuj stolik</string>
     <string name="label_add_table">Dodaj stolik</string>
     <string name="label_delete_table">Usuń stolik</string>
+    <string name="label_restaurant_register_complete">Pomyślnie stworzono restaurację</string>
+    <string name="label_restaurant_saved">Zapisano restaurację</string>
 </resources>
