@@ -557,4 +557,6 @@
     <string name="label_edit_table">Edit table</string>
     <string name="label_add_table">Add table</string>
     <string name="label_delete_table">Delete table</string>
+    <string name="label_restaurant_register_complete">Restaurant created successfully</string>
+    <string name="label_restaurant_saved">Restaurant saved</string>
 </resources>

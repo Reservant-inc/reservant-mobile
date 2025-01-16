@@ -330,9 +330,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 },
                                 label = stringResource(id = R.string.label_stats_show_group_stats),
                                 icon = Icons.Outlined.BarChart,
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .padding(vertical = 8.dp)
+                                fullWidth = false
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -343,9 +341,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 },
                                 label = stringResource(id = R.string.label_edit_group_name),
                                 icon = Icons.Outlined.Edit,
-                                modifier = Modifier
-                                    .wrapContentWidth()
-                                    .padding(vertical = 8.dp)
+                                fullWidth = false
                             )
                         }
                     }
@@ -669,7 +665,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
 
         composable<RestaurantManagementRoutes.Edit> {
             RegisterRestaurantActivity(
-                navControllerHome = navController,
+                onReturnClick = { navController.popBackStack() },
+                navControllerHome = navControllerHome,
                 group = selectedGroup,
                 restaurantId = it.toRoute<RestaurantManagementRoutes.Edit>().restaurantId
             )

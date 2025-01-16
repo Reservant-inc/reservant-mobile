@@ -93,7 +93,10 @@ fun HomeActivity() {
                     RestaurantManagementActivity(navControllerHome = innerNavController)
                 }
                 composable<RegisterRestaurantRoutes.Register>{
-                    RegisterRestaurantActivity(navControllerHome = innerNavController)
+                    RegisterRestaurantActivity(
+                        onReturnClick = { innerNavController.popBackStack() },
+                        navControllerHome = innerNavController
+                    )
                 }
                 composable<MainRoutes.Settings>{
                     SettingsActivity(

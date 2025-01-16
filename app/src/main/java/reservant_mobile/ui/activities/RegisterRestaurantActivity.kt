@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,6 +70,7 @@ import java.util.Locale
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun RegisterRestaurantActivity(
+    onReturnClick: () -> Unit,
     navControllerHome: NavHostController,
     restaurantId: Int? = null,
     group: RestaurantGroupDTO? = null
@@ -119,14 +121,14 @@ fun RegisterRestaurantActivity(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_new_restaurant),
                         showBackButton = true,
-                        onReturnClick = { navControllerHome.popBackStack() }
+                        onReturnClick = onReturnClick
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_edit_restaurant),
                         showBackButton = true,
-                        onReturnClick = { navControllerHome.popBackStack() }
+                        onReturnClick = onReturnClick
                     )
                 }
 
@@ -825,39 +827,42 @@ fun RegisterRestaurantActivity(
                     context = LocalContext.current,
                     id = restaurantViewModel.getToastError3()
                 )
+                var successText = ""
 
-                if (restaurantId == null && group == null) {
-                    ButtonComponent(
-                        label = stringResource(id = R.string.label_register_restaurant),
-                        isLoading = isLoading,
-                        onClick = {
-                            restaurantViewModel.viewModelScope.launch {
-                                isLoading = true
-                                formSent3 = true
-                                if (restaurantViewModel.registerRestaurant(context)) {
-                                    navControllerHome.navigate(MainRoutes.Home)
-                                }
+                if(restaurantId == null && group == null)
+                    successText = stringResource(R.string.label_restaurant_register_complete)
+                else
+                    successText = stringResource(R.string.label_restaurant_saved)
 
-                                isLoading = false
+                ButtonComponent(
+                    label = if (restaurantId == null && group == null)
+                        stringResource(id = R.string.label_register_restaurant)
+                    else
+                        stringResource(id = R.string.label_save),
+                    isLoading = isLoading,
+                    onClick = {
+                        restaurantViewModel.viewModelScope.launch {
+                            isLoading = true
+                            formSent3 = true
+                            val success = if (restaurantId == null && group == null) {
+                                restaurantViewModel.registerRestaurant(context)
+                            } else {
+                                restaurantViewModel.editRestaurant(context)
                             }
+
+                            Toast.makeText(
+                                context,
+                                successText,
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            if (success) {
+                                navControllerHome.navigate(MainRoutes.Home)
+                            }
+                            isLoading = false
                         }
-                    )
-                } else {
-                    ButtonComponent(label = stringResource(id = R.string.label_save),
-                        isLoading = isLoading,
-                        onClick = {
-                            restaurantViewModel.viewModelScope.launch {
-                                isLoading = true
-                                formSent = true
-
-                                if (restaurantViewModel.editRestaurant(context)) {
-                                    navControllerHome.navigate(MainRoutes.Home)
-                                }
-
-                                isLoading = false
-                            }
-                        })
-                }
+                    }
+                )
                 Spacer(modifier = Modifier.height(64.dp))
             }
         }

@@ -60,7 +60,7 @@ class RestaurantViewModel(
     var tags = listOf(String())
     var selectedTags: List<String> by mutableStateOf(listOf())
     var delivery by mutableStateOf(false)
-    var deposit by mutableStateOf(0.0)
+    var deposit by mutableStateOf<Double?>(null)
 
     // Grupa
     var groups: List<RestaurantGroupDTO>? by mutableStateOf(listOf())
@@ -95,7 +95,7 @@ class RestaurantViewModel(
             logo.value = restaurant.value.logo.orEmpty().drop(9)
             description.value = restaurant.value.description
             delivery = restaurant.value.provideDelivery
-            deposit = restaurant.value.reservationDeposit ?: 0.0
+            deposit = restaurant.value.reservationDeposit
             selectedTags = restaurant.value.tags
             selectedGroup = group
             restaurant.value.maxReservationDurationMinutes?.let {
@@ -142,7 +142,7 @@ class RestaurantViewModel(
         }
 
         val restaurant = getRestaurantData()
-        if(selectedToGroup.value!!.restaurantGroupId != restaurant.groupId){
+        if(selectedToGroup.value != null && selectedToGroup.value!!.restaurantGroupId != restaurant.groupId){
             selectedToGroup.value!!.restaurantGroupId?.let {
                 moveToGroup(it)
             }
@@ -297,6 +297,8 @@ class RestaurantViewModel(
 
     private fun getRestaurantData(): RestaurantDTO {
 
+        if(deposit == 0.0) deposit = null
+
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
             name = name.value,
@@ -404,7 +406,8 @@ class RestaurantViewModel(
     }
 
     fun isDepositInvalid(): Boolean {
-        return deposit < 0.0
+        if(deposit != null) return deposit!! < 0.0
+        return false
     }
 
     fun isRestaurantTypeInvalid(): Boolean {
