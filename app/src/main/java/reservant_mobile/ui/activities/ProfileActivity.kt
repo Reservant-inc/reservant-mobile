@@ -114,6 +114,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     val friendsFlow by profileViewModel.friendsFlow.collectAsState()
     val friendsPagingItems = friendsFlow?.collectAsLazyPagingItems()
 
+    val friendsRequestsFlow by profileViewModel.friendsRequestsFlow.collectAsState()
+    val friendsRequestsPagingItems = friendsRequestsFlow?.collectAsLazyPagingItems()
+
     val eventsFlow by profileViewModel.eventsFlow.collectAsState()
     val eventPagingItems = eventsFlow?.collectAsLazyPagingItems()
 
@@ -432,7 +435,14 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     navController
                                 )
                             },
-                            stringResource(R.string.label_friends) to { FriendsTab(friendsPagingItems, navController) },
+                            stringResource(R.string.label_friends) to {
+                                FriendsTab(
+                                    friendsPagingItems,
+                                    friendsRequestsPagingItems,
+                                    navController,
+                                    profileViewModel
+                                )
+                            },
                             stringResource(R.string.label_event_history) to { EventHistoryTab(eventPagingItems, navController) }
                         )
                     )
@@ -483,7 +493,7 @@ fun JoinRequestsTab(
                     if (interestedUsersPagingItems != null) {
                         when (interestedUsersPagingItems.loadState.refresh) {
                             is LoadState.Loading -> {
-                                 //CircularProgressIndicator()
+                                 CircularProgressIndicator()
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
@@ -798,9 +808,11 @@ fun EventHistoryTab(
 @Composable
 fun FriendsTab(
     friendsPagingItems: LazyPagingItems<FriendRequestDTO>?,
-    navController: NavHostController
+    friendsRequestsPagingItems: LazyPagingItems<FriendRequestDTO>?,
+    navController: NavHostController,
+    profileViewModel: ProfileViewModel
 ) {
-    if (friendsPagingItems == null) {
+    if (friendsPagingItems == null || friendsRequestsPagingItems == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -809,9 +821,77 @@ fun FriendsTab(
         }
     } else {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
+            if (friendsRequestsPagingItems.itemCount > 0) {
+                item {
+                    Text(
+                        text = stringResource(R.string.label_friend_requests),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(top = 80.dp, start = 16.dp, end = 16.dp)
+                    )
+                }
+
+                items(friendsRequestsPagingItems.itemCount) { index ->
+                    val request = friendsRequestsPagingItems[index]
+                    val otherUser = request?.otherUser
+                    if (otherUser != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        UserListItem(
+                            user = EventDTO.Participant(
+                                userId = otherUser.userId,
+                                firstName = otherUser.firstName ?: "Unknown",
+                                lastName = otherUser.lastName ?: "User"
+                            ),
+                            showButtons = true,
+                            onApproveClick = {
+                                profileViewModel.acceptFriendRequest(otherUser.userId)
+                            },
+                            onRejectClick = {
+                                profileViewModel.rejectFriendRequest(otherUser.userId)
+                            },
+                            onCardClick = {
+                                navController.navigate(
+                                    UserRoutes.UserProfile(userId = otherUser.userId)
+                                )
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                friendsRequestsPagingItems.apply {
+                    when (loadState.append) {
+                        is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+
+                        is LoadState.Error -> {
+                            val e = friendsRequestsPagingItems.loadState.append as LoadState.Error
+                            item {
+                                Text(
+                                    text = stringResource(R.string.error_loading_more_friends),
+                                    color = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                        else -> { /* Do nothing */ }
+                    }
+                }
+            }
 
             if (friendsPagingItems.itemCount == 0) {
                 item {
@@ -829,17 +909,24 @@ fun FriendsTab(
                     }
                 }
             } else {
-
+                item {
+                    Text(
+                        text = stringResource(R.string.label_friends),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                    )
+                }
                 item {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         shape = RoundedCornerShape(12.dp),
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column {
-
                             for (index in 0 until friendsPagingItems.itemCount) {
                                 val friend = friendsPagingItems[index]
                                 val otherUser = friend?.otherUser
@@ -848,13 +935,15 @@ fun FriendsTab(
                                     UserListItem(
                                         user = EventDTO.Participant(
                                             userId = otherUser.userId,
-                                            firstName = otherUser.firstName ?: "Unknown",
-                                            lastName = otherUser.lastName ?: "User"
+                                            firstName = otherUser.firstName!!,
+                                            lastName = otherUser.lastName!!
                                         ),
                                         showButtons = false,
                                         modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                                         onCardClick = {
-                                            navController.navigate(UserRoutes.UserProfile(userId = otherUser.userId))
+                                            navController.navigate(
+                                                UserRoutes.UserProfile(userId = otherUser.userId)
+                                            )
                                         }
                                     )
                                     Spacer(modifier = Modifier.padding(4.dp))
@@ -884,7 +973,6 @@ fun FriendsTab(
                                 }
                             }
                         }
-
                         is LoadState.Error -> {
                             val e = friendsPagingItems.loadState.append as LoadState.Error
                             item {
@@ -895,13 +983,14 @@ fun FriendsTab(
                                 )
                             }
                         }
-                        is LoadState.NotLoading -> { /* Do nothing */ }
+                        else -> { /* Do nothing */ }
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
