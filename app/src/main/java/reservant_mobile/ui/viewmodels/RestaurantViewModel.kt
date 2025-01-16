@@ -98,7 +98,6 @@ class RestaurantViewModel(
             deposit = restaurant.value.reservationDeposit
             selectedTags = restaurant.value.tags
             selectedGroup = group
-//            selectedToGroup = group
             restaurant.value.maxReservationDurationMinutes?.let {
                 maxReservationMinutes.value = it.toString()
             }
@@ -297,6 +296,8 @@ class RestaurantViewModel(
     }
 
     private fun getRestaurantData(): RestaurantDTO {
+
+        if(deposit == 0.0) deposit = null
 
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
