@@ -75,6 +75,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -111,9 +112,14 @@ import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantDetailActivity(restaurantId: Int = 1) {
+fun RestaurantDetailActivity(
+    restaurantId: Int = 1,
+    onReturnClick: () -> Unit
+) {
 
     val Context = LocalContext.current
+
+    val navController = rememberNavController()
 
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -143,8 +149,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
 
     var isCartVisible by remember { mutableStateOf(false) }
-
-    val navController = rememberNavController()
 
     NavHost(
         navController = navController,
@@ -199,7 +203,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
 
                                     IconButton(
-                                        onClick = { navController.popBackStack() },
+                                        onClick = onReturnClick,
                                         modifier = Modifier
                                             .padding(16.dp)
                                             .align(Alignment.TopStart)
