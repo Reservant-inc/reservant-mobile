@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -456,6 +457,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             stringResource(R.string.label_event_history) to {
                                 EventHistoryTab(
                                     eventPagingItems,
+                                    profileViewModel,
                                     navController
                                 )
                             }
@@ -731,6 +733,7 @@ fun CurrentOrdersTab(
 @Composable
 fun EventHistoryTab(
     eventPagingItems: LazyPagingItems<EventDTO>?,
+    profileViewModel: ProfileViewModel,
     navController: NavHostController
 ) {
 
@@ -750,12 +753,22 @@ fun EventHistoryTab(
             items(eventPagingItems.itemCount) { index ->
                 val event = eventPagingItems[index]
                 if (event != null) {
+
+                    var eventPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                    LaunchedEffect(event.photo) {
+                        event.photo?.let { photo ->
+                            eventPhoto = profileViewModel.getPhoto(photo)
+                        }
+                    }
+
                     EventCard(
                         eventName = event.name ?: "",
                         eventDate = event.time,
                         eventLocation = event.restaurant?.name ?: "",
                         interestedCount = event.numberInterested ?: 0,
                         takePartCount = event.numberParticipants ?: 0,
+                        eventPhoto = eventPhoto,
                         onClick = {
                             navController.navigate(
                                 EventRoutes.Details(eventId = event.eventId!!)

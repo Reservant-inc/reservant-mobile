@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,6 +69,7 @@ import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.data.utils.getRestaurantOpeningTime
 import reservant_mobile.ui.navigation.EventRoutes
+import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -200,6 +202,7 @@ fun EventCard(
     eventLocation: String,
     interestedCount: Int,
     takePartCount: Int,
+    eventPhoto: Bitmap?,
     onClick: () -> Unit
 ) {
     val date = formatToDateTime(eventDate, "dd MMMM yyyy")
@@ -223,14 +226,26 @@ fun EventCard(
                         .height(180.dp)
                         .padding(bottom = 16.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.restaurant_photo),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "Event Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp)),
-                    )
+                    if(eventPhoto != null){
+                        Image(
+                            bitmap = eventPhoto.asImageBitmap(),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "Event Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                        )
+                    }else{
+                        Image(
+                            painter = painterResource(R.drawable.restaurant_photo),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "Event Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                        )
+                    }
+
                 }
 
                 Text(
@@ -325,6 +340,7 @@ fun MenuContent(
 @Composable
 fun EventsContent(
     eventsFlow: LazyPagingItems<EventDTO>?,
+    restaurantDetailVM: RestaurantDetailViewModel,
     navController: NavController
 ) {
 
@@ -343,12 +359,22 @@ fun EventsContent(
                     for (index in 0 until events.itemCount) {
                         val event = events[index]
                         if (event != null) {
+
+                            var eventPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                            LaunchedEffect(event.photo) {
+                                event.photo?.let { photo ->
+                                    eventPhoto = restaurantDetailVM.getPhoto(photo)
+                                }
+                            }
+
                             EventCard(
                                 eventName = event.name.orEmpty(),
                                 eventDate = event.time,
                                 eventLocation = event.restaurant?.address.orEmpty(),
                                 interestedCount = event.numberInterested ?: 0,
                                 takePartCount = event.numberParticipants ?: 0,
+                                eventPhoto = eventPhoto,
                                 onClick = {
                                     navController.navigate(
                                         EventRoutes.Details(

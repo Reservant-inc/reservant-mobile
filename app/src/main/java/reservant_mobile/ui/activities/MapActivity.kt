@@ -297,12 +297,22 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
                                     items(events.itemCount) { index ->
                                         val item = events[index]
                                         if(item != null){
+
+                                            var eventPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                                            LaunchedEffect(item.photo) {
+                                                item.photo?.let { photo ->
+                                                    eventPhoto = mapViewModel.getPhoto(photo)
+                                                }
+                                            }
+
                                             EventCard(
                                                 eventName = item.name,
                                                 eventDate = item.time,
                                                 eventLocation = if (item.restaurant != null) item.restaurant.address else "",
                                                 interestedCount = item.numberInterested,
                                                 takePartCount = item.numberParticipants,
+                                                eventPhoto = eventPhoto,
                                                 onClick = {
                                                     if(isUserLoggedIn){
                                                         navController.navigate(

@@ -207,7 +207,6 @@ fun RestaurantDetailActivity(
                                         }
                                     }
 
-
                                     IconButton(
                                         onClick = onReturnClick,
                                         modifier = Modifier
@@ -419,6 +418,7 @@ fun RestaurantDetailActivity(
                                         stringResource(R.string.label_events) to {
                                             EventsContent(
                                                 eventsFlow = events,
+                                                restaurantDetailVM = restaurantDetailVM,
                                                 navController = navController
                                             )
                                         },

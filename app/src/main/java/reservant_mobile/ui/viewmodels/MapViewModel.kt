@@ -204,7 +204,8 @@ class MapViewModel : ReservantViewModel() {
                             distance = dto.distance,
                             restaurant = dto.restaurant,
                             numberInterested = dto.numberInterested?:0,
-                            numberParticipants = dto.numberParticipants?:0
+                            numberParticipants = dto.numberParticipants?:0,
+                            photo = dto.photo
                         )
                     }
                 }
@@ -262,7 +263,7 @@ class MapViewModel : ReservantViewModel() {
         }
     }
 
-    private suspend fun getPhoto(photoStr: String): Bitmap? {
+    suspend fun getPhoto(photoStr: String): Bitmap? {
         val result = fileService.getImage(photoStr)
         if (!result.isError){
             return  result.value!!
@@ -345,5 +346,6 @@ data class EventOnMap(
     val restaurant: RestaurantDTO?,
     val distance: Double?,
     val numberInterested: Int,
-    val numberParticipants: Int
+    val numberParticipants: Int,
+    val photo: String?
 )
