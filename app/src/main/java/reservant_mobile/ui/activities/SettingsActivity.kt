@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Report
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.RestaurantMenu
@@ -107,6 +108,15 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             text = stringResource(id = R.string.label_my_orders),
                             onClick = {
                                 navController.navigate(UserRoutes.Orders)
+                            }
+                        )
+
+                    if (Roles.RESTAURANT_OWNER !in UserService.UserObject.roles && Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
+                        UnderlinedItem(
+                            icon = Icons.Filled.RestaurantMenu,
+                            text = stringResource(id = R.string.label_become_restaurant_owner),
+                            onClick = {
+                                navController.navigate(UserRoutes.BecomeRestaurantOwner)
                             }
                         )
 
@@ -239,6 +249,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     threadId = it.toRoute<UserRoutes.Chat>().threadId,
                     title = it.toRoute<UserRoutes.Chat>().threadTitle,
                 )
+            }
+            composable<UserRoutes.BecomeRestaurantOwner>{
+                //todo
             }
 
         }
