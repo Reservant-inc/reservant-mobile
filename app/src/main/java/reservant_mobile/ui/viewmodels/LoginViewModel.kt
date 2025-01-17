@@ -32,6 +32,7 @@ class LoginViewModel(
                 rememberMe = true
             )
         )
+        if (result.isError) return false
 
         if (Roles.CUSTOMER_SUPPORT_AGENT in UserService.UserObject.roles){
             result = Result(

@@ -547,6 +547,10 @@
     <string name="label_delete_table">Usuń stolik</string>
     <string name="label_restaurant_register_complete">Pomyślnie stworzono restaurację</string>
     <string name="label_restaurant_saved">Zapisano restaurację</string>
+    <string name="label_no_gallery">Brak galerii</string>
+    <string name="label_restaurant_status_verified">Zweryfikowana</string>
+    <string name="label_restaurant_status_not_verified">Oczekuje na weryfikację</string>
+    <string name="error_restaurant_status_not_verified">Restauracja nie została jeszcze zweryfikowana</string>
     <string name="error_cant_send_message">Nie można wysłać wiadomości</string>
     <string name="label_friend_requests">Zaproszenia do znajomych</string>
 </resources>

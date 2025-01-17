@@ -25,6 +25,10 @@ class RestaurantManagementViewModel(
     var selectedRestaurantLogo: Bitmap? by mutableStateOf(null)
     var newGroupName: String by mutableStateOf("")
     var isLoading: Boolean by mutableStateOf(false)
+    var isGalleryLoading: Boolean by mutableStateOf(true)
+    var restaurantGallery: List<Bitmap> by mutableStateOf(emptyList())
+
+
 
 
     init {
@@ -81,6 +85,20 @@ class RestaurantManagementViewModel(
             return result.value!!
         }
         return null
+    }
+    suspend fun getGallery(restaurant: RestaurantDTO) {
+
+        isGalleryLoading = true
+        val tmp = restaurantService.getRestaurant(restaurant.restaurantId)
+        val newRestaurant = tmp.value
+        if (newRestaurant != null) {
+            restaurantGallery = newRestaurant.photos.mapNotNull {
+                val result = fileService.getImage(it)
+                if (!result.isError) result.value
+                else null
+            }
+        }
+        isGalleryLoading = false
     }
 
 

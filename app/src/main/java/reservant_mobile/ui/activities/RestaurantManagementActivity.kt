@@ -67,6 +67,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -90,6 +91,7 @@ import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.ReturnButton
+import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
@@ -353,14 +355,19 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 img = restaurantManageVM.getPhoto(restaurant)
                             }
                         }
-
+                        val restaurantNotVerifiedMsg = stringResource(id = R.string.error_restaurant_status_not_verified)
                         Card(
                             shape = RoundedCornerShape(16.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                             onClick = {
-                                restaurantManageVM.selectedRestaurant = restaurant
-                                restaurantManageVM.selectedRestaurantLogo = img
-                                navController.navigate(RestaurantManagementRoutes.RestaurantPreview)
+                                if(restaurant.isVerified){
+                                    restaurantManageVM.selectedRestaurant = restaurant
+                                    restaurantManageVM.selectedRestaurantLogo = img
+                                    navController.navigate(RestaurantManagementRoutes.RestaurantPreview)
+                                }
+                                else{
+                                    Toast.makeText(context, restaurantNotVerifiedMsg, Toast.LENGTH_SHORT).show()
+                                }
                             },
                             modifier = Modifier
                                 .padding(8.dp)
@@ -393,15 +400,21 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         text = restaurant.address,
                                         fontSize = 14.sp,
                                     )
-                                    if(restaurant.postalIndex.isNotEmpty())
-                                        Text(
-                                            text = restaurant.postalIndex,
-                                            fontSize = 14.sp,
-                                        )
+                                    val cityText = restaurant.city
+                                    val postalText = restaurant.postalIndex
                                     Text(
-                                        text = restaurant.city,
+                                        text = "$cityText $postalText",
                                         fontSize = 14.sp,
                                     )
+
+                                    if(!restaurant.isVerified){
+                                        Text(
+                                            text = stringResource(id = R.string.label_restaurant_status_not_verified),
+                                            fontSize = 14.sp,
+                                            fontStyle = FontStyle.Italic
+                                        )
+                                    }
+
                                 }
                                 IconButton(
                                     modifier = Modifier
@@ -549,18 +562,42 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         .fillMaxWidth()
                                         .padding(vertical = 5.dp)
                                 )
-
-                                Row(
-                                    modifier = Modifier
-                                        .horizontalScroll(rememberScrollState()),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    repeat(5) {
-                                        ImageCard(
-                                            painterResource(R.drawable.pizza)
+                                LaunchedEffect(key1 = true) {
+                                    restaurantManageVM.getGallery(restaurant)
+                                }
+                                if(restaurantManageVM.isGalleryLoading){
+                                    CircularProgressIndicator(modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                    )
+                                }
+                                else{
+                                    val gallery = restaurantManageVM.restaurantGallery
+                                    if(gallery.isEmpty()) {
+                                        Text(
+                                            text = stringResource(id = R.string.label_no_gallery),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 5.dp)
                                         )
                                     }
+                                    else{
+                                        Row(
+                                            modifier = Modifier
+                                                .horizontalScroll(rememberScrollState()),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            gallery.forEach {
+                                                ImageCard(
+                                                    it.asImageBitmap()
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
+
+
                             }
 
                         }

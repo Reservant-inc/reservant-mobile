@@ -559,6 +559,10 @@
     <string name="label_delete_table">Delete table</string>
     <string name="label_restaurant_register_complete">Restaurant created successfully</string>
     <string name="label_restaurant_saved">Restaurant saved</string>
+    <string name="label_no_gallery">No gallery</string>
+    <string name="label_restaurant_status_verified">Verified</string>
+    <string name="label_restaurant_status_not_verified">Waiting for verification</string>
+    <string name="error_restaurant_status_not_verified">The restaurant has not yet been verified</string>
     <string name="error_cant_send_message">Can\'t send message</string>
     <string name="label_friend_requests">Friend requests</string>
 </resources>
