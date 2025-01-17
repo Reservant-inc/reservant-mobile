@@ -435,8 +435,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                         pages = listOf(
                             stringResource(R.string.label_visits) to {
                                 CurrentOrdersTab(
-                                    visitsPagingItems = visitsPagingItems,
-                                    profileViewModel = profileViewModel
+                                    visitsPagingItems = visitsPagingItems
                                 )
                             },
                             stringResource(R.string.label_join_requests) to {
@@ -649,8 +648,7 @@ fun JoinRequestsTab(
 
 @Composable
 fun CurrentOrdersTab(
-    visitsPagingItems: LazyPagingItems<VisitDTO>?,
-    profileViewModel: ProfileViewModel
+    visitsPagingItems: LazyPagingItems<VisitDTO>?
 ) {
     if (visitsPagingItems == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
