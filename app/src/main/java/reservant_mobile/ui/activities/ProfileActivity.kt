@@ -201,7 +201,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                         .size(80.dp)
                                         .clip(CircleShape),
                                     contentScale = ContentScale.Crop,
-                                    placeholder = R.drawable.jd,
+                                    placeholder = R.drawable.unknown_profile_photo,
                                     placeholderModifier = Modifier
                                         .size(80.dp)
                                         .clip(CircleShape)
