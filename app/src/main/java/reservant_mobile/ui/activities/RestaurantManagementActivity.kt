@@ -67,6 +67,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -405,13 +406,15 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         text = "$cityText $postalText",
                                         fontSize = 14.sp,
                                     )
-                                    val restaurantVerifiedText = stringResource(id = R.string.label_restaurant_status_verified)
-                                    val restaurantNotVerifiedText = stringResource(id = R.string.label_restaurant_status_not_verified)
-                                    val restaurantStatus = if(restaurant.isVerified) restaurantVerifiedText else restaurantNotVerifiedText
-                                    Text(
-                                        text = stringResource(id = R.string.status_label, restaurantStatus),
-                                        fontSize = 14.sp,
-                                    )
+
+                                    if(!restaurant.isVerified){
+                                        Text(
+                                            text = stringResource(id = R.string.label_restaurant_status_not_verified),
+                                            fontSize = 14.sp,
+                                            fontStyle = FontStyle.Italic
+                                        )
+                                    }
+
                                 }
                                 IconButton(
                                     modifier = Modifier
