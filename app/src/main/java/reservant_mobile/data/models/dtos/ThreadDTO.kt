@@ -9,7 +9,8 @@ data class ThreadDTO (
     /***
      * UserDTO contains userId, firstName, lastName, photo
      */
-    val participants: List<UserDTO>? = null
+    val participants: List<UserDTO>? = null,
+    val type: MessageThreadType? = null
 ){
     @Serializable
     data class CreateThreadRequest(

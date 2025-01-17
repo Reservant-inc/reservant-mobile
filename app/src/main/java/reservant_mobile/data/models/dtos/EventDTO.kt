@@ -22,6 +22,7 @@ data class EventDTO (
     val numberInterested: Int? = null,
     val numberParticipants: Int? = null,
     val isArchived: Boolean? = null,
+    val threadId: Int? = null
 ){
     @Serializable
     data class Participant(

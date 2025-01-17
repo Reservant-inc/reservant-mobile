@@ -54,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,10 +76,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
@@ -91,6 +94,7 @@ import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.CartItemCard
+import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
@@ -103,6 +107,7 @@ import reservant_mobile.ui.components.RatingBar
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagItem
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
@@ -111,9 +116,14 @@ import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RestaurantDetailActivity(restaurantId: Int = 1) {
+fun RestaurantDetailActivity(
+    restaurantId: Int = 1,
+    onReturnClick: () -> Unit
+) {
 
     val Context = LocalContext.current
+
+    val navController = rememberNavController()
 
     val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -121,6 +131,8 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                 RestaurantDetailViewModel(restaurantId) as T
         }
     )
+
+    val events by rememberUpdatedState(newValue = restaurantDetailVM.events.collectAsLazyPagingItems())
 
     val reviewsViewModel: ReviewsViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -143,8 +155,6 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
 
     var isCartVisible by remember { mutableStateOf(false) }
-
-    val navController = rememberNavController()
 
     NavHost(
         navController = navController,
@@ -199,7 +209,7 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
 
 
                                     IconButton(
-                                        onClick = { navController.popBackStack() },
+                                        onClick = onReturnClick,
                                         modifier = Modifier
                                             .padding(16.dp)
                                             .align(Alignment.TopStart)
@@ -406,7 +416,12 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
                                                 }
                                             )
                                         },
-                                        stringResource(R.string.label_events) to { EventsContent() },
+                                        stringResource(R.string.label_events) to {
+                                            EventsContent(
+                                                eventsFlow = events,
+                                                navController = navController
+                                            )
+                                        },
                                         stringResource(R.string.label_reviews) to {
                                             ReviewsContent(
                                                 reviewsFlow,
@@ -502,6 +517,12 @@ fun RestaurantDetailActivity(restaurantId: Int = 1) {
             EditReviewActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.AddReview>().restaurantId,
                 reviewId = it.toRoute<RestaurantRoutes.EditReview>().reviewId,
+                navController = navController
+            )
+        }
+        composable<EventRoutes.Details> {
+            EventDetailActivity(
+                eventId = it.toRoute<EventRoutes.Details>().eventId,
                 navController = navController
             )
         }

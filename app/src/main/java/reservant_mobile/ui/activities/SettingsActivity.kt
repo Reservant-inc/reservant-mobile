@@ -50,6 +50,7 @@ import reservant_mobile.ui.components.NotificationHandler
 import reservant_mobile.ui.components.RequestPermission
 import reservant_mobile.ui.components.UnderlinedItem
 import reservant_mobile.ui.navigation.AuthRoutes
+import reservant_mobile.ui.navigation.EventRoutes
 import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.UserRoutes
@@ -224,6 +225,12 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
             }
             composable<UserRoutes.Wallet>{
                 WalletActivity()
+            }
+            composable<EventRoutes.Details>{
+                EventDetailActivity(
+                    navController = navController,
+                    eventId = it.toRoute<EventRoutes.Details>().eventId
+                )
             }
             composable<UserRoutes.Chat>{
                 ChatActivity(
