@@ -393,11 +393,12 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         text = restaurant.address,
                                         fontSize = 14.sp,
                                     )
-                                    if(restaurant.postalIndex.isNotEmpty())
-                                        Text(
-                                            text = restaurant.postalIndex,
-                                            fontSize = 14.sp,
-                                        )
+                                    val cityText = restaurant.city
+                                    val postalText = restaurant.postalIndex
+                                    Text(
+                                        text = "$cityText $postalText",
+                                        fontSize = 14.sp,
+                                    )
                                     Text(
                                         text = restaurant.city,
                                         fontSize = 14.sp,
