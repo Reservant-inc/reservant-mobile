@@ -1,8 +1,10 @@
 package reservant_mobile.ui.activities
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -422,7 +424,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 if (profileViewModel.isCurrentUser) {
                     FloatingTabSwitch(
                         pages = listOf(
-                            stringResource(R.string.label_orders) to {
+                            stringResource(R.string.label_visits) to {
                                 CurrentOrdersTab(
                                     visitsPagingItems = visitsPagingItems,
                                     profileViewModel = profileViewModel
@@ -659,10 +661,7 @@ fun CurrentOrdersTab(
                     val visit = visitsPagingItems[index]
                     if (visit != null) {
                         OrderCard(
-                            visit = visit,
-                            onConfirmArrival = {
-                                profileViewModel.confirmArrival(visit.visitId.toString())
-                            }
+                            visit = visit
                         )
                     }
                 }
@@ -998,9 +997,19 @@ fun FriendsTab(
 
 
 @Composable
-fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
-    val isConfirmed = visit.actualStartTime != null
+fun OrderCard(visit: VisitDTO) {
 
+//    val (statusText, statusColor) = when (visit.status) {
+//        "Accepted" -> "Accepted" to Color.Green
+//        else       -> "Pending" to Color.Yellow
+//    }
+
+    // TODO: TEMPORARY CODE, DELETE AFTER STATUS UPDATE IN DTO
+    val (statusText, statusColor) = when ("Accepted") {
+        "Accepted" -> "Accepted" to Color(58, 148, 16)
+        else       -> "Pending" to Color(204, 150, 22)
+    }
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1009,6 +1018,7 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.restaurant_photo),
@@ -1020,7 +1030,6 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
                         .padding(8.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                // Restaurant Name and Date
                 Column {
                     Text(
                         text = visit.restaurant?.name ?: "",
@@ -1028,11 +1037,8 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${stringResource(R.string.label_visit_date)}: ${visit.date?.let {
-                            formatToDateTime(
-                                it
-                            )
-                        }}",
+                        text = "${stringResource(R.string.label_visit_date)}: " +
+                                (visit.date?.let { formatToDateTime(it) } ?: ""),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -1043,9 +1049,7 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = "${stringResource(R.string.label_number_of_guests)}: ${visit.numberOfGuests}",
                     style = MaterialTheme.typography.bodyLarge
@@ -1061,18 +1065,17 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!isConfirmed) {
-                Button(
-                    onClick = { onConfirmArrival() },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(text = stringResource(R.string.label_confirm_arrival))
-                }
-            } else {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clip(RoundedCornerShape(24.dp))
+                    .border(BorderStroke(1.dp, statusColor), RoundedCornerShape(24.dp))
+                    .background(statusColor.copy(alpha = 0.1f))
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
                 Text(
-                    text = stringResource(R.string.label_arrival_confirmed),
-                    color = Color.Green,
-                    modifier = Modifier.align(Alignment.End),
+                    text = "Status: $statusText",
+                    color = statusColor,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
