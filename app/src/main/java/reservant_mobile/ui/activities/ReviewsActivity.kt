@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +47,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
@@ -121,9 +125,20 @@ fun ReviewsActivity(
                         modifier = Modifier.verticalScroll(rememberScrollState())
                     ) {
                         filteredReviews.forEach { review ->
+
+                            var userDto: UserSummaryDTO? by remember { mutableStateOf(null) }
+
+                            LaunchedEffect(review.authorId) {
+                                review.authorId?.let {
+                                    userDto = reviewsViewModel.getUser(review.authorId)
+                                }
+                            }
+
                             ReviewCardWithReply(
                                 review = review,
                                 isOwner = isOwner,
+                                reviewsViewModel = reviewsViewModel,
+                                userDto = userDto,
                                 onReplySubmitted = { replyContent ->
                                     reviewsViewModel.postReply(reviewId = review.reviewId!!, replyContent = replyContent)
                                 }
@@ -147,6 +162,8 @@ fun ReviewsActivity(
 fun ReviewCardWithReply(
     review: ReviewDTO,
     isOwner: Boolean,
+    userDto: UserSummaryDTO?,
+    reviewsViewModel: ReviewsViewModel,
     onReplySubmitted: (String) -> Unit
 ) {
     var showReplyField by remember { mutableStateOf(false) }
@@ -160,13 +177,23 @@ fun ReviewCardWithReply(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
+                LoadedPhotoComponent(
+                    photoModifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color.Gray)
+                        .background(Color.Gray),
+                    placeholderModifier = Modifier.size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray),
+                    placeholder = R.drawable.unknown_profile_photo
                 ) {
-                    // avatar
+                    if(userDto != null){
+                        userDto.photo?.let { photo ->
+                            reviewsViewModel.getPhoto(photo)
+                        }
+                    }else{
+                        null
+                    }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
