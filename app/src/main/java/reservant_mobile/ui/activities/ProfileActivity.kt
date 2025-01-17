@@ -91,6 +91,7 @@ import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.EventRoutes
@@ -194,14 +195,21 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.jd),
-                                    contentDescription = stringResource(R.string.label_profile_picture),
-                                    modifier = Modifier
+                                LoadedPhotoComponent(
+                                    photoModifier = Modifier
                                         .size(80.dp)
                                         .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = R.drawable.jd,
+                                    placeholderModifier = Modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape)
+
+                                ) {
+                                    profileViewModel.simpleProfileUser?.photo?.let {photo ->
+                                        profileViewModel.getPhoto(photo)
+                                    }
+                                }
                                 Spacer(modifier = Modifier.width(16.dp))
 
                                 Column {
@@ -1009,7 +1017,7 @@ fun OrderCard(visit: VisitDTO) {
         "Accepted" -> "Accepted" to Color(58, 148, 16)
         else       -> "Pending" to Color(204, 150, 22)
     }
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()

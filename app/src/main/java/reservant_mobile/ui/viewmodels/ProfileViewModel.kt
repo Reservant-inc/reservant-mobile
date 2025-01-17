@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -208,6 +209,13 @@ class ProfileViewModel(
         }
     }
 
+    suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
 
     private fun fetchUserEvents() {
         viewModelScope.launch {
