@@ -550,7 +550,10 @@ fun MapActivity(isUserLoggedIn: Boolean = false){
             }
         }
         composable<RestaurantRoutes.Details> {
-            RestaurantDetailActivity(restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId)
+            RestaurantDetailActivity(
+                restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId,
+                onReturnClick = { navController.popBackStack() }
+            )
         }
         composable<EventRoutes.Details>{
             EventDetailActivity(
