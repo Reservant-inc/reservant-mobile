@@ -90,6 +90,7 @@ import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
 import reservant_mobile.ui.components.ReturnButton
+import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagsDetailView
 import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
@@ -353,14 +354,19 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                 img = restaurantManageVM.getPhoto(restaurant)
                             }
                         }
-
+                        val restaurantNotVerifiedMsg = stringResource(id = R.string.error_restaurant_status_not_verified)
                         Card(
                             shape = RoundedCornerShape(16.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                             onClick = {
-                                restaurantManageVM.selectedRestaurant = restaurant
-                                restaurantManageVM.selectedRestaurantLogo = img
-                                navController.navigate(RestaurantManagementRoutes.RestaurantPreview)
+                                if(restaurant.isVerified){
+                                    restaurantManageVM.selectedRestaurant = restaurant
+                                    restaurantManageVM.selectedRestaurantLogo = img
+                                    navController.navigate(RestaurantManagementRoutes.RestaurantPreview)
+                                }
+                                else{
+                                    Toast.makeText(context, restaurantNotVerifiedMsg, Toast.LENGTH_SHORT).show()
+                                }
                             },
                             modifier = Modifier
                                 .padding(8.dp)
@@ -399,8 +405,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         text = "$cityText $postalText",
                                         fontSize = 14.sp,
                                     )
+                                    val restaurantVerifiedText = stringResource(id = R.string.label_restaurant_status_verified)
+                                    val restaurantNotVerifiedText = stringResource(id = R.string.label_restaurant_status_not_verified)
+                                    val restaurantStatus = if(restaurant.isVerified) restaurantVerifiedText else restaurantNotVerifiedText
                                     Text(
-                                        text = restaurant.city,
+                                        text = stringResource(id = R.string.status_label, restaurantStatus),
                                         fontSize = 14.sp,
                                     )
                                 }
