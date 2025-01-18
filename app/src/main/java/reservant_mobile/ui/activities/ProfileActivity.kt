@@ -936,7 +936,14 @@ fun FriendsTab(
                     }
                 }
             } else {
+                if(friendsRequestsPagingItems.itemCount == 0){
+                    item {
+                        Spacer(modifier = Modifier.height(80.dp))
+                    }
+                }
+
                 item {
+
                     Text(
                         text = stringResource(R.string.label_friends),
                         style = MaterialTheme.typography.headlineSmall,
