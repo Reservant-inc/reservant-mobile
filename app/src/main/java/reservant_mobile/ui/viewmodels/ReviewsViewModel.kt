@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,14 +14,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
+import reservant_mobile.data.models.dtos.UserDTO
+import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 
 class ReviewsViewModel(
     private val restaurantId: Int,
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val fileService: FileService = FileService(),
+    private val userService: IUserService = UserService()
 ) : ViewModel() {
 
     var restaurant: RestaurantDTO? by mutableStateOf(null)
@@ -40,6 +47,24 @@ class ReviewsViewModel(
 
     init {
         fetchReviews()
+    }
+
+    suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            return  result.value!!
+        }
+        return null
+    }
+
+    suspend fun getUser(userId: String): UserSummaryDTO? {
+        val result = userService.getUserSimpleInfo(userId)
+
+        if(!result.isError){
+            return result.value
+        }else{
+            throw Exception()
+        }
     }
 
     fun fetchReviews() {

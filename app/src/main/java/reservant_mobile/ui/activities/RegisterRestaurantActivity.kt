@@ -764,7 +764,7 @@ fun RegisterRestaurantActivity(
                                         label = stringResource(R.string.label_add_to_group),
                                         isError = restaurantViewModel.isGroupInvalid(),
                                         errorText = stringResource(
-                                            if (restaurantViewModel.getGroupError() != -1)
+                                            if (restaurantViewModel.getGroupError() != -1 && formSent3)
                                                 restaurantViewModel.getGroupError()
                                             else
                                                 R.string.error_registerRestaurant_invalid_group
@@ -828,6 +828,7 @@ fun RegisterRestaurantActivity(
                     id = restaurantViewModel.getToastError3()
                 )
                 var successText = ""
+                val errorText = stringResource(R.string.error_create_restaurant)
 
                 if(restaurantId == null && group == null)
                     successText = stringResource(R.string.label_restaurant_register_complete)
@@ -850,14 +851,19 @@ fun RegisterRestaurantActivity(
                                 restaurantViewModel.editRestaurant(context)
                             }
 
-                            Toast.makeText(
-                                context,
-                                successText,
-                                Toast.LENGTH_SHORT
-                            ).show()
-
                             if (success) {
                                 navControllerHome.navigate(MainRoutes.Home)
+                                Toast.makeText(
+                                    context,
+                                    successText,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    errorText,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                             isLoading = false
                         }

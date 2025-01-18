@@ -1,8 +1,11 @@
 package reservant_mobile.ui.activities
 
 import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -89,6 +92,7 @@ import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.FormInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.navigation.EventRoutes
@@ -192,14 +196,21 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.jd),
-                                    contentDescription = stringResource(R.string.label_profile_picture),
-                                    modifier = Modifier
+                                LoadedPhotoComponent(
+                                    photoModifier = Modifier
                                         .size(80.dp)
                                         .clip(CircleShape),
-                                    contentScale = ContentScale.Crop
-                                )
+                                    contentScale = ContentScale.Crop,
+                                    placeholder = R.drawable.unknown_profile_photo,
+                                    placeholderModifier = Modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape)
+
+                                ) {
+                                    profileViewModel.simpleProfileUser?.photo?.let {photo ->
+                                        profileViewModel.getPhoto(photo)
+                                    }
+                                }
                                 Spacer(modifier = Modifier.width(16.dp))
 
                                 Column {
@@ -422,10 +433,9 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                 if (profileViewModel.isCurrentUser) {
                     FloatingTabSwitch(
                         pages = listOf(
-                            stringResource(R.string.label_orders) to {
+                            stringResource(R.string.label_visits) to {
                                 CurrentOrdersTab(
-                                    visitsPagingItems = visitsPagingItems,
-                                    profileViewModel = profileViewModel
+                                    visitsPagingItems = visitsPagingItems
                                 )
                             },
                             stringResource(R.string.label_join_requests) to {
@@ -446,6 +456,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                             stringResource(R.string.label_event_history) to {
                                 EventHistoryTab(
                                     eventPagingItems,
+                                    profileViewModel,
                                     navController
                                 )
                             }
@@ -637,8 +648,7 @@ fun JoinRequestsTab(
 
 @Composable
 fun CurrentOrdersTab(
-    visitsPagingItems: LazyPagingItems<VisitDTO>?,
-    profileViewModel: ProfileViewModel
+    visitsPagingItems: LazyPagingItems<VisitDTO>?
 ) {
     if (visitsPagingItems == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -659,10 +669,7 @@ fun CurrentOrdersTab(
                     val visit = visitsPagingItems[index]
                     if (visit != null) {
                         OrderCard(
-                            visit = visit,
-                            onConfirmArrival = {
-                                profileViewModel.confirmArrival(visit.visitId.toString())
-                            }
+                            visit = visit
                         )
                     }
                 }
@@ -724,6 +731,7 @@ fun CurrentOrdersTab(
 @Composable
 fun EventHistoryTab(
     eventPagingItems: LazyPagingItems<EventDTO>?,
+    profileViewModel: ProfileViewModel,
     navController: NavHostController
 ) {
 
@@ -743,12 +751,22 @@ fun EventHistoryTab(
             items(eventPagingItems.itemCount) { index ->
                 val event = eventPagingItems[index]
                 if (event != null) {
+
+                    var eventPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                    LaunchedEffect(event.photo) {
+                        event.photo?.let { photo ->
+                            eventPhoto = profileViewModel.getPhoto(photo)
+                        }
+                    }
+
                     EventCard(
                         eventName = event.name ?: "",
                         eventDate = event.time,
                         eventLocation = event.restaurant?.name ?: "",
                         interestedCount = event.numberInterested ?: 0,
                         takePartCount = event.numberParticipants ?: 0,
+                        eventPhoto = eventPhoto,
                         onClick = {
                             navController.navigate(
                                 EventRoutes.Details(eventId = event.eventId!!)
@@ -998,8 +1016,18 @@ fun FriendsTab(
 
 
 @Composable
-fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
-    val isConfirmed = visit.actualStartTime != null
+fun OrderCard(visit: VisitDTO) {
+
+//    val (statusText, statusColor) = when (visit.status) {
+//        "Accepted" -> "Accepted" to Color.Green
+//        else       -> "Pending" to Color.Yellow
+//    }
+
+    // TODO: TEMPORARY CODE, DELETE AFTER STATUS UPDATE IN DTO
+    val (statusText, statusColor) = when ("Accepted") {
+        "Accepted" -> "Accepted" to Color(58, 148, 16)
+        else       -> "Pending" to Color(204, 150, 22)
+    }
 
     Card(
         modifier = Modifier
@@ -1009,6 +1037,7 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.restaurant_photo),
@@ -1020,7 +1049,6 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
                         .padding(8.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                // Restaurant Name and Date
                 Column {
                     Text(
                         text = visit.restaurant?.name ?: "",
@@ -1028,11 +1056,8 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${stringResource(R.string.label_visit_date)}: ${visit.date?.let {
-                            formatToDateTime(
-                                it
-                            )
-                        }}",
+                        text = "${stringResource(R.string.label_visit_date)}: " +
+                                (visit.date?.let { formatToDateTime(it) } ?: ""),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -1043,9 +1068,7 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = "${stringResource(R.string.label_number_of_guests)}: ${visit.numberOfGuests}",
                     style = MaterialTheme.typography.bodyLarge
@@ -1061,18 +1084,17 @@ fun OrderCard(visit: VisitDTO, onConfirmArrival: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!isConfirmed) {
-                Button(
-                    onClick = { onConfirmArrival() },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(text = stringResource(R.string.label_confirm_arrival))
-                }
-            } else {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .clip(RoundedCornerShape(24.dp))
+                    .border(BorderStroke(1.dp, statusColor), RoundedCornerShape(24.dp))
+                    .background(statusColor.copy(alpha = 0.1f))
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
                 Text(
-                    text = stringResource(R.string.label_arrival_confirmed),
-                    color = Color.Green,
-                    modifier = Modifier.align(Alignment.End),
+                    text = "Status: $statusText",
+                    color = statusColor,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }

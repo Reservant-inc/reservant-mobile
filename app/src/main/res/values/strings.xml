@@ -567,4 +567,5 @@
     <string name="label_friend_requests">Friend requests</string>
     <string name="label_report_resolved_positively">Resolved positively</string>
     <string name="label_report_resolved_negatively">ReResolved negatively</string>
+    <string name="error_create_restaurant">Error while creating restaurant</string>
 </resources>
