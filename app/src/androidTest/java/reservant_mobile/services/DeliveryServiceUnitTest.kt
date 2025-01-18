@@ -12,7 +12,7 @@ import reservant_mobile.data.services.IDeliveryService
 class DeliveryServiceUnitTest: ServiceTest() {
     private val ser: IDeliveryService = DeliveryService()
     private val delivery = DeliveryDTO(
-        restaurantId = 1,
+        restaurantId = 4,
         ingredients = listOf(DeliveryDTO.DeliveryIngredientDTO(
             deliveryId = 1,
             ingredientId = 1,
