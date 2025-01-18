@@ -23,7 +23,12 @@ class MyRestaurants {
                       val dateFrom: String? = null,
                       val dateUntil: String? = null,
                       val category: String? = null,
-                      val reportedUserId: String? = null)
+                      val reportedUserId: String? = null,
+                      val createdById: String? = null,
+                      val assignedToId: String? = null,
+                      val page: Int? = null,
+                      val perPage: Int? = null
+            )
 
         @Resource("statistics")
         class Statistics(val parent: Id,
