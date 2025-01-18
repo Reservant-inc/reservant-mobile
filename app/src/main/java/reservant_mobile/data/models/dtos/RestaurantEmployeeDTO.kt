@@ -17,6 +17,7 @@ data class RestaurantEmployeeDTO(
     val password: String? = null,
     val roles: List<String>? = null,
     val photo: String? = null,
+    val bannedUntil: String? = null,
     val friendStatus: FriendStatus? = null,
     val employerId: String? = null,
     val restaurantName: String? = null,

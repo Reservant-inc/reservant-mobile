@@ -135,7 +135,11 @@ interface IRestaurantService{
                                          dateFrom: LocalDateTime? = null,
                                          dateUntil: LocalDateTime? = null,
                                          category: ReportDTO.ReportCategory? = null,
-                                         reportedUserId: String? = null, ): Result<List<ReportDTO>?>
+                                         status: ReportDTO.ReportStatus? = null,
+                                         reportedUserId: String? = null,
+                                         createdById: String? = null,
+                                         assignedToId: String? = null,
+                                         ): Result<Flow<PagingData<ReportDTO>>?>
 
     suspend fun getAllStatistics(dateFrom: LocalDateTime? = null,
                               dateUntil: LocalDateTime? = null,
@@ -568,16 +572,28 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
         dateFrom: LocalDateTime?,
         dateUntil: LocalDateTime?,
         category: ReportDTO.ReportCategory?,
-        reportedUserId: String?
-    ): Result<List<ReportDTO>?> {
-        val res  = api.get(MyRestaurants.Id.Reports(
-            parent = MyRestaurants.Id(restaurantId = restaurantId.toString()),
-            dateFrom = dateFrom?.toString(),
-            dateUntil = dateUntil?.toString(),
-            category = category?.name,
-            reportedUserId = reportedUserId,
-        ))
-        return complexResultWrapper(res)
+        status: ReportDTO.ReportStatus?,
+        reportedUserId: String?,
+        createdById: String?,
+        assignedToId: String?,
+    ): Result<Flow<PagingData<ReportDTO>>?> {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
+            api.get(
+                MyRestaurants.Id.Reports(
+                    parent = MyRestaurants.Id(restaurantId = restaurantId.toString()),
+                    dateFrom = dateFrom?.toString(),
+                    dateUntil = dateUntil?.toString(),
+                    category = category?.name,
+                    reportedUserId = reportedUserId,
+                    createdById = createdById,
+                    assignedToId = assignedToId,
+                    page = page,
+                    perPage = perPage
+                )
+            )
+        }
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReportDTO::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 
     override suspend fun getAllStatistics(

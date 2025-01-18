@@ -13,6 +13,7 @@ import reservant_mobile.data.services.RestaurantMenuService
 
 class RestaurantMenuServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantMenuService = RestaurantMenuService()
+    private val restaurantId = 4
 
     private lateinit var menu: RestaurantMenuDTO
     private lateinit var menuItem: RestaurantMenuItemDTO
@@ -22,15 +23,16 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
         loginUser()
 
         menu = RestaurantMenuDTO(
-            restaurantId = 1,
+            restaurantId = 4,
             name = "Test Menu",
             alternateName = "Testovací menu",
             menuType = "Food",
-            dateFrom = "2020-02-20"
+            dateFrom = "2020-02-20",
+            menuItemsIds = emptyList()
         )
 
         menuItem = RestaurantMenuItemDTO(
-            restaurantId = 1,
+            restaurantId = 4,
             price = 100.0,
             name = "Burger",
             alcoholPercentage = 99.9,
@@ -51,7 +53,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_owner_menus_return_not_null()= runTest{
-        assertThat(ser.getOwnerMenus(1).value).isNotNull()
+        assertThat(ser.getOwnerMenus(restaurantId).value).isNotNull()
     }
 
     @Test
@@ -67,13 +69,13 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_menu_return_not_null()= runTest{
-        val id = ser.getMenus(1).value!!.last().menuId!!
+        val id = ser.getMenus(restaurantId).value!!.last().menuId!!
         assertThat(ser.editMenu(id, menu).value).isNotNull()
     }
 
     @Test
     fun get_menu_items_return_not_null()= runTest{
-        assertThat(ser.getMenuItems(1).value).isNotNull()
+        assertThat(ser.getMenuItems(restaurantId).value).isNotNull()
     }
 
     @Test
@@ -83,7 +85,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_menu_item_return_not_null()= runTest{
-        val id = ser.getMenuItems(1).value!!.first().menuItemId!!
+        val id = ser.getMenuItems(restaurantId).value!!.first().menuItemId!!
         assertThat(ser.getMenuItem(id).value).isNotNull()
     }
 
@@ -96,14 +98,14 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_menu_item_return_not_null()= runTest{
-        val id = ser.getMenuItems(1).value!!.last().menuItemId!!
+        val id = ser.getMenuItems(restaurantId).value!!.last().menuItemId!!
         assertThat(ser.editMenuItem(id, menuItem).value).isNotNull()
     }
 
     @Test
     fun add_items_to_menu_return_not_null()= runTest{
-        val menuId = ser.getMenus(1).value!!.last().menuId!!
-        val itemId = ser.getMenuItems(1).value!!.last().menuItemId!!
+        val menuId = ser.getMenus(restaurantId).value!!.last().menuId!!
+        val itemId = ser.getMenuItems(restaurantId).value!!.last().menuItemId!!
         assertThat(ser.addItemsToMenu(menuId, listOf(itemId)).value).isNotNull()
     }
 

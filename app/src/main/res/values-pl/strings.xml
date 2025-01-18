@@ -553,4 +553,6 @@
     <string name="error_restaurant_status_not_verified">Restauracja nie została jeszcze zweryfikowana</string>
     <string name="error_cant_send_message">Nie można wysłać wiadomości</string>
     <string name="label_friend_requests">Zaproszenia do znajomych</string>
+    <string name="label_report_resolved_positively">Zatwierdzono</string>
+    <string name="label_report_resolved_negatively">Odrzucono</string>
 </resources>

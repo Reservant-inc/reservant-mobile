@@ -73,7 +73,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
             amountUsed = 10.0
         )
     )
-    private val restaurantId = 2
+    private val restaurantId = 5
 
     @Before
     fun setupData() = runBlocking {
@@ -300,7 +300,11 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun get_reports_return_not_null()= runTest{
         val date = LocalDateTime.now()
-        assertThat(ser.getUserRestaurantReports(restaurantId, dateUntil = date).value).isNotNull()
+        val items = ser.getUserRestaurantReports(restaurantId, dateUntil = date).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 
     @Test

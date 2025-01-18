@@ -11,7 +11,7 @@ import reservant_mobile.data.services.IFriendsService
 
 class FriendsServiceUnitTest:ServiceTest() {
     private val ser: IFriendsService = FriendsService()
-    private val jdId = "e5779baf-5c9b-4638-b9e7-ec285e57b367"
+    private val customerId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29"
 
 
     @Before
@@ -21,10 +21,10 @@ class FriendsServiceUnitTest:ServiceTest() {
     
     @Test
     fun accept_and_delete_friend_request()= runTest{
-        assertThat(ser.sendFriendRequest(jdId).value).isTrue()
-        assertThat(ser.markRequestAsRead(jdId).value).isTrue()
-        assertThat(ser.acceptFriendRequest(jdId).value).isTrue()
-        assertThat(ser.deleteFriendOrRequest(jdId).value).isTrue()
+        assertThat(ser.sendFriendRequest(customerId).value).isTrue()
+        assertThat(ser.markRequestAsRead(customerId).value).isTrue()
+        assertThat(ser.acceptFriendRequest(customerId).value).isTrue()
+        assertThat(ser.deleteFriendOrRequest(customerId).value).isTrue()
     }
 
     @Test
