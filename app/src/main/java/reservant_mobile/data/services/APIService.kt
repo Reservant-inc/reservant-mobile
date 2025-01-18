@@ -162,20 +162,22 @@ class APIService{
         return client
     }
 
-    fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
-        res?:
+    companion object{
+        fun responseWrapper(res: HttpResponse?): Result<HttpResponse?> {
+            res?:
             return Result(isError = true, errors =  mapOf(pair= Pair("TOAST", R.string.error_connection_server)), value = null)
 
-        if (res.status == HttpStatusCode.Unauthorized)
-            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
+            if (res.status == HttpStatusCode.Unauthorized)
+                return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unauthorized_access)) ,value = null)
 
-        if (res.status == HttpStatusCode.NotFound)
-            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_not_found)) ,value = null)
+            if (res.status == HttpStatusCode.NotFound)
+                return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_not_found)) ,value = null)
 
-        if (res.status == HttpStatusCode.InternalServerError)
-            return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+            if (res.status == HttpStatusCode.InternalServerError)
+                return Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
 
-        return Result(isError = false, value = res)
+            return Result(isError = false, value = res)
+        }
     }
 
     suspend fun createWebsocketSession(path: String):Result<DefaultClientWebSocketSession?> {
