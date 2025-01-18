@@ -789,7 +789,10 @@ fun RegisterRestaurantActivity(
                                         expanded = expandedState,
                                         value = selectedGroup?.name ?: "",
                                         onValueChange = { name ->
-                                            restaurantViewModel.selectedToGroup.value = newGroups.find { it.name == name }
+                                            val tmp = newGroups.find { it.name == name }
+                                            restaurantViewModel.selectedToGroup.value = tmp
+                                            restaurantViewModel.selectedGroup = tmp
+
                                         },
                                         options = newGroups.map { it.name },
                                         label = stringResource(R.string.label_add_to_group),
