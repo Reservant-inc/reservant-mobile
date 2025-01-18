@@ -835,16 +835,20 @@ fun FriendsTab(
     navController: NavHostController,
     profileViewModel: ProfileViewModel
 ) {
+    Spacer(modifier = Modifier.height(64.dp))
+
     if (friendsPagingItems == null || friendsRequestsPagingItems == null) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
     } else {
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             if (friendsRequestsPagingItems.itemCount > 0) {
                 item {
