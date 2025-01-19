@@ -381,7 +381,10 @@ fun EmployeeHomeActivity() {
                                 empHomeVM.localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
                             }
                                       },
-                        withBackButton = true
+                        withBackButton = true,
+                        onReturnClick = {
+                            innerNavController.popBackStack()
+                        }
                     )
                 }
                 composable<AuthRoutes.Landing> {

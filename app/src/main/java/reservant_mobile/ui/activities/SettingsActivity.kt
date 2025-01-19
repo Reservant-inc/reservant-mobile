@@ -57,7 +57,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false) {
+fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false, onReturnClick: () -> Unit = {}) {
     val loginViewModel = viewModel<LoginViewModel>()
     var showLogoutPopup by remember { mutableStateOf(false) }
     var showDeleteAccountPopup by remember { mutableStateOf(false) }
@@ -79,7 +79,8 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
                         text = stringResource(R.string.label_settings),
-                        showBackButton = withBackButton
+                        showBackButton = withBackButton,
+                        onReturnClick = onReturnClick
                     )
 
                     Spacer(modifier = Modifier.padding(top = 16.dp))
