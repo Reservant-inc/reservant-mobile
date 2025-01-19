@@ -131,6 +131,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         if(navController.currentBackStackEntry?.destination?.route == RestaurantManagementRoutes.RestaurantPreview::class.qualifiedName)
                             navController.navigate(RestaurantManagementRoutes.Restaurant)
                         restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
+                        selectedGroup = null
                         showDeleteRestaurantPopup = false
                     }
                 }
