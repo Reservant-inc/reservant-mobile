@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -599,21 +600,27 @@ fun RestaurantDetailPreview(
     isUserLoggedIn: Boolean = false
 ){
     val modalBottomSheetState = rememberModalBottomSheetState()
+
+    val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                RestaurantDetailViewModel(restaurantId) as T
+        }
+    )
+
+    LaunchedEffect(key1 = true) {
+        restaurantDetailVM.loadRestaurant(restaurantId)
+    }
+    val contentHeight = if (restaurantDetailVM.restaurant?.photos != null && restaurantDetailVM.restaurant!!.photos.isNotEmpty())
+        450.dp
+    else
+        350.dp
+
     ModalBottomSheet(
         onDismissRequest = { onDismiss()},
         sheetState = modalBottomSheetState,
-        modifier = Modifier.height(450.dp)
+        modifier = Modifier.height(contentHeight)
     ) {
-        val restaurantDetailVM = viewModel<RestaurantDetailViewModel>(
-            factory = object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                    RestaurantDetailViewModel(restaurantId) as T
-            }
-        )
-
-        LaunchedEffect(key1 = true) {
-            restaurantDetailVM.loadRestaurant(restaurantId)
-        }
 
         Box(modifier = Modifier.fillMaxSize()) {
 
@@ -633,8 +640,8 @@ fun RestaurantDetailPreview(
                 restaurantDetailVM.restaurant != null -> {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         restaurantDetailVM.restaurant?.let { restaurant ->
-
-                            if(restaurant.photos.size > 1){
+                            
+                            if(restaurant.photos.isNotEmpty()){
                                 var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
                                 LaunchedEffect(restaurant.photos) {
@@ -655,12 +662,16 @@ fun RestaurantDetailPreview(
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp)
                                             .horizontalScroll(rememberScrollState()),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.Center
                                     ) {
                                         images.forEach { img ->
-                                            ImageCard(
-                                                image = img.asImageBitmap()
-                                            )
+                                            Box(
+                                                modifier = Modifier.padding(horizontal = 8.dp)
+                                            ) {
+                                                ImageCard(
+                                                    image = img.asImageBitmap()
+                                                )
+                                            }
                                         }
                                     }
                                 }
