@@ -261,6 +261,19 @@ fun EmployeeHomeActivity() {
 
                 composable<EmployeeRoutes.Home> {
                     val restaurant = empHomeVM.selectedEmployment!!.restaurant!!
+                    val reservations = EmpMenuOption(
+                        text = stringResource(id = R.string.label_reservations),
+                        icon = Icons.Outlined.Inbox,
+                        background = painterResource(id = R.drawable.reservation_checklist),
+                        onClick = {
+                            innerNavController.navigate(
+                                RestaurantRoutes.Reservation(
+                                    restaurantId = restaurant.restaurantId,
+                                    isReservation = true
+                                )
+                            )
+                        }
+                    )
                     val warehouse = EmpMenuOption(
                         text = stringResource(id = R.string.label_warehouse),
                         icon = Icons.Outlined.ShoppingBasket,
@@ -273,7 +286,7 @@ fun EmployeeHomeActivity() {
                             )
                         }
                     )
-                    val optionsWithWarehouse: List<EmpMenuOption> = listOf(
+                    val options: List<EmpMenuOption> = listOf(
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_orders),
                             icon = Icons.Outlined.Book,
@@ -298,19 +311,7 @@ fun EmployeeHomeActivity() {
                                 )
                             }
                         ),
-                        EmpMenuOption(
-                            text = stringResource(id = R.string.label_reservations),
-                            icon = Icons.Outlined.Inbox,
-                            background = painterResource(id = R.drawable.reservation_checklist),
-                            onClick = {
-                                innerNavController.navigate(
-                                    RestaurantRoutes.Reservation(
-                                        restaurantId = restaurant.restaurantId,
-                                        isReservation = true
-                                    )
-                                )
-                            }
-                        ),
+                        reservations,
                         warehouse,
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_reviews),
@@ -331,7 +332,8 @@ fun EmployeeHomeActivity() {
                         ),
                     )
 
-                    val options = optionsWithWarehouse.filter { it != warehouse }
+                    val hallEmpOptions = options.filter { it != warehouse }
+                    val backdoorEmpOptions = options.filter { it != reservations }
 
                     Column(
                         modifier = Modifier
@@ -356,14 +358,14 @@ fun EmployeeHomeActivity() {
                             horizontalArrangement = Arrangement.Center,
                             columns = GridCells.Adaptive(minSize = 200.dp)
                         ) {
-                            if (empHomeVM.showWarehouse()){
-                                items(optionsWithWarehouse.size) { optionIndex ->
-                                    val option = optionsWithWarehouse[optionIndex]
+                            if (empHomeVM.isBackdoorEmp()){
+                                items(backdoorEmpOptions.size) { optionIndex ->
+                                    val option = backdoorEmpOptions[optionIndex]
                                     EmpMenuButton(option = option)
                                 }
                             } else {
-                                items(options.size) { optionIndex ->
-                                    val option = options[optionIndex]
+                                items(hallEmpOptions.size) { optionIndex ->
+                                    val option = hallEmpOptions[optionIndex]
                                     EmpMenuButton(option = option)
                                 }
                             }
