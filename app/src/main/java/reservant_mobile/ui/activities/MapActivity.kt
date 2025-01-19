@@ -640,7 +640,7 @@ fun RestaurantDetailPreview(
                 restaurantDetailVM.restaurant != null -> {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         restaurantDetailVM.restaurant?.let { restaurant ->
-                            
+
                             if(restaurant.photos.isNotEmpty()){
                                 var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
