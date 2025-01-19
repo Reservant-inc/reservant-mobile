@@ -44,6 +44,10 @@ class User {
         val dateUntil: String? = null,
         val category: String? = null,
         val reportedUserId: String? = null,
-        val restaurantId: Int? = null,
+        val restaurantId: String? = null,
+        val assignedToId: String? = null,
+        val status: String? = null,
+        val page: Int? = null,
+        val perPage: Int? = null,
     )
 }
