@@ -73,7 +73,9 @@ interface IUserService{
                            dateUntil: LocalDateTime? = null,
                            category: ReportDTO.ReportCategory? = null,
                            reportedUserId: String? = null,
-                           restaurantId: Int? = null): Result<List<ReportDTO>?>
+                           restaurantId: Int? = null,
+                           assignedToId: String? = null,
+                           status: ReportDTO.ReportStatus? = null): Result<Flow<PagingData<ReportDTO>>?>
     suspend fun deleteAccount(): Result<Boolean>
 
 }
@@ -338,20 +340,30 @@ class UserService(): ServiceUtil(), IUserService {
 
     override suspend fun getReports(
         dateFrom: LocalDateTime?,
-        dateUntil: LocalDateTime?,
-        category: ReportDTO.ReportCategory?,
-        reportedUserId: String?,
-        restaurantId: Int?
-    ): Result<List<ReportDTO>?> {
-        val res  = api.get(User.Reports(
-            dateFrom = dateFrom?.toString(),
-            dateUntil = dateUntil?.toString(),
-            category = category?.name,
-            reportedUserId = reportedUserId,
-            restaurantId = restaurantId
+        dateUntil: LocalDateTime? ,
+        category: ReportDTO.ReportCategory? ,
+        reportedUserId: String? ,
+        restaurantId: Int? ,
+        assignedToId: String? ,
+        status: ReportDTO.ReportStatus? ): Result<Flow<PagingData<ReportDTO>>?>
+    {
+        val call : suspend (Int, Int) -> Result<HttpResponse?> = { page, perPage ->
+            api.get(
+                User.Reports(
+                    dateFrom = dateFrom?.toString(),
+                    dateUntil = dateUntil?.toString(),
+                    category = category?.name,
+                    reportedUserId = reportedUserId,
+                    restaurantId = restaurantId?.toString(),
+                    assignedToId = assignedToId,
+                    status = status?.name,
+                    page = page,
+                    perPage = perPage
+                )
             )
-        )
-        return complexResultWrapper(res)
+        }
+        val sps = ServicePagingSource(call, serializer = PageDTO.serializer(ReportDTO::class.serializer()))
+        return pagingResultWrapper(sps)
     }
 
     override suspend fun deleteAccount(): Result<Boolean> {
