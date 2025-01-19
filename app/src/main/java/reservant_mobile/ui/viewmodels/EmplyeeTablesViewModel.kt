@@ -5,17 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.reservant_mobile.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.TableDTO
+import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
 
-class TablesViewModel(private val restaurantId: Int) : ViewModel() {
+class TablesViewModel(private val restaurantId: Int) : ReservantViewModel() {
 
     private val restaurantService: IRestaurantService = RestaurantService()
+
+    var res: Result<RestaurantDTO?> = Result(isError=false, value=null)
 
     var selectedTable: TableDTO? by mutableStateOf(null)
     var isEditSelected by mutableStateOf(false)
@@ -27,24 +32,30 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
     val tables: StateFlow<List<TableDTO>> get() = _tables
 
     init {
-        fetchTables()
+        viewModelScope.launch{
+            fetchTables()
+        }
     }
 
-    private fun fetchTables() {
-        viewModelScope.launch {
-            val result = restaurantService.getRestaurant(restaurantId)
-            if (!result.isError) {
-                _tables.value = result.value?.tables ?: emptyList()
-            }
+    private suspend fun fetchTables() {
+        val result = restaurantService.getRestaurant(restaurantId)
+        if (!result.isError) {
+            _tables.value = result.value?.tables ?: emptyList()
         }
+
     }
 
     suspend fun updateTables(): Boolean {
-        val result = restaurantService.putTables(restaurantId, tables = tables.value)
-        if (!result.isError){
-            fetchTables()
-        }
-        return result.isError
+        res = restaurantService.putTables(restaurantId, tables = tables.value)
+        if (res.isError)
+            res = Result(
+                value = null,
+                errors = mapOf("TOAST" to R.string.error_unauthorized_access),
+                isError = true
+            )
+
+        fetchTables()
+        return res.isError
     }
 
     fun removeTable(tableId: Int) {
@@ -64,7 +75,6 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
     }
 
     fun generateTableId(): Int {
-
         return if (tables.value.isEmpty()){
             1
         } else {
@@ -72,6 +82,10 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
                 it.tableId
             }.tableId + 1
         }
+    }
+
+    fun getToastError(): Int {
+        return getToastError(res)
     }
 
 
