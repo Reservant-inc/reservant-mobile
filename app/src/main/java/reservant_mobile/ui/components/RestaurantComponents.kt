@@ -479,8 +479,7 @@ fun OpeningHours(
 
                         append(" • ")
 
-                        //if (availableHours.from == null && availableHours.until == null){ TODO
-                        if (date.dayOfWeek == DayOfWeek.SUNDAY){
+                        if (availableHours.from == null && availableHours.until == null){
                             withStyle(SpanStyle(color = MaterialTheme.colorScheme.error)){
                                 append(stringResource(id = R.string.label_closed))
                             }
@@ -495,7 +494,9 @@ fun OpeningHours(
                     pushStyle(SpanStyle(color = if (isOpen) Color.Green else Color.Red))
                     append(stringResource(id = if (isOpen) R.string.label_open else R.string.label_closed ))
                     pop()
-                    append(" • $openingTime - $closingTime")
+                    if (openingTime != null && closingTime != null){
+                        append(" • $openingTime - $closingTime\n")
+                    }
                 }
             },
             maxLines = if (isExpanded) Int.MAX_VALUE else 1,
