@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +38,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.FormFileInput
@@ -110,6 +112,65 @@ fun EventDetailActivity(
                             .clip(RoundedCornerShape(8.dp))
                             .shadow(8.dp, RoundedCornerShape(8.dp))
                     )
+                }
+                if(!eventDetailVM.isEventOwner){
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                eventDetailVM.viewModelScope.launch {
+
+                                    if (eventDetailVM.isInterested) {
+                                        val success = eventDetailVM.markEventAsUnInterested()
+                                        if (success) {
+                                            eventDetailVM.isInterested = false
+                                        }
+                                    } else {
+                                        val success = eventDetailVM.joinInterested()
+                                        if (success) {
+                                            eventDetailVM.isInterested = true
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (eventDetailVM.isInterested) Color.Gray else MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = if (eventDetailVM.isInterested) Icons.Default.Star else Icons.Default.StarBorder,
+                                contentDescription = if (eventDetailVM.isInterested) stringResource(R.string.label_not_interested) else stringResource(R.string.label_interested),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (eventDetailVM.isInterested) stringResource(R.string.label_interested) else stringResource(R.string.label_interest)
+                            )
+                        }
+                    }
+                }else{
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_your_event),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
                 }
 
                 if (showEditDialog) {
@@ -198,29 +259,35 @@ fun EventDetailActivity(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (eventDetailVM.isEventOwner && interestedUsers != null && interestedUsers.itemCount > 0) {
-                    item {
-                        Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
-                        Spacer(modifier = Modifier.height(8.dp))
+                if (interestedUsers != null && interestedUsers.itemCount > 0) {
+                    if(eventDetailVM.isEventOwner){
+                        item {
+                            Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
+
                     items(interestedUsers.itemCount) { index ->
                         var user = interestedUsers[index]
                         if (user != null) {
-                            UserListItem(
-                                user = user,
-                                showButtons = true,
-                                onApproveClick = {
-                                    eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.acceptUser(user.userId)
+                            if(eventDetailVM.isEventOwner){
+                                UserListItem(
+                                    user = user,
+                                    showButtons = true,
+                                    onApproveClick = {
+                                        eventDetailVM.viewModelScope.launch {
+                                            eventDetailVM.acceptUser(user.userId)
+                                        }
+                                    },
+                                    onRejectClick = {
+                                        eventDetailVM.viewModelScope.launch {
+                                            eventDetailVM.rejectUser(user.userId)
+                                        }
                                     }
-                                },
-                                onRejectClick = {
-                                    eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.rejectUser(user.userId)
-                                    }
-                                }
-                            )
-                            HorizontalDivider()
+                                )
+                                HorizontalDivider()
+                            }
+
                         }
                     }
                     item {

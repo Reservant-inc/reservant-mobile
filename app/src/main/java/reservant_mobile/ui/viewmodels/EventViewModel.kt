@@ -21,6 +21,7 @@ import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.getFileFromUri
@@ -67,6 +68,8 @@ class EventViewModel(
     var photo by mutableStateOf("")
     var selectedRestaurant by mutableStateOf<RestaurantDTO?>(null)
     var formSent by mutableStateOf(false)
+    var isInterested by mutableStateOf(false)
+
 
     var result by mutableStateOf(Result(isError = false, value = null as EventDTO?))
 
@@ -75,11 +78,28 @@ class EventViewModel(
 
     init {
         viewModelScope.launch {
-            if(fetchRestaurants)
+            if(fetchRestaurants){
                 fetchRestaurants()
-            else
+            } else{
                 getEvent()
+            }
         }
+    }
+
+    suspend fun joinInterested(): Boolean {
+        val result = eventService.markEventAsInterested(eventId)
+        if (!result.isError) {
+            return true
+        }
+        return false
+    }
+
+    suspend fun markEventAsUnInterested(): Boolean {
+        val result = eventService.markEventAsNotInterested(eventId)
+        if (!result.isError) {
+            return true
+        }
+        return false
     }
 
     suspend fun acceptUser(userId: String) {
@@ -137,7 +157,6 @@ class EventViewModel(
         isLoading = true
 
         val resultEvent = eventService.getEvent(eventId)
-        isLoading = false
 
         if (resultEvent.isError) {
             return false
@@ -147,9 +166,10 @@ class EventViewModel(
 
         refreshParticipants()
 
-        if (isEventOwner) {
+        if(isEventOwner)
             refreshInterestedUsers()
-        }
+
+        isLoading = false
 
         return true
     }
