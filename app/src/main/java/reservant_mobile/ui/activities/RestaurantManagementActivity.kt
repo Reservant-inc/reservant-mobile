@@ -348,7 +348,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         }
                     }
 
-                    selectedGroup?.restaurants?.forEach { restaurant ->
+                    selectedGroup?.restaurants?.filter{ it.isArchived != true }.orEmpty().forEach { restaurant ->
                         var img by remember { mutableStateOf<Bitmap?>(null) }
                         LaunchedEffect(key1 = true) {
                             if(restaurant.logo!=null){
