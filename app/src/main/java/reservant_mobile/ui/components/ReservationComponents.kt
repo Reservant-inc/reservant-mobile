@@ -259,7 +259,7 @@ fun OrderFormContent(
             item {
                 val totalCost = reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
                     (menuItem.price ?: 0.0) * quantity
-                }
+                } + reservationViewModel.tip
                 val formattedPrice = String.format("%.2f", totalCost)
 
                 Text(
