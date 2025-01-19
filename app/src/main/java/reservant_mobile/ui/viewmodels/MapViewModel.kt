@@ -111,8 +111,9 @@ class MapViewModel : ReservantViewModel() {
         _addedRestaurants = emptyList<Int>().toMutableList()
         OsmMap.view = mv
         addUserMarker()
-        getRestaurants(startPoint)
-        getEvents(startPoint)
+        val tmpPoint = normalizeGeoPoint(startPoint)
+        getRestaurants(tmpPoint)
+        getEvents(tmpPoint)
 
         return OsmMap.view
     }
@@ -123,9 +124,9 @@ class MapViewModel : ReservantViewModel() {
         val userMarker = MyLocationNewOverlay(GpsMyLocationProvider(context), OsmMap.view)
         userMarker.enableMyLocation()
         userMarker.enableFollowLocation()
-        userMarker.runOnFirstFix {
-            userPosition =  GeoPoint(userMarker.myLocation)
-        }
+//        userMarker.runOnFirstFix {
+//            userPosition =  normalizeGeoPoint(GeoPoint(userMarker.myLocation))
+//        }
         val icon = context.getDrawable( R.drawable.user)
         val iconBitmap = (icon as BitmapDrawable).bitmap
         userMarker.setPersonIcon(iconBitmap)
@@ -133,6 +134,18 @@ class MapViewModel : ReservantViewModel() {
         userMarker.setPersonAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         userMarker.setDirectionAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         OsmMap.view.overlays.add(userMarker)
+    }
+
+    private fun normalizeGeoPoint(point: GeoPoint): GeoPoint{
+        val min = -90
+        val max = 90
+
+        val normLat = (point.latitude - min)/(max - min)
+        val normLon = (point.longitude - min)/(max - min)
+        point.latitude =normLat
+        point.latitude =normLon
+
+        return point
     }
 
     fun refreshRestaurants(userLocation: GeoPoint) {
