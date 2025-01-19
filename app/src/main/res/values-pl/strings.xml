@@ -558,4 +558,7 @@
     <string name="error_create_restaurant">Błąd podczas tworzenia restauracji</string>
     <string name="label_edit_opening_hours">Edycja godzin otwarcia</string>
     <string name="label_add_opening_hours">Dodawanie godzin otwarcia</string>
+    <string name="label_not_interested">Niezainteresowany</string>
+    <string name="label_interest">Zainteresuj się</string>
+    <string name="label_your_event">Twoje wydarzenie</string>
 </resources>

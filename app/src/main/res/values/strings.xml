@@ -570,4 +570,7 @@
     <string name="error_create_restaurant">Error while creating restaurant</string>
     <string name="label_edit_opening_hours">Edit opening hours</string>
     <string name="label_add_opening_hours">Add opening hours</string>
+    <string name="label_not_interested">Not interested</string>
+    <string name="label_interest">Interest</string>
+    <string name="label_your_event">Your event</string>
 </resources>
