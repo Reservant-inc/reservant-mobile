@@ -80,6 +80,7 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.theme.AppTheme
 import reservant_mobile.ui.viewmodels.EmployeeHomeViewModel
+import java.util.Objects
 import kotlin.reflect.typeOf
 
 @Composable
@@ -124,15 +125,15 @@ fun EmployeeHomeActivity() {
             ) {
                 composable<EmployeeRoutes.SelectRestaurant> {
 
-                    val restaurants = empHomeVM.restaurants
+                    val employments = empHomeVM.employments
 
                     Column {
-                        if (restaurants.size == 1) {
+                        if (employments.size == 1) {
                             LaunchedEffect(key1 = Unit) {
-                                empHomeVM.selectRestaurant(restaurants.first())
+                                empHomeVM.selectRestaurant(employments.first())
                                 innerNavController.navigate(EmployeeRoutes.Home)
                             }
-                        } else if (restaurants.size > 1) {
+                        } else if (employments.size > 1) {
                             Text(
                                 text = stringResource(
                                     id = R.string.label_employee_greetings,
@@ -159,8 +160,11 @@ fun EmployeeHomeActivity() {
                                     .fillMaxWidth()
                                     .wrapContentHeight()
                             )
-                            restaurants.forEach { restaurant ->
+                            employments.forEach { employment ->
                                 var img by remember { mutableStateOf<Bitmap?>(null) }
+                                val restaurant by remember {
+                                    mutableStateOf(employment.restaurant!!)
+                                }
                                 LaunchedEffect(key1 = true) {
                                     if (restaurant.logo != null) {
                                         img = empHomeVM.getRestaurantLogo(restaurant)
@@ -172,7 +176,8 @@ fun EmployeeHomeActivity() {
                                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                                     onClick = {
                                         empHomeVM.viewModelScope.launch {
-                                            empHomeVM.selectRestaurant(restaurant)
+
+                                            empHomeVM.selectRestaurant(employment)
                                             innerNavController.navigate(EmployeeRoutes.Home)
                                         }
                                     },
@@ -255,8 +260,20 @@ fun EmployeeHomeActivity() {
                 }
 
                 composable<EmployeeRoutes.Home> {
-                    val restaurant = empHomeVM.selectedRestaurant!!
-                    val options: List<EmpMenuOption> = listOf(
+                    val restaurant = empHomeVM.selectedEmployment!!.restaurant!!
+                    val warehouse = EmpMenuOption(
+                        text = stringResource(id = R.string.label_warehouse),
+                        icon = Icons.Outlined.ShoppingBasket,
+                        background = painterResource(id = R.drawable.wood_wine_store),
+                        onClick = {
+                            innerNavController.navigate(
+                                RestaurantRoutes.Warehouse(
+                                    restaurantId = restaurant.restaurantId
+                                )
+                            )
+                        }
+                    )
+                    val optionsWithWarehouse: List<EmpMenuOption> = listOf(
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_orders),
                             icon = Icons.Outlined.Book,
@@ -294,18 +311,7 @@ fun EmployeeHomeActivity() {
                                 )
                             }
                         ),
-                        EmpMenuOption(
-                            text = stringResource(id = R.string.label_warehouse),
-                            icon = Icons.Outlined.ShoppingBasket,
-                            background = painterResource(id = R.drawable.wood_wine_store),
-                            onClick = {
-                                innerNavController.navigate(
-                                    RestaurantRoutes.Warehouse(
-                                        restaurantId = restaurant.restaurantId
-                                    )
-                                )
-                            }
-                        ),
+                        warehouse,
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_reviews),
                             icon = Icons.Outlined.Star,
@@ -325,6 +331,7 @@ fun EmployeeHomeActivity() {
                         ),
                     )
 
+                    val options = optionsWithWarehouse.filter { it != warehouse }
 
                     Column(
                         modifier = Modifier
@@ -337,7 +344,7 @@ fun EmployeeHomeActivity() {
                             IconWithHeader(
                                 icon = Icons.Rounded.RestaurantMenu,
                                 text = restaurant.name,
-                                showBackButton = empHomeVM.restaurants.size > 1,
+                                showBackButton = empHomeVM.employments.size > 1,
                                 onReturnClick = {
                                     innerNavController.navigate(EmployeeRoutes.SelectRestaurant)
                                 }
@@ -349,10 +356,18 @@ fun EmployeeHomeActivity() {
                             horizontalArrangement = Arrangement.Center,
                             columns = GridCells.Adaptive(minSize = 200.dp)
                         ) {
-                            items(options.size) { optionIndex ->
-                                val option = options[optionIndex]
-                                EmpMenuButton(option = option)
+                            if (empHomeVM.showWarehouse()){
+                                items(optionsWithWarehouse.size) { optionIndex ->
+                                    val option = optionsWithWarehouse[optionIndex]
+                                    EmpMenuButton(option = option)
+                                }
+                            } else {
+                                items(options.size) { optionIndex ->
+                                    val option = options[optionIndex]
+                                    EmpMenuButton(option = option)
+                                }
                             }
+
                         }
                     }
                 }
