@@ -56,7 +56,7 @@ class UserServiceUnitTest: ServiceTest(){
 
     @Test
     fun get_users_return_pagination() = runTest {
-        val items = userService.getUsers("John").value
+        val items = userService.getUsers("Customer").value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
@@ -182,15 +182,21 @@ class UserServiceUnitTest: ServiceTest(){
     fun change_password_return_true()= runTest{
         val res = userService.changePassword(oldPassword = "Pa${"$"}${"$"}w0rd", newPassword = "P@ssw0rd")
         assertThat(res.value).isTrue()
+        val res2 = userService.changePassword(oldPassword = "P@ssw0rd", newPassword = "Pa${"$"}${"$"}w0rd")
+        assertThat(res2.value).isTrue()
     }
 
     @Test
-    fun get_reports_return_not_null()= runTest{
+    fun get_reports_return_pagination()= runTest{
         val date = LocalDateTime.now()
         val category = ReportDTO.ReportCategory.LostItem
-        assertThat(userService.getReports(
+        val items = userService.getReports(
             dateUntil = date,
             category = category
-        ).value).isNotNull()
+        ).value
+        val itemsSnapshot = items?.asSnapshot {
+            scrollTo(index = 10)
+        }
+        assertThat(itemsSnapshot).isNotEmpty()
     }
 }

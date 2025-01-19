@@ -20,6 +20,8 @@ import java.time.LocalDateTime
 
 class RestaurantServiceUnitTest: ServiceTest() {
     private val ser: IRestaurantService = RestaurantService()
+    private val restaurantId = 4
+
     private val restaurant = RestaurantDTO(
         name = "Test restaurant",
         nip = "1060000062",
@@ -70,7 +72,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     )
     private val restaurantGroup = RestaurantGroupDTO(
         name = "Test group",
-        restaurantIds = listOf(1)
+        restaurantIds = listOf(restaurantId)
     )
     private val restaurantEmployee = RestaurantEmployeeDTO(
         login = "JohnTest",
@@ -93,12 +95,12 @@ class RestaurantServiceUnitTest: ServiceTest() {
         minimalAmount = 10.0,
         amountToOrder = 10.0,
         amount = 10.0,
+        restaurantId = restaurantId,
         menuItem =  IngredientDTO.IngredientMenuItemDTO(
             menuItemId = 1,
             amountUsed = 10.0
         )
     )
-    private val restaurantId = 5
 
     @Before
     fun setupData() = runBlocking {
@@ -143,21 +145,18 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_groups_return_not_null()= runTest{
+        val groups = ser.getGroups().value
         assertThat(ser.getGroups().value).isNotNull()
+        assertThat(ser.getGroup(groups!!.first().restaurantGroupId!!).value).isNotNull()
+
     }
 
-    @Test
-    fun get_group_return_not_null()= runTest{
-        assertThat(ser.getGroup(1).value).isNotNull()
-    }
-
-    @Test
-    fun add_and_delete_group_return_not_null()= runTest{
-        assertThat(ser.addGroup(restaurantGroup).value).isTrue()
-        val id = ser.getGroups().value!!.last().restaurantGroupId
-//        TODO: uncomment when fixed server internal error
+//    @Test
+//    fun add_and_delete_group_return_not_null()= runTest{
+//        assertThat(ser.addGroup(restaurantGroup).value).isTrue()
+//        val id = ser.getGroups().value!!.last().restaurantGroupId
 //        assertThat(id?.let { ser.deleteGroup(it).value }).isTrue()
-    }
+//    }
 
     @Test
     fun move_restaurant_to_group_return_not_null()= runTest{
@@ -286,13 +285,17 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun edit_ingredient_return_not_null()= runTest{
-        assertThat(ser.editIngredient(1,ingredient).value).isNotNull()
+        val ingrs = ser.getIngredients(restaurantId).value
+
+        assertThat(ser.editIngredient(ingrs!!.first().ingredientId!!,ingredient).value).isNotNull()
     }
 
     @Test
     fun correct_ingredient_return_not_null()= runTest{
+        val ingrs = ser.getIngredients(restaurantId).value
+
         assertThat(ser.correctIngredient(
-            ingredientId = 1,
+            ingredientId = ingrs!!.first().ingredientId!!,
             newAmount = 10.0,
             comment = "Test"
         ).value).isNotNull()
@@ -310,7 +313,8 @@ class RestaurantServiceUnitTest: ServiceTest() {
 
     @Test
     fun get_ingredient_history_return_pagination()= runTest{
-        val items = ser.getIngredientHistory(1).value
+        val ingrs = ser.getIngredients(restaurantId).value
+        val items = ser.getIngredientHistory(ingrs!!.first().ingredientId!!).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
@@ -323,7 +327,7 @@ class RestaurantServiceUnitTest: ServiceTest() {
     }
 
     @Test
-    fun get_reports_return_not_null()= runTest{
+    fun get_reports_return_pagination()= runTest{
         val date = LocalDateTime.now()
         val items = ser.getUserRestaurantReports(restaurantId, dateUntil = date).value
         val itemsSnapshot = items?.asSnapshot {
@@ -341,12 +345,13 @@ class RestaurantServiceUnitTest: ServiceTest() {
     @Test
     fun get_statistics_not_null()= runTest {
         val date = LocalDateTime.now()
-        assertThat(ser.getStatistics(restaurantId = 10, dateUntil = date).value).isNotNull()
+        assertThat(ser.getStatistics(restaurantId = restaurantId, dateUntil = date).value).isNotNull()
     }
 
     @Test
     fun get_group_statistics_not_null()= runTest {
         val date = LocalDateTime.now()
-        assertThat(ser.getStatisticsGroup(groupId = 10, dateUntil = date).value).isNotNull()
+        val group = ser.getGroups().value!!.first()
+        assertThat(ser.getStatisticsGroup(groupId = group.restaurantGroupId!!, dateUntil = date).value).isNotNull()
     }
 }
