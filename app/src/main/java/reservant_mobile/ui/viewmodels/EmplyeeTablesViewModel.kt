@@ -64,9 +64,14 @@ class TablesViewModel(private val restaurantId: Int) : ViewModel() {
     }
 
     fun generateTableId(): Int {
-        return tables.value.maxBy {
-            it.tableId
-        }.tableId + 1
+
+        return if (tables.value.isEmpty()){
+            1
+        } else {
+            tables.value.maxBy {
+                it.tableId
+            }.tableId + 1
+        }
     }
 
 
