@@ -469,14 +469,14 @@ fun RegisterRestaurantActivity(
                 if (restaurantId == null && group == null) {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_new_restaurant),
+                        text = stringResource(R.string.label_add_opening_hours),
                         showBackButton = true,
                         onReturnClick = { navController.popBackStack() }
                     )
                 } else {
                     IconWithHeader(
                         icon = Icons.Rounded.RestaurantMenu,
-                        text = stringResource(R.string.label_edit_restaurant),
+                        text = stringResource(R.string.label_edit_opening_hours),
                         showBackButton = true,
                         onReturnClick = { navController.popBackStack() }
                     )

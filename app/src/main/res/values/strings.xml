@@ -568,4 +568,6 @@
     <string name="label_report_resolved_positively">Resolved positively</string>
     <string name="label_report_resolved_negatively">ReResolved negatively</string>
     <string name="error_create_restaurant">Error while creating restaurant</string>
+    <string name="label_edit_opening_hours">Edit opening hours</string>
+    <string name="label_add_opening_hours">Add opening hours</string>
 </resources>
