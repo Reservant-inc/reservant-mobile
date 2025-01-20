@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
+import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.GetIngredientsSort
@@ -46,6 +48,17 @@ class WarehouseViewModel(
 
     var isEditIngredientDialogVisible by mutableStateOf(false)
     var ingredientToEdit: IngredientDTO? by mutableStateOf(null)
+
+    private val _toastMessage = MutableStateFlow<Int?>(null)
+    val toastMessage: StateFlow<Int?> get() = _toastMessage
+
+    private fun showToastMessage(messageResId: Int) {
+        _toastMessage.value = messageResId
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
+    }
 
     fun loadIngredients(restaurantId: Int, orderBy: GetIngredientsSort? = null) {
         viewModelScope.launch {
@@ -90,11 +103,14 @@ class WarehouseViewModel(
             )
             val result = deliveryService.addDelivery(delivery)
             if (!result.isError) {
+                // Success => clear cart, reload, show toast
                 cart.clear()
                 isCartVisible = false
                 loadIngredients(restaurantId)
+                showToastMessage(R.string.order_submitted_successfully)
             } else {
-                // Obsługa błędu
+                // If you like, show an error toast
+                showToastMessage(R.string.order_submitted_failed)
             }
         }
     }
@@ -124,6 +140,7 @@ class WarehouseViewModel(
             quantity < minQuantity && amountToOrder == null && !isAlreadyInCart
         }
 
+        // Add new items to cart
         cart.addAll(ingredientsToAdd.map { ingredient ->
             DeliveryDTO.DeliveryIngredientDTO(
                 ingredientId = ingredient.ingredientId ?: 0,
@@ -133,6 +150,7 @@ class WarehouseViewModel(
             )
         })
 
+        // Existing logic to show dialogs
         if (ingredientsToAdd.isNotEmpty()) {
             val addedCount = ingredientsToAdd.size
             addedToCartMessageResId = R.string.successfully_added_multiple_to_cart
@@ -151,19 +169,38 @@ class WarehouseViewModel(
             ingredientsWithoutAmountToOrderList = ingredientsWithoutAmountToOrder
             showMissingAmountToOrderDialog = true
         }
-    }
 
-    fun addIngredient(ingredient: IngredientDTO) {
-        viewModelScope.launch {
-            val result = restaurantService.addIngredient(ingredient)
-            if (!result.isError && result.value != null) {
-                loadIngredients(ingredient.restaurantId ?: 0)
-                isAddIngredientDialogVisible = false
-            } else {
-                // Obsługa błędu
-            }
+        // --- Show a Toast if NO new items were actually added ---
+        // That means ingredientsToAdd is empty
+        // AND we didn't open "alreadyInCart" or "missingAmount" dialogs
+        // If you want to show the toast in other conditions, adapt this if-check.
+        if (
+            ingredientsToAdd.isEmpty() &&
+            ingredientsAlreadyInCart.isEmpty() &&
+            ingredientsWithoutAmountToOrder.isEmpty()
+        ) {
+            showToastMessage(R.string.no_items_added_to_cart)
         }
     }
+
+//    fun addIngredient(ingredient: IngredientDTO) {
+//        viewModelScope.launch {
+//            val result = restaurantService.addIngredient(ingredient)
+//            if (!result.isError && result.value != null) {
+//                loadIngredients(ingredient.restaurantId ?: 0)
+//                isAddIngredientDialogVisible = false
+//            } else {
+//                // Obsługa błędu
+//            }
+//        }
+//    }
+    fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?> {
+        // Note: if using coroutines, mark with `suspend`
+        return runBlocking {
+            restaurantService.addIngredient(ingredient)
+        }
+    }
+
 
     var addedToCartMessageArgs: Array<Any> = emptyArray() // Argumenty dla komunikatu
 
@@ -178,11 +215,11 @@ class WarehouseViewModel(
         }
     }
 
-    fun correctIngredient(ingredient: IngredientDTO, newAmount: Double, comment: String) {
+    fun correctIngredient(ingredient: IngredientDTO, newAmount: Double, comment: String, restaurantId: Int) {
         viewModelScope.launch {
             val result = restaurantService.correctIngredient(ingredient.ingredientId ?: 0, newAmount, comment)
             if (!result.isError && result.value != null) {
-                loadIngredients(result.value.ingredient?.restaurantId ?: 0)
+                loadIngredients(restaurantId)
             } else {
                 // Obsługa błędu
             }
@@ -201,7 +238,7 @@ class WarehouseViewModel(
     ) {
         if (newAmount != null && comment != null) {
             // Jeśli jest korekta ilości
-            correctIngredient(updatedIngredient, newAmount, comment)
+            correctIngredient(updatedIngredient, newAmount, comment, updatedIngredient.restaurantId?: 0)
         } else {
             // Jeśli tylko edycja danych składnika
             editIngredient(updatedIngredient.ingredientId ?: 0, updatedIngredient)
