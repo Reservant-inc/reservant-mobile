@@ -59,7 +59,8 @@ fun UserCard(
                     .size(50.dp)
                     .weight(0.2f)
                     .clip(CircleShape),
-                getPhoto = getImage
+                getPhoto = getImage,
+                placeholder = R.drawable.ic_profile_placeholder
             )
 
             Column(

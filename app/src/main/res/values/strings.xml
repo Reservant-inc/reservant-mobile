@@ -43,6 +43,7 @@
     <string name="label_add_to_group">Add to group</string>
     <string name="error_unknown">Unknown error</string>
     <string name="error_unauthorized_access">Unauthorized access</string>
+    <string name="error_incorrect_login_or_password">Incorrect login or password</string>
     <string name="label_management_edit_local_data">Manage local data</string>
     <string name="label_management_manage_menu">Manage menu</string>
     <string name="label_management_reviews">Reviews</string>

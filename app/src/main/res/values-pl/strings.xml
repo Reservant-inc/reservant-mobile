@@ -39,6 +39,7 @@
     <string name="label_add_to_group">Dodaj do grupy</string>
     <string name="error_unknown">Nieznany błąd</string>
     <string name="error_unauthorized_access">Funkcja niedostępna</string>
+    <string name="error_incorrect_login_or_password">Niepoprawny login lub hasło</string>
     <string name="label_management_edit_local_data">Edytuj dane lokalu</string>
     <string name="label_management_manage_menu">Zarządzaj menu</string>
     <string name="label_management_reviews">Opinie</string>

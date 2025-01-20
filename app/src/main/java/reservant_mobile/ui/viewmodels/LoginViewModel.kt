@@ -37,7 +37,7 @@ class LoginViewModel(
         if (Roles.CUSTOMER_SUPPORT_AGENT in UserService.UserObject.roles){
             result = Result(
                 isError = true,
-                errors = mapOf("TOAST" to R.string.error_unauthorized_access),
+                errors = mapOf("TOAST" to R.string.error_incorrect_login_or_password),
                 value = false
             )
             userService.logoutUser()
@@ -55,21 +55,21 @@ class LoginViewModel(
         return LocalDataService().getData(PrefsKeys.BEARER_TOKEN).isNotEmpty() && userService.refreshToken()
     }
     
-    private fun isLoginInvalid(): Boolean{
+    public fun isLoginInvalid(): Boolean{
         return isInvalid(login.value) ||
                 getFieldError(result, login.name) != -1
     }
 
-    private fun isPasswordInvalid(): Boolean{
+    public fun isPasswordInvalid(): Boolean{
         return isInvalid(password.value) ||
                 getFieldError(result, password.name) != -1
     }
 
-    private fun isFormInvalid(): Boolean {
+    public fun isFormInvalid(): Boolean {
         return isLoginInvalid() || isPasswordInvalid()
     }
 
-    private fun isInvalid(str: String) : Boolean{
+    public fun isInvalid(str: String) : Boolean{
         return str.isBlank()
     }
 

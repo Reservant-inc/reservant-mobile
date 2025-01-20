@@ -291,11 +291,6 @@ fun RestaurantDetailActivity(
                                         style = MaterialTheme.typography.bodySmall
                                     )
 
-                                    Text(
-                                        text = stringResource(R.string.label_delivery_cost) + ": 5,70zł",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-
                                     restaurant.openingHours?.let {
 
                                         HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
