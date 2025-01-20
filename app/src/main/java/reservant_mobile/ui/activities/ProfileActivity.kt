@@ -920,7 +920,7 @@ fun FriendsTab(
                 }
             }
 
-            if (friendsPagingItems.itemCount == 0) {
+            if (friendsPagingItems.itemCount == 0 && friendsRequestsPagingItems.itemCount == 0) {
                 item {
                     Box(
                         modifier = Modifier
@@ -935,7 +935,7 @@ fun FriendsTab(
                         )
                     }
                 }
-            } else {
+            } else if(friendsPagingItems.itemCount != 0){
                 if(friendsRequestsPagingItems.itemCount == 0){
                     item {
                         Spacer(modifier = Modifier.height(80.dp))
@@ -1029,15 +1029,9 @@ fun FriendsTab(
 @Composable
 fun OrderCard(visit: VisitDTO) {
 
-//    val (statusText, statusColor) = when (visit.status) {
-//        "Accepted" -> "Accepted" to Color.Green
-//        else       -> "Pending" to Color.Yellow
-//    }
-
-    // TODO: TEMPORARY CODE, DELETE AFTER STATUS UPDATE IN DTO
-    val (statusText, statusColor) = when ("Accepted") {
-        "Accepted" -> "Accepted" to Color(58, 148, 16)
-        else       -> "Pending" to Color(204, 150, 22)
+    val (statusText, statusColor) = when (visit.isAccepted) {
+        true -> stringResource(R.string.label_accepted) to Color(58, 148, 16)
+        else -> stringResource(R.string.label_pending) to Color(204, 150, 22)
     }
 
     Card(
