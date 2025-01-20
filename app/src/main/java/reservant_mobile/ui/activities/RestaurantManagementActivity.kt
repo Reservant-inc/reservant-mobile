@@ -299,6 +299,16 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     restaurantManageVM.getGroup(it1)
                                 }
                             }
+                            Text(
+                                text = selectedGroup?.name ?: stringResource(id = R.string.label_group),
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         } else if (restaurantManageVM.isLoading){
                             Box(
                                 modifier = Modifier.fillMaxSize(),
