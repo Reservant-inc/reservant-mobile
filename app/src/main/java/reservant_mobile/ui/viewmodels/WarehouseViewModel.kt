@@ -187,11 +187,11 @@ class WarehouseViewModel(
         }
     }
 
-    fun correctIngredient(ingredient: IngredientDTO, newAmount: Double, comment: String) {
+    fun correctIngredient(ingredient: IngredientDTO, newAmount: Double, comment: String, restaurantId: Int) {
         viewModelScope.launch {
             val result = restaurantService.correctIngredient(ingredient.ingredientId ?: 0, newAmount, comment)
             if (!result.isError && result.value != null) {
-                loadIngredients(result.value.ingredient?.restaurantId ?: 0)
+                loadIngredients(restaurantId)
             } else {
                 // Obsługa błędu
             }
@@ -210,7 +210,7 @@ class WarehouseViewModel(
     ) {
         if (newAmount != null && comment != null) {
             // Jeśli jest korekta ilości
-            correctIngredient(updatedIngredient, newAmount, comment)
+            correctIngredient(updatedIngredient, newAmount, comment, updatedIngredient.restaurantId?: 0)
         } else {
             // Jeśli tylko edycja danych składnika
             editIngredient(updatedIngredient.ingredientId ?: 0, updatedIngredient)
