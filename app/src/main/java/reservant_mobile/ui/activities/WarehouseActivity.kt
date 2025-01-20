@@ -383,11 +383,23 @@ fun AddDeliveryDialog(
     onSubmit: (String, String) -> Unit,
     ingredient: IngredientDTO?
 ) {
+    val context = LocalContext.current
+
     var storeName by remember { mutableStateOf("") }
     var amountOrdered by remember { mutableStateOf("") }
 
+    // For toggling the error display after user presses "Add"
+    var formSent by remember { mutableStateOf(false) }
+
+    // Simple check: amount must be > 0
+    fun isAmountInvalid(): Boolean {
+        val value = amountOrdered.toDoubleOrNull()
+        return (value == null || value <= 0.0)
+    }
+
     LaunchedEffect(ingredient) {
-        amountOrdered = ingredient?.amountToOrder?.toString() ?: ""
+        // If there's a default "amountToOrder," prefill it
+        amountOrdered = ingredient?.amountToOrder?.toString().orEmpty()
     }
 
     AlertDialog(
@@ -395,31 +407,51 @@ fun AddDeliveryDialog(
         title = { Text(stringResource(id = R.string.add_to_cart)) },
         text = {
             Column {
-                Text(text = stringResource(id = R.string.ingredient_colon, ingredient?.publicName ?: ""))
+                Text(text = stringResource(id = R.string.ingredient_colon, ingredient?.publicName.orEmpty()))
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // Store name is optional => no error if blank
                 FormInput(
                     inputText = storeName,
                     onValueChange = { storeName = it },
                     label = stringResource(id = R.string.store_name),
-                    optional = true
+                    optional = true,
+                    // Not logically "required", so isError = false
+                    isError = false,
+                    // We do still pass formSent so it can highlight if you like,
+                    // but here it’s optional.
+                    formSent = formSent
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // Required "amountOrdered"
                 FormInput(
                     inputText = amountOrdered,
                     onValueChange = { amountOrdered = it },
                     label = stringResource(id = R.string.amount_to_order),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    maxLines = 1
+                    maxLines = 1,
+                    isError = isAmountInvalid(),
+                    errorText = stringResource(R.string.error_invalid_number),
+                    formSent = formSent
                 )
             }
         },
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    if ((amountOrdered.toDoubleOrNull() ?: 0.0) > 0.0) {
-                        onSubmit(storeName.takeIf { it.isNotBlank() } ?: "", amountOrdered)
-                        onDismiss()
+                    // Set formSent = true => triggers error on invalid fields
+                    formSent = true
+                    // If amount is invalid, do NOT dismiss
+                    if (isAmountInvalid()) {
+                        return@ButtonComponent
                     }
+                    // Otherwise, proceed
+                    onSubmit(
+                        storeName.takeIf { it.isNotBlank() } ?: "",
+                        amountOrdered
+                    )
+                    onDismiss()
                 },
                 label = stringResource(id = R.string.add_to_cart)
             )
@@ -433,7 +465,6 @@ fun AddDeliveryDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddOrEditIngredientDialog(
     onDismiss: () -> Unit,
