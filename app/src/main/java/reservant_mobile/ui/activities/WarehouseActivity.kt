@@ -583,7 +583,10 @@ fun AddOrEditIngredientDialog(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
                     label = stringResource(R.string.amount_to_order),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Next),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = if (isEdit) Done else Next
+                    ),
                     isDisabled = isEmployee,
                     isError = isAmountToOrderInvalid(),
                     errorText = stringResource(R.string.error_field_required),
