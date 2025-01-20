@@ -573,4 +573,7 @@
     <string name="fill_both_for_correction">Please fill both "New amount" and "Comment" fields to make a correction, or leave both empty to only edit other fields.</string>
     <string name="add_ingredient_failed">Failed to add ingredient. Please correct errors and try again.</string>
     <string name="success_ingredient_added">Successfully added new ingredient!</string>
+    <string name="order_submitted_successfully">Order submitted successfully!</string>
+    <string name="order_submitted_failed">Could not submit the order.</string>
+    <string name="no_items_added_to_cart">No items were added to the cart.</string>
 </resources>

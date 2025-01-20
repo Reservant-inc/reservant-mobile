@@ -83,6 +83,23 @@ fun WarehouseActivity(
 
     val ingredients by viewModel.ingredients.collectAsState()
 
+    val toastMessage by viewModel.toastMessage.collectAsState()
+
+    val context = LocalContext.current
+
+    // 2) Whenever toastMessage changes, show a toast
+    LaunchedEffect(toastMessage) {
+        toastMessage?.let { msgResId ->
+            Toast.makeText(context, context.getString(msgResId), Toast.LENGTH_SHORT).show()
+            // Clear the message so we don't show it again on recomposition
+            viewModel.clearToastMessage()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadIngredients(restaurantId)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.loadIngredients(restaurantId)
     }

@@ -561,4 +561,7 @@
     <string name="fill_both_for_correction">Wypełnij oba pola „Nowa kwota” i „Komentarz”, aby wprowadzić korektę, lub pozostaw oba puste, aby edytować tylko inne pola.</string>
     <string name="add_ingredient_failed">Nie udało się dodać składnika. Popraw błędy i spróbuj ponownie.</string>
     <string name="success_ingredient_added">Pomyślnie dodano nowy składnik!</string>
+    <string name="order_submitted_successfully">Zamówienie przesłane pomyślnie!</string>
+    <string name="order_submitted_failed">Nie można przesłać zamówienia.</string>
+    <string name="no_items_added_to_cart">Żadne produkty nie zostały dodane do koszyka.</string>
 </resources>

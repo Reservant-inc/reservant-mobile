@@ -49,6 +49,17 @@ class WarehouseViewModel(
     var isEditIngredientDialogVisible by mutableStateOf(false)
     var ingredientToEdit: IngredientDTO? by mutableStateOf(null)
 
+    private val _toastMessage = MutableStateFlow<Int?>(null)
+    val toastMessage: StateFlow<Int?> get() = _toastMessage
+
+    private fun showToastMessage(messageResId: Int) {
+        _toastMessage.value = messageResId
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
+    }
+
     fun loadIngredients(restaurantId: Int, orderBy: GetIngredientsSort? = null) {
         viewModelScope.launch {
             val result = restaurantService.getIngredients(
@@ -92,11 +103,14 @@ class WarehouseViewModel(
             )
             val result = deliveryService.addDelivery(delivery)
             if (!result.isError) {
+                // Success => clear cart, reload, show toast
                 cart.clear()
                 isCartVisible = false
                 loadIngredients(restaurantId)
+                showToastMessage(R.string.order_submitted_successfully)
             } else {
-                // Obsługa błędu
+                // If you like, show an error toast
+                showToastMessage(R.string.order_submitted_failed)
             }
         }
     }
@@ -126,6 +140,7 @@ class WarehouseViewModel(
             quantity < minQuantity && amountToOrder == null && !isAlreadyInCart
         }
 
+        // Add new items to cart
         cart.addAll(ingredientsToAdd.map { ingredient ->
             DeliveryDTO.DeliveryIngredientDTO(
                 ingredientId = ingredient.ingredientId ?: 0,
@@ -135,6 +150,7 @@ class WarehouseViewModel(
             )
         })
 
+        // Existing logic to show dialogs
         if (ingredientsToAdd.isNotEmpty()) {
             val addedCount = ingredientsToAdd.size
             addedToCartMessageResId = R.string.successfully_added_multiple_to_cart
@@ -152,6 +168,18 @@ class WarehouseViewModel(
         if (ingredientsWithoutAmountToOrder.isNotEmpty()) {
             ingredientsWithoutAmountToOrderList = ingredientsWithoutAmountToOrder
             showMissingAmountToOrderDialog = true
+        }
+
+        // --- Show a Toast if NO new items were actually added ---
+        // That means ingredientsToAdd is empty
+        // AND we didn't open "alreadyInCart" or "missingAmount" dialogs
+        // If you want to show the toast in other conditions, adapt this if-check.
+        if (
+            ingredientsToAdd.isEmpty() &&
+            ingredientsAlreadyInCart.isEmpty() &&
+            ingredientsWithoutAmountToOrder.isEmpty()
+        ) {
+            showToastMessage(R.string.no_items_added_to_cart)
         }
     }
 
