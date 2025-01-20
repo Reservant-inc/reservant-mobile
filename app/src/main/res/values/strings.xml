@@ -573,4 +573,6 @@
     <string name="label_not_interested">Not interested</string>
     <string name="label_interest">Interest</string>
     <string name="label_your_event">Your event</string>
+    <string name="label_accepted">Accepted</string>
+    <string name="label_pending">Pending</string>
 </resources>
