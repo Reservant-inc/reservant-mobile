@@ -79,7 +79,7 @@ class ProfileViewModel(
                 fetchFriends()
                 fetchFriendRequests()
                 fetchUserEvents()
-                fetchOwnedEvents()
+                fetchEvents()
                 fetchUserVisits()
             }
 
@@ -141,10 +141,10 @@ class ProfileViewModel(
         }
     }
 
-    private fun fetchOwnedEvents() {
+    private fun fetchEvents() {
         viewModelScope.launch {
             val result = userService.getUserEvents(
-                category = GetUserEventsCategory.CreatedBy
+                category = GetUserEventsCategory.All
             )
 
             if (!result.isError) {
