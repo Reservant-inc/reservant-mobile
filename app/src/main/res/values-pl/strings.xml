@@ -561,4 +561,6 @@
     <string name="label_not_interested">Niezainteresowany</string>
     <string name="label_interest">Zainteresuj się</string>
     <string name="label_your_event">Twoje wydarzenie</string>
+    <string name="label_accepted">Zaakceptowana</string>
+    <string name="label_pending">Oczekująca</string>
 </resources>
