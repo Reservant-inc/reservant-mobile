@@ -575,4 +575,5 @@
     <string name="label_your_event">Your event</string>
     <string name="label_accepted">Accepted</string>
     <string name="label_pending">Pending</string>
+    <string name="label_event_category_all">All</string>
 </resources>
