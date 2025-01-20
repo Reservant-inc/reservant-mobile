@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.models.dtos.IngredientDTO
+import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.GetIngredientsSort
@@ -153,17 +155,24 @@ class WarehouseViewModel(
         }
     }
 
-    fun addIngredient(ingredient: IngredientDTO) {
-        viewModelScope.launch {
-            val result = restaurantService.addIngredient(ingredient)
-            if (!result.isError && result.value != null) {
-                loadIngredients(ingredient.restaurantId ?: 0)
-                isAddIngredientDialogVisible = false
-            } else {
-                // Obsługa błędu
-            }
+//    fun addIngredient(ingredient: IngredientDTO) {
+//        viewModelScope.launch {
+//            val result = restaurantService.addIngredient(ingredient)
+//            if (!result.isError && result.value != null) {
+//                loadIngredients(ingredient.restaurantId ?: 0)
+//                isAddIngredientDialogVisible = false
+//            } else {
+//                // Obsługa błędu
+//            }
+//        }
+//    }
+    fun addIngredient(ingredient: IngredientDTO): Result<IngredientDTO?> {
+        // Note: if using coroutines, mark with `suspend`
+        return runBlocking {
+            restaurantService.addIngredient(ingredient)
         }
     }
+
 
     var addedToCartMessageArgs: Array<Any> = emptyArray() // Argumenty dla komunikatu
 
