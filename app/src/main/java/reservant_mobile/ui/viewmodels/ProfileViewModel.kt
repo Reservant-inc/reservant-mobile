@@ -107,18 +107,16 @@ class ProfileViewModel(
         return true
     }
 
-    private fun fetchFriends() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getFriends()
-            if (!result.isError) {
-                _friendsFlow.value = result.value?.cachedIn(viewModelScope)
-            }
+    private suspend fun fetchFriends() {
+        val result = friendsService.getFriends()
+        if (!result.isError) {
+            _friendsFlow.value = result.value?.cachedIn(viewModelScope)
         }
     }
 
     private fun fetchFriendRequests() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getIncomingFriendRequests()
+            val result = friendsService.getIncomingFriendRequests()
             if (!result.isError) {
                 _friendsRequestsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -127,7 +125,7 @@ class ProfileViewModel(
 
     private fun fetchUserVisits() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<VisitDTO>>?> = userService.getUserVisits()
+            val result = userService.getUserVisits()
             if (!result.isError) {
                 _visitsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -145,7 +143,7 @@ class ProfileViewModel(
 
     private fun fetchOwnedEvents() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserEvents(
+            val result = userService.getUserEvents(
                 category = GetUserEventsCategory.CreatedBy
             )
 
