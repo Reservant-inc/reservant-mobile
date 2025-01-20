@@ -442,19 +442,15 @@ fun AddOrEditIngredientDialog(
     isEdit: Boolean = false,
     existingIngredient: IngredientDTO? = null,
     isEmployee: Boolean = false,
-    // We add a callback for the direct add call, in case isEdit = false:
+    // For adding a brand new ingredient
     onAddNewIngredient: suspend (IngredientDTO) -> Result<IngredientDTO?>,
-    // This callback can let us refresh the data if the add was successful
+    // Called after a successful add, to refresh your data
     onSuccessRefresh: () -> Unit
 ) {
-    // Remember we'll only do full-field validation if `isEdit == false`,
-    // because in "edit" we also have correction logic.
-    // We replicate the approach from AddEventActivity for the "new ingredient" scenario.
-
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Existing fields
+    // Ingredient fields
     var publicName by remember { mutableStateOf(existingIngredient?.publicName ?: "") }
     var unitOfMeasurement by remember {
         mutableStateOf(existingIngredient?.unitOfMeasurement ?: UnitOfMeasurement.Gram)
@@ -463,48 +459,48 @@ fun AddOrEditIngredientDialog(
     var amountToOrder by remember { mutableStateOf(existingIngredient?.amountToOrder?.toString() ?: "") }
     var amount by remember { mutableStateOf(existingIngredient?.amount?.toString() ?: "") }
 
-    // Correction fields (used only if isEdit == true)
+    // Correction fields (used if isEdit == true for "newAmount" & "comment")
     var newAmount by remember { mutableStateOf("") }
     var comment by remember { mutableStateOf("") }
 
-    // For toggling errors after the first submission attempt
+    // This flag, once set to true, shows errors in all FormInputs at once.
     var formSent by remember { mutableStateOf(false) }
-
-    // If you want an error toast or inline message from your ViewModel, track it here
-    var errorToastMsg by remember { mutableStateOf<Int?>(null) }
-
-    // For "both fields must be filled for correction" error
     var showCorrectionError by remember { mutableStateOf(false) }
 
     val unitOptions = UnitOfMeasurement.values().map { it.name }
     val expanded = remember { mutableStateOf(false) }
 
-    // Simple validators for "new ingredient" scenario
+    // Validation checks
     fun isNameInvalid() = publicName.isBlank()
     fun isMinimalInvalid() = minimalAmount.toDoubleOrNull() == null
-    fun isInitialAmountInvalid() = amount.toDoubleOrNull() == null
     fun isAmountToOrderInvalid() = amountToOrder.toDoubleOrNull() == null
+    fun isInitialAmountInvalid() = amount.toDoubleOrNull() == null
 
-    // We'll show an inline error if the user has clicked "Add" (formSent) and the field is invalid.
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(if (isEdit) stringResource(R.string.edit_ingredient)
-            else stringResource(R.string.add_new_ingredient))
+            Text(
+                if (isEdit) stringResource(R.string.edit_ingredient)
+                else stringResource(R.string.add_new_ingredient)
+            )
         },
         text = {
             Column {
-                // -- Shared for add/edit: Name, unit, minimal, amountToOrder
+                // 1) Public Name
                 FormInput(
                     inputText = publicName,
                     onValueChange = { publicName = it },
                     label = stringResource(R.string.name),
                     isDisabled = isEmployee,
-                    isError = formSent && isNameInvalid(),
+                    // We'll supply the logic "is field invalid?" to isError
+                    isError = isNameInvalid(),
                     errorText = stringResource(R.string.error_field_required),
+                    // Crucial: pass formSent down, so error can show instantly on "Add"
+                    formSent = formSent
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // 2) Unit of Measurement ComboBox
                 ComboBox(
                     expanded = expanded,
                     value = unitOfMeasurement.name,
@@ -517,48 +513,55 @@ fun AddOrEditIngredientDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // 3) Minimal Amount
                 FormInput(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
                     label = stringResource(R.string.min_quantity),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isDisabled = isEmployee,
-                    isError = formSent && isMinimalInvalid(),
-                    errorText = stringResource(R.string.error_field_required)
+                    isError = isMinimalInvalid(),
+                    errorText = stringResource(R.string.error_field_required),
+                    formSent = formSent
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // 4) Amount to Order
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
                     label = stringResource(R.string.amount_to_order),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isDisabled = isEmployee,
-                    isError = formSent && isAmountToOrderInvalid(),
-                    errorText = stringResource(R.string.error_field_required)
+                    isError = isAmountToOrderInvalid(),
+                    errorText = stringResource(R.string.error_field_required),
+                    formSent = formSent
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (!isEdit) {
                     // --- ADD NEW INGREDIENT MODE ---
-                    // Validate "initial amount" is not empty or invalid
                     FormInput(
                         inputText = amount,
                         onValueChange = { amount = it },
                         label = stringResource(R.string.initial_amount),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         isDisabled = isEmployee,
-                        isError = formSent && isInitialAmountInvalid(),
-                        errorText = stringResource(R.string.error_field_required)
+                        isError = isInitialAmountInvalid(),
+                        errorText = stringResource(R.string.error_field_required),
+                        formSent = formSent
                     )
                 } else {
-                    // --- EDIT MODE WITH CORRECTION ---
+                    // --- EDIT MODE => Correction fields
                     FormInput(
                         inputText = newAmount,
                         onValueChange = { newAmount = it },
                         label = stringResource(R.string.new_amount),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isDisabled = false
+                        isDisabled = false,
+                        // We typically do not show an error unless partial fill → handled below
+                        isError = false,
+                        formSent = false
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -567,7 +570,9 @@ fun AddOrEditIngredientDialog(
                         onValueChange = { comment = it },
                         label = stringResource(R.string.comment),
                         keyboardOptions = KeyboardOptions.Default,
-                        isDisabled = false
+                        isDisabled = false,
+                        isError = false,
+                        formSent = false
                     )
 
                     if (showCorrectionError) {
@@ -583,17 +588,21 @@ fun AddOrEditIngredientDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    // On press "Add" or "Save changes"
+                    // Once the user clicks Add/Save => show all errors for invalid fields
                     formSent = true
-                    // 1) Validate if isEdit == false => we require all fields
+
                     if (!isEdit) {
-                        val isFormInvalid = isNameInvalid() || isMinimalInvalid() ||
-                                isAmountToOrderInvalid() || isInitialAmountInvalid()
+                        // Creating a brand-new ingredient
+                        val isFormInvalid = isNameInvalid() ||
+                                isMinimalInvalid() ||
+                                isAmountToOrderInvalid() ||
+                                isInitialAmountInvalid()
+
                         if (isFormInvalid) {
-                            // There's an error => do NOT dismiss
+                            // Do not dismiss => user sees red errors on each invalid field
                             return@ButtonComponent
                         }
-                        // If no error => call add new ingredient
+                        // If no errors, call the service
                         scope.launch {
                             val newIngredient = IngredientDTO(
                                 publicName = publicName,
@@ -605,7 +614,7 @@ fun AddOrEditIngredientDialog(
                             )
                             val result = onAddNewIngredient(newIngredient)
                             if (!result.isError && result.value != null) {
-                                // success => show toast, refresh data, then dismiss
+                                // success => show toast, refresh, dismiss
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.success_ingredient_added),
@@ -614,7 +623,7 @@ fun AddOrEditIngredientDialog(
                                 onSuccessRefresh()
                                 onDismiss()
                             } else {
-                                // failed => show an error toast
+                                // show error, but remain in dialog
                                 Toast.makeText(
                                     context,
                                     context.getString(R.string.add_ingredient_failed),
@@ -623,7 +632,7 @@ fun AddOrEditIngredientDialog(
                             }
                         }
                     } else {
-                        // 2) If isEdit => do your existing logic for correction or plain edit
+                        // EDIT or CORRECTION
                         val updatedIngredient = IngredientDTO(
                             ingredientId = existingIngredient?.ingredientId,
                             publicName = publicName,
@@ -640,15 +649,15 @@ fun AddOrEditIngredientDialog(
                         val bothFilled = (newAmountValue != null && commentValue != null)
 
                         if (bothEmpty) {
-                            // plain edit
+                            // Plain edit, no correction
                             onSubmit(updatedIngredient, null, null)
                             onDismiss()
                         } else if (bothFilled) {
-                            // correction
+                            // Correction
                             onSubmit(updatedIngredient, newAmountValue, commentValue)
                             onDismiss()
                         } else {
-                            // partial => show inline error
+                            // Partial => show the correction error text
                             showCorrectionError = true
                         }
                     }
