@@ -44,6 +44,8 @@ import androidx.compose.ui.res.stringResource // Importuj dla stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
+import androidx.compose.ui.text.input.ImeAction.Companion.Next
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -437,7 +439,8 @@ fun AddDeliveryDialog(
                     isError = false,
                     // We do still pass formSent so it can highlight if you like,
                     // but here it’s optional.
-                    formSent = formSent
+                    formSent = formSent,
+                    keyboardOptions = KeyboardOptions(imeAction = Next)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -446,7 +449,7 @@ fun AddDeliveryDialog(
                     inputText = amountOrdered,
                     onValueChange = { amountOrdered = it },
                     label = stringResource(id = R.string.amount_to_order),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Done),
                     maxLines = 1,
                     isError = isAmountInvalid(),
                     errorText = stringResource(R.string.error_invalid_number),
@@ -544,7 +547,8 @@ fun AddOrEditIngredientDialog(
                     isError = isNameInvalid(),
                     errorText = stringResource(R.string.error_field_required),
                     // Crucial: pass formSent down, so error can show instantly on "Add"
-                    formSent = formSent
+                    formSent = formSent,
+                    keyboardOptions = KeyboardOptions(imeAction = Next)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -566,7 +570,7 @@ fun AddOrEditIngredientDialog(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
                     label = stringResource(R.string.min_quantity),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Next),
                     isDisabled = isEmployee,
                     isError = isMinimalInvalid(),
                     errorText = stringResource(R.string.error_field_required),
@@ -579,7 +583,7 @@ fun AddOrEditIngredientDialog(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
                     label = stringResource(R.string.amount_to_order),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Next),
                     isDisabled = isEmployee,
                     isError = isAmountToOrderInvalid(),
                     errorText = stringResource(R.string.error_field_required),
@@ -593,7 +597,7 @@ fun AddOrEditIngredientDialog(
                         inputText = amount,
                         onValueChange = { amount = it },
                         label = stringResource(R.string.initial_amount),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Done),
                         isDisabled = isEmployee,
                         isError = isInitialAmountInvalid(),
                         errorText = stringResource(R.string.error_field_required),
@@ -605,7 +609,7 @@ fun AddOrEditIngredientDialog(
                         inputText = newAmount,
                         onValueChange = { newAmount = it },
                         label = stringResource(R.string.new_amount),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = Next),
                         isDisabled = false,
                         // We typically do not show an error unless partial fill → handled below
                         isError = false,
@@ -617,10 +621,10 @@ fun AddOrEditIngredientDialog(
                         inputText = comment,
                         onValueChange = { comment = it },
                         label = stringResource(R.string.comment),
-                        keyboardOptions = KeyboardOptions.Default,
                         isDisabled = false,
                         isError = false,
-                        formSent = false
+                        formSent = false,
+                        keyboardOptions = KeyboardOptions(imeAction = Done)
                     )
 
                     if (showCorrectionError) {
