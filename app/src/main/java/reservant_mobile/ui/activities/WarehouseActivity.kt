@@ -426,28 +426,42 @@ fun AddOrEditIngredientDialog(
     existingIngredient: IngredientDTO? = null,
     isEmployee: Boolean = false
 ) {
+    // Existing states
     var publicName by remember { mutableStateOf(existingIngredient?.publicName ?: "") }
     var unitOfMeasurement by remember { mutableStateOf(existingIngredient?.unitOfMeasurement ?: UnitOfMeasurement.Gram) }
     var minimalAmount by remember { mutableStateOf(existingIngredient?.minimalAmount?.toString() ?: "") }
     var amountToOrder by remember { mutableStateOf(existingIngredient?.amountToOrder?.toString() ?: "") }
     var amount by remember { mutableStateOf(existingIngredient?.amount?.toString() ?: "") }
+
+    // For correction only
     var newAmount by remember { mutableStateOf("") }
     var comment by remember { mutableStateOf("") }
+
+    // Error flag when only one of the correction fields is filled
+    var showCorrectionError by remember { mutableStateOf(false) }
+
     val unitOptions = UnitOfMeasurement.values().map { it.name }
     val expanded = remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isEdit) stringResource(id = R.string.edit_ingredient) else stringResource(id = R.string.add_new_ingredient)) },
+        title = {
+            Text(
+                if (isEdit) stringResource(R.string.edit_ingredient)
+                else stringResource(R.string.add_new_ingredient)
+            )
+        },
         text = {
             Column {
+                // --- Common fields ---
                 FormInput(
                     inputText = publicName,
                     onValueChange = { publicName = it },
-                    label = stringResource(id = R.string.name),
+                    label = stringResource(R.string.name),
                     isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 ComboBox(
                     expanded = expanded,
                     value = unitOfMeasurement.name,
@@ -455,50 +469,64 @@ fun AddOrEditIngredientDialog(
                         unitOfMeasurement = UnitOfMeasurement.valueOf(it)
                     },
                     options = unitOptions,
-                    label = stringResource(id = R.string.unit_of_measurement),
+                    label = stringResource(R.string.unit_of_measurement),
                     isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 FormInput(
                     inputText = minimalAmount,
                     onValueChange = { minimalAmount = it },
-                    label = stringResource(id = R.string.min_quantity),
+                    label = stringResource(R.string.min_quantity),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
-                    label = stringResource(id = R.string.amount_to_order),
+                    label = stringResource(R.string.amount_to_order),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isDisabled = isEmployee
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 if (!isEdit) {
+                    // -- Add new ingredient
                     FormInput(
                         inputText = amount,
                         onValueChange = { amount = it },
-                        label = stringResource(id = R.string.initial_amount),
+                        label = stringResource(R.string.initial_amount),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         isDisabled = isEmployee
                     )
                 } else {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    // -- Edit existing ingredient
                     FormInput(
                         inputText = newAmount,
                         onValueChange = { newAmount = it },
-                        label = stringResource(id = R.string.new_amount),
+                        label = stringResource(R.string.new_amount),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         isDisabled = false
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+
                     FormInput(
                         inputText = comment,
                         onValueChange = { comment = it },
-                        label = stringResource(id = R.string.comment),
+                        label = stringResource(R.string.comment),
                         keyboardOptions = KeyboardOptions.Default,
                         isDisabled = false
+                    )
+                }
+
+                // --- Possible validation error for correction ---
+                if (showCorrectionError) {
+                    Text(
+                        text = stringResource(R.string.fill_both_for_correction),
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             }
@@ -506,6 +534,7 @@ fun AddOrEditIngredientDialog(
         confirmButton = {
             ButtonComponent(
                 onClick = {
+                    // Prepare the ingredient to be sent
                     val ingredient = IngredientDTO(
                         ingredientId = existingIngredient?.ingredientId,
                         publicName = publicName,
@@ -515,18 +544,41 @@ fun AddOrEditIngredientDialog(
                         amount = if (isEdit) existingIngredient?.amount else amount.toDoubleOrNull(),
                         restaurantId = restaurantId
                     )
+
+                    // Convert user inputs for correction
                     val newAmountValue = if (isEdit) newAmount.toDoubleOrNull() else null
-                    val commentValue = if (isEdit) comment.takeIf { it.isNotBlank() } else null
-                    onSubmit(ingredient, newAmountValue, commentValue)
-                    onDismiss()
+                    val commentValue = if (isEdit && comment.isNotBlank()) comment else null
+
+                    if (isEdit) {
+                        val bothEmpty = (newAmountValue == null && commentValue == null)
+                        val bothFilled = (newAmountValue != null && commentValue != null)
+
+                        if (bothEmpty) {
+                            // Means user changed only minimal amount, name, etc.
+                            onSubmit(ingredient, null, null)  // triggers plain edit
+                            onDismiss()
+                        } else if (bothFilled) {
+                            // Valid correction
+                            onSubmit(ingredient, newAmountValue, commentValue)
+                            onDismiss()
+                        } else {
+                            // One is filled, the other is empty => show error
+                            showCorrectionError = true
+                        }
+                    } else {
+                        // Adding brand new ingredient
+                        onSubmit(ingredient, null, null)
+                        onDismiss()
+                    }
                 },
-                label = if (isEdit) stringResource(id = R.string.save_changes) else stringResource(id = R.string.add_ingredient)
+                label = if (isEdit) stringResource(R.string.save_changes)
+                else stringResource(R.string.add_ingredient)
             )
         },
         dismissButton = {
             ButtonComponent(
                 onClick = onDismiss,
-                label = stringResource(id = R.string.cancel)
+                label = stringResource(R.string.cancel)
             )
         }
     )

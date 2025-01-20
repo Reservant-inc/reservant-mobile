@@ -558,4 +558,5 @@
     <string name="error_create_restaurant">Błąd podczas tworzenia restauracji</string>
     <string name="label_edit_opening_hours">Edycja godzin otwarcia</string>
     <string name="label_add_opening_hours">Dodawanie godzin otwarcia</string>
+    <string name="fill_both_for_correction">Wypełnij oba pola „Nowa kwota” i „Komentarz”, aby wprowadzić korektę, lub pozostaw oba puste, aby edytować tylko inne pola.</string>
 </resources>

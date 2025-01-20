@@ -570,4 +570,5 @@
     <string name="error_create_restaurant">Error while creating restaurant</string>
     <string name="label_edit_opening_hours">Edit opening hours</string>
     <string name="label_add_opening_hours">Add opening hours</string>
+    <string name="fill_both_for_correction">Please fill both "New amount" and "Comment" fields to make a correction, or leave both empty to only edit other fields.</string>
 </resources>

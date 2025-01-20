@@ -716,7 +716,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
                 navHostController = navController,
-                isEmployee = true
+                isEmployee = false
             )
         }
         composable<RestaurantRoutes.Reviews> {
