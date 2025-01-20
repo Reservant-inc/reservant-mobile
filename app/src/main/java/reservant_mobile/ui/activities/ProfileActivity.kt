@@ -920,6 +920,8 @@ fun FriendsTab(
                 }
             }
 
+            println("Friends count: ${friendsPagingItems.itemCount}")
+
             if (friendsPagingItems.itemCount == 0 && friendsRequestsPagingItems.itemCount == 0) {
                 item {
                     Box(
