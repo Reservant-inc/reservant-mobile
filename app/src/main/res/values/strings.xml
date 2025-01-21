@@ -612,4 +612,6 @@
     <string name="future_visits_tab">Upcoming</string>
     <string name="past_visits_tab">Past</string>
     <string name="label_my_visits">My visits</string>
+    <string name="label_event_deleted">Event deleted</string>
+    <string name="error_deleting_event">Error while deleting event</string>
 </resources>
