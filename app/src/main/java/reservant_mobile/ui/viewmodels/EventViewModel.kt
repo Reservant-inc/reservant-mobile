@@ -36,7 +36,8 @@ class EventViewModel(
     private val eventId: Int = 0,
     fetchRestaurants: Boolean = true, // true for AddEventActivity, false for EventDetailActivity
     private val eventService: IEventService = EventService(),
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val userService: IUserService = UserService()
 ) : ReservantViewModel() {
 
     var isLoading: Boolean by mutableStateOf(false)
@@ -83,6 +84,7 @@ class EventViewModel(
                 fetchRestaurants()
             } else{
                 getEvent()
+                checkInterest()
             }
         }
     }
@@ -90,6 +92,19 @@ class EventViewModel(
     suspend fun joinInterested(): Boolean {
         val result = eventService.markEventAsInterested(eventId)
         if (!result.isError) {
+            return true
+        }
+        return false
+    }
+
+    suspend fun checkInterest(): Boolean {
+        val result = userService.isInterestedInEvent(eventId)
+        if (!result.isError) {
+            when(result.value){
+                true -> isInterested = true
+                false -> isInterested = false
+                null -> null
+            }
             return true
         }
         return false
