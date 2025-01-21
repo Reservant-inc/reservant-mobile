@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -118,14 +119,10 @@ fun DeliveriesActivity(
                 CircularProgressIndicator()
             }
         } else {
-            // Gdybyś włączył pobieranie z lazyPagingItems – poniższy kod jest zakomentowany.
-            // Tutaj używamy exampleDeliveries na potrzeby testów.
-            //
-            // lazyPagingItems?.let { pagingItems ->
-            //     ...
-            // }
+
 
             val exampleDeliveries = listOf(
+                // 1) Dostawa w stanie oczekującym (ani anulowana, ani dostarczona)
                 DeliveryDTO(
                     deliveryId = 1,
                     orderTime = "2025-01-21T10:00:00.000Z",
@@ -140,16 +137,26 @@ fun DeliveriesActivity(
                         )
                     )
                 ),
+                // 2) Kolejna oczekująca (bez deliveredTime ani canceledTime)
                 DeliveryDTO(
                     deliveryId = 2,
-                    orderTime = "2025-01-22T09:15:00.000Z",
+                    orderTime = "2025-01-22T09:15:20.123Z", // trochę inna godzina z milisekundami
                     userFullName = "Anna Kowalska",
-                    cost = 64.99
+                    cost = 64.99,
+                    ingredients = listOf(
+                        DeliveryDTO.DeliveryIngredientDTO(
+                            deliveryId = 2,
+                            ingredientId = 202,
+                            amountOrdered = 1.0,
+                            ingredientName = "Ziemniaki"
+                        )
+                    )
                 ),
+                // 3) Dostawa dostarczona (deliveredTime != null)
                 DeliveryDTO(
                     deliveryId = 3,
-                    orderTime = "2025-01-23T15:05:00.000Z",
-                    deliveredTime = "2025-01-23T16:02:00.000Z",
+                    orderTime = "2025-01-23T15:05:10.500Z",
+                    deliveredTime = "2025-01-23T16:02:30.999Z",
                     userFullName = "Restauracja Rondo",
                     cost = 205.99,
                     ingredients = listOf(
@@ -159,19 +166,37 @@ fun DeliveriesActivity(
                             amountOrdered = 10.0,
                             amountDelivered = 10.0,
                             ingredientName = "Makaron"
+                        ),
+                        DeliveryDTO.DeliveryIngredientDTO(
+                            deliveryId = 3,
+                            ingredientId = 303,
+                            amountOrdered = 2.0,
+                            amountDelivered = 2.0,
+                            ingredientName = "Oliwa z oliwek"
                         )
                     )
                 ),
+                // 4) Dostawa anulowana (canceledTime != null)
                 DeliveryDTO(
                     deliveryId = 4,
-                    orderTime = "2025-01-24T11:20:00.000Z",
+                    orderTime = "2025-01-24T11:20:45.200Z",
                     canceledTime = "2025-01-24T12:00:00.000Z",
                     userFullName = "Firma Cateringowa",
-                    cost = 380.10
+                    cost = 380.10,
+                    ingredients = listOf(
+                        DeliveryDTO.DeliveryIngredientDTO(
+                            deliveryId = 4,
+                            ingredientId = 404,
+                            amountOrdered = 6.0,
+                            amountDelivered = 0.0,
+                            ingredientName = "Mąka pszenna"
+                        )
+                    )
                 ),
+                // 5) Dostawa oczekująca z większą liczbą składników
                 DeliveryDTO(
                     deliveryId = 5,
-                    orderTime = "2025-01-25T08:45:00.000Z",
+                    orderTime = "2025-01-25T08:45:59.777Z",
                     userFullName = "Stanisław Bąk",
                     cost = 99.00,
                     ingredients = listOf(
@@ -186,28 +211,32 @@ fun DeliveriesActivity(
                             ingredientId = 404,
                             amountOrdered = 12.0,
                             ingredientName = "Ser mozzarella"
+                        ),
+                        DeliveryDTO.DeliveryIngredientDTO(
+                            deliveryId = 5,
+                            ingredientId = 505,
+                            amountOrdered = 1.0,
+                            ingredientName = "Bazylia świeża"
                         )
                     )
                 )
             )
 
-            // 4) Filtrujemy listę wg searchQuery + selectedStatus
             val filteredDeliveries = exampleDeliveries.filter { delivery ->
-                // Filtr po statusie
+
                 val statusMatches = when (selectedStatus) {
                     "Canceled" -> delivery.canceledTime != null
                     "Delivered" -> delivery.deliveredTime != null
                     "Pending" -> (delivery.canceledTime == null && delivery.deliveredTime == null)
-                    else -> true // All albo null
+                    else -> true
                 }
-                // Filtr po wyszukiwaniu w userFullName (ignorujemy wielkość liter)
+
                 val searchMatches = delivery.userFullName
                     ?.contains(searchQuery, ignoreCase = true) ?: false
 
                 statusMatches && searchMatches
             }
 
-            // 5) Wyświetlamy przefiltrowane rekordy
             LazyColumn {
                 items(filteredDeliveries) { delivery ->
                     DeliveryItem(
@@ -235,12 +264,13 @@ fun DeliveryItem(
     onCancelClick: () -> Unit,
     onMarkArrivedClick: () -> Unit
 ) {
-
     val pastelRed = Color(0xFFFFC1C1)
-    val pastelGreen = Color(0xFF84C58D)
+    val pastelGreen = Color(0xFF67B873)
 
     val darkRed = Color(0xFFD32F2F)
-    val darkGreen = Color(0xFF28692B)
+    val darkGreen = Color(0xFF2E7D32)
+
+    var isIngredientsExpanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -266,13 +296,14 @@ fun DeliveryItem(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Delivery #${delivery.deliveryId ?: "--"}",
+                    text = "${stringResource(R.string.label_delivery)} #${delivery.deliveryId ?: "--"}",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Nazwa zamawiającego
             val userName = delivery.userFullName ?: "Anonim"
             Text(
                 text = userName,
@@ -281,46 +312,65 @@ fun DeliveryItem(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            val orderDateFormatted = delivery.orderTime?.let { formatToDateTime(it, "dd MMMM yyyy") }
-            val orderTimeFormatted = delivery.orderTime?.let { formatToDateTime(it, "HH:mm") }
-
+            // Data zamówienia
             Text(
-                text = stringResource(R.string.label_ordered)+": $orderDateFormatted | ${orderTimeFormatted ?: "--"}",
+                text = "${stringResource(R.string.label_ordered_at)}: ${delivery.orderTime ?: "--"}",
                 style = MaterialTheme.typography.bodyMedium
             )
-
+            // Koszt
             Text(
-                text = stringResource(R.string.label_cost) + ": ${delivery.cost ?: 0.0} PLN",
+                text = "${stringResource(R.string.label_cost)}: ${delivery.cost ?: 0.0} PLN",
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            val ingredientsList = delivery.ingredients.orEmpty()
+            if (ingredientsList.isNotEmpty()) {
+                Text(
+                    text =
+                    if (isIngredientsExpanded)
+                        stringResource(R.string.label_hide_ingredients)
+                    else
+                        stringResource(R.string.label_show_ingredients) ,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .clickable {
+                            isIngredientsExpanded = !isIngredientsExpanded
+                        }
+                        .padding(vertical = 4.dp)
+                )
+
+                if (isIngredientsExpanded) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    ingredientsList.forEach { ing ->
+                        Text(
+                            text = "• ${ing.ingredientName ?: "Unknown"}" +
+                                    " (${stringResource(R.string.label_ordered)}: ${ing.amountOrdered ?: 0.0})",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             when {
-
                 delivery.canceledTime != null -> {
-
-                    val cancelDateFormatted = formatToDateTime(delivery.canceledTime, "dd MMMM yyyy")
-                    val cancelTimeFormatted = formatToDateTime(delivery.canceledTime, "HH:mm")
                     Text(
-                        text = stringResource(R.string.label_canceled_at)+": $cancelDateFormatted | $cancelTimeFormatted",
+                        text = "${stringResource(R.string.label_canceled_at)} ${delivery.canceledTime}",
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-
                 delivery.deliveredTime != null -> {
-                    val deliveredDateFormatted = formatToDateTime(delivery.deliveredTime, "dd MMMM yyyy")
-                    val deliveredTimeFormatted = formatToDateTime(delivery.deliveredTime, "HH:mm")
-
                     Text(
-                        text = stringResource(R.string.label_arrived_at)+": $deliveredDateFormatted | $deliveredTimeFormatted",
+                        text = "${stringResource(R.string.label_arrived_at)} ${delivery.deliveredTime}",
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
                 else -> {
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -341,11 +391,7 @@ fun DeliveryItem(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.label_mark_arrived),
-                                fontSize = 12.sp,
-                                maxLines = 1
-                            )
+                            Text(text = stringResource(R.string.label_mark_arrived), fontSize = 12.sp)
                         }
                         ElevatedButton(
                             onClick = onCancelClick,
@@ -362,11 +408,7 @@ fun DeliveryItem(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = stringResource(R.string.label_cancel),
-                                fontSize = 12.sp,
-                                maxLines = 1
-                            )
+                            Text(text = stringResource(R.string.label_cancel), fontSize = 12.sp)
                         }
                     }
                 }
