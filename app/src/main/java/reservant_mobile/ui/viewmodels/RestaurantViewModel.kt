@@ -22,6 +22,7 @@ import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
+import java.text.Normalizer.Form
 import java.time.LocalTime
 
 class RestaurantViewModel(
@@ -45,6 +46,8 @@ class RestaurantViewModel(
     val city: FormField = FormField(RestaurantDTO::city.name)
     val description: FormField = FormField(RestaurantDTO::description.name)
 
+    //Lokalizacja
+    lateinit var loc: LocationDTO
 
     // Pliki do załączenia
     val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
@@ -200,7 +203,25 @@ class RestaurantViewModel(
             postalCode = postalCode.value
         )
 
-        return !res.isError
+        if (res.isError){
+            return false
+        }
+
+        res.value?.let {
+
+            val lat = it[0].lat
+            val lon = it[0].lon
+
+            if (lat != null && lon != null){
+                loc = LocationDTO(
+                    latitude = lat,
+                    longitude = lon
+                )
+            }
+
+        }
+
+        return true
     }
 
     suspend fun validateSecondStep(context: Context): Boolean {
