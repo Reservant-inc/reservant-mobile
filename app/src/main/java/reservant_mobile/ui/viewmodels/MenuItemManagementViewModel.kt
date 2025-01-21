@@ -7,19 +7,21 @@ import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import reservant_mobile.data.endpoints.Ingredients
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.IRestaurantMenuService
+import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantMenuService
+import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
 
 class MenuItemManagementViewModel(
     private val menuId: Int,
     private val restaurantId: Int,
-    private val service: IRestaurantMenuService = RestaurantMenuService(),
+    private val menuService: IRestaurantMenuService = RestaurantMenuService(),
+    private val restaurantService: IRestaurantService = RestaurantService()
 ): ReservantViewModel() {
     var items by mutableStateOf<List<RestaurantMenuItemDTO>>(emptyList())
 
@@ -28,19 +30,30 @@ class MenuItemManagementViewModel(
     val price: FormField = FormField(RestaurantMenuItemDTO::stringPrice.name)
     val alcoholPercentage: FormField = FormField(RestaurantMenuItemDTO::stringAlcoholPercentage.name)
     val photo: FormField = FormField(RestaurantMenuItemDTO::photoFileName.name)
-    var ingredients: List<IngredientDTO> = emptyList()
+    var ingredients: MutableList<String> = mutableListOf()
+
+    var restaurantIngredients: List<IngredientDTO> = emptyList()
 
     init {
         viewModelScope.launch {
             fetchMenuItems()
+            fetchIngredients()
         }
     }
 
     private suspend fun fetchMenuItems(){
-        items = service.getMenu(menuId).value?.menuItems?.toMutableList() ?: mutableListOf()
+        items = menuService.getMenu(menuId).value?.menuItems?.toMutableList() ?: mutableListOf()
         items.forEach{item ->
             price.value = item.price.toString()
             alcoholPercentage.value = item.alcoholPercentage.toString()
+        }
+    }
+
+    private suspend fun fetchIngredients(){
+        val res = restaurantService.getIngredients(restaurantId = restaurantId)
+
+        if (!res.isError){
+            restaurantIngredients = res.value.orEmpty()
         }
     }
 
@@ -61,7 +74,9 @@ class MenuItemManagementViewModel(
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
             photoFileName = sendPhoto(photo.value, context),
-            ingredients = ingredients
+            ingredients = restaurantIngredients.filter {
+                ingredients.contains(it.publicName)
+            }
         )
     }
 
@@ -74,18 +89,20 @@ class MenuItemManagementViewModel(
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
             photo = photo.value,
-            ingredients = ingredients
+            ingredients = restaurantIngredients.filter {
+                ingredients.contains(it.publicName)
+            }
         )
     }
 
     suspend fun createMenuItem(context: Context){
         val menuitem = createMenuItemDTO(context = context)
 
-        val result = service.createMenuItem(menuitem)
+        val result = menuService.createMenuItem(menuitem)
 
         if(!result.isError){
             val menuItemId = result.value?.menuItemId
-            val resultadd = service.addItemsToMenu(menuId, listOf(menuItemId!!))
+            val resultadd = menuService.addItemsToMenu(menuId, listOf(menuItemId!!))
 
             if(!resultadd.isError){
                 fetchMenuItems()
@@ -95,7 +112,7 @@ class MenuItemManagementViewModel(
     }
 
     suspend fun deleteMenuItem(id: Int){
-        val result = service.deleteMenuItem(id)
+        val result = menuService.deleteMenuItem(id)
 
         if (!result.isError){
             fetchMenuItems()
@@ -105,7 +122,7 @@ class MenuItemManagementViewModel(
     suspend fun editMenuItem(menuItem: RestaurantMenuItemDTO) {
         val editedMenuItem = putMenuItemDTO(menuItem.menuItemId)
 
-        val result = service.editMenuItem(menuItem.menuItemId!!, editedMenuItem)
+        val result = menuService.editMenuItem(menuItem.menuItemId!!, editedMenuItem)
 
         if (!result.isError){
             fetchMenuItems()
@@ -132,7 +149,15 @@ class MenuItemManagementViewModel(
         return true
     }
 
-    fun assignIngredients(ingredients: List<IngredientDTO>?){
-        this.ingredients = ingredients ?: emptyList()
+    /*fun assignIngredients(ingredients: List<IngredientDTO>?){
+        this.ingredients = (ingredients ?: mutableListOf()).toMutableList()
+    }*/
+
+    fun onIngredientAdded(ingredient: String) {
+        ingredients += ingredient
+    }
+
+    fun onIngredientRemoved(ingredient: String){
+        ingredients -= ingredient
     }
 }

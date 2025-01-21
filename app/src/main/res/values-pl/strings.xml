@@ -600,4 +600,5 @@
     <string name="label_my_visits">Moje wizyty</string>
     <string name="error_invalid_price">Niepoprawna cena</string>
     <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
+    <string name="label_choose_ingredients">Wybierz składniki</string>
 </resources>
