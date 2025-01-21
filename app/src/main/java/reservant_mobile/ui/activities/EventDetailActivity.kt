@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -196,7 +197,28 @@ fun EventDetailActivity(
                                 }
                                 showEditDialog = false
                             },
-                            context = context
+                            context = context,
+                            onDeleteEvent = {
+                                eventDetailVM.viewModelScope.launch {
+                                    val success = eventDetailVM.deleteEvent()
+
+                                    if(success){
+                                        navController.popBackStack()
+
+                                        Toast.makeText(
+                                            context,
+                                            "Event deleted",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }else{
+                                        Toast.makeText(
+                                            context,
+                                            "Error",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -478,8 +500,13 @@ fun EditEventDialog(
     event: EventDTO,
     onDismiss: () -> Unit,
     onSave: (EventDTO) -> Unit,
-    context: Context
+    context: Context,
+    onDeleteEvent: () -> Unit
 ) {
+
+
+    var showDeletePopup by remember { mutableStateOf(false) }
+
     var name by remember { mutableStateOf(event.name ?: "") }
     var description by remember { mutableStateOf(event.description ?: "") }
     var maxPeople by remember { mutableStateOf(event.maxPeople?.toString() ?: "") }
@@ -512,6 +539,22 @@ fun EditEventDialog(
             joinUntilDateTime.isAfter(now) &&
             eventDateTime.isAfter(joinUntilDateTime)
 
+
+    if (showDeletePopup) {
+        DeleteCountdownPopup(
+            icon = Icons.Filled.DeleteForever,
+            title = stringResource(R.string.confirm_delete_title),
+            text = stringResource(R.string.confirm_delete_text),
+            onConfirm = {
+                onDeleteEvent()
+                showDeletePopup = false
+            },
+            onDismissRequest = { showDeletePopup = false },
+            confirmText = stringResource(R.string.label_yes_capital),
+            dismissText = stringResource(R.string.label_cancel)
+        )
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -539,7 +582,24 @@ fun EditEventDialog(
             }
         },
         title = {
-            Text(text = stringResource(R.string.label_edit_event))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.label_edit_event),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                IconButton(
+                    onClick = { showDeletePopup = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete event"
+                    )
+                }
+            }
         },
         text = {
             Column(

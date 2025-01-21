@@ -118,8 +118,16 @@ class EventViewModel(
         }
     }
 
+    suspend fun deleteEvent(): Boolean {
+        val result = eventService.deleteEvent(eventId)
+        if (!result.isError) {
+            return true
+        }
+        return false
+    }
+
     suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
-        
+
         var eventPhotoResult = sendPhoto(dto.photo, context)
 
         val resultDTO: EventDTO
