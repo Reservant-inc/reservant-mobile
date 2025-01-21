@@ -60,7 +60,8 @@ class MenuItemManagementViewModel(
             alternateName = alternateName.value.ifEmpty { null },
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
-            photoFileName = photo.value
+            photoFileName = photo.value,
+            photo = photo.value
         )
     }
 
@@ -119,5 +120,16 @@ class MenuItemManagementViewModel(
         price.value = ""
         alcoholPercentage.value = ""
         photo.value = ""
+    }
+
+    fun isFormValid(): Boolean {
+        return name.value.isNotBlank() &&
+                (price.value.toDoubleOrNull() ?: 0.0 ) > 0 &&
+                (alcoholPercentage.value.toDoubleOrNull() ?: 0.0 ) >= 0 &&
+                isPhotoValid()
+    }
+
+    fun isPhotoValid(): Boolean {
+        return true
     }
 }

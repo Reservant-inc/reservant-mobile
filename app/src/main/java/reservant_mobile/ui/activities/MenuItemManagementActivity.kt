@@ -74,7 +74,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                             viewmodel.fetchPhoto(it)
                         }
                     },
-                    isFormValid = false
+                    isFormValid = viewmodel.isFormValid()
                 )
             }
         }
@@ -95,7 +95,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     }
                 },
                 context = context,
-                isFormValid = false
+                isFormValid = viewmodel.isFormValid()
             )
         }
     }

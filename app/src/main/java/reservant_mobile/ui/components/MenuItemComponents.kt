@@ -86,7 +86,7 @@ fun MenuItemCard(
             altName?.value = menuItem.alternateName ?: ""
             price?.value = menuItem.price.toString()
             alcoholPercentage?.value = (menuItem.alcoholPercentage ?: "").toString()
-            photoField?.value = menuItem.photoFileName ?: ""
+            photoField?.value = menuItem.photo.orEmpty().drop(9)
 
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
@@ -283,6 +283,11 @@ fun MenuItemPopup(
                 )
                 FormFileInput(
                     label = stringResource(id = R.string.label_menu_item_photo),
+                    defaultValue =
+                    if (photo.value == "null")
+                        ""
+                    else
+                        photo.value,
                     onFilePicked = { file -> photo.value = file.toString() },
                     context = context
                 )
