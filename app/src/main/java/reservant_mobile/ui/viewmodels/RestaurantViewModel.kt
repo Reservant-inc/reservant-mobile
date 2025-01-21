@@ -21,7 +21,6 @@ import reservant_mobile.data.utils.getFileName
 import reservant_mobile.data.utils.isFileNameInvalid
 import reservant_mobile.data.utils.isFileSizeInvalid
 import java.time.LocalTime
-import kotlin.math.max
 
 class RestaurantViewModel(
     private val restaurantService: IRestaurantService = RestaurantService()
@@ -50,6 +49,8 @@ class RestaurantViewModel(
     val businessPermission: FormField = FormField(RestaurantDTO::businessPermission.name)
     val idCard: FormField = FormField(RestaurantDTO::idCard.name)
     val logo: FormField = FormField(RestaurantDTO::logo.name)
+    var photos: List<String> by mutableStateOf(emptyList())
+
 
     //Godziny otwarcia
     var openingHours: MutableList<Pair<String?, String?>> = MutableList(7){
@@ -93,6 +94,7 @@ class RestaurantViewModel(
             businessPermission.value = restaurant.value.businessPermission.orEmpty().drop(9)
             idCard.value = restaurant.value.idCard.orEmpty().drop(9)
             logo.value = restaurant.value.logo.orEmpty().drop(9)
+            photos = restaurant.value.photos.map { it.drop(9)}
             description.value = restaurant.value.description
             delivery = restaurant.value.provideDelivery
             deposit = restaurant.value.reservationDeposit
@@ -195,6 +197,18 @@ class RestaurantViewModel(
             null
         }
 
+
+        val restaurantGallery = if (photos.all {
+            !it.endsWith(".png", ignoreCase = true) &&
+            !it.endsWith(".jpg", ignoreCase = true)}
+        ) {
+            photos.map {
+                sendPhoto(it, context)
+            }
+        } else {
+            listOf(null)
+        }
+
         val permission = if (!businessPermission.value.endsWith(
                 ".pdf",
                 ignoreCase = true
@@ -230,6 +244,16 @@ class RestaurantViewModel(
                 logo.value = restaurantLogo.value?.fileName ?: ""
             else
                 logo.value = "Bledny plik"
+        }
+
+
+        photos = restaurantGallery.map {
+            if(it != null && !it.isError){
+                it.value?.fileName ?: ""
+            }
+            else {
+                "Bledny plik"
+            }
         }
 
         if (permission != null) {
@@ -317,7 +341,7 @@ class RestaurantViewModel(
             tags = selectedTags,
             reservationDeposit = deposit,
             groupId = selectedGroup?.restaurantGroupId,
-            photos = emptyList(),
+            photos = photos,
             tables = emptyList(),
             location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046),
             openingHours = openingHours.map {
@@ -377,6 +401,7 @@ class RestaurantViewModel(
                 isAlcoholLicenseInvalid(context) ||
                 isRentalContractInvalid(context) ||
                 isLogoInvalid(context) ||
+                arePhotosInvalid(context) ||
                 isRestaurantTypeInvalid() ||
                 areTagsInvalid() ||
                 isDepositInvalid()
@@ -397,6 +422,7 @@ class RestaurantViewModel(
                 isIdCardInvalid(context) ||
                 isAlcoholLicenseInvalid(context) ||
                 isRentalContractInvalid(context) ||
+                arePhotosInvalid(context) ||
                 isLogoInvalid(context)
 
     }
@@ -500,20 +526,30 @@ class RestaurantViewModel(
 
 
     fun isLogoInvalid(context: Context): Boolean {
-        val value = logo.value
-        return value.isBlank() ||
-                !(getFileName(context, value)
+        return isLogoInvalid(context, logo.value)
+    }
+
+    private fun isLogoInvalid(context: Context, target: String): Boolean {
+        return target.isBlank() ||
+                !(getFileName(context, target)
                     .endsWith(
                         ".png",
                         ignoreCase = true
                     )
                         || getFileName(
                     context,
-                    value
+                    target
                 ).endsWith(
                     ".jpg",
                     ignoreCase = true
-                )) || isFileSizeInvalid(context, value)
+                )) || isFileSizeInvalid(context, target)
+    }
+
+    fun arePhotosInvalid(context: Context): Boolean {
+        for (photo in photos) {
+            if(isLogoInvalid(context, photo)) return true
+        }
+        return false
     }
 
     fun isOpeningHoursTimeInvalid(times: Pair<String?, String?>): Boolean {
@@ -583,6 +619,10 @@ class RestaurantViewModel(
 
     fun getLogoError(): Int {
         return getFieldError(resultFileUploads, logo.name)
+    }
+
+    fun getPhotosError(): Int {
+        return getFieldError(resultFileUploads, RestaurantDTO::photos.name)
     }
 
     fun getGroupError(): Int {

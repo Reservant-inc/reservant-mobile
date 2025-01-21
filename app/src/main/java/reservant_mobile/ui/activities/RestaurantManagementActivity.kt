@@ -134,6 +134,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         if(navController.currentBackStackEntry?.destination?.route == RestaurantManagementRoutes.RestaurantPreview::class.qualifiedName)
                             navController.navigate(RestaurantManagementRoutes.Restaurant)
                         restaurantManageVM.deleteRestaurant(restaurant.restaurantId)
+                        selectedGroup = null
                         showDeleteRestaurantPopup = false
                     }
                 }
@@ -301,6 +302,16 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     restaurantManageVM.getGroup(it1)
                                 }
                             }
+                            Text(
+                                text = selectedGroup?.name ?: stringResource(id = R.string.label_group),
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         } else if (restaurantManageVM.isLoading){
                             Box(
                                 modifier = Modifier.fillMaxSize(),
@@ -351,7 +362,7 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         }
                     }
 
-                    selectedGroup?.restaurants?.forEach { restaurant ->
+                    selectedGroup?.restaurants?.filter{ it.isArchived != true }.orEmpty().forEach { restaurant ->
                         var img by remember { mutableStateOf<Bitmap?>(null) }
                         LaunchedEffect(key1 = true) {
                             if(restaurant.logo!=null){
