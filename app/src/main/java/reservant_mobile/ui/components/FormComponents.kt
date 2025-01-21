@@ -95,6 +95,9 @@ fun FormInput(
     if (inputText.isEmpty() && optional)
         beginValidation = false
 
+    // If optional && the field is blank => override isError to false
+    val finalIsError = if (optional && inputText.isBlank()) false else isError
+
     Column {
         OutlinedTextField(
             modifier =
@@ -132,7 +135,7 @@ fun FormInput(
                 else keyboardOptions.imeAction
             ),
             shape = shape,
-            isError = isError && (beginValidation || formSent),
+            isError = finalIsError && (beginValidation || formSent),
             maxLines = maxLines,
             singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
@@ -140,7 +143,7 @@ fun FormInput(
             interactionSource = interactionSource,
             readOnly = readOnly
         )
-        if (isError && (beginValidation || formSent)) {
+        if (finalIsError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
                 color = MaterialTheme.colorScheme.error
