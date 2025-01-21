@@ -97,7 +97,8 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     }
                 },
                 context = context,
-                isFormValid = viewmodel.isFormValid()
+                isFormValid = viewmodel.isFormValid(),
+
             )
         }
     }

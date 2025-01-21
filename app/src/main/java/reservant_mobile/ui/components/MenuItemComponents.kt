@@ -3,7 +3,6 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
-import androidx.collection.intSetOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
-import reservant_mobile.data.endpoints.Ingredients
 import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
@@ -106,7 +104,11 @@ fun MenuItemCard(
                 alcoholPercentage = alcoholPercentage!!,
                 photo = photoField!!,
                 context = context!!,
-                isFormValid = isFormValid
+                isFormValid = isFormValid,
+                ingredients = emptyList(),
+                selectedIngredients = emptyList(),
+                onAddIngredient = {s ->},
+                onRemoveIngredient = {s->}
             )
         }
     }
@@ -248,7 +250,11 @@ fun MenuItemPopup(
     alcoholPercentage: FormField,
     photo: FormField,
     context: Context,
-    isFormValid: Boolean
+    isFormValid: Boolean,
+    selectedIngredients: List<String>,
+    ingredients: List<String>,
+    onAddIngredient: (String) -> Unit,
+    onRemoveIngredient: (String) -> Unit
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -299,6 +305,37 @@ fun MenuItemPopup(
                     context = context
                 )
 
+                var showIngredientChoice by remember {
+                    mutableStateOf(false)
+                }
+
+                TagList(
+                    tags = selectedIngredients,
+                    onRemoveTag = { ingredient ->
+                        onRemoveIngredient(ingredient)
+                    })
+
+                ButtonComponent(
+                    onClick = { showIngredientChoice = true },
+                    label = stringResource(id = R.string.label_choose_tags)
+                )
+
+                if (showIngredientChoice){
+                    IngredientSelectionScreen(
+                        title = "Choose ingredients",
+                        ingredients = ingredients,
+                        selectedIngredients = selectedIngredients,
+                        onDismiss = { showIngredientChoice = false },
+                        onIngredientSelected = { ingredient, isSelected ->
+                            if (isSelected) {
+                                onAddIngredient(ingredient)
+                            } else {
+                                onRemoveIngredient(ingredient)
+                            }
+                        }
+                    )
+                }
+
             }
         },
         dismissButton = {
@@ -336,7 +373,11 @@ fun AddMenuItemButton(
     clearFields: () -> Unit,
     addMenu: () -> Unit,
     context: Context,
-    isFormValid: Boolean
+    isFormValid: Boolean,
+    selectedIngredients: List<String>,
+    ingredients: List<String>,
+    onAddIngredient: (String) -> Unit,
+    onRemoveIngredient: (String) -> Unit
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
 
@@ -357,7 +398,11 @@ fun AddMenuItemButton(
                 alcoholPercentage = alcoholPercentage,
                 photo = photo,
                 context = context,
-                isFormValid = isFormValid
+                isFormValid = isFormValid,
+                selectedIngredients,
+                ingredients,
+                onAddIngredient,
+                onRemoveIngredient
             )
         }
     }

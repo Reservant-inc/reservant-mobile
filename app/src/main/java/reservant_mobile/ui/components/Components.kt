@@ -53,7 +53,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -142,7 +141,6 @@ import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.activities.FilterOptionWithStars
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -796,6 +794,53 @@ fun TagItem(
         shape = RoundedCornerShape(50),
         modifier = Modifier.padding(4.dp),
         selected = false
+    )
+}
+
+@Composable
+fun IngredientSelectionScreen(
+    title: String,
+    ingredients: List<String>,
+    selectedIngredients: List<String>,
+    onDismiss: () -> Unit,
+    onIngredientSelected: (String, Boolean) -> Unit
+){
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            LazyColumn {
+                items(ingredients) { tag ->
+                    val isChecked = selectedIngredients.contains(tag)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isSelected ->
+                                onIngredientSelected(tag, isSelected)
+                            }
+                        )
+                        Text(
+                            text = tag,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .clickable { onIngredientSelected(tag, !isChecked) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
     )
 }
 
