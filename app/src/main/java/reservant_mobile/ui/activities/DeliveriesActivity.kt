@@ -119,7 +119,35 @@ fun DeliveriesActivity(
                 CircularProgressIndicator()
             }
         } else {
-
+//            lazyPagingItems?.let { pagingItems ->
+//                LazyColumn(
+//                    verticalArrangement = Arrangement.spacedBy(8.dp),
+//                ) {
+//                    items(pagingItems.itemCount) { index ->
+//                        val delivery = pagingItems[index]
+//                        if (delivery != null) {
+//                            DeliveryItem(
+//                                delivery = delivery,
+//                                onCancelClick = {
+//                                    delivery.deliveryId?.let {
+//                                        deliveriesViewModel.markCanceled(it)
+//                                    }
+//                                },
+//                                onMarkArrivedClick = {
+//                                    delivery.deliveryId?.let {
+//                                        deliveriesViewModel.confirmDelivered(it)
+//                                    }
+//                                }
+//                            )
+//                        }
+//                    }
+//                }
+//            } ?: run {
+//                Text(
+//                    text = stringResource(R.string.label_no_deliveries),
+//                    modifier = Modifier.padding(8.dp)
+//                )
+//            }
 
             val exampleDeliveries = listOf(
                 // 1) Dostawa w stanie oczekującym (ani anulowana, ani dostarczona)
