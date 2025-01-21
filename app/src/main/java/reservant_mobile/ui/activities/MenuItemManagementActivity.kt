@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FoodBank
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,10 +56,11 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     price = viewmodel.price,
                     photoField = viewmodel.photo,
                     alcoholPercentage = viewmodel.alcoholPercentage,
+                    assignIngredients = { viewmodel.assignIngredients(it) },
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
-                            viewmodel.editMenuItem(item, context)
+                            viewmodel.editMenuItem(item)
                         }
                     },
                     onDeleteClick = {
@@ -99,18 +101,5 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
             )
         }
     }
-
-
-//    LazyColumn (
-//        modifier = Modifier.padding(16.dp, 8.dp, 16.dp, 8.dp)
-//    ){
-//        items(viewmodel.items) { item ->
-//            MenuItemCard(
-//                menuItem = item,
-//                onEditClick = {}, //TODO
-//                onDeleteClick = { viewmodel.deleteMenu(item) }
-//            )
-//        }
-//    }
 
 }

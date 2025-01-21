@@ -41,6 +41,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.endpoints.Ingredients
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 
@@ -53,6 +55,7 @@ fun MenuItemCard(
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
+    assignIngredients: (List<IngredientDTO>?) -> Unit = {},
     name: FormField? = null,
     altName: FormField? = null,
     price: FormField? = null,
@@ -82,11 +85,15 @@ fun MenuItemCard(
         }
 
         showEditPopup && role == Roles.RESTAURANT_OWNER -> {
-            name?.value = menuItem.name
-            altName?.value = menuItem.alternateName ?: ""
-            price?.value = menuItem.price.toString()
-            alcoholPercentage?.value = (menuItem.alcoholPercentage ?: "").toString()
-            photoField?.value = menuItem.photo.orEmpty().drop(9)
+
+            LaunchedEffect(key1 = Unit) {
+                assignIngredients(menuItem.ingredients)
+                name?.value = menuItem.name
+                altName?.value = menuItem.alternateName.orEmpty()
+                price?.value = menuItem.price.toString()
+                alcoholPercentage?.value = (menuItem.alcoholPercentage ?: "").toString()
+                photoField?.value = menuItem.photo.orEmpty().drop(9)
+            }
 
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },

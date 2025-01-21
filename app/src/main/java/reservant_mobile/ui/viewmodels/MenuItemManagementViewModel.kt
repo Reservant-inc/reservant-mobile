@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import reservant_mobile.data.endpoints.Ingredients
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.DataType
@@ -26,6 +28,7 @@ class MenuItemManagementViewModel(
     val price: FormField = FormField(RestaurantMenuItemDTO::stringPrice.name)
     val alcoholPercentage: FormField = FormField(RestaurantMenuItemDTO::stringAlcoholPercentage.name)
     val photo: FormField = FormField(RestaurantMenuItemDTO::photoFileName.name)
+    var ingredients: List<IngredientDTO> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -50,15 +53,28 @@ class MenuItemManagementViewModel(
         return fDto?.fileName ?: ""
     }
 
-    private suspend fun createMenuItemDTO(menuItemId: Int? = null, context: Context): RestaurantMenuItemDTO {
+    private suspend fun createMenuItemDTO(context: Context): RestaurantMenuItemDTO {
         return RestaurantMenuItemDTO(
-            menuItemId  = menuItemId,
             name = name.value,
             restaurantId = restaurantId,
             alternateName = alternateName.value.ifEmpty { null },
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
-            photo = sendPhoto(photo.value, context)
+            photoFileName = sendPhoto(photo.value, context),
+            ingredients = ingredients
+        )
+    }
+
+    private fun putMenuItemDTO(menuItemId: Int? = null): RestaurantMenuItemDTO {
+        return RestaurantMenuItemDTO(
+            menuItemId = menuItemId,
+            name = name.value,
+            restaurantId = restaurantId,
+            alternateName = alternateName.value.ifEmpty { null },
+            price = price.value.toDouble(),
+            alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
+            photo = photo.value,
+            ingredients = ingredients
         )
     }
 
@@ -86,8 +102,8 @@ class MenuItemManagementViewModel(
         }
     }
 
-    suspend fun editMenuItem(menuItem: RestaurantMenuItemDTO, context: Context) {
-        val editedMenuItem = createMenuItemDTO(menuItem.menuItemId, context)
+    suspend fun editMenuItem(menuItem: RestaurantMenuItemDTO) {
+        val editedMenuItem = putMenuItemDTO(menuItem.menuItemId)
 
         val result = service.editMenuItem(menuItem.menuItemId!!, editedMenuItem)
 
@@ -112,7 +128,11 @@ class MenuItemManagementViewModel(
                 isPhotoValid()
     }
 
-    fun isPhotoValid(): Boolean {
+    private fun isPhotoValid(): Boolean {
         return true
+    }
+
+    fun assignIngredients(ingredients: List<IngredientDTO>?){
+        this.ingredients = ingredients ?: emptyList()
     }
 }
