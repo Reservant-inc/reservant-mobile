@@ -105,16 +105,24 @@ fun EventDetailActivity(
                     .padding(16.dp)
             ) {
                 item {
-                    Image(
-                        painter = painterResource(id = R.drawable.restaurant_photo),
-                        contentDescription = "Event Image",
+                    LoadedPhotoComponent(
+                        photoModifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shadow(8.dp, RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
+                        placeholder = R.drawable.restaurant_photo,
+                        placeholderModifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .shadow(8.dp, RoundedCornerShape(8.dp))
-                    )
+                    ){
+                        eventDetailVM.event!!.photo?.let {
+                            eventDetailVM.getPhoto(it)
+                        }
+                    }
                 }
                 if(!eventDetailVM.isEventOwner){
                     item {
@@ -551,7 +559,8 @@ fun EditEventDialog(
                                 eventDate = it
                             },
                             allowFutureDates = true,
-                            startDate = LocalDate.now().toString()
+                            allowPastDates = false,
+                            startDate = eventDate
                         )
                     }
                     Column(
@@ -581,7 +590,8 @@ fun EditEventDialog(
                                 joinUntilDate = it
                             },
                             allowFutureDates = true,
-                            startDate = LocalDate.now().toString()
+                            allowPastDates = false,
+                            startDate = joinUntilDate
                         )
                     }
                     Column(
@@ -600,23 +610,14 @@ fun EditEventDialog(
 
                 }
 
-                // TODO: photo input
                 FormFileInput(
                     label = stringResource(id = R.string.label_event_photo),
                     onFilePicked = { file ->
                         photo = file.toString()
                     },
                     context = context,
-                    //isError = addEventViewModel.isPhotoInvalid() && addEventViewModel.formSent,
-//                    errorText = stringResource(
-//                        if (addEventViewModel.getPhotoError() != -1)
-//                            addEventViewModel.getPhotoError()
-//                        else
-//                            R.string.error_field_required
-//                    ),
-                    //formSent = addEventViewModel.formSent
+                    defaultValue = event.photo ?: ""
                 )
-
             }
         }
     )
