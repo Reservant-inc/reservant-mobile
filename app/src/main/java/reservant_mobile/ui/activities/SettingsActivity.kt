@@ -241,6 +241,13 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 )
             }
 
+            composable<UserRoutes.VisitDetails>{
+                VisitDetailActivity(
+                    visitId = it.toRoute<UserRoutes.VisitDetails>().visitId,
+                    onReturnClick = {navController.popBackStack()}
+                )
+            }
+
         }
 
     }

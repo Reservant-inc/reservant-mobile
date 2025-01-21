@@ -3,21 +3,29 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.IUserService
+import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.services.VisitsService
 import reservant_mobile.ui.viewmodels.ReservantViewModel
 
 class VisitHistoryViewModel(
-    private val userService: IUserService = UserService()
+    private val userService: IUserService = UserService(),
+    private val visitsService: IVisitsService = VisitsService()
 ) : ReservantViewModel() {
 
     // Backing field for the paging flow
     private val _visitHistoryFlow = MutableStateFlow<Flow<PagingData<VisitDTO>>?>(null)
     val visitHistoryFlow: Flow<PagingData<VisitDTO>>?
         get() = _visitHistoryFlow.value
+
+    private val _visit = MutableStateFlow<VisitDTO?>(null)
+    val visit: StateFlow<VisitDTO?> = _visit.asStateFlow()
 
     /**
      * Call this to start loading the user's visit history
@@ -30,6 +38,17 @@ class VisitHistoryViewModel(
                 _visitHistoryFlow.value = result.value!!.cachedIn(viewModelScope)
             } else {
                 _visitHistoryFlow.value = null
+            }
+        }
+    }
+
+    fun loadVisit(visitId: Int) {
+        viewModelScope.launch {
+            val result: Result<VisitDTO?> = visitsService.getVisit(visitId)
+            if (!result.isError && result.value != null) {
+                _visit.value = result.value
+            } else {
+                _visit.value = null // or show an error
             }
         }
     }

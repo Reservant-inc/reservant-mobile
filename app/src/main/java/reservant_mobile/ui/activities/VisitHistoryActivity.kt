@@ -19,8 +19,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.navigation.UserRoutes
 
 @Composable
 fun VisitHistoryActivity(navController: NavHostController) {
@@ -96,7 +98,7 @@ fun VisitHistoryActivity(navController: NavHostController) {
                                     VisitCard(
                                         visit = visit,
                                         onClick = {
-                                            // navController.navigate("visit_detail/${visit.visitId}")
+                                            navController.navigate(UserRoutes.VisitDetails(visitId = visit.visitId!!))
                                         }
                                     )
                                 }

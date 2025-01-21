@@ -28,6 +28,11 @@ data object UserRoutes {
     object Orders
 
     @Serializable
+    data class VisitDetails(
+        val visitId: Int
+    )
+
+    @Serializable
     object FindFriends
 
     @Serializable

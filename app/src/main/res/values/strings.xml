@@ -590,4 +590,8 @@
     <string name="visit_history_title">Your Visit History</string>
     <string name="loading_visit_history">Loading visit history...</string>
     <string name="no_visits_found">No visits found.</string>
+    <string name="visit_detail_title">Visit details</string>
+    <string name="dish_item_info" translatable="false">%1$d x %.2f (Status: %3$s)</string>
+    <string name="order_status_colon" translatable="false">Status: %1$s</string>
+
 </resources>

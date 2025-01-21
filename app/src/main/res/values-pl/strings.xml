@@ -578,4 +578,5 @@
     <string name="visit_history_title">Twoja historia wizyt</string>
     <string name="loading_visit_history">Ładowanie historii wizyt...</string>
     <string name="no_visits_found">Brak wizyt.</string>
+    <string name="visit_detail_title">Szczegóły zamówienia</string>
 </resources>
