@@ -50,4 +50,11 @@ class User {
         val page: Int? = null,
         val perPage: Int? = null,
     )
+
+    @Resource("is-interested-in-event")
+    class IsInterestedInEvent(val parent: User = User()){
+        @Resource("{eventId}")
+        class Id(val parent: IsInterestedInEvent = IsInterestedInEvent(), val eventId: String)
+    }
+
 }
