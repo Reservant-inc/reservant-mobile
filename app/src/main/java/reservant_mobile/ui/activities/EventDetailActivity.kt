@@ -507,15 +507,15 @@ fun EditEventDialog(
                     onSave(updatedEvent)
                 }
             ) {
-                Text("Save")
+                stringResource(R.string.label_save)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                stringResource(R.string.label_cancel)
             }
         },
-        title = { Text("Edit Event") },
+        title = { stringResource(R.string.label_edit_event) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -524,7 +524,7 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Event Name") },
+                    label = { stringResource(R.string.label_event_name) },
                     isError = name.isBlank(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -532,14 +532,14 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { stringResource(R.string.label_event_description) },
                     isError = description.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = maxPeople,
                     onValueChange = { maxPeople = it },
-                    label = { Text("Max People") },
+                    label = { stringResource(R.string.label_event_max_people) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = maxPeople.toIntOrNull() == null,
                     singleLine = true,

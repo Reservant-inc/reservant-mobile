@@ -120,7 +120,7 @@ class EventViewModel(
 
     suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
 
-        val eventPhotoResult = if (
+        var eventPhotoResult = if (
             (dto.photo!!.endsWith(".png", ignoreCase = true) ||
                     dto.photo.endsWith(".jpg", ignoreCase = true)) &&
             !isFileSizeInvalid(context, dto.photo)
@@ -128,6 +128,11 @@ class EventViewModel(
             sendPhoto(dto.photo, context)
         } else {
             null
+        }
+
+        if(eventPhotoResult == null){
+            eventPhotoResult = sendPhoto(event?.photo, context)
+            println("2ND IF, PROCEEDING: $eventPhotoResult")
         }
 
         val resultDTO: EventDTO
