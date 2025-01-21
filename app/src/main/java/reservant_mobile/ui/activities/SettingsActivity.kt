@@ -1,6 +1,6 @@
 package reservant_mobile.ui.activities
 
-import OrdersActivity
+import VisitHistoryActivity
 import WalletActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -216,7 +216,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 ProfileActivity(navController = navController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
             }
             composable<UserRoutes.Orders>{
-                OrdersActivity(navController = navController)
+                VisitHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
                 NewTicketActivity()

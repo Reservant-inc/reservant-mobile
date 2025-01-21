@@ -578,4 +578,16 @@
     <string name="order_submitted_successfully">Order submitted successfully!</string>
     <string name="order_submitted_failed">Could not submit the order.</string>
     <string name="no_items_added_to_cart">No items were added to the cart.</string>
+    <string name="unknown_restaurant">Unknown Restaurant</string>
+    <string name="restaurant_colon">Restaurant: %1$s</string>
+    <string name="visit_date_colon">Visit Date: %1$s</string>
+    <string name="mode_colon">Mode: %1$s</string>
+    <string name="accepted_colon">Accepted: %1$s</string>
+    <string name="accepted_yes">Accepted</string>
+    <string name="accepted_no">Not accepted</string>
+    <string name="on_site_label">On-site</string>
+    <string name="total_guests_colon">Total Guests: %1$d</string>
+    <string name="visit_history_title">Your Visit History</string>
+    <string name="loading_visit_history">Loading visit history...</string>
+    <string name="no_visits_found">No visits found.</string>
 </resources>
