@@ -30,6 +30,7 @@
 
         <activity
             android:name="reservant_mobile.ui.activities.MainActivity"
+            android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true"
             android:theme="@style/Theme.ReservantSplashScreen">
