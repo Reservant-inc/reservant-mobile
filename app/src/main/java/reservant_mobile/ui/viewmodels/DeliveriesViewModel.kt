@@ -14,6 +14,7 @@ import reservant_mobile.data.services.IDeliveryService
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.utils.GetDeliveriesSort
 
 class DeliveriesViewModel(
     private val restaurantId: Int,
@@ -37,7 +38,10 @@ class DeliveriesViewModel(
         viewModelScope.launch {
             try {
                 isLoading.value = true
-                val result = restaurantService.getDeliveries(restaurantId)
+                val result = restaurantService.getDeliveries(
+                    restaurantId,
+                    orderBy = GetDeliveriesSort.OrderTimeAsc
+                )
                 if (!result.isError) {
                     _deliveries.value = result.value?.cachedIn(viewModelScope)
                 } else {
