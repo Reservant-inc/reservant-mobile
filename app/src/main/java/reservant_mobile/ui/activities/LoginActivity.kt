@@ -46,9 +46,12 @@ import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun LoginActivity(navController: NavHostController, onReturnClick: (() -> Unit)? = null) {
-
+fun LoginActivity(
+    navController: NavHostController,
+    onReturnClick: (() -> Unit)? = null
+) {
     val loginViewModel = viewModel<LoginViewModel>()
+
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var formSent by remember { mutableStateOf(false) }
@@ -61,32 +64,39 @@ fun LoginActivity(navController: NavHostController, onReturnClick: (() -> Unit)?
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val onBack = onReturnClick?:{navController.popBackStack()}
+            val onBack = onReturnClick ?: { navController.popBackStack() }
+
             LogoWithReturn { onBack() }
 
+            // ----- LOGIN FIELD -----
             FormInput(
                 inputText = loginViewModel.login.value,
                 onValueChange = {
                     loginViewModel.login.value = it
-                    formSent = false
+                    // Once user types, you could reset formSent or keep it
+                    // formSent = false // optional
                 },
                 label = stringResource(R.string.label_login),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                isError = loginViewModel.result.isError && formSent,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                // Show red error if blank AND user pressed login
+                isError = loginViewModel.isLoginInvalid() && formSent,
+                errorText = stringResource(R.string.error_field_required),
                 formSent = formSent
             )
 
+            // ----- PASSWORD FIELD -----
             FormInput(
                 inputText = loginViewModel.password.value,
                 onValueChange = {
                     loginViewModel.password.value = it
-                    formSent = false
+                    // formSent = false // optional
                 },
                 label = stringResource(R.string.label_password),
                 leadingIcon = {
-                    IconButton(onClick = {
-                        isPasswordVisible = !isPasswordVisible
-                    }) {
+                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(
                             imageVector = if (isPasswordVisible)
                                 Icons.Filled.Visibility
@@ -100,41 +110,69 @@ fun LoginActivity(navController: NavHostController, onReturnClick: (() -> Unit)?
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                isError = loginViewModel.result.isError && formSent,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                isError = loginViewModel.isPasswordInvalid() && formSent,
+                errorText = stringResource(R.string.error_field_required),
                 formSent = formSent
             )
 
+            // ----- LOGIN BUTTON -----
+            ButtonComponent(
+                onClick = {
+                    loginViewModel.viewModelScope.launch {
+                        isLoading = true
+                        // Trigger form validation
+                        formSent = true
 
-            ButtonComponent(onClick = {
-                loginViewModel.viewModelScope.launch {
-                    isLoading = true
-                    formSent = true
-
-                    if (loginViewModel.login()){
-                        if(Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
-                            navController.navigate(EmployeeRoutes.SelectRestaurant)
+                        // If any field is invalid, do NOT proceed
+                        if (loginViewModel.isFormInvalid()) {
+                            // remain on screen, show red errors
+                            isLoading = false
+                            return@launch
                         }
-                        else{
-                            navController.navigate(MainRoutes.Home)
+
+                        // Otherwise attempt login
+                        if (loginViewModel.login()) {
+                            // success => go to next screen
+                            if (Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles) {
+                                navController.navigate(EmployeeRoutes.SelectRestaurant)
+                            } else {
+                                navController.navigate(MainRoutes.Home)
+                            }
                         }
-                    } 
+                        isLoading = false
+                    }
+                },
+                label = stringResource(R.string.label_login_action),
+                isLoading = isLoading
+            )
 
-                    isLoading = false
-
-                }
-            }, label = stringResource(R.string.label_login_action), isLoading = isLoading)
-
+            // Show possible error from server (like invalid credentials)
             ShowErrorToast(context = LocalContext.current, id = loginViewModel.getToastError())
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ButtonComponent(onClick = { if (!isLoading) navController.navigate(AuthRoutes.Register) },
-                label = stringResource(R.string.label_signup))
+            // ----- REGISTER BUTTON -----
+            ButtonComponent(
+                onClick = {
+                    if (!isLoading)
+                        navController.navigate(AuthRoutes.Register)
+                },
+                label = stringResource(R.string.label_signup)
+            )
 
-            ButtonComponent(onClick = { if (!isLoading) return@ButtonComponent /* Handle Password Recovery */ },
-                label = stringResource(R.string.label_password_forgot))
+            // ----- FORGOT PASSWORD BUTTON -----
+            ButtonComponent(
+                onClick = {
+                    if (!isLoading) {
+                        // TODO: Handle password recovery / navigate
+                    }
+                },
+                label = stringResource(R.string.label_password_forgot)
+            )
         }
     }
-
 }

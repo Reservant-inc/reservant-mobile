@@ -436,7 +436,7 @@ class RestaurantService(): ServiceUtil(), IRestaurantService {
                 tableId = tableId,
                 hasOrders = hasOrders,
                 isTakeaway = isTakeaway,
-                reservationStatus = reservationStatus.toString(),
+                reservationStatus = reservationStatus?.toString(),
                 visitSorting = orderBy?.toString(),
                 page = page,
                 perPage = perPage

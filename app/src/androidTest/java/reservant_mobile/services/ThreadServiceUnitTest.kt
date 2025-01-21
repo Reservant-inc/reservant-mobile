@@ -12,6 +12,7 @@ import reservant_mobile.data.services.ThreadsService
 
 class ThreadServiceUnitTest:ServiceTest() {
     private val ser: IThreadsService = ThreadsService()
+    private val threadId = 2
     private val jdId = "e5779baf-5c9b-4638-b9e7-ec285e57b367"
     private val customerId = "e08ff043-f8d2-45d2-b89c-aec4eb6a1f29"
 
@@ -36,24 +37,24 @@ class ThreadServiceUnitTest:ServiceTest() {
         val thread = ThreadDTO(
             title = "Test Thread Title"
         )
-        assertThat(ser.editThread(1, thread).value).isNotNull()
+        assertThat(ser.editThread(threadId, thread).value).isNotNull()
     }
 
     @Test
     fun get_thread_return_not_null()= runTest{
-        assertThat(ser.getThread(1).value).isNotNull()
+        assertThat(ser.getThread(threadId).value).isNotNull()
     }
 
     @Test
     fun create_and_delete_message()= runTest{
-        val res = ser.createMessage(1, "test message").value
+        val res = ser.createMessage(threadId, "test message").value
         assertThat(res).isNotNull()
         assertThat(ser.deleteThread(res!!.messageId!!).value).isNotNull()
     }
 
     @Test
     fun get_messages_return_pagination()= runTest{
-        val items = ser.getMessages(1).value
+        val items = ser.getMessages(threadId).value
         val itemsSnapshot = items?.asSnapshot {
             scrollTo(index = 10)
         }
