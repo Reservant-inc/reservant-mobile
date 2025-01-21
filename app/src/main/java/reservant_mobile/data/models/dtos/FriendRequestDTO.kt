@@ -16,7 +16,8 @@ data class FriendRequestDTO(
      * Date in 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z'' format
      */
     val dateAccepted: String?,
-    val otherUser: OtherUserDTO? = null
+    val otherUser: OtherUserDTO? = null,
+    val privateMessageThreadId: Int? = null
 ){
     @Serializable
     data class OtherUserDTO(

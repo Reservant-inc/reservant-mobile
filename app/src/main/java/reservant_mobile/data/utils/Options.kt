@@ -31,6 +31,7 @@ enum class GetUserEventsSort{
 }
 
 enum class GetUserEventsCategory(val stringId: Int){
+    All(R.string.label_event_category_created),
     CreatedBy(R.string.label_event_category_created),
     ParticipateIn(R.string.label_event_category_participated),
     InterestedIn(R.string.label_event_category_interested)

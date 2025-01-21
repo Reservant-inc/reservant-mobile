@@ -1,7 +1,10 @@
 package reservant_mobile.ui.activities
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -37,15 +41,18 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EventViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
 fun EventDetailActivity(
@@ -100,16 +107,83 @@ fun EventDetailActivity(
                     .padding(16.dp)
             ) {
                 item {
-                    Image(
-                        painter = painterResource(id = R.drawable.restaurant_photo),
-                        contentDescription = "Event Image",
+                    LoadedPhotoComponent(
+                        photoModifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shadow(8.dp, RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
+                        placeholder = R.drawable.restaurant_photo,
+                        placeholderModifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .shadow(8.dp, RoundedCornerShape(8.dp))
-                    )
+                    ){
+                        eventDetailVM.event!!.photo?.let {
+                            eventDetailVM.getPhoto(it)
+                        }
+                    }
+                }
+                if(!eventDetailVM.isEventOwner){
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                eventDetailVM.viewModelScope.launch {
+
+                                    if (eventDetailVM.isInterested) {
+                                        val success = eventDetailVM.markEventAsUnInterested()
+                                        if (success) {
+                                            eventDetailVM.isInterested = false
+                                        }
+                                    } else {
+                                        val success = eventDetailVM.joinInterested()
+                                        if (success) {
+                                            eventDetailVM.isInterested = true
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (eventDetailVM.isInterested) Color.Gray else MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = if (eventDetailVM.isInterested) Icons.Default.Star else Icons.Default.StarBorder,
+                                contentDescription = if (eventDetailVM.isInterested) stringResource(R.string.label_not_interested) else stringResource(R.string.label_interested),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (eventDetailVM.isInterested) stringResource(R.string.label_interested) else stringResource(R.string.label_interest)
+                            )
+                        }
+                    }
+                }else{
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.label_your_event),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            )
+                        }
+                    }
                 }
 
                 if (showEditDialog) {
@@ -123,7 +197,28 @@ fun EventDetailActivity(
                                 }
                                 showEditDialog = false
                             },
-                            context = context
+                            context = context,
+                            onDeleteEvent = {
+                                eventDetailVM.viewModelScope.launch {
+                                    val success = eventDetailVM.deleteEvent()
+
+                                    if(success){
+                                        navController.popBackStack()
+
+                                        Toast.makeText(
+                                            context,
+                                            "Event deleted",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }else{
+                                        Toast.makeText(
+                                            context,
+                                            "Error",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -198,29 +293,48 @@ fun EventDetailActivity(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (eventDetailVM.isEventOwner && interestedUsers != null && interestedUsers.itemCount > 0) {
-                    item {
-                        Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
-                        Spacer(modifier = Modifier.height(8.dp))
+                if (interestedUsers != null && interestedUsers.itemCount > 0) {
+                    if(eventDetailVM.isEventOwner){
+                        item {
+                            Text(
+                                text = stringResource(R.string.label_join_requests),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
+
                     items(interestedUsers.itemCount) { index ->
                         var user = interestedUsers[index]
                         if (user != null) {
-                            UserListItem(
-                                user = user,
-                                showButtons = true,
-                                onApproveClick = {
-                                    eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.acceptUser(user.userId)
-                                    }
-                                },
-                                onRejectClick = {
-                                    eventDetailVM.viewModelScope.launch {
-                                        eventDetailVM.rejectUser(user.userId)
+                            if(eventDetailVM.isEventOwner){
+                                var userPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                                LaunchedEffect(user.photo) {
+                                    user.photo?.let { photo ->
+                                        userPhoto = eventDetailVM.getPhoto(photo)
                                     }
                                 }
-                            )
-                            HorizontalDivider()
+
+
+                                UserListItem(
+                                    user = user,
+                                    showButtons = true,
+                                    onApproveClick = {
+                                        eventDetailVM.viewModelScope.launch {
+                                            eventDetailVM.acceptUser(user.userId)
+                                        }
+                                    },
+                                    onRejectClick = {
+                                        eventDetailVM.viewModelScope.launch {
+                                            eventDetailVM.rejectUser(user.userId)
+                                        }
+                                    },
+                                    photo = userPhoto
+                                )
+                                HorizontalDivider()
+                            }
+
                         }
                     }
                     item {
@@ -228,22 +342,37 @@ fun EventDetailActivity(
                     }
                 }
 
+
                 item {
-                    Text(text = "Participants", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = stringResource(R.string.label_participants),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+
+
                 if (eventDetailVM.participants.isEmpty()) {
                     item {
                         Text(
-                            text = "No one participates at this event.",
+                            text = stringResource(R.string.label_no_participants),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 } else {
                     items(eventDetailVM.participants) { participant ->
+                        var participantPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                        LaunchedEffect(participant.photo) {
+                            participant.photo?.let { photo ->
+                                participantPhoto = eventDetailVM.getPhoto(photo)
+                            }
+                        }
+
                         UserListItem(
                             user = participant,
-                            deletable = eventDetailVM.isEventOwner
+                            deletable = eventDetailVM.isEventOwner,
+                            photo = participantPhoto
                         )
                         HorizontalDivider()
                     }
@@ -262,75 +391,90 @@ fun UserListItem(
     onRejectClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
     onCardClick: (() -> Unit)? = null,
+    photo: Bitmap? = null,
     modifier: Modifier? = null
 ) {
     var showPopup by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = modifier ?: Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.jd),
-            contentDescription = null,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = "${user.firstName} ${user.lastName}",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    onCardClick?.invoke()
-                }
-        )
-
-        if (showButtons) {
-            Row {
-                Button(
-                    onClick = { onApproveClick?.invoke() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.padding(end = 4.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.label_accept)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-
-                VerticalDivider(modifier = Modifier.padding(8.dp))
-
-                Button(
-                    onClick = { onRejectClick?.invoke() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(R.string.label_reject)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-            }
-        } else if (deletable) {
-            IconButton(
-                onClick = { showPopup = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.label_delete_user),
-                    tint = MaterialTheme.colorScheme.error
+    if(user.isArchived == null || user.isArchived == false ){
+        Row(
+            modifier = modifier ?: Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if(photo != null){
+                Image(
+                    bitmap = photo.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
+            }else{
+                Image(
+                    painter = painterResource(id = R.drawable.unknown_profile_photo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = "${user.firstName} ${user.lastName}",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        onCardClick?.invoke()
+                    }
+            )
+
+            if (showButtons) {
+                Row {
+                    Button(
+                        onClick = { onApproveClick?.invoke() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = stringResource(R.string.label_accept)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    VerticalDivider(modifier = Modifier.padding(8.dp))
+
+                    Button(
+                        onClick = { onRejectClick?.invoke() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.label_reject)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
+            } else if (deletable) {
+                IconButton(
+                    onClick = { showPopup = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.label_delete_user),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
@@ -356,28 +500,71 @@ fun EditEventDialog(
     event: EventDTO,
     onDismiss: () -> Unit,
     onSave: (EventDTO) -> Unit,
-    context: Context
+    context: Context,
+    onDeleteEvent: () -> Unit
 ) {
+
+
+    var showDeletePopup by remember { mutableStateOf(false) }
 
     var name by remember { mutableStateOf(event.name ?: "") }
     var description by remember { mutableStateOf(event.description ?: "") }
     var maxPeople by remember { mutableStateOf(event.maxPeople?.toString() ?: "") }
-    var photo by remember { mutableStateOf(event.photo ?: "") }
+    var photo by remember { mutableStateOf("") }
+
 
     var eventDate by remember { mutableStateOf(event.time.substring(0, 10) ?: "") }
     var eventTime by remember { mutableStateOf(event.time.substring(11, 16) ?: "") }
     var joinUntilDate by remember { mutableStateOf(event.mustJoinUntil.substring(0, 10) ?: "") }
     var joinUntilTime by remember { mutableStateOf(event.mustJoinUntil.substring(11, 16) ?: "") }
 
+    fun parseDateTime(dateStr: String, timeStr: String): LocalDateTime? {
+        return runCatching {
+            LocalDateTime.parse("${dateStr}T${timeStr}")
+        }.getOrNull()
+    }
+
+    val eventDateTime = parseDateTime(eventDate, eventTime)
+    val joinUntilDateTime = parseDateTime(joinUntilDate, joinUntilTime)
+    val now = LocalDateTime.now()
+
+    val maxPeopleInt = maxPeople.toIntOrNull()
+
+    val canSave = name.isNotBlank() &&
+            description.isNotBlank() &&
+            maxPeopleInt != null &&
+            photo.isNotBlank() &&
+            eventDateTime != null && joinUntilDateTime != null &&
+            eventDateTime.isAfter(now) &&
+            joinUntilDateTime.isAfter(now) &&
+            eventDateTime.isAfter(joinUntilDateTime)
+
+
+    if (showDeletePopup) {
+        DeleteCountdownPopup(
+            icon = Icons.Filled.DeleteForever,
+            title = stringResource(R.string.confirm_delete_title),
+            text = stringResource(R.string.confirm_delete_text),
+            onConfirm = {
+                onDeleteEvent()
+                showDeletePopup = false
+            },
+            onDismissRequest = { showDeletePopup = false },
+            confirmText = stringResource(R.string.label_yes_capital),
+            dismissText = stringResource(R.string.label_cancel)
+        )
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
+                enabled = canSave,
                 onClick = {
                     val updatedEvent = event.copy(
                         name = name,
                         description = description,
-                        maxPeople = maxPeople.toIntOrNull(),
+                        maxPeople = maxPeopleInt,
                         restaurantId = event.restaurant?.restaurantId,
                         time = "${eventDate}T${eventTime}",
                         mustJoinUntil = "${joinUntilDate}T${joinUntilTime}",
@@ -386,15 +573,34 @@ fun EditEventDialog(
                     onSave(updatedEvent)
                 }
             ) {
-                Text("Save")
+                Text(text = stringResource(R.string.label_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(text = stringResource(R.string.label_cancel))
             }
         },
-        title = { Text("Edit Event") },
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.label_edit_event),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                IconButton(
+                    onClick = { showDeletePopup = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete event"
+                    )
+                }
+            }
+        },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -403,7 +609,7 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Event Name") },
+                    label = { Text(stringResource(R.string.label_event_name)) },
                     isError = name.isBlank(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -411,14 +617,14 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text(stringResource(R.string.label_event_description)) },
                     isError = description.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = maxPeople,
                     onValueChange = { maxPeople = it },
-                    label = { Text("Max People") },
+                    label = { Text(stringResource(R.string.label_event_max_people)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = maxPeople.toIntOrNull() == null,
                     singleLine = true,
@@ -429,16 +635,13 @@ fun EditEventDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(0.45f)
-                    ) {
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = stringResource(R.string.label_start_date),
-                            onDateChange = {
-                                eventDate = it
-                            },
+                            onDateChange = { eventDate = it },
                             allowFutureDates = true,
-                            startDate = LocalDate.now().toString()
+                            allowPastDates = false,
+                            startDate = eventDate
                         )
                     }
                     Column(
@@ -450,8 +653,7 @@ fun EditEventDialog(
                             onTimeSelected = { selectedTime ->
                                 eventTime = selectedTime
                             },
-                            modifier = Modifier
-                                .scale(0.85f)
+                            modifier = Modifier.scale(0.85f)
                         )
                     }
                 }
@@ -459,52 +661,39 @@ fun EditEventDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(0.45f)
-                    ){
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = stringResource(R.string.label_event_join_until),
-                            onDateChange = {
-                                joinUntilDate = it
-                            },
+                            onDateChange = { joinUntilDate = it },
                             allowFutureDates = true,
-                            startDate = LocalDate.now().toString()
+                            allowPastDates = false,
+                            startDate = joinUntilDate
                         )
                     }
                     Column(
                         modifier = Modifier
-                        .weight(0.55f)
-                        .align(Alignment.CenterVertically)
+                            .weight(0.55f)
+                            .align(Alignment.CenterVertically)
                     ){
                         MyTimePickerDialog(
                             onTimeSelected = { selectedTime ->
                                 joinUntilTime = selectedTime
                             },
-                            modifier = Modifier
-                                .scale(0.85f)
+                            modifier = Modifier.scale(0.85f)
                         )
                     }
-
                 }
 
-                // TODO: photo input
                 FormFileInput(
-                    label = stringResource(id = R.string.label_event_photo),
+                    label = stringResource(R.string.label_event_photo),
                     onFilePicked = { file ->
                         photo = file.toString()
                     },
                     context = context,
-                    //isError = addEventViewModel.isPhotoInvalid() && addEventViewModel.formSent,
-//                    errorText = stringResource(
-//                        if (addEventViewModel.getPhotoError() != -1)
-//                            addEventViewModel.getPhotoError()
-//                        else
-//                            R.string.error_field_required
-//                    ),
-                    //formSent = addEventViewModel.formSent
+                    defaultValue = photo
                 )
-
             }
         }
     )
 }
+

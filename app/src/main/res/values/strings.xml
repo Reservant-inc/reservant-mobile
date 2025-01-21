@@ -572,6 +572,17 @@
     <string name="error_create_restaurant">Error while creating restaurant</string>
     <string name="label_edit_opening_hours">Edit opening hours</string>
     <string name="label_add_opening_hours">Add opening hours</string>
+    <string name="label_not_interested">Not interested</string>
+    <string name="label_interest">Interest</string>
+    <string name="label_your_event">Your event</string>
+    <string name="label_accepted">Accepted</string>
+    <string name="label_pending">Pending</string>
+    <string name="label_event_category_all">All</string>
+    <string name="label_participants">Participants</string>
+    <string name="label_no_participants">No one participates at this event.</string>
+    <string name="label_event_updated">Event updated</string>
+    <string name="error_event_update">Error while updating event - verify your form</string>
+    <string name="label_edit_event">Edit event</string>
     <string name="art_header_become_restaurant_owner">How to register your restaurant?</string>
     <string name="art_body1_become_restaurant_owner">Reservant is an ever-growing platform that owes its success to a large and supportive community. The system supports numerous restaurants around the world. Plenty of restaurant owners choose to switch to us!</string>
     <string name="art_body2_become_restaurant_owner">If you already own a restaurant, you can easily apply to add your restaurant to our system. You will gain the ability to manage your menu, assortment and employees more easily. In addition, you will be able to view your restaurant\'s statistics or buy the possibility of additional promotion on our platform.</string>

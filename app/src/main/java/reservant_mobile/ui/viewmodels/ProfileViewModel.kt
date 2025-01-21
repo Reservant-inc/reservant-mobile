@@ -79,7 +79,7 @@ class ProfileViewModel(
                 fetchFriends()
                 fetchFriendRequests()
                 fetchUserEvents()
-                fetchOwnedEvents()
+                fetchEvents()
                 fetchUserVisits()
             }
 
@@ -107,18 +107,16 @@ class ProfileViewModel(
         return true
     }
 
-    private fun fetchFriends() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getFriends()
-            if (!result.isError) {
-                _friendsFlow.value = result.value?.cachedIn(viewModelScope)
-            }
+    private suspend fun fetchFriends() {
+        val result = friendsService.getFriends()
+        if (!result.isError) {
+            _friendsFlow.value = result.value?.cachedIn(viewModelScope)
         }
     }
 
     private fun fetchFriendRequests() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<FriendRequestDTO>>?> = friendsService.getIncomingFriendRequests()
+            val result = friendsService.getIncomingFriendRequests()
             if (!result.isError) {
                 _friendsRequestsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -127,7 +125,7 @@ class ProfileViewModel(
 
     private fun fetchUserVisits() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<VisitDTO>>?> = userService.getUserVisits()
+            val result = userService.getUserVisits()
             if (!result.isError) {
                 _visitsFlow.value = result.value?.cachedIn(viewModelScope)
             }
@@ -143,10 +141,10 @@ class ProfileViewModel(
         }
     }
 
-    private fun fetchOwnedEvents() {
+    private fun fetchEvents() {
         viewModelScope.launch {
-            val result: Result<Flow<PagingData<EventDTO>>?> = userService.getUserEvents(
-                category = GetUserEventsCategory.CreatedBy
+            val result = userService.getUserEvents(
+                category = GetUserEventsCategory.All
             )
 
             if (!result.isError) {
@@ -295,7 +293,7 @@ class ProfileViewModel(
                 if (result.isError) {
                     friendRequestError = "Nie udało się zaakceptować zaproszenia"
                 } else {
-                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Friend)
                     friendRequestError = null
                     fetchFriends()
                 }

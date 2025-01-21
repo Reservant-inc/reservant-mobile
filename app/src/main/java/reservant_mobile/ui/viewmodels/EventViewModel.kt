@@ -1,6 +1,7 @@
 package reservant_mobile.ui.viewmodels
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +22,7 @@ import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.IEventService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.getFileFromUri
@@ -67,6 +69,8 @@ class EventViewModel(
     var photo by mutableStateOf("")
     var selectedRestaurant by mutableStateOf<RestaurantDTO?>(null)
     var formSent by mutableStateOf(false)
+    var isInterested by mutableStateOf(false)
+
 
     var result by mutableStateOf(Result(isError = false, value = null as EventDTO?))
 
@@ -75,11 +79,28 @@ class EventViewModel(
 
     init {
         viewModelScope.launch {
-            if(fetchRestaurants)
+            if(fetchRestaurants){
                 fetchRestaurants()
-            else
+            } else{
                 getEvent()
+            }
         }
+    }
+
+    suspend fun joinInterested(): Boolean {
+        val result = eventService.markEventAsInterested(eventId)
+        if (!result.isError) {
+            return true
+        }
+        return false
+    }
+
+    suspend fun markEventAsUnInterested(): Boolean {
+        val result = eventService.markEventAsNotInterested(eventId)
+        if (!result.isError) {
+            return true
+        }
+        return false
     }
 
     suspend fun acceptUser(userId: String) {
@@ -97,47 +118,51 @@ class EventViewModel(
         }
     }
 
-    suspend fun updateEvent(dto: EventDTO, context: Context){
-
-        val eventPhotoResult = if (
-            !dto.photo!!.endsWith(".png", ignoreCase = true) &&
-            !dto.photo.endsWith(".jpg", ignoreCase = true) &&
-            !isFileSizeInvalid(context, dto.photo)
-        ) {
-            sendPhoto(dto.photo, context)
-        } else {
-            null
+    suspend fun deleteEvent(): Boolean {
+        val result = eventService.deleteEvent(eventId)
+        if (!result.isError) {
+            return true
         }
+        return false
+    }
+
+    suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
+
+        var eventPhotoResult = sendPhoto(dto.photo, context)
 
         val resultDTO: EventDTO
 
         if (eventPhotoResult != null) {
             if (!eventPhotoResult.isError) {
+
                 resultDTO = EventDTO(
                     eventId = eventId,
                     name = dto.name,
                     description = dto.description,
                     maxPeople = dto.maxPeople,
-                    restaurantId = if (dto.restaurantId != 0) dto.restaurantId else null,
+                    restaurant = event?.restaurant,
+                    restaurantId = event?.restaurant?.restaurantId,
                     time = dto.time,
                     mustJoinUntil = dto.mustJoinUntil,
-                    photo = eventPhotoResult.value?.fileName ?: ""
+                    photo = eventPhotoResult.value!!.fileName
                 )
                 val result = eventService.updateEvent(eventId, resultDTO)
-                if(!result.isError){
+                if (!result.isError) {
                     getEvent()
+                    return true
+                } else {
+                    println("ERROR WHILE UPDATING EVENT: " + result.errors)
                 }
             }
-        }else{
-            // error
         }
+
+        return false
     }
 
     private suspend fun getEvent(): Boolean {
         isLoading = true
 
         val resultEvent = eventService.getEvent(eventId)
-        isLoading = false
 
         if (resultEvent.isError) {
             return false
@@ -147,16 +172,22 @@ class EventViewModel(
 
         refreshParticipants()
 
-        if (isEventOwner) {
+        if(isEventOwner)
             refreshInterestedUsers()
-        }
+
+        isLoading = false
 
         return true
     }
 
     private fun refreshParticipants() {
+
+        val filteredParticipants = event?.participants?.filter {
+            it.isArchived != true
+        } ?: emptyList()
+
         participants.clear()
-        participants.addAll(event?.participants ?: emptyList())
+        participants.addAll(filteredParticipants)
     }
 
     private fun refreshInterestedUsers() {
@@ -228,7 +259,15 @@ class EventViewModel(
         isSaving.value = false
     }
 
-    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
+    suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
+
+    private suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
         if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
             return null
         }
@@ -280,7 +319,9 @@ class EventViewModel(
     }
 
     fun isPhotoInvalid(): Boolean {
-        return photo.isBlank() || getFieldError(result, "photo") != -1
+        return photo.isBlank() ||
+                photo == "" ||
+                getFieldError(result, "photo") != -1
     }
 
     fun getPhotoError(): Int {
