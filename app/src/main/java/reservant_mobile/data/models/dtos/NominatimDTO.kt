@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable()
-data class NominatumDTO(
+data class NominatimDTO(
     val lat: Double? = null,
     val lon: Double? = null,
     @SerialName("class")

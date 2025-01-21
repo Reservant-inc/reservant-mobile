@@ -9,12 +9,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.LocationDTO
+import reservant_mobile.data.models.dtos.NominatimDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
+import reservant_mobile.data.services.INominatimService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.NominatimService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
@@ -23,7 +26,8 @@ import reservant_mobile.data.utils.isFileSizeInvalid
 import java.time.LocalTime
 
 class RestaurantViewModel(
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val nomiService: INominatimService = NominatimService()
 ): ReservantViewModel() {
 
     // Wynik rejestracji
@@ -32,6 +36,7 @@ class RestaurantViewModel(
     var resultGroup by mutableStateOf(Result(isError = false, value = false))
     var resultRegistration by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
     var resultMove by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
+    var resultAddress by mutableStateOf(Result<List<NominatimDTO>?>(isError = false, value = emptyList()))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
@@ -42,6 +47,9 @@ class RestaurantViewModel(
     val city: FormField = FormField(RestaurantDTO::city.name)
     val description: FormField = FormField(RestaurantDTO::description.name)
 
+    //Lokalizacja
+    private var loc: LocationDTO? = null
+    var addressValidated: Boolean = true
 
     // Pliki do załączenia
     val rentalContract: FormField = FormField(RestaurantDTO::rentalContract.name)
@@ -186,6 +194,39 @@ class RestaurantViewModel(
         return resultFirstStep.value
     }
 
+    suspend fun validateAddress(): Boolean{
+        if (isRestaurantRegistrationFirstStepInvalid()) {
+            return false
+        }
+
+        resultAddress = nomiService.getLocationData(
+            city = city.value,
+            street = address.value,
+            postalCode = postalCode.value
+        )
+
+        if (resultAddress.isError || resultAddress.value!!.isEmpty()){
+            addressValidated = false
+            return false
+        }
+
+        val lat = resultAddress.value!![0].lat
+        val lon = resultAddress.value!![0].lon
+
+        if (lat != null && lon != null){
+            loc = LocationDTO(
+                latitude = lat,
+                longitude = lon
+            )
+
+            addressValidated = true
+            return true
+        }
+
+        addressValidated = false
+        return false
+    }
+
     suspend fun validateSecondStep(context: Context): Boolean {
 
         val restaurantLogo = if (
@@ -311,11 +352,12 @@ class RestaurantViewModel(
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
             name = name.value,
-            restaurantType = restaurantType.value,
+            restaurantType = convertRestaurantType(restaurantType.value),
             nip = nip.value,
             address = address.value,
             postalIndex = postalCode.value,
             city = city.value,
+            location = loc
         )
     }
 
@@ -326,7 +368,7 @@ class RestaurantViewModel(
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
             name = name.value,
-            restaurantType = restaurantType.value,
+            restaurantType = convertRestaurantType(restaurantType.value),
             nip = nip.value,
             address = address.value,
             postalIndex = postalCode.value,
@@ -589,7 +631,7 @@ class RestaurantViewModel(
         return getFieldError(resultFirstStep, nip.name)
     }
 
-    fun getAdressError(): Int {
+    fun getAddressError(): Int {
         return getFieldError(resultFirstStep, address.name)
     }
 
@@ -647,4 +689,11 @@ class RestaurantViewModel(
         return getToastError(resultRegistration)
     }
 
+    private fun convertRestaurantType(restaurantType: String): String {
+        return when (restaurantType) {
+            "Restauracja" -> "Restaurant"
+            "Kawiarnia" -> "Cafe "
+            else -> restaurantType
+        }
+    }
 }

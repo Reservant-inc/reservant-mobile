@@ -188,12 +188,12 @@ fun RegisterRestaurantActivity(
                     onValueChange = { restaurantViewModel.address.value = it },
                     label = stringResource(id = R.string.label_restaurant_address),
                     optional = false,
-                    isError = restaurantViewModel.isAddressInvalid(),
+                    isError = restaurantViewModel.isAddressInvalid() || !restaurantViewModel.addressValidated,
                     errorText = stringResource(
-                        if (restaurantViewModel.getAdressError() != -1)
-                            restaurantViewModel.getAdressError()
+                        if (restaurantViewModel.getAddressError() != -1)
+                            restaurantViewModel.getAddressError()
                         else
-                            R.string.error_registerRestaurant_invalid_adress
+                            R.string.error_registerRestaurant_invalid_address
                     ),
                     formSent = formSent
                 )
@@ -247,9 +247,10 @@ fun RegisterRestaurantActivity(
                             isLoading = true
                             formSent = true
 
+                            val resNomi = restaurantViewModel.validateAddress()
                             val result = restaurantViewModel.validateFirstStep()
 
-                            if (result) {
+                            if (result && resNomi) {
                                 navController.navigate(RegisterRestaurantRoutes.Files)
                             }
 
