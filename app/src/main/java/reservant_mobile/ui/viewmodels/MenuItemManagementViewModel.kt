@@ -5,13 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.DataType
-import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.RestaurantMenuService
 import reservant_mobile.data.utils.getFileFromUri
@@ -76,17 +74,6 @@ class MenuItemManagementViewModel(
             if(!resultadd.isError){
                 fetchMenuItems()
             }
-        }
-
-    }
-
-    suspend fun addMenuItemToMenu(context: Context){
-        val menuitem = createMenuItemDTO(context = context)
-
-        val result = service.createMenuItem(menuitem)
-
-        if(!result.isError){
-            fetchMenuItems()
         }
 
     }
