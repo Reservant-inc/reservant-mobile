@@ -29,7 +29,8 @@ data class EventDTO (
         val userId: String,
         val firstName: String,
         val lastName: String,
-        val photo: String? = null
+        val photo: String? = null,
+        val isArchived: Boolean? = null
     )
 
     @Serializable
