@@ -601,4 +601,6 @@
     <string name="label_event_deleted">Usunięto wydarzenie</string>
     <string name="error_deleting_event">Błąd podczas usuwania wydarzenia</string>
     <string name="label_deliveries">Dostawy</string>
+    <string name="label_no_deliveries">Brak dostaw</string>
+    <string name="label_delivery_date">Data zamówienia</string>
 </resources>

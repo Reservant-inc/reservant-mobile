@@ -615,4 +615,6 @@
     <string name="label_event_deleted">Event deleted</string>
     <string name="error_deleting_event">Error while deleting event</string>
     <string name="label_deliveries">Deliveries</string>
+    <string name="label_no_deliveries">No deliveries</string>
+    <string name="label_delivery_date">Delivery date</string>
 </resources>
