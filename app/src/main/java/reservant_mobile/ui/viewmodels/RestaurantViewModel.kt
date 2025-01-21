@@ -354,6 +354,7 @@ class RestaurantViewModel(
             address = address.value,
             postalIndex = postalCode.value,
             city = city.value,
+            location = loc
         )
     }
 
