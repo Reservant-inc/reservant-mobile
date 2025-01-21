@@ -258,7 +258,9 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 TicketHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Wallet>{
-                WalletActivity()
+                WalletActivity(
+                    onReturnClick = { navController.popBackStack() }
+                )
             }
             composable<EventRoutes.Details>{
                 EventDetailActivity(

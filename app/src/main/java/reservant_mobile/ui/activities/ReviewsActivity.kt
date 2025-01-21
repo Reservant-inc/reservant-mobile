@@ -47,6 +47,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
@@ -115,9 +116,10 @@ fun ReviewsActivity(
                 }
             } else {
                 val filteredReviews = lazyReviews.itemSnapshotList.items.filter { review ->
-                    val matchesQuery = review.contents.contains(searchQuery, ignoreCase = true)
+                    val contentMatchesQuery = review.contents.contains(searchQuery, ignoreCase = true)
+                    val usernameMatchesQuery = review.authorFullName?.contains(searchQuery, ignoreCase = true) ?: false
                     val matchesFilter = currentFilterInt == null || review.stars == currentFilterInt
-                    matchesQuery && matchesFilter
+                    (contentMatchesQuery || usernameMatchesQuery) && matchesFilter
                 }
 
                 if (filteredReviews.isNotEmpty()) {
@@ -140,7 +142,9 @@ fun ReviewsActivity(
                                 reviewsViewModel = reviewsViewModel,
                                 userDto = userDto,
                                 onReplySubmitted = { replyContent ->
-                                    reviewsViewModel.postReply(reviewId = review.reviewId!!, replyContent = replyContent)
+                                    reviewsViewModel.viewModelScope.launch {
+                                        reviewsViewModel.postReply(reviewId = review.reviewId!!, replyContent = replyContent)
+                                    }
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))

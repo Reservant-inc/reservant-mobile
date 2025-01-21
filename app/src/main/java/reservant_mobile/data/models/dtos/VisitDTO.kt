@@ -41,5 +41,5 @@ data class VisitDTO(
     val isArchived: Boolean? = null,
     val restaurantId: Int? = null,
     val createdByEmployee: Boolean? = null,
-    val isAccepted: Boolean? = null,
+    val isAccepted: Boolean? = null
 )

@@ -46,7 +46,9 @@ class ReviewsViewModel(
         private set
 
     init {
-        fetchReviews()
+        viewModelScope.launch {
+            fetchReviews()
+        }
     }
 
     suspend fun getPhoto(photoStr: String): Bitmap? {
@@ -60,33 +62,29 @@ class ReviewsViewModel(
     suspend fun getUser(userId: String): UserSummaryDTO? {
         val result = userService.getUserSimpleInfo(userId)
 
-        if(!result.isError){
-            return result.value
-        }else{
-            throw Exception()
+        return if(!result.isError){
+            result.value
+        } else {
+            null
         }
     }
 
-    fun fetchReviews() {
-        viewModelScope.launch {
-            val result: Result<Flow<PagingData<ReviewDTO>>?> =
-                restaurantService.getRestaurantReviews(restaurantId)
+    suspend fun fetchReviews() {
+        val result: Result<Flow<PagingData<ReviewDTO>>?> =
+            restaurantService.getRestaurantReviews(restaurantId)
 
-            if (!result.isError) {
-                _reviewsFlow.value = result.value?.cachedIn(viewModelScope)
-            }
+        if (!result.isError) {
+            _reviewsFlow.value = result.value?.cachedIn(viewModelScope)
         }
     }
 
-    fun fetchReview(reviewId: Int) {
-        viewModelScope.launch {
-            val result: Result<ReviewDTO?> = restaurantService.getRestaurantReview(reviewId)
+    suspend fun fetchReview(reviewId: Int) {
+        val result: Result<ReviewDTO?> = restaurantService.getRestaurantReview(reviewId)
 
-            if (!result.isError) {
-                _review.value = result
-            } else {
-                _review.value = Result(isError = true, value = null)
-            }
+        if (!result.isError) {
+            _review.value = result
+        } else {
+            _review.value = Result(isError = true, value = null)
         }
     }
 
@@ -109,56 +107,50 @@ class ReviewsViewModel(
         isSaving = false
     }
 
-    fun editReview(reviewId: Int, stars: Int, contents: String) {
-        viewModelScope.launch {
-            isSaving = true
+    suspend fun editReview(reviewId: Int, stars: Int, contents: String) {
+        isSaving = true
 
-            val updatedReview = ReviewDTO(
-                stars = stars,
-                contents = contents
-            )
+        val updatedReview = ReviewDTO(
+            stars = stars,
+            contents = contents
+        )
 
-            val result = restaurantService.editRestaurantReview(reviewId, updatedReview)
+        val result = restaurantService.editRestaurantReview(reviewId, updatedReview)
 
-            this@ReviewsViewModel.result.isError = result.isError
+        this@ReviewsViewModel.result.isError = result.isError
 
-            if (!result.isError) {
-                fetchReviews()
-            }
-
-            isSaving = false
+        if (!result.isError) {
+            fetchReviews()
         }
+
+        isSaving = false
     }
 
-    fun deleteReview(reviewId: Int) {
-        viewModelScope.launch {
-            isSaving = true
+    suspend fun deleteReview(reviewId: Int) {
+        isSaving = true
 
-            val result = restaurantService.deleteRestaurantReview(reviewId)
+        val result = restaurantService.deleteRestaurantReview(reviewId)
 
-            this@ReviewsViewModel.result.isError = result.isError
+        this@ReviewsViewModel.result.isError = result.isError
 
-            if (!result.isError) {
-                fetchReviews()
-            }
-
-            isSaving = false
+        if (!result.isError) {
+            fetchReviews()
         }
+
+        isSaving = false
     }
 
-    fun postReply(reviewId: Int, replyContent: String) {
-        viewModelScope.launch {
-            isSaving = true
+    suspend fun postReply(reviewId: Int, replyContent: String) {
+        isSaving = true
 
-            val result = restaurantService.addRestaurantResponse(reviewId, replyContent)
+        val result = restaurantService.addRestaurantResponse(reviewId, replyContent)
 
-            this@ReviewsViewModel.result.isError = result.isError
+        this@ReviewsViewModel.result.isError = result.isError
 
-            if (!result.isError) {
-                fetchReviews()
-            }
-
-            isSaving = false
+        if (!result.isError) {
+            fetchReviews()
         }
+
+        isSaving = false
     }
 }
