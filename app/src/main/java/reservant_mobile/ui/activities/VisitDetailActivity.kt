@@ -76,7 +76,7 @@ fun VisitDetailActivity(
             ) {
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
-                    ClientInfoSectionReadOnly(visit!!)
+                    InfoSectionReadOnly(visit!!)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
@@ -113,7 +113,7 @@ fun VisitDetailActivity(
 }
 
 @Composable
-fun ClientInfoSectionReadOnly(visit: VisitDTO) {
+fun InfoSectionReadOnly(visit: VisitDTO) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -128,6 +128,13 @@ fun ClientInfoSectionReadOnly(visit: VisitDTO) {
         val startTimePattern = if (isToday) "HH:mm" else "dd.MM.yyyy HH:mm"
         val startTime = formatToDateTime(visit.date.orEmpty(), startTimePattern)
         val endTime = formatToDateTime(visit.endTime.orEmpty(), "HH:mm")
+
+        Text(
+            text = visit.restaurant!!.name,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
 
         val formattedDateRange = "$startTime - $endTime"
         Text(

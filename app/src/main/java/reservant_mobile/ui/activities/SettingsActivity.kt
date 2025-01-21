@@ -104,7 +104,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
                         UnderlinedItem(
                             icon = Icons.Filled.ShoppingCart,
-                            text = stringResource(id = R.string.label_my_orders),
+                            text = stringResource(id = R.string.label_my_visits),
                             onClick = {
                                 navController.navigate(UserRoutes.Orders)
                             }

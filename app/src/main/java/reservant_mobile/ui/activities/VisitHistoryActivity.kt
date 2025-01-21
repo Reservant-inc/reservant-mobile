@@ -1,8 +1,11 @@
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,23 +19,31 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.UserRoutes
 
 @Composable
-fun VisitHistoryActivity(navController: NavHostController) {
+fun VisitHistoryActivity(
+    navController: NavHostController
+) {
     val viewModel: VisitHistoryViewModel = viewModel()
-    val visitHistoryFlow = viewModel.visitHistoryFlow
-    val lazyVisits = visitHistoryFlow?.collectAsLazyPagingItems()
 
+    // Load both flows once
     LaunchedEffect(Unit) {
-        viewModel.loadVisitHistory()
+        viewModel.loadUpcomingVisits()  // For future visits
+        viewModel.loadVisitHistory()    // For past visits
     }
+
+    // Convert them to lazyPagingItems
+    val futureVisits = viewModel.futureVisitsFlow?.collectAsLazyPagingItems()
+    val historyVisits = viewModel.visitHistoryFlow?.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.fillMaxSize()) {
         IconWithHeader(
@@ -42,66 +53,87 @@ fun VisitHistoryActivity(navController: NavHostController) {
             onReturnClick = { navController.popBackStack() }
         )
 
-        // If the flow is null, we can treat it as a loading state or error
-        if (lazyVisits == null) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+        FloatingTabSwitch(
+            pages = listOf(
+                Pair(stringResource(R.string.future_visits_tab)) {
+                    Column{
+                        Spacer(modifier = Modifier.height(56.dp))
+                        VisitsList(lazyVisits = futureVisits, navController = navController)
+                    }
+                },
+                Pair(stringResource(R.string.past_visits_tab)) {
+                    Column{
+                        Spacer(modifier = Modifier.height(56.dp))
+                        VisitsList(lazyVisits = historyVisits, navController = navController)
+                    }
+                }
+            )
+        )
+    }
+}
+
+
+@Composable
+fun VisitsList(
+    lazyVisits: LazyPagingItems<VisitDTO>?,
+    navController: NavHostController
+) {
+    if (lazyVisits == null) {
+        // No flow yet => treat as loading
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        val loadState = lazyVisits.loadState.refresh
+        when {
+            // 1) Still loading the initial page
+            loadState is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-        } else {
-            // -- Check LoadState of the paging items --
-            val loadState = lazyVisits.loadState.refresh
-            when {
-                // 1) Still loading the initial page
-                loadState is LoadState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
 
-                // 2) Initial load error
-                loadState is LoadState.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.error_loading_data),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+            // 2) Initial load error
+            loadState is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.error_loading_data),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
+            }
 
-                // 3) Not loading => check item count
-                else -> {
-                    if (lazyVisits.itemCount == 0) {
-                        // 3a) No items => "No visits"
-                        Text(
-                            text = stringResource(R.string.no_visits_found),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    } else {
-                        // 3b) We have items => show them
-                        androidx.compose.foundation.lazy.LazyColumn(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            items(lazyVisits.itemCount) { index ->
-                                val visit = lazyVisits[index]
-                                if (visit != null) {
-                                    VisitCard(
-                                        visit = visit,
-                                        onClick = {
-                                            navController.navigate(UserRoutes.VisitDetails(visitId = visit.visitId!!))
-                                        }
-                                    )
-                                }
+            // 3) Not loading => check item count
+            else -> {
+                if (lazyVisits.itemCount == 0) {
+                    Text(
+                        text = stringResource(R.string.no_visits_found),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        items(lazyVisits.itemCount) { index ->
+                            val visit = lazyVisits[index]
+                            if (visit != null) {
+                                VisitCard(
+                                    visit = visit,
+                                    onClick = {
+                                        navController.navigate(UserRoutes.VisitDetails(visitId = visit.visitId!!))
+                                    }
+                                )
                             }
                         }
                     }
