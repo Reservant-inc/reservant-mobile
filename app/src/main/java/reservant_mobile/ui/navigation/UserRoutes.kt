@@ -37,4 +37,7 @@ data object UserRoutes {
 
     @Serializable
     object Wallet
+
+    @Serializable
+    object BecomeRestaurantOwner
 }

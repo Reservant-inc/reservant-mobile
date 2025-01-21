@@ -560,6 +560,11 @@
     <string name="error_create_restaurant">Błąd podczas tworzenia restauracji</string>
     <string name="label_edit_opening_hours">Edycja godzin otwarcia</string>
     <string name="label_add_opening_hours">Dodawanie godzin otwarcia</string>
+    <string name="art_header_become_restaurant_owner">Jak zarejestrować swoją restaurację?</string>
+    <string name="art_body1_become_restaurant_owner">Reservant to ciągle rozwijająca się platforma, która zawdzięcza swój sukces licznej i wspierającej społeczności. System wspiera liczne restauracje na całym świecie. Mnóstwo właścicieli restauracji decyduje się przejść do nas!</string>
+    <string name="art_body2_become_restaurant_owner">Jeżeli jesteś już właścicielem restauracji, możesz w łatwy sposób aplikować o dodanie twojej restauracji do naszego systemu. Zyskasz możliwość łatwiejszego zarządzania swoim menu, asortymentem oraz pracownikami. Dodatkowo będziesz mieć wgląd do statystyk restauracji lub wykupić możliwość dodatkowego promowania na naszej platformie.</string>
+    <string name="art_body3_become_restaurant_owner">Aby do nas dołączyć, kliknij poniższy przycisk, wypełnij wszystkie kroki formularza i wyślij go. Następnie nasz zespół zweryfikuje podesłane przez Ciebie informacje i jeżeli wszystko będzie się zgadzać, w twojej aplikacji pojawi się nowa zakładka zarządzania restauracją.</string>
+    <string name="label_selected_elements">Zaznaczone elementy: %1$s</string>
     <string name="fill_both_for_correction">Wypełnij oba pola „Nowa kwota” i „Komentarz”, aby wprowadzić korektę, lub pozostaw oba puste, aby edytować tylko inne pola.</string>
     <string name="add_ingredient_failed">Nie udało się dodać składnika. Popraw błędy i spróbuj ponownie.</string>
     <string name="success_ingredient_added">Pomyślnie dodano nowy składnik!</string>

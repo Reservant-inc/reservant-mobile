@@ -292,7 +292,8 @@ fun MyTimePickerDialog(
 fun FormFileInput(
     label: String = "",
     defaultValue: String = "",
-    onFilePicked: (Uri?) -> Unit,
+    onFilePicked: (Uri?) -> Unit = {},
+    onFilesPicked: (List<Uri>?) -> Unit = {},
     modifier: Modifier = Modifier,
     context: Context,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
@@ -300,15 +301,24 @@ fun FormFileInput(
     errorText: String = "",
     formSent: Boolean = false,
     optional: Boolean = false,
-    deletable: Boolean = false
+    deletable: Boolean = false,
+    multipleFiles: Boolean = false
 ) {
+
+
     var fileName by remember { mutableStateOf<String?>(null) }
-    val pickFileLauncher = rememberLauncherForActivityResult(
+    val tmpPick1 = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         fileName = uri?.let { getFileName(context, it.toString()) }
         onFilePicked(uri)
     }
+    val tmpPick2 = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uri: List<@JvmSuppressWildcards Uri> ->
+        onFilesPicked(uri)
+    }
+    val pickFileLauncher = if(multipleFiles) tmpPick2 else tmpPick1
     var beginValidation: Boolean by remember { mutableStateOf(false) }
 
     if (fileName != null) {
@@ -373,6 +383,8 @@ fun FormFileInput(
                     modifier = Modifier.clickable {
                         fileName = null
                         onFilePicked(null)
+                        onFilesPicked(emptyList())
+
                     }
                 )
             } else if (fileName == null) {

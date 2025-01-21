@@ -316,6 +316,37 @@ fun RegisterRestaurantActivity(
                 )
 
                 FormFileInput(
+                    label = stringResource(id = R.string.label_gallery),
+                    defaultValue =
+                    if (restaurantViewModel.photos.isNotEmpty())
+                        stringResource(id = R.string.label_selected_elements, restaurantViewModel.photos.size)
+                    else
+                        "",
+                    onFilesPicked = { files ->
+                        if (files != null) {
+                            restaurantViewModel.photos = files.map { it.toString() }
+                        }
+                    },
+                    context = context,
+                    isError = restaurantViewModel.arePhotosInvalid(context),
+                    errorText = stringResource(
+                        if (restaurantViewModel.getPhotosError() != -1) {
+                            restaurantViewModel.getPhotosError()
+                        } else{
+                            if (restaurantViewModel.photos.all { isFileSizeInvalid(context, it) }) {
+                                R.string.error_file_size
+                            } else
+                                R.string.error_registerRestaurant_invalid_file_photo
+                        }, maxSize
+
+                    ),
+                    formSent = formSent2,
+                    deletable = true,
+                    optional = true,
+                    multipleFiles = true
+                )
+
+                FormFileInput(
                     label = stringResource(R.string.label_restaurant_consent),
                     defaultValue =
                     if (restaurantViewModel.businessPermission.value == "null")
@@ -758,7 +789,10 @@ fun RegisterRestaurantActivity(
                                         expanded = expandedState,
                                         value = selectedGroup?.name ?: "",
                                         onValueChange = { name ->
-                                            restaurantViewModel.selectedToGroup.value = newGroups.find { it.name == name }
+                                            val tmp = newGroups.find { it.name == name }
+                                            restaurantViewModel.selectedToGroup.value = tmp
+                                            restaurantViewModel.selectedGroup = tmp
+
                                         },
                                         options = newGroups.map { it.name },
                                         label = stringResource(R.string.label_add_to_group),
