@@ -125,7 +125,7 @@ fun DeliveriesActivity(
                 // 1) Dostawa w stanie oczekującym (ani anulowana, ani dostarczona)
                 DeliveryDTO(
                     deliveryId = 1,
-                    orderTime = "2025-01-21T10:00:00.000Z",
+                    orderTime = "2025-01-21T10:00:00.5059895",
                     userFullName = "Jan Nowak",
                     cost = 135.50,
                     ingredients = listOf(
@@ -140,7 +140,7 @@ fun DeliveriesActivity(
                 // 2) Kolejna oczekująca (bez deliveredTime ani canceledTime)
                 DeliveryDTO(
                     deliveryId = 2,
-                    orderTime = "2025-01-22T09:15:20.123Z", // trochę inna godzina z milisekundami
+                    orderTime = "2025-01-22T09:15:20.5033188",
                     userFullName = "Anna Kowalska",
                     cost = 64.99,
                     ingredients = listOf(
@@ -152,11 +152,11 @@ fun DeliveriesActivity(
                         )
                     )
                 ),
-                // 3) Dostawa dostarczona (deliveredTime != null)
+                // 3) Dostawa już dostarczona (deliveredTime != null)
                 DeliveryDTO(
                     deliveryId = 3,
-                    orderTime = "2025-01-23T15:05:10.500Z",
-                    deliveredTime = "2025-01-23T16:02:30.999Z",
+                    orderTime = "2025-01-23T15:05:10.1234567",
+                    deliveredTime = "2025-01-23T16:02:30.7654321",
                     userFullName = "Restauracja Rondo",
                     cost = 205.99,
                     ingredients = listOf(
@@ -179,8 +179,8 @@ fun DeliveriesActivity(
                 // 4) Dostawa anulowana (canceledTime != null)
                 DeliveryDTO(
                     deliveryId = 4,
-                    orderTime = "2025-01-24T11:20:45.200Z",
-                    canceledTime = "2025-01-24T12:00:00.000Z",
+                    orderTime = "2025-01-24T11:20:45.9876543",
+                    canceledTime = "2025-01-24T12:00:00.8888888",
                     userFullName = "Firma Cateringowa",
                     cost = 380.10,
                     ingredients = listOf(
@@ -196,7 +196,7 @@ fun DeliveriesActivity(
                 // 5) Dostawa oczekująca z większą liczbą składników
                 DeliveryDTO(
                     deliveryId = 5,
-                    orderTime = "2025-01-25T08:45:59.777Z",
+                    orderTime = "2025-01-25T08:45:59.1111111",
                     userFullName = "Stanisław Bąk",
                     cost = 99.00,
                     ingredients = listOf(
