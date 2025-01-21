@@ -262,7 +262,10 @@ fun EventDetailActivity(
                 if (interestedUsers != null && interestedUsers.itemCount > 0) {
                     if(eventDetailVM.isEventOwner){
                         item {
-                            Text(text = "Join Requests", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = stringResource(R.string.label_join_requests),
+                                style = MaterialTheme.typography.titleMedium
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -295,14 +298,20 @@ fun EventDetailActivity(
                     }
                 }
 
+
                 item {
-                    Text(text = "Participants", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = stringResource(R.string.label_participants),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+
+
                 if (eventDetailVM.participants.isEmpty()) {
                     item {
                         Text(
-                            text = "No one participates at this event.",
+                            text = stringResource(R.string.label_no_participants),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -333,71 +342,73 @@ fun UserListItem(
 ) {
     var showPopup by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = modifier ?: Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.jd),
-            contentDescription = null,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
+    if(user.isArchived == null || user.isArchived == false ){
+        Row(
+            modifier = modifier ?: Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.jd),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-        Text(
-            text = "${user.firstName} ${user.lastName}",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .weight(1f)
-                .clickable {
-                    onCardClick?.invoke()
+            Text(
+                text = "${user.firstName} ${user.lastName}",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        onCardClick?.invoke()
+                    }
+            )
+
+            if (showButtons) {
+                Row {
+                    Button(
+                        onClick = { onApproveClick?.invoke() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = stringResource(R.string.label_accept)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    VerticalDivider(modifier = Modifier.padding(8.dp))
+
+                    Button(
+                        onClick = { onRejectClick?.invoke() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.label_reject)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
                 }
-        )
-
-        if (showButtons) {
-            Row {
-                Button(
-                    onClick = { onApproveClick?.invoke() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.padding(end = 4.dp)
+            } else if (deletable) {
+                IconButton(
+                    onClick = { showPopup = true }
                 ) {
                     Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.label_accept)
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.label_delete_user),
+                        tint = MaterialTheme.colorScheme.error
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
                 }
-
-                VerticalDivider(modifier = Modifier.padding(8.dp))
-
-                Button(
-                    onClick = { onRejectClick?.invoke() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(R.string.label_reject)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-            }
-        } else if (deletable) {
-            IconButton(
-                onClick = { showPopup = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.label_delete_user),
-                    tint = MaterialTheme.colorScheme.error
-                )
             }
         }
     }

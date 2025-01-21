@@ -117,7 +117,7 @@ class EventViewModel(
         }
     }
 
-    suspend fun updateEvent(dto: EventDTO, context: Context){
+    suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
 
         val eventPhotoResult = if (
             !dto.photo!!.endsWith(".png", ignoreCase = true) &&
@@ -146,10 +146,14 @@ class EventViewModel(
                 val result = eventService.updateEvent(eventId, resultDTO)
                 if(!result.isError){
                     getEvent()
+                    return true
                 }
             }
+            throw Exception("ERROR WHILE UPDATING EVENT")
+            return false
         }else{
-            // error
+        throw Exception("ERROR WHILE UPLOADING PHOTO")
+            return false
         }
     }
 
@@ -175,8 +179,13 @@ class EventViewModel(
     }
 
     private fun refreshParticipants() {
+
+        val filteredParticipants = event?.participants?.filter {
+            it.isArchived != true
+        } ?: emptyList()
+
         participants.clear()
-        participants.addAll(event?.participants ?: emptyList())
+        participants.addAll(filteredParticipants)
     }
 
     private fun refreshInterestedUsers() {
