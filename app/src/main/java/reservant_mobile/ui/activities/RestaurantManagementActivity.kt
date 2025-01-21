@@ -81,7 +81,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
+import reservant_mobile.data.utils.toCustomNavType
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.DeleteCountdownPopup
@@ -97,6 +99,7 @@ import reservant_mobile.ui.navigation.RegisterRestaurantRoutes
 import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.RestaurantManagementViewModel
+import kotlin.reflect.typeOf
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -723,8 +726,8 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             WarehouseActivity(
                 onReturnClick = { navController.popBackStack() },
                 restaurantId = it.toRoute<RestaurantRoutes.Warehouse>().restaurantId,
-                navHostController = navControllerHome,
-                isEmployee = true
+                navHostController = navController,
+                isEmployee = false
             )
         }
         composable<RestaurantRoutes.Reviews> {
@@ -746,6 +749,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                 restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId,
                 onReturnClick = { navController.popBackStack() }
             )
+        }
+
+        composable<RestaurantRoutes.IngredientHistory>(
+            typeMap = mapOf(typeOf<IngredientDTO>() to toCustomNavType(IngredientDTO.serializer())),
+        ) {
+            val item = it.toRoute<RestaurantRoutes.IngredientHistory>().ingredient
+            IngredientDetailsActivity(onReturnClick = { navController.popBackStack() }, ingredient = item)
         }
     }
 }
