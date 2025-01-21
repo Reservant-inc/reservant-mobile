@@ -1,6 +1,6 @@
 package reservant_mobile.ui.activities
 
-import OrdersActivity
+import VisitHistoryActivity
 import WalletActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -128,7 +128,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
                         UnderlinedItem(
                             icon = Icons.Filled.ShoppingCart,
-                            text = stringResource(id = R.string.label_my_orders),
+                            text = stringResource(id = R.string.label_my_visits),
                             onClick = {
                                 navController.navigate(UserRoutes.Orders)
                             }
@@ -249,7 +249,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 ProfileActivity(navController = navController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
             }
             composable<UserRoutes.Orders>{
-                OrdersActivity(navController = navController)
+                VisitHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
                 NewTicketActivity()
@@ -377,6 +377,13 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         
                     }
                 }
+            }
+
+            composable<UserRoutes.VisitDetails>{
+                VisitDetailActivity(
+                    visitId = it.toRoute<UserRoutes.VisitDetails>().visitId,
+                    onReturnClick = {navController.popBackStack()}
+                )
             }
 
         }

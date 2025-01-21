@@ -53,10 +53,14 @@ class RegisterViewModel(
             birthDate = birthday.value,
             email = email.value,
             password = password.value,
-            phoneNumber = PhoneNumberDTO(
-                code = "+${mobileCountry!!.code}",
-                number = phoneNum.value
-            )
+            phoneNumber = if (phoneNum.value.isNullOrBlank()) {
+                null
+            } else {
+                PhoneNumberDTO(
+                    code = "+${mobileCountry!!.code}",
+                    number = phoneNum.value
+                )
+            }
         )
 
         result = userService.registerUser(user)
@@ -72,7 +76,6 @@ class RegisterViewModel(
                 isFirstNameInvalid() ||
                 isLastNameInvalid()  ||
                 isBirthDateInvalid()  ||
-                isPhoneInvalid() ||
                 isEmailInvalid()    ||
                 isPasswordInvalid() ||
                 isConfirmPasswordDiff()
