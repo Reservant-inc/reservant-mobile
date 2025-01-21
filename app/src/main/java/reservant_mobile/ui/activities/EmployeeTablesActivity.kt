@@ -138,7 +138,7 @@ fun EmployeeTablesActivity(
                                     tablesViewModel.numberOfPeople = it.toIntOrNull()
                                 },
                                 formSent = true,
-                                isError = tablesViewModel.numberOfPeople == null,
+                                isError = tablesViewModel.isNumberOfPeopleInvalid(),
                                 errorText = stringResource(id = R.string.error_invalid_number),
                                 keyboardOptions = KeyboardOptions(
                                     imeAction = ImeAction.Done,
