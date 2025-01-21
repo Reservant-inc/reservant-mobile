@@ -39,6 +39,7 @@
     <string name="label_add_to_group">Dodaj do grupy</string>
     <string name="error_unknown">Nieznany błąd</string>
     <string name="error_unauthorized_access">Funkcja niedostępna</string>
+    <string name="error_incorrect_login_or_password">Niepoprawny login lub hasło</string>
     <string name="label_management_edit_local_data">Edytuj dane lokalu</string>
     <string name="label_management_manage_menu">Zarządzaj menu</string>
     <string name="label_management_reviews">Opinie</string>
@@ -374,6 +375,7 @@
     <string name="ingredient_colon">Składnik: %1$s</string>
     <string name="store_name">Nazwa sklepu</string>
     <string name="amount_to_order">Ilość do zamówienia</string>
+    <string name="default_amount_to_order">Domyślna ilość zamówienia</string>
     <string name="add_new_ingredient">Dodaj nowy składnik</string>
     <string name="name">Nazwa</string>
     <string name="unit_of_measurement">Jednostka miary</string>
@@ -569,4 +571,31 @@
     <string name="label_event_updated">Zaktualizowano wydarzenie</string>
     <string name="error_event_update">Błąd podczas aktualizacji - zweryfikuj dane</string>
     <string name="label_edit_event">Edytuj wydarzenie</string>
+    <string name="art_header_become_restaurant_owner">Jak zarejestrować swoją restaurację?</string>
+    <string name="art_body1_become_restaurant_owner">Reservant to ciągle rozwijająca się platforma, która zawdzięcza swój sukces licznej i wspierającej społeczności. System wspiera liczne restauracje na całym świecie. Mnóstwo właścicieli restauracji decyduje się przejść do nas!</string>
+    <string name="art_body2_become_restaurant_owner">Jeżeli jesteś już właścicielem restauracji, możesz w łatwy sposób aplikować o dodanie twojej restauracji do naszego systemu. Zyskasz możliwość łatwiejszego zarządzania swoim menu, asortymentem oraz pracownikami. Dodatkowo będziesz mieć wgląd do statystyk restauracji lub wykupić możliwość dodatkowego promowania na naszej platformie.</string>
+    <string name="art_body3_become_restaurant_owner">Aby do nas dołączyć, kliknij poniższy przycisk, wypełnij wszystkie kroki formularza i wyślij go. Następnie nasz zespół zweryfikuje podesłane przez Ciebie informacje i jeżeli wszystko będzie się zgadzać, w twojej aplikacji pojawi się nowa zakładka zarządzania restauracją.</string>
+    <string name="label_selected_elements">Zaznaczone elementy: %1$s</string>
+    <string name="fill_both_for_correction">Wypełnij oba pola „Nowa kwota” i „Komentarz”, aby wprowadzić korektę, lub pozostaw oba puste, aby edytować tylko inne pola.</string>
+    <string name="add_ingredient_failed">Nie udało się dodać składnika. Popraw błędy i spróbuj ponownie.</string>
+    <string name="success_ingredient_added">Pomyślnie dodano nowy składnik!</string>
+    <string name="order_submitted_successfully">Zamówienie przesłane pomyślnie!</string>
+    <string name="order_submitted_failed">Nie można przesłać zamówienia.</string>
+    <string name="no_items_added_to_cart">Żadne produkty nie zostały dodane do koszyka.</string>
+    <string name="unknown_restaurant">Nieznana restauracja</string>
+    <string name="restaurant_colon">Restauracja: %1$s</string>
+    <string name="visit_date_colon">Data wizyty: %1$s</string>
+    <string name="mode_colon">Tryb: %1$s</string>
+    <string name="accepted_colon">Zaakceptowano: %1$s</string>
+    <string name="accepted_yes">Zaakceptowano</string>
+    <string name="accepted_no">Odrzucono</string>
+    <string name="on_site_label">Na miejscu</string>
+    <string name="total_guests_colon">Łączna liczba gości: %1$d</string>
+    <string name="visit_history_title">Twoja historia wizyt</string>
+    <string name="loading_visit_history">Ładowanie historii wizyt...</string>
+    <string name="no_visits_found">Brak wizyt.</string>
+    <string name="visit_detail_title">Szczegóły zamówienia</string>
+    <string name="future_visits_tab">Nadchodzące</string>
+    <string name="past_visits_tab">Przeszłe</string>
+    <string name="label_my_visits">Moje wizyty</string>
 </resources>

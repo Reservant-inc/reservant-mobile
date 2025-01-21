@@ -261,6 +261,18 @@ fun EmployeeHomeActivity() {
 
                 composable<EmployeeRoutes.Home> {
                     val restaurant = empHomeVM.selectedEmployment!!.restaurant!!
+                    val tables = EmpMenuOption(
+                        text = stringResource(id = R.string.label_restaurant_tables),
+                        icon = Icons.Outlined.TableBar,
+                        background = painterResource(id = R.drawable.table_cafe_town_restaurant),
+                        onClick = {
+                            innerNavController.navigate(
+                                RestaurantRoutes.Tables(
+                                    restaurantId = restaurant.restaurantId
+                                )
+                            )
+                        }
+                    )
                     val reservations = EmpMenuOption(
                         text = stringResource(id = R.string.label_reservations),
                         icon = Icons.Outlined.Inbox,
@@ -299,18 +311,7 @@ fun EmployeeHomeActivity() {
                                 )
                             }
                         ),
-                        EmpMenuOption(
-                            text = stringResource(id = R.string.label_restaurant_tables),
-                            icon = Icons.Outlined.TableBar,
-                            background = painterResource(id = R.drawable.table_cafe_town_restaurant),
-                            onClick = {
-                                innerNavController.navigate(
-                                    RestaurantRoutes.Tables(
-                                        restaurantId = restaurant.restaurantId
-                                    )
-                                )
-                            }
-                        ),
+                        tables,
                         reservations,
                         warehouse,
                         EmpMenuOption(
@@ -333,7 +334,7 @@ fun EmployeeHomeActivity() {
                     )
 
                     val hallEmpOptions = options.filter { it != warehouse }
-                    val backdoorEmpOptions = options.filter { it != reservations }
+                    val backdoorEmpOptions = options.filter { it != reservations && it != tables }
 
                     Column(
                         modifier = Modifier

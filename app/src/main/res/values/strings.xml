@@ -43,6 +43,7 @@
     <string name="label_add_to_group">Add to group</string>
     <string name="error_unknown">Unknown error</string>
     <string name="error_unauthorized_access">Unauthorized access</string>
+    <string name="error_incorrect_login_or_password">Incorrect login or password</string>
     <string name="label_management_edit_local_data">Manage local data</string>
     <string name="label_management_manage_menu">Manage menu</string>
     <string name="label_management_reviews">Reviews</string>
@@ -385,6 +386,7 @@
     <string name="ingredient_colon">Ingredient: %1$s</string>
     <string name="store_name">Store name</string>
     <string name="amount_to_order">Amount to order</string>
+    <string name="default_amount_to_order">Default order amount</string>
     <string name="add_new_ingredient">Add new ingredient</string>
     <string name="name">Name</string>
     <string name="unit_of_measurement">Unit of measurement</string>
@@ -581,4 +583,33 @@
     <string name="label_event_updated">Event updated</string>
     <string name="error_event_update">Error while updating event - verify your form</string>
     <string name="label_edit_event">Edit event</string>
+    <string name="art_header_become_restaurant_owner">How to register your restaurant?</string>
+    <string name="art_body1_become_restaurant_owner">Reservant is an ever-growing platform that owes its success to a large and supportive community. The system supports numerous restaurants around the world. Plenty of restaurant owners choose to switch to us!</string>
+    <string name="art_body2_become_restaurant_owner">If you already own a restaurant, you can easily apply to add your restaurant to our system. You will gain the ability to manage your menu, assortment and employees more easily. In addition, you will be able to view your restaurant\'s statistics or buy the possibility of additional promotion on our platform.</string>
+    <string name="art_body3_become_restaurant_owner">To join us, click the button below, complete all the steps of the form and submit it. Our team will then verify the information you submit and if everything matches, a new restaurant management tab will appear in your application.</string>
+    <string name="label_selected_elements">Selected elements: %1$s</string>
+    <string name="fill_both_for_correction">Please fill both "New amount" and "Comment" fields to make a correction, or leave both empty to only edit other fields.</string>
+    <string name="add_ingredient_failed">Failed to add ingredient. Please correct errors and try again.</string>
+    <string name="success_ingredient_added">Successfully added new ingredient!</string>
+    <string name="order_submitted_successfully">Order submitted successfully!</string>
+    <string name="order_submitted_failed">Could not submit the order.</string>
+    <string name="no_items_added_to_cart">No items were added to the cart.</string>
+    <string name="unknown_restaurant">Unknown Restaurant</string>
+    <string name="restaurant_colon">Restaurant: %1$s</string>
+    <string name="visit_date_colon">Visit Date: %1$s</string>
+    <string name="mode_colon">Mode: %1$s</string>
+    <string name="accepted_colon">Accepted: %1$s</string>
+    <string name="accepted_yes">Accepted</string>
+    <string name="accepted_no">Not accepted</string>
+    <string name="on_site_label">On-site</string>
+    <string name="total_guests_colon">Total Guests: %1$d</string>
+    <string name="visit_history_title">Your Visit History</string>
+    <string name="loading_visit_history">Loading visit history...</string>
+    <string name="no_visits_found">No visits found.</string>
+    <string name="visit_detail_title">Visit details</string>
+    <string name="dish_item_info" translatable="false">%1$d x %.2f (Status: %3$s)</string>
+    <string name="order_status_colon" translatable="false">Status: %1$s</string>
+    <string name="future_visits_tab">Upcoming</string>
+    <string name="past_visits_tab">Past</string>
+    <string name="label_my_visits">My visits</string>
 </resources>

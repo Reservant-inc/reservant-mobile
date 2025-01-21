@@ -95,6 +95,9 @@ fun FormInput(
     if (inputText.isEmpty() && optional)
         beginValidation = false
 
+    // If optional && the field is blank => override isError to false
+    val finalIsError = if (optional && inputText.isBlank()) false else isError
+
     Column {
         OutlinedTextField(
             modifier =
@@ -132,7 +135,7 @@ fun FormInput(
                 else keyboardOptions.imeAction
             ),
             shape = shape,
-            isError = isError && (beginValidation || formSent),
+            isError = finalIsError && (beginValidation || formSent),
             maxLines = maxLines,
             singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
@@ -140,7 +143,7 @@ fun FormInput(
             interactionSource = interactionSource,
             readOnly = readOnly
         )
-        if (isError && (beginValidation || formSent)) {
+        if (finalIsError && (beginValidation || formSent)) {
             Text(
                 text = errorText,
                 color = MaterialTheme.colorScheme.error
@@ -289,7 +292,8 @@ fun MyTimePickerDialog(
 fun FormFileInput(
     label: String = "",
     defaultValue: String = "",
-    onFilePicked: (Uri?) -> Unit,
+    onFilePicked: (Uri?) -> Unit = {},
+    onFilesPicked: (List<Uri>?) -> Unit = {},
     modifier: Modifier = Modifier,
     context: Context,
     shape: RoundedCornerShape = RoundedCornerShape(8.dp),
@@ -297,15 +301,24 @@ fun FormFileInput(
     errorText: String = "",
     formSent: Boolean = false,
     optional: Boolean = false,
-    deletable: Boolean = false
+    deletable: Boolean = false,
+    multipleFiles: Boolean = false
 ) {
+
+
     var fileName by remember { mutableStateOf<String?>(null) }
-    val pickFileLauncher = rememberLauncherForActivityResult(
+    val tmpPick1 = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         fileName = uri?.let { getFileName(context, it.toString()) }
         onFilePicked(uri)
     }
+    val tmpPick2 = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uri: List<@JvmSuppressWildcards Uri> ->
+        onFilesPicked(uri)
+    }
+    val pickFileLauncher = if(multipleFiles) tmpPick2 else tmpPick1
     var beginValidation: Boolean by remember { mutableStateOf(false) }
 
     if (fileName != null) {
@@ -370,6 +383,8 @@ fun FormFileInput(
                     modifier = Modifier.clickable {
                         fileName = null
                         onFilePicked(null)
+                        onFilesPicked(emptyList())
+
                     }
                 )
             } else if (fileName == null) {
