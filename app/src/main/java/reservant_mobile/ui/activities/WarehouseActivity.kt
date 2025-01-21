@@ -590,7 +590,8 @@ fun AddOrEditIngredientDialog(
                     isDisabled = isEmployee,
                     isError = isAmountToOrderInvalid(),
                     errorText = stringResource(R.string.error_field_required),
-                    formSent = formSent
+                    formSent = formSent,
+                    optional = true
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -650,7 +651,6 @@ fun AddOrEditIngredientDialog(
                         // Creating a brand-new ingredient
                         val isFormInvalid = isNameInvalid() ||
                                 isMinimalInvalid() ||
-                                isAmountToOrderInvalid() ||
                                 isInitialAmountInvalid()
 
                         if (isFormInvalid) {
