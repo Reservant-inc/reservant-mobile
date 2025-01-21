@@ -322,7 +322,7 @@ fun MenuItemPopup(
 
                 if (showIngredientChoice){
                     IngredientSelectionScreen(
-                        title = "Choose ingredients",
+                        title = stringResource(id = R.string.label_choose_ingredients),
                         ingredients = ingredients,
                         selectedIngredients = selectedIngredients,
                         onDismiss = { showIngredientChoice = false },

@@ -56,7 +56,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     price = viewmodel.price,
                     photoField = viewmodel.photo,
                     alcoholPercentage = viewmodel.alcoholPercentage,
-                    assignIngredients = { viewmodel.assignIngredients(it) },
+                    assignIngredients = { /*viewmodel.assignIngredients(it)*/ },
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
@@ -98,7 +98,10 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                 },
                 context = context,
                 isFormValid = viewmodel.isFormValid(),
-
+                ingredients = viewmodel.restaurantIngredients.map { it.publicName.orEmpty() },
+                selectedIngredients = viewmodel.ingredients,
+                onRemoveIngredient = { s -> viewmodel.onIngredientRemoved(s)},
+                onAddIngredient = { s -> viewmodel.onIngredientAdded(s) }
             )
         }
     }

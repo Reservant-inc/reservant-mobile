@@ -237,9 +237,9 @@ fun ButtonComponent(
         modifier =
         if(fullWidth)
             modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(gradientBrush, RoundedCornerShape(16.dp))
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .background(gradientBrush, RoundedCornerShape(16.dp))
         else
             modifier
                 .wrapContentWidth()
@@ -810,8 +810,11 @@ fun IngredientSelectionScreen(
         title = { Text(title) },
         text = {
             LazyColumn {
-                items(ingredients) { tag ->
-                    val isChecked = selectedIngredients.contains(tag)
+                items(ingredients) { ingredient ->
+                    var isChecked by remember {
+                        mutableStateOf(selectedIngredients.contains(ingredient))
+                    }
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -821,14 +824,18 @@ fun IngredientSelectionScreen(
                         Checkbox(
                             checked = isChecked,
                             onCheckedChange = { isSelected ->
-                                onIngredientSelected(tag, isSelected)
+                                onIngredientSelected(ingredient, isSelected)
+                                isChecked = !isChecked
                             }
                         )
                         Text(
-                            text = tag,
+                            text = ingredient,
                             modifier = Modifier
                                 .padding(start = 2.dp)
-                                .clickable { onIngredientSelected(tag, !isChecked) }
+                                .clickable {
+                                    onIngredientSelected(ingredient, !isChecked)
+                                    isChecked = !isChecked
+                                }
                         )
                     }
                 }
