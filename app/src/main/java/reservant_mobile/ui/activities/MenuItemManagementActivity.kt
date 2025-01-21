@@ -53,6 +53,7 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     name = viewmodel.name,
                     altName = viewmodel.alternateName,
                     price = viewmodel.price,
+                    photoField = viewmodel.photo,
                     alcoholPercentage = viewmodel.alcoholPercentage,
                     //photo = viewmodel.photo, // TODO: fetchowanie zdjec menu
                     menuItem = item,
