@@ -3,12 +3,12 @@ package reservant_mobile.services
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import com.google.common.truth.Truth.assertThat
-import reservant_mobile.data.services.INominatumService
+import reservant_mobile.data.services.INominatimService
 import reservant_mobile.data.services.NominatimService
 
 
 class NominatimServiceUnitTest {
-    private val service:INominatumService = NominatimService()
+    private val service:INominatimService = NominatimService()
 
     @Test
     fun get_location_data_return_valid_data()= runTest{

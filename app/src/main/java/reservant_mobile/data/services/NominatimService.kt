@@ -4,15 +4,12 @@ import com.example.reservant_mobile.R
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
-import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
@@ -23,11 +20,11 @@ import kotlinx.serialization.json.Json
 import reservant_mobile.data.models.dtos.NominatumDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
-interface INominatumService{
+interface INominatimService{
     suspend fun getLocationData(street: String, city: String, country: String = "Poland", postalCode: String? = null): Result<List<NominatumDTO>?>
 }
 
-class NominatimService: INominatumService {
+class NominatimService: INominatimService {
     private val backendUrl= "https://nominatim.openstreetmap.org"
     private val client = HttpClient(CIO){
         defaultRequest {
