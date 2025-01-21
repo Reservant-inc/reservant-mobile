@@ -248,8 +248,9 @@ fun RegisterRestaurantActivity(
                             formSent = true
 
                             val result = restaurantViewModel.validateFirstStep()
+                            val resNomi = restaurantViewModel.validateAddress()
 
-                            if (result) {
+                            if (result && resNomi) {
                                 navController.navigate(RegisterRestaurantRoutes.Files)
                             }
 
