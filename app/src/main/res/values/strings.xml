@@ -578,4 +578,6 @@
     <string name="label_event_category_all">All</string>
     <string name="label_participants">Participants</string>
     <string name="label_no_participants">No one participates at this event.</string>
+    <string name="label_event_updated">Event updated</string>
+    <string name="error_event_update">Error while updating event - verify your form</string>
 </resources>

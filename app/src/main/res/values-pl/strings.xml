@@ -566,4 +566,6 @@
     <string name="label_event_category_all">Wszystkie</string>
     <string name="label_participants">Uczestnicy</string>
     <string name="label_no_participants">Nikt nie uczestniczy w tym wydarzeniu</string>
+    <string name="label_event_updated">Zaktualizowano wydarzenie</string>
+    <string name="error_event_update">Błąd podczas aktualizacji - zweryfikuj dane</string>
 </resources>
