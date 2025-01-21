@@ -14,7 +14,9 @@ import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DataType
+import reservant_mobile.data.services.INominatimService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.NominatimService
 import reservant_mobile.data.services.RestaurantService
 import reservant_mobile.data.utils.getFileFromUri
 import reservant_mobile.data.utils.getFileName
@@ -23,7 +25,8 @@ import reservant_mobile.data.utils.isFileSizeInvalid
 import java.time.LocalTime
 
 class RestaurantViewModel(
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val nomiService: INominatimService = NominatimService()
 ): ReservantViewModel() {
 
     // Wynik rejestracji
@@ -184,6 +187,20 @@ class RestaurantViewModel(
 
         resultFirstStep = restaurantService.validateFirstStep(restaurant)
         return resultFirstStep.value
+    }
+
+    suspend fun validateAddress(): Boolean{
+        if (isRestaurantRegistrationFirstStepInvalid()) {
+            return false
+        }
+
+        val res = nomiService.getLocationData(
+            city = city.value,
+            street = address.value,
+            postalCode = postalCode.value
+        )
+        
+        return !res.isError
     }
 
     suspend fun validateSecondStep(context: Context): Boolean {
