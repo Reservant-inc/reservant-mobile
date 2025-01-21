@@ -55,7 +55,6 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     price = viewmodel.price,
                     photoField = viewmodel.photo,
                     alcoholPercentage = viewmodel.alcoholPercentage,
-                    //photo = viewmodel.photo, // TODO: fetchowanie zdjec menu
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
@@ -74,7 +73,8 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                         item.photo?.let {
                             viewmodel.fetchPhoto(it)
                         }
-                    }
+                    },
+                    isFormValid = false
                 )
             }
         }
@@ -95,7 +95,8 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                         viewmodel.createMenuItem(context)
                     }
                 },
-                context = context
+                context = context,
+                isFormValid = false
             )
         }
     }

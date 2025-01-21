@@ -3,7 +3,7 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.collection.intSetOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,10 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,7 +58,8 @@ fun MenuItemCard(
     alcoholPercentage: FormField? = null,
     photoField: FormField? = null,
     clearFields: () -> Unit = {},
-    context: Context? = null
+    context: Context? = null,
+    isFormValid: Boolean = true
 ) {
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
@@ -86,7 +84,7 @@ fun MenuItemCard(
             name?.value = menuItem.name
             altName?.value = menuItem.alternateName ?: ""
             price?.value = menuItem.price.toString()
-            alcoholPercentage?.value = menuItem.alcoholPercentage?.toString() ?: ""
+            alcoholPercentage?.value = (menuItem.alcoholPercentage ?: "").toString()
             photoField?.value = menuItem.photoFileName ?: ""
 
             MenuItemPopup(
@@ -99,7 +97,8 @@ fun MenuItemCard(
                 price = price!!,
                 alcoholPercentage = alcoholPercentage!!,
                 photo = photoField!!,
-                context = context!!
+                context = context!!,
+                isFormValid = isFormValid
             )
         }
     }
@@ -209,11 +208,12 @@ fun MenuItemCard(
                 }
 
                 val mod by remember {
-                    mutableStateOf(Modifier
-                        .size(80.dp)
-                        .padding(start = 8.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .fillMaxSize())
+                    mutableStateOf(
+                        Modifier
+                            .size(80.dp)
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize())
                 }
 
                 LoadedPhotoComponent(
@@ -239,7 +239,8 @@ fun MenuItemPopup(
     price: FormField,
     alcoholPercentage: FormField,
     photo: FormField,
-    context: Context
+    context: Context,
+    isFormValid: Boolean
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -252,7 +253,9 @@ fun MenuItemPopup(
                 FormInput(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
-                    onValueChange = { name.value = it }
+                    onValueChange = { name.value = it },
+                    isError = name.value.isEmpty(),
+                    errorText = stringResource(id = R.string.error_invalid_name)
                 )
                 FormInput(
                     label = stringResource(id = R.string.label_alternate_name),
@@ -264,14 +267,19 @@ fun MenuItemPopup(
                     label = stringResource(id = R.string.label_price),
                     inputText = price.value,
                     onValueChange = { price.value = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    isError = (price.value.toDoubleOrNull() ?: 0.0 ) <= 0,
+                    errorText = stringResource(id = R.string.error_invalid_price)
                 )
+                println("[DEBUG]: ${alcoholPercentage.value}")
                 FormInput(
                     label = stringResource(id = R.string.label_alcohol),
                     inputText = alcoholPercentage.value,
                     onValueChange = { alcoholPercentage.value = it },
                     optional = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    isError = (alcoholPercentage.value.toDoubleOrNull() ?: 0.0 ) < 0,
+                    errorText = stringResource(id = R.string.error_invalid_alcohol_percentage)
                 )
                 FormFileInput(
                     label = stringResource(id = R.string.label_menu_item_photo),
@@ -293,9 +301,11 @@ fun MenuItemPopup(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    hide()
-                    onConfirm()
-                    clear()
+                    if (isFormValid){
+                        hide()
+                        onConfirm()
+                        clear()
+                    }
                 },
                 label = stringResource(id = R.string.label_save)
             )
@@ -313,7 +323,8 @@ fun AddMenuItemButton(
     photo: FormField,
     clearFields: () -> Unit,
     addMenu: () -> Unit,
-    context: Context
+    context: Context,
+    isFormValid: Boolean
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
 
@@ -329,7 +340,8 @@ fun AddMenuItemButton(
                 price = price,
                 alcoholPercentage = alcoholPercentage,
                 photo = photo,
-                context = context
+                context = context,
+                isFormValid = isFormValid
             )
         }
     }

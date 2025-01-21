@@ -140,7 +140,7 @@
     <string name="label_restaurant_no_events">Restaurant has no events</string>
     <string name="error_file_not_given">File is required</string>
     <string name="error_wrong_file_format">Wrong file format</string>
-    <string name="error_invalid_menu_name">Invalid name</string>
+    <string name="error_invalid_name">Invalid name</string>
     <string name="error_invalid_menu_type">Invalid menu type</string>
     <string name="label_edit_profile">Edit profile</string>
     <string name="label_wallet">Wallet</string>
@@ -612,4 +612,6 @@
     <string name="future_visits_tab">Upcoming</string>
     <string name="past_visits_tab">Past</string>
     <string name="label_my_visits">My visits</string>
+    <string name="error_invalid_price">Invalid price</string>
+    <string name="error_invalid_alcohol_percentage">Invalid alcohol percentage</string>
 </resources>

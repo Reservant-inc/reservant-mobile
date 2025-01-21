@@ -135,7 +135,7 @@
     <string name="label_restaurant_no_events">Restauracja nie ma wydarzeń</string>
     <string name="error_file_not_given">Plik jest wymagany</string>
     <string name="error_wrong_file_format">Zły format pliku</string>
-    <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
+    <string name="error_invalid_name">Niepoprawna nazwa</string>
     <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
     <string name="label_edit_profile">Edytuj profil</string>
     <string name="label_wallet">Portfel</string>
@@ -598,4 +598,6 @@
     <string name="future_visits_tab">Nadchodzące</string>
     <string name="past_visits_tab">Przeszłe</string>
     <string name="label_my_visits">Moje wizyty</string>
+    <string name="error_invalid_price">Niepoprawna cena</string>
+    <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
 </resources>
