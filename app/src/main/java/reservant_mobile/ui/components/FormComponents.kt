@@ -135,7 +135,7 @@ fun FormInput(
                 else keyboardOptions.imeAction
             ),
             shape = shape,
-            isError = isError && (beginValidation || formSent),
+            isError = finalIsError && (beginValidation || formSent),
             maxLines = maxLines,
             singleLine = maxLines == 1,
             leadingIcon = leadingIcon,
