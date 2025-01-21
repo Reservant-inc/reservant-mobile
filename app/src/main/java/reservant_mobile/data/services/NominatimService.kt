@@ -17,11 +17,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import reservant_mobile.data.models.dtos.NominatumDTO
+import reservant_mobile.data.models.dtos.NominatimDTO
 import reservant_mobile.data.models.dtos.fields.Result
 
 interface INominatimService{
-    suspend fun getLocationData(street: String, city: String, country: String = "Poland", postalCode: String? = null): Result<List<NominatumDTO>?>
+    suspend fun getLocationData(street: String, city: String, country: String = "Poland", postalCode: String? = null): Result<List<NominatimDTO>?>
 }
 
 class NominatimService: INominatimService {
@@ -48,7 +48,7 @@ class NominatimService: INominatimService {
         city: String,
         country: String,
         postalCode: String?
-    ): Result<List<NominatumDTO>?> {
+    ): Result<List<NominatimDTO>?> {
         val res = client.get("search") {
             url {
                 parameters.append("street", street)
@@ -65,14 +65,14 @@ class NominatimService: INominatimService {
             }
         }
         val parsedRes = APIService.responseWrapper(res)
-        val errorRes: Result<List<NominatumDTO>?> = Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
+        val errorRes: Result<List<NominatimDTO>?> = Result(isError = true, errors = mapOf(pair= Pair("TOAST", R.string.error_unknown)) ,value = null)
 
         if(parsedRes.isError)
             return Result(isError = true, errors = parsedRes.errors, value = null)
 
         if (parsedRes.value!!.status == HttpStatusCode.OK){
             return try {
-                val r: List<NominatumDTO>? = parsedRes.value.body()
+                val r: List<NominatimDTO>? = parsedRes.value.body()
                 Result(isError = false, value = r)
             }
             catch (e: Exception){

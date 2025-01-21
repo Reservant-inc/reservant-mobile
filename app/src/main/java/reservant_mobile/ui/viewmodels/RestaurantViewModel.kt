@@ -6,11 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
-import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.LocationDTO
-import reservant_mobile.data.models.dtos.NominatumDTO
+import reservant_mobile.data.models.dtos.NominatimDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.fields.FormField
@@ -37,7 +36,7 @@ class RestaurantViewModel(
     var resultGroup by mutableStateOf(Result(isError = false, value = false))
     var resultRegistration by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
     var resultMove by mutableStateOf(Result<RestaurantDTO?>(isError = false, value = null))
-    var resultAddress by mutableStateOf(Result<List<NominatumDTO>?>(isError = false, value = emptyList()))
+    var resultAddress by mutableStateOf(Result<List<NominatimDTO>?>(isError = false, value = emptyList()))
 
     // Pola do walidacji
     val name: FormField = FormField(RestaurantDTO::name.name)
