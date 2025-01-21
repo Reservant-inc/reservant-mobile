@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -271,7 +272,6 @@ fun MenuItemPopup(
                     isError = (price.value.toDoubleOrNull() ?: 0.0 ) <= 0,
                     errorText = stringResource(id = R.string.error_invalid_price)
                 )
-                println("[DEBUG]: ${alcoholPercentage.value}")
                 FormInput(
                     label = stringResource(id = R.string.label_alcohol),
                     inputText = alcoholPercentage.value,
@@ -330,6 +330,10 @@ fun AddMenuItemButton(
 
     when {
         showAddDialog -> {
+            LaunchedEffect(key1 = Unit) {
+                clearFields()
+            }
+
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
                 hide = { showAddDialog = false },

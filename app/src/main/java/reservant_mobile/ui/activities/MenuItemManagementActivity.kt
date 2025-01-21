@@ -81,7 +81,6 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-            //.padding(8.dp)
         ){
             AddMenuItemButton(
                 name = viewmodel.name,
