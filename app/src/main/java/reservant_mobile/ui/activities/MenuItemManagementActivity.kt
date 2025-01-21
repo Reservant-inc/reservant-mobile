@@ -68,7 +68,8 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     },
                     clearFields = viewmodel::clearFields,
                     role = Roles.RESTAURANT_OWNER,
-                    context = context
+                    context = context,
+                    getPhoto = { null }
                 )
             }
         }

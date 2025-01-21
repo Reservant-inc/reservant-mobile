@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -52,7 +50,7 @@ import reservant_mobile.data.models.dtos.fields.FormField
 fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
     role: String,
-    photo: Bitmap? = null,
+    getPhoto: suspend () -> Bitmap?,
     onInfoClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
@@ -210,29 +208,21 @@ fun MenuItemCard(
                     }
                 }
 
-                if(photo != null){
-                    Image(
-                        bitmap = photo.asImageBitmap(),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(start = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
-                }else{
-                    Image(
-                        painter = painterResource(R.drawable.unknown_image),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(start = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
+                val mod by remember {
+                    mutableStateOf(Modifier
+                        .size(80.dp)
+                        .padding(start = 8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxSize())
                 }
+
+                LoadedPhotoComponent(
+                    photoModifier = mod,
+                    placeholderModifier = mod,
+                    placeholder = R.drawable.unknown_image,
+                    getPhoto = getPhoto
+                )
+
             }
         }
     }
