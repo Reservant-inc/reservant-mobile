@@ -293,7 +293,7 @@ class ProfileViewModel(
                 if (result.isError) {
                     friendRequestError = "Nie udało się zaakceptować zaproszenia"
                 } else {
-                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Stranger)
+                    simpleProfileUser = simpleProfileUser?.copy(friendStatus = FriendStatus.Friend)
                     friendRequestError = null
                     fetchFriends()
                 }
