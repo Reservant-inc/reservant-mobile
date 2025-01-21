@@ -88,5 +88,12 @@ class TablesViewModel(private val restaurantId: Int) : ReservantViewModel() {
         return getToastError(res)
     }
 
+    fun isNumberOfPeopleInvalid(): Boolean {
+        return if (numberOfPeople == null)
+            true
+        else
+            (numberOfPeople ?: 0) <= 0
+    }
+
 
 }
