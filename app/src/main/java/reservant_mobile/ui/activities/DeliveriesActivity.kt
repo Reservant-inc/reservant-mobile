@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,12 +39,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.reservant_mobile.R
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import reservant_mobile.data.models.dtos.DeliveryDTO
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.SearchBarWithFilter
 import reservant_mobile.ui.viewmodels.DeliveriesViewModel
@@ -67,14 +70,11 @@ fun DeliveriesActivity(
     val errorMessage by deliveriesViewModel.errorMessage.collectAsState()
     val isLoading by deliveriesViewModel.isLoading.collectAsState()
 
-    // 1) Zmienna na wyszukiwany tekst:
     var searchQuery by remember { mutableStateOf("") }
 
-    // 2) Zmienna na wybrany filtr statusu (null = All)
     var selectedStatus by remember { mutableStateOf<String?>(null) }
 
-    // 3) Definiujemy dostępne opcje filtra: All, Delivered, Canceled, Pending
-    val filterOptions = listOf("All", "Delivered", "Canceled", "Pending")
+    val filterOptions = listOf("Delivered", "Canceled", "Pending")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -105,10 +105,11 @@ fun DeliveriesActivity(
             filterOptions = filterOptions,
             onFilterSelected = { status ->
                 selectedStatus = status
-            }
+            },
+            modifier = Modifier
+                .padding(16.dp)
         )
 
-        // Sekcja główna
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -236,7 +237,10 @@ fun DeliveryItem(
 ) {
 
     val pastelRed = Color(0xFFFFC1C1)
-    val pastelGreen = Color(0xFFB2F2BB)
+    val pastelGreen = Color(0xFF84C58D)
+
+    val darkRed = Color(0xFFD32F2F)
+    val darkGreen = Color(0xFF28692B)
 
     Card(
         modifier = Modifier
@@ -247,10 +251,7 @@ fun DeliveryItem(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Górny wiersz: ID dostawy z ikoną
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.LocalShipping,
                     contentDescription = null,
@@ -279,69 +280,93 @@ fun DeliveryItem(
             )
 
             Spacer(modifier = Modifier.height(4.dp))
-            // Data zamówienia
+
+            val orderDateFormatted = delivery.orderTime?.let { formatToDateTime(it, "dd MMMM yyyy") }
+            val orderTimeFormatted = delivery.orderTime?.let { formatToDateTime(it, "HH:mm") }
+
             Text(
-                text = "Ordered: ${delivery.orderTime ?: "--"}",
+                text = stringResource(R.string.label_ordered)+": $orderDateFormatted | ${orderTimeFormatted ?: "--"}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            // Koszt
+
             Text(
-                text = "Cost: ${delivery.cost ?: 0.0} PLN",
+                text = stringResource(R.string.label_cost) + ": ${delivery.cost ?: 0.0} PLN",
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             when {
-                // Jeśli jest anulowana
+
                 delivery.canceledTime != null -> {
+
+                    val cancelDateFormatted = formatToDateTime(delivery.canceledTime, "dd MMMM yyyy")
+                    val cancelTimeFormatted = formatToDateTime(delivery.canceledTime, "HH:mm")
                     Text(
-                        text = "Canceled at ${delivery.canceledTime}",
+                        text = stringResource(R.string.label_canceled_at)+": $cancelDateFormatted | $cancelTimeFormatted",
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                // Jeśli jest dostarczona
+
                 delivery.deliveredTime != null -> {
+                    val deliveredDateFormatted = formatToDateTime(delivery.deliveredTime, "dd MMMM yyyy")
+                    val deliveredTimeFormatted = formatToDateTime(delivery.deliveredTime, "HH:mm")
+
                     Text(
-                        text = "Arrived at ${delivery.deliveredTime}",
+                        text = stringResource(R.string.label_arrived_at)+": $deliveredDateFormatted | $deliveredTimeFormatted",
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
                 else -> {
-                    // Przyciski, jeśli nie jest anulowana/dostarczona
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         ElevatedButton(
-                            onClick = { onMarkArrivedClick() },
+                            onClick = onMarkArrivedClick,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = pastelGreen
-                            )
+                                containerColor = pastelGreen,
+                                contentColor = darkGreen
+                            ),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "Mark as arrived")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.label_mark_arrived),
+                                fontSize = 12.sp,
+                                maxLines = 1
+                            )
                         }
                         ElevatedButton(
-                            onClick = { onCancelClick() },
+                            onClick = onCancelClick,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = pastelRed
-                            )
+                                containerColor = pastelRed,
+                                contentColor = darkRed
+                            ),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = null
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "Cancel delivery")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.label_cancel),
+                                fontSize = 12.sp,
+                                maxLines = 1
+                            )
                         }
                     }
                 }
