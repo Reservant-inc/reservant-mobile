@@ -68,15 +68,19 @@ fun OrderManagementScreen(
         ))
     }
 
-    val currentVisitsFlow = viewModel.getVisitsFlow(
-        dateStart = LocalDateTime.now(),
-        reservationStatus = GetReservationStatus.ApprovedByRestaurant
-    )
+    val currentVisitsFlow by remember {
+        mutableStateOf(viewModel.getVisitsFlow(
+            dateStart = LocalDateTime.now(),
+            reservationStatus = GetReservationStatus.ApprovedByRestaurant
+        ))
+    }
 
-    val pastVisitsFlow = viewModel.getVisitsFlow(
-        dateEnd = LocalDateTime.now(),
-        reservationStatus = GetReservationStatus.ApprovedByRestaurant
-    )
+    val pastVisitsFlow by remember {
+        mutableStateOf(viewModel.getVisitsFlow(
+            dateEnd = LocalDateTime.now(),
+            reservationStatus = GetReservationStatus.ApprovedByRestaurant
+        ))
+    }
 
     val reservationVisits = if (isReservation) reservationVisitsFlow.collectAsLazyPagingItems() else null
     val currentVisits = if (!isReservation && selectedTabIndex == 0) currentVisitsFlow.collectAsLazyPagingItems() else null
