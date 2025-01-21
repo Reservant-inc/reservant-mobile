@@ -60,8 +60,7 @@ class MenuItemManagementViewModel(
             alternateName = alternateName.value.ifEmpty { null },
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
-            photoFileName = photo.value,
-            photo = photo.value
+            photo = sendPhoto(photo.value, context)
         )
     }
 
@@ -70,9 +69,6 @@ class MenuItemManagementViewModel(
 
         val result = service.createMenuItem(menuitem)
 
-        //TODO z jakiegoś powodu resultFirstStep.isError zwraca true, a dalej zwraca poprawne dane
-        //TODO resultFirstStep.menuitemid np to null ale nie wiem dlaczego bo zwraca dane normalnie ta koncowka
-        println(result.errors)
         if(!result.isError){
             val menuItemId = result.value?.menuItemId
             val resultadd = service.addItemsToMenu(menuId, listOf(menuItemId!!))
