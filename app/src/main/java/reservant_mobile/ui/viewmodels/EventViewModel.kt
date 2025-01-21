@@ -119,35 +119,24 @@ class EventViewModel(
     }
 
     suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
-
-        var eventPhotoResult = if (
-            (dto.photo!!.endsWith(".png", ignoreCase = true) ||
-                    dto.photo.endsWith(".jpg", ignoreCase = true)) &&
-            !isFileSizeInvalid(context, dto.photo)
-        ) {
-            sendPhoto(dto.photo, context)
-        } else {
-            null
-        }
-
-        if(eventPhotoResult == null){
-            eventPhotoResult = sendPhoto(event?.photo, context)
-            println("2ND IF, PROCEEDING: $eventPhotoResult")
-        }
+        
+        var eventPhotoResult = sendPhoto(dto.photo, context)
 
         val resultDTO: EventDTO
 
         if (eventPhotoResult != null) {
             if (!eventPhotoResult.isError) {
+
                 resultDTO = EventDTO(
                     eventId = eventId,
                     name = dto.name,
                     description = dto.description,
                     maxPeople = dto.maxPeople,
-                    restaurantId = event?.restaurantId,
+                    restaurant = event?.restaurant,
+                    restaurantId = event?.restaurant?.restaurantId,
                     time = dto.time,
                     mustJoinUntil = dto.mustJoinUntil,
-                    photo = eventPhotoResult.value?.fileName ?: ""
+                    photo = eventPhotoResult.value!!.fileName
                 )
                 val result = eventService.updateEvent(eventId, resultDTO)
                 if (!result.isError) {

@@ -51,6 +51,7 @@ import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.EventViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
 fun EventDetailActivity(
@@ -479,26 +480,48 @@ fun EditEventDialog(
     onSave: (EventDTO) -> Unit,
     context: Context
 ) {
-
     var name by remember { mutableStateOf(event.name ?: "") }
     var description by remember { mutableStateOf(event.description ?: "") }
     var maxPeople by remember { mutableStateOf(event.maxPeople?.toString() ?: "") }
-    var photo by remember { mutableStateOf(event.photo ?: "") }
+    var photo by remember { mutableStateOf("") }
+
 
     var eventDate by remember { mutableStateOf(event.time.substring(0, 10) ?: "") }
     var eventTime by remember { mutableStateOf(event.time.substring(11, 16) ?: "") }
     var joinUntilDate by remember { mutableStateOf(event.mustJoinUntil.substring(0, 10) ?: "") }
     var joinUntilTime by remember { mutableStateOf(event.mustJoinUntil.substring(11, 16) ?: "") }
 
+    fun parseDateTime(dateStr: String, timeStr: String): LocalDateTime? {
+        return runCatching {
+            LocalDateTime.parse("${dateStr}T${timeStr}")
+        }.getOrNull()
+    }
+
+    val eventDateTime = parseDateTime(eventDate, eventTime)
+    val joinUntilDateTime = parseDateTime(joinUntilDate, joinUntilTime)
+    val now = LocalDateTime.now()
+
+    val maxPeopleInt = maxPeople.toIntOrNull()
+
+    val canSave = name.isNotBlank() &&
+            description.isNotBlank() &&
+            maxPeopleInt != null &&
+            photo.isNotBlank() &&
+            eventDateTime != null && joinUntilDateTime != null &&
+            eventDateTime.isAfter(now) &&
+            joinUntilDateTime.isAfter(now) &&
+            eventDateTime.isAfter(joinUntilDateTime)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
+                enabled = canSave,
                 onClick = {
                     val updatedEvent = event.copy(
                         name = name,
                         description = description,
-                        maxPeople = maxPeople.toIntOrNull(),
+                        maxPeople = maxPeopleInt,
                         restaurantId = event.restaurant?.restaurantId,
                         time = "${eventDate}T${eventTime}",
                         mustJoinUntil = "${joinUntilDate}T${joinUntilTime}",
@@ -507,15 +530,17 @@ fun EditEventDialog(
                     onSave(updatedEvent)
                 }
             ) {
-                stringResource(R.string.label_save)
+                Text(text = stringResource(R.string.label_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                stringResource(R.string.label_cancel)
+                Text(text = stringResource(R.string.label_cancel))
             }
         },
-        title = { stringResource(R.string.label_edit_event) },
+        title = {
+            Text(text = stringResource(R.string.label_edit_event))
+        },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -524,7 +549,7 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { stringResource(R.string.label_event_name) },
+                    label = { Text(stringResource(R.string.label_event_name)) },
                     isError = name.isBlank(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -532,14 +557,14 @@ fun EditEventDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { stringResource(R.string.label_event_description) },
+                    label = { Text(stringResource(R.string.label_event_description)) },
                     isError = description.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = maxPeople,
                     onValueChange = { maxPeople = it },
-                    label = { stringResource(R.string.label_event_max_people) },
+                    label = { Text(stringResource(R.string.label_event_max_people)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = maxPeople.toIntOrNull() == null,
                     singleLine = true,
@@ -550,14 +575,10 @@ fun EditEventDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(0.45f)
-                    ) {
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = stringResource(R.string.label_start_date),
-                            onDateChange = {
-                                eventDate = it
-                            },
+                            onDateChange = { eventDate = it },
                             allowFutureDates = true,
                             allowPastDates = false,
                             startDate = eventDate
@@ -572,8 +593,7 @@ fun EditEventDialog(
                             onTimeSelected = { selectedTime ->
                                 eventTime = selectedTime
                             },
-                            modifier = Modifier
-                                .scale(0.85f)
+                            modifier = Modifier.scale(0.85f)
                         )
                     }
                 }
@@ -581,14 +601,10 @@ fun EditEventDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(0.45f)
-                    ){
+                    Column(modifier = Modifier.weight(0.45f)) {
                         MyDatePickerDialog(
                             label = stringResource(R.string.label_event_join_until),
-                            onDateChange = {
-                                joinUntilDate = it
-                            },
+                            onDateChange = { joinUntilDate = it },
                             allowFutureDates = true,
                             allowPastDates = false,
                             startDate = joinUntilDate
@@ -603,22 +619,21 @@ fun EditEventDialog(
                             onTimeSelected = { selectedTime ->
                                 joinUntilTime = selectedTime
                             },
-                            modifier = Modifier
-                                .scale(0.85f)
+                            modifier = Modifier.scale(0.85f)
                         )
                     }
-
                 }
 
                 FormFileInput(
-                    label = stringResource(id = R.string.label_event_photo),
+                    label = stringResource(R.string.label_event_photo),
                     onFilePicked = { file ->
                         photo = file.toString()
                     },
                     context = context,
-                    defaultValue = event.photo ?: ""
+                    defaultValue = photo
                 )
             }
         }
     )
 }
+
