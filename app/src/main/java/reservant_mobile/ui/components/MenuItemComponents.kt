@@ -53,7 +53,6 @@ fun MenuItemCard(
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {},
-    assignIngredients: (List<IngredientDTO>?) -> Unit = {},
     name: FormField? = null,
     altName: FormField? = null,
     price: FormField? = null,
@@ -61,7 +60,12 @@ fun MenuItemCard(
     photoField: FormField? = null,
     clearFields: () -> Unit = {},
     context: Context? = null,
-    isFormValid: Boolean = true
+    isFormValid: Boolean = true,
+    selectedIngredients: List<String> = emptyList(),
+    ingredients: List<String> = emptyList(),
+    onAddIngredient: (String) -> Unit = {s->},
+    onRemoveIngredient: (String) -> Unit= {s->},
+    fetchIngredients: suspend (Int) -> Unit = {i->}
 ) {
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
@@ -85,7 +89,7 @@ fun MenuItemCard(
         showEditPopup && role == Roles.RESTAURANT_OWNER -> {
 
             LaunchedEffect(key1 = Unit) {
-                assignIngredients(menuItem.ingredients)
+                fetchIngredients(menuItem.menuItemId!!)
                 name?.value = menuItem.name
                 altName?.value = menuItem.alternateName.orEmpty()
                 price?.value = menuItem.price.toString()
@@ -105,10 +109,10 @@ fun MenuItemCard(
                 photo = photoField!!,
                 context = context!!,
                 isFormValid = isFormValid,
-                ingredients = emptyList(),
-                selectedIngredients = emptyList(),
-                onAddIngredient = {s ->},
-                onRemoveIngredient = {s->}
+                ingredients = ingredients,
+                selectedIngredients = selectedIngredients,
+                onAddIngredient = onAddIngredient,
+                onRemoveIngredient = onRemoveIngredient
             )
         }
     }
@@ -309,11 +313,10 @@ fun MenuItemPopup(
                     mutableStateOf(false)
                 }
 
-                TagList(
-                    tags = selectedIngredients,
-                    onRemoveTag = { ingredient ->
-                        onRemoveIngredient(ingredient)
-                    })
+                IngredientList(
+                    ingredients = selectedIngredients,
+                    onRemoveIngredient = onRemoveIngredient
+                )
 
                 ButtonComponent(
                     onClick = { showIngredientChoice = true },

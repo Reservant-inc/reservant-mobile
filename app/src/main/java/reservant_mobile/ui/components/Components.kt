@@ -798,6 +798,18 @@ fun TagItem(
 }
 
 @Composable
+fun IngredientList(ingredients: List<String>, onRemoveIngredient: (String) -> Unit){
+    Row(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+    ) {
+        ingredients.forEach {
+            TagItem(tag = it, onRemove = { onRemoveIngredient(it) })
+        }
+    }
+}
+
+@Composable
 fun IngredientSelectionScreen(
     title: String,
     ingredients: List<String>,

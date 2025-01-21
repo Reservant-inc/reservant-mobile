@@ -8,7 +8,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.IngredientDTO
+import reservant_mobile.data.models.dtos.IngredientDTO.IngredientMenuItemDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.data.models.dtos.UnitOfMeasurement
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.IRestaurantMenuService
@@ -53,7 +55,9 @@ class MenuItemManagementViewModel(
         val res = restaurantService.getIngredients(restaurantId = restaurantId)
 
         if (!res.isError){
-            restaurantIngredients = res.value.orEmpty()
+            restaurantIngredients = res.value.orEmpty().map {
+                it.copy(amountUsed = 1.0)
+            }
         }
     }
 
@@ -73,7 +77,7 @@ class MenuItemManagementViewModel(
             alternateName = alternateName.value.ifEmpty { null },
             price = price.value.toDouble(),
             alcoholPercentage = alcoholPercentage.value.toDoubleOrNull(),
-            photoFileName = sendPhoto(photo.value, context),
+            photo = sendPhoto(photo.value, context),
             ingredients = restaurantIngredients.filter {
                 ingredients.contains(it.publicName)
             }
@@ -130,6 +134,16 @@ class MenuItemManagementViewModel(
 
     }
 
+    suspend fun fetchIngredientsForMenuItem(id: Int){
+        val res = menuService.getMenuItem(id)
+
+        if (!res.isError){
+            ingredients = res.value!!.ingredients?.map { it.publicName.orEmpty() }
+                .orEmpty()
+                .toMutableList()
+        }
+    }
+
     fun clearFields(){
         name.value = ""
         alternateName.value = ""
@@ -148,10 +162,6 @@ class MenuItemManagementViewModel(
     private fun isPhotoValid(): Boolean {
         return true
     }
-
-    /*fun assignIngredients(ingredients: List<IngredientDTO>?){
-        this.ingredients = (ingredients ?: mutableListOf()).toMutableList()
-    }*/
 
     fun onIngredientAdded(ingredient: String) {
         ingredients += ingredient
