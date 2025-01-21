@@ -617,4 +617,8 @@
     <string name="label_deliveries">Deliveries</string>
     <string name="label_no_deliveries">No deliveries</string>
     <string name="label_delivery_date">Delivery date</string>
+    <string name="label_ordered">Ordered</string>
+    <string name="label_canceled_at">Canceled at</string>
+    <string name="label_arrived_at">Arrived at</string>
+    <string name="label_mark_arrived">Mark arrived</string>
 </resources>

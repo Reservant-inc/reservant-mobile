@@ -603,4 +603,8 @@
     <string name="label_deliveries">Dostawy</string>
     <string name="label_no_deliveries">Brak dostaw</string>
     <string name="label_delivery_date">Data zamówienia</string>
+    <string name="label_ordered">Zamówione</string>
+    <string name="label_canceled_at">Anulowane</string>
+    <string name="label_arrived_at">"Dostarczone "</string>
+    <string name="label_mark_arrived">Dostarczone</string>
 </resources>
