@@ -317,7 +317,7 @@ fun MenuItemPopup(
 
                 ButtonComponent(
                     onClick = { showIngredientChoice = true },
-                    label = stringResource(id = R.string.label_choose_tags)
+                    label = stringResource(id = R.string.label_choose_ingredients)
                 )
 
                 if (showIngredientChoice){
