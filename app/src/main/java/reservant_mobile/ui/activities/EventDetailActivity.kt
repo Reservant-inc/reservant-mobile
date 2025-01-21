@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,6 +45,7 @@ import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.FormFileInput
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MyDatePickerDialog
 import reservant_mobile.ui.components.MyTimePickerDialog
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -274,6 +277,15 @@ fun EventDetailActivity(
                         var user = interestedUsers[index]
                         if (user != null) {
                             if(eventDetailVM.isEventOwner){
+                                var userPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                                LaunchedEffect(user.photo) {
+                                    user.photo?.let { photo ->
+                                        userPhoto = eventDetailVM.getPhoto(photo)
+                                    }
+                                }
+
+
                                 UserListItem(
                                     user = user,
                                     showButtons = true,
@@ -286,7 +298,8 @@ fun EventDetailActivity(
                                         eventDetailVM.viewModelScope.launch {
                                             eventDetailVM.rejectUser(user.userId)
                                         }
-                                    }
+                                    },
+                                    photo = userPhoto
                                 )
                                 HorizontalDivider()
                             }
@@ -317,9 +330,18 @@ fun EventDetailActivity(
                     }
                 } else {
                     items(eventDetailVM.participants) { participant ->
+                        var participantPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                        LaunchedEffect(participant.photo) {
+                            participant.photo?.let { photo ->
+                                participantPhoto = eventDetailVM.getPhoto(photo)
+                            }
+                        }
+
                         UserListItem(
                             user = participant,
-                            deletable = eventDetailVM.isEventOwner
+                            deletable = eventDetailVM.isEventOwner,
+                            photo = participantPhoto
                         )
                         HorizontalDivider()
                     }
@@ -338,6 +360,7 @@ fun UserListItem(
     onRejectClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
     onCardClick: (() -> Unit)? = null,
+    photo: Bitmap? = null,
     modifier: Modifier? = null
 ) {
     var showPopup by remember { mutableStateOf(false) }
@@ -349,14 +372,26 @@ fun UserListItem(
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.jd),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+            if(photo != null){
+                Image(
+                    bitmap = photo.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }else{
+                Image(
+                    painter = painterResource(id = R.drawable.unknown_profile_photo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
 
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -551,8 +586,8 @@ fun EditEventDialog(
                     }
                     Column(
                         modifier = Modifier
-                        .weight(0.55f)
-                        .align(Alignment.CenterVertically)
+                            .weight(0.55f)
+                            .align(Alignment.CenterVertically)
                     ){
                         MyTimePickerDialog(
                             onTimeSelected = { selectedTime ->

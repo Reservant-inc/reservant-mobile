@@ -1,6 +1,7 @@
 package reservant_mobile.ui.viewmodels
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -257,7 +258,15 @@ class EventViewModel(
         isSaving.value = false
     }
 
-    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
+    suspend fun getPhoto(photoStr: String): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
+
+    private suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
         if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
             return null
         }
