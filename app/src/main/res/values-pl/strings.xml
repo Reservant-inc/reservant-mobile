@@ -565,4 +565,5 @@
     <string name="label_pending">Oczekująca</string>
     <string name="label_event_category_all">Wszystkie</string>
     <string name="label_participants">Uczestnicy</string>
+    <string name="label_no_participants">Nikt nie uczestniczy w tym wydarzeniu</string>
 </resources>
