@@ -61,10 +61,12 @@ fun OrderManagementScreen(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    val reservationVisitsFlow = viewModel.getVisitsFlow(
-        dateStart = LocalDateTime.now(),
-        reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
-    )
+    val reservationVisitsFlow by remember {
+        mutableStateOf(viewModel.getVisitsFlow(
+            dateStart = LocalDateTime.now(),
+            reservationStatus = GetReservationStatus.ToBeReviewedByRestaurant
+        ))
+    }
 
     val currentVisitsFlow = viewModel.getVisitsFlow(
         dateStart = LocalDateTime.now(),
@@ -105,6 +107,7 @@ fun OrderManagementScreen(
                                 LoadingScreenWithTimeout(Duration.parse("10s"))
                             }
                             is LoadState.Error -> {
+                                println((visits.loadState.refresh as LoadState.Error).error)
                                 Text(
                                     text = stringResource(R.string.error_loading_reservations),
                                     modifier = Modifier.padding(16.dp)
@@ -278,12 +281,12 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservati
             .fillMaxWidth()
             .padding(8.dp)
             .clickable(onClick = {
-            homeNavController.navigate(
-                RestaurantRoutes.OrderDetail(
-                    visitId = visit.visitId!!
+                homeNavController.navigate(
+                    RestaurantRoutes.OrderDetail(
+                        visitId = visit.visitId!!
+                    )
                 )
-            )
-        }),
+            }),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
         elevation = CardDefaults.cardElevation(4.dp)
