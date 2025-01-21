@@ -386,6 +386,7 @@
     <string name="ingredient_colon">Ingredient: %1$s</string>
     <string name="store_name">Store name</string>
     <string name="amount_to_order">Amount to order</string>
+    <string name="default_amount_to_order">Default amount to order</string>
     <string name="add_new_ingredient">Add new ingredient</string>
     <string name="name">Name</string>
     <string name="unit_of_measurement">Unit of measurement</string>

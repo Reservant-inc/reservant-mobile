@@ -582,7 +582,7 @@ fun AddOrEditIngredientDialog(
                 FormInput(
                     inputText = amountToOrder,
                     onValueChange = { amountToOrder = it },
-                    label = stringResource(R.string.amount_to_order),
+                    label = stringResource(R.string.default_amount_to_order),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = if (isEdit) Done else Next

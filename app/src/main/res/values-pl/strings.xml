@@ -375,6 +375,7 @@
     <string name="ingredient_colon">Składnik: %1$s</string>
     <string name="store_name">Nazwa sklepu</string>
     <string name="amount_to_order">Ilość do zamówienia</string>
+    <string name="default_amount_to_order">Domyślna ilość do zamówienia</string>
     <string name="add_new_ingredient">Dodaj nowy składnik</string>
     <string name="name">Nazwa</string>
     <string name="unit_of_measurement">Jednostka miary</string>
