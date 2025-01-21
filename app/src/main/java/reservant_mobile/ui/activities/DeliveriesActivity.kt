@@ -269,6 +269,7 @@ fun DeliveryItem(
 
     val darkRed = Color(0xFFD32F2F)
     val darkGreen = Color(0xFF2E7D32)
+    val darkGreenLabel = Color(58, 148, 16)
 
     var isIngredientsExpanded by remember { mutableStateOf(false) }
 
@@ -313,8 +314,11 @@ fun DeliveryItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             // Data zamówienia
+            val orderDateFormatted = delivery.orderTime?.let { formatToDateTime(it, "dd MMMM yyyy") }
+            val orderTimeFormatted = delivery.orderTime?.let { formatToDateTime(it, "HH:mm") }
+
             Text(
-                text = "${stringResource(R.string.label_ordered_at)}: ${delivery.orderTime ?: "--"}",
+                text = "${stringResource(R.string.label_ordered_at)}: $orderDateFormatted | ${orderTimeFormatted ?: "--"}",
                 style = MaterialTheme.typography.bodyMedium
             )
             // Koszt
@@ -357,16 +361,22 @@ fun DeliveryItem(
 
             when {
                 delivery.canceledTime != null -> {
+                    val cancelDateFormatted = formatToDateTime(delivery.canceledTime, "dd MMMM yyyy")
+                    val cancelTimeFormatted = formatToDateTime(delivery.canceledTime, "HH:mm")
+
                     Text(
-                        text = "${stringResource(R.string.label_canceled_at)} ${delivery.canceledTime}",
+                        text = "${stringResource(R.string.label_canceled_at)} $cancelDateFormatted | $cancelTimeFormatted",
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
                 delivery.deliveredTime != null -> {
+                    val deliveredDateFormatted = formatToDateTime(delivery.deliveredTime, "dd MMMM yyyy")
+                    val deliveredTimeFormatted = formatToDateTime(delivery.deliveredTime, "HH:mm")
+
                     Text(
-                        text = "${stringResource(R.string.label_arrived_at)} ${delivery.deliveredTime}",
-                        color = MaterialTheme.colorScheme.primary,
+                        text = "${stringResource(R.string.label_arrived_at)} $deliveredDateFormatted | $deliveredTimeFormatted",
+                        color = darkGreenLabel,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
