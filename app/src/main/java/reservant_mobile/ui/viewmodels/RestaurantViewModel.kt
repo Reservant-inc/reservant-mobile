@@ -199,7 +199,7 @@ class RestaurantViewModel(
             street = address.value,
             postalCode = postalCode.value
         )
-        
+
         return !res.isError
     }
 
@@ -328,7 +328,7 @@ class RestaurantViewModel(
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
             name = name.value,
-            restaurantType = restaurantType.value,
+            restaurantType = convertRestaurantType(restaurantType.value),
             nip = nip.value,
             address = address.value,
             postalIndex = postalCode.value,
@@ -343,7 +343,7 @@ class RestaurantViewModel(
         return RestaurantDTO(
             restaurantId = restaurantId ?: -1,
             name = name.value,
-            restaurantType = restaurantType.value,
+            restaurantType = convertRestaurantType(restaurantType.value),
             nip = nip.value,
             address = address.value,
             postalIndex = postalCode.value,
@@ -664,4 +664,11 @@ class RestaurantViewModel(
         return getToastError(resultRegistration)
     }
 
+    fun convertRestaurantType(restaurantType: String): String {
+        return when (restaurantType) {
+            "Restauracja" -> "Restaurant"
+            "Kawiarnia" -> "Cafe "
+            else -> restaurantType
+        }
+    }
 }
