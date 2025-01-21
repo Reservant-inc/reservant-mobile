@@ -121,8 +121,8 @@ class EventViewModel(
     suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
 
         val eventPhotoResult = if (
-            !dto.photo!!.endsWith(".png", ignoreCase = true) &&
-            !dto.photo.endsWith(".jpg", ignoreCase = true) &&
+            (dto.photo!!.endsWith(".png", ignoreCase = true) ||
+                    dto.photo.endsWith(".jpg", ignoreCase = true)) &&
             !isFileSizeInvalid(context, dto.photo)
         ) {
             sendPhoto(dto.photo, context)
@@ -139,23 +139,22 @@ class EventViewModel(
                     name = dto.name,
                     description = dto.description,
                     maxPeople = dto.maxPeople,
-                    restaurantId = if (dto.restaurantId != 0) dto.restaurantId else null,
+                    restaurantId = event?.restaurantId,
                     time = dto.time,
                     mustJoinUntil = dto.mustJoinUntil,
                     photo = eventPhotoResult.value?.fileName ?: ""
                 )
                 val result = eventService.updateEvent(eventId, resultDTO)
-                if(!result.isError){
+                if (!result.isError) {
                     getEvent()
                     return true
+                } else {
+                    println("ERROR WHILE UPDATING EVENT: " + result.errors)
                 }
             }
-            throw Exception("ERROR WHILE UPDATING EVENT")
-            return false
-        }else{
-        throw Exception("ERROR WHILE UPLOADING PHOTO")
-            return false
         }
+
+        return false
     }
 
     private suspend fun getEvent(): Boolean {
@@ -318,7 +317,9 @@ class EventViewModel(
     }
 
     fun isPhotoInvalid(): Boolean {
-        return photo.isBlank() || getFieldError(result, "photo") != -1
+        return photo.isBlank() ||
+                photo == "" ||
+                getFieldError(result, "photo") != -1
     }
 
     fun getPhotoError(): Int {
