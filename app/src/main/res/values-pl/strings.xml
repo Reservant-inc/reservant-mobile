@@ -611,4 +611,5 @@
     <string name="label_hide_ingredients">Ukryj składniki</string>
     <string name="label_ordered_at">Zamówione</string>
     <string name="label_delivered">Dostarczone</string>
+    <string name="label_not_delivered">Niedostarczone</string>
 </resources>
