@@ -203,11 +203,11 @@ fun DeliveryItem(
     ingredientsList: List<DeliveryDTO.DeliveryIngredientDTO>?
 ) {
     // Kolory i inne zmienne – bez zmian
-    val pastelRed = Color(0xFFFFC1C1)
-    val pastelGreen = Color(0xFF67B873)
-    val darkRed = Color(0xFFD32F2F)
-    val darkGreen = Color(0xFF2E7D32)
-    val darkGreenLabel = Color(58, 148, 16)
+    val pastelRed by remember { mutableStateOf(Color(0xFFFFC1C1)) }
+    val pastelGreen by remember { mutableStateOf(Color(0xFF67B873)) }
+    val darkRed by remember { mutableStateOf(Color(0xFFD32F2F)) }
+    val darkGreen by remember { mutableStateOf(Color(0xFF2E7D32)) }
+    val darkGreenLabel by remember { mutableStateOf(Color(58, 148, 16)) }
 
     // Dodajemy tu jedną linijkę, aby móc skorzystać z listy restaurantIngredients:
     val deliveriesViewModel = viewModel<DeliveriesViewModel>()
