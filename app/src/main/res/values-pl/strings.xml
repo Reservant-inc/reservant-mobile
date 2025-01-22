@@ -96,7 +96,7 @@
     <string name="label_choose_tags">Wybierz tagi</string>
     <string name="label_become_restaurant_owner">Zostań właścicielem restauracji</string>
     <string name="label_edit_menu">Edytuj menu</string>
-    <string name="label_alternate_name">Przetłumaczona nazwa</string>
+    <string name="label_alternate_name">Nazwa tłumaczona</string>
     <string name="label_menu_type">Typ menu</string>
     <string name="label_date_from">Data od</string>
     <string name="label_date_to">Data do</string>
@@ -135,7 +135,7 @@
     <string name="label_restaurant_no_events">Restauracja nie ma wydarzeń</string>
     <string name="error_file_not_given">Plik jest wymagany</string>
     <string name="error_wrong_file_format">Zły format pliku</string>
-    <string name="error_invalid_menu_name">Niepoprawna nazwa</string>
+    <string name="error_invalid_name">Niepoprawna nazwa</string>
     <string name="error_invalid_menu_type">Niepoprawny typ menu</string>
     <string name="label_edit_profile">Edytuj profil</string>
     <string name="label_wallet">Portfel</string>
@@ -612,4 +612,7 @@
     <string name="label_ordered_at">Zamówione</string>
     <string name="label_delivered">Dostarczone</string>
     <string name="label_not_delivered">Niedostarczone</string>
+    <string name="error_invalid_price">Niepoprawna cena</string>
+    <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
+    <string name="label_choose_ingredients">Wybierz składniki</string>
 </resources>

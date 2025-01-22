@@ -3,13 +3,11 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,17 +33,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.reservant_mobile.R
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 
@@ -52,7 +48,7 @@ import reservant_mobile.data.models.dtos.fields.FormField
 fun MenuItemCard(
     menuItem: RestaurantMenuItemDTO,
     role: String,
-    photo: Bitmap? = null,
+    getPhoto: suspend () -> Bitmap?,
     onInfoClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
@@ -63,7 +59,13 @@ fun MenuItemCard(
     alcoholPercentage: FormField? = null,
     photoField: FormField? = null,
     clearFields: () -> Unit = {},
-    context: Context? = null
+    context: Context? = null,
+    isFormValid: Boolean = true,
+    selectedIngredients: List<String> = emptyList(),
+    ingredients: List<String> = emptyList(),
+    onAddIngredient: (String) -> Unit = {s->},
+    onRemoveIngredient: (String) -> Unit= {s->},
+    fetchIngredients: suspend (Int) -> Unit = {i->}
 ) {
     var showConfirmDeletePopup by remember { mutableStateOf(false) }
     var showEditPopup by remember { mutableStateOf(false) }
@@ -85,11 +87,15 @@ fun MenuItemCard(
         }
 
         showEditPopup && role == Roles.RESTAURANT_OWNER -> {
-            name?.value = menuItem.name
-            altName?.value = menuItem.alternateName ?: ""
-            price?.value = menuItem.price.toString()
-            alcoholPercentage?.value = menuItem.alcoholPercentage?.toString() ?: ""
-            photoField?.value = menuItem.photoFileName ?: ""
+
+            LaunchedEffect(key1 = Unit) {
+                fetchIngredients(menuItem.menuItemId!!)
+                name?.value = menuItem.name
+                altName?.value = menuItem.alternateName.orEmpty()
+                price?.value = menuItem.price.toString()
+                alcoholPercentage?.value = (menuItem.alcoholPercentage ?: "").toString()
+                photoField?.value = menuItem.photo.orEmpty().drop(9)
+            }
 
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
@@ -101,7 +107,12 @@ fun MenuItemCard(
                 price = price!!,
                 alcoholPercentage = alcoholPercentage!!,
                 photo = photoField!!,
-                context = context!!
+                context = context!!,
+                isFormValid = isFormValid,
+                ingredients = ingredients,
+                selectedIngredients = selectedIngredients,
+                onAddIngredient = onAddIngredient,
+                onRemoveIngredient = onRemoveIngredient
             )
         }
     }
@@ -210,29 +221,22 @@ fun MenuItemCard(
                     }
                 }
 
-                if(photo != null){
-                    Image(
-                        bitmap = photo.asImageBitmap(),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
+                val mod by remember {
+                    mutableStateOf(
+                        Modifier
                             .size(80.dp)
                             .padding(start = 8.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
-                }else{
-                    Image(
-                        painter = painterResource(R.drawable.unknown_image),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .padding(start = 8.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .fillMaxSize()
-                    )
+                            .fillMaxSize())
                 }
+
+                LoadedPhotoComponent(
+                    photoModifier = mod,
+                    placeholderModifier = mod,
+                    placeholder = R.drawable.unknown_image,
+                    getPhoto = getPhoto
+                )
+
             }
         }
     }
@@ -249,7 +253,12 @@ fun MenuItemPopup(
     price: FormField,
     alcoholPercentage: FormField,
     photo: FormField,
-    context: Context
+    context: Context,
+    isFormValid: Boolean,
+    selectedIngredients: List<String>,
+    ingredients: List<String>,
+    onAddIngredient: (String) -> Unit,
+    onRemoveIngredient: (String) -> Unit
 ) {
     AlertDialog(
         onDismissRequest = {
@@ -262,7 +271,9 @@ fun MenuItemPopup(
                 FormInput(
                     label = stringResource(id = R.string.label_restaurant_name),
                     inputText = name.value,
-                    onValueChange = { name.value = it }
+                    onValueChange = { name.value = it },
+                    isError = name.value.isEmpty(),
+                    errorText = stringResource(id = R.string.error_invalid_name)
                 )
                 FormInput(
                     label = stringResource(id = R.string.label_alternate_name),
@@ -274,20 +285,59 @@ fun MenuItemPopup(
                     label = stringResource(id = R.string.label_price),
                     inputText = price.value,
                     onValueChange = { price.value = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    isError = (price.value.toDoubleOrNull() ?: 0.0 ) <= 0,
+                    errorText = stringResource(id = R.string.error_invalid_price)
                 )
                 FormInput(
                     label = stringResource(id = R.string.label_alcohol),
                     inputText = alcoholPercentage.value,
                     onValueChange = { alcoholPercentage.value = it },
                     optional = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    isError = (alcoholPercentage.value.toDoubleOrNull() ?: 0.0 ) < 0,
+                    errorText = stringResource(id = R.string.error_invalid_alcohol_percentage)
                 )
                 FormFileInput(
                     label = stringResource(id = R.string.label_menu_item_photo),
+                    defaultValue =
+                    if (photo.value == "null")
+                        ""
+                    else
+                        photo.value,
                     onFilePicked = { file -> photo.value = file.toString() },
                     context = context
                 )
+
+                var showIngredientChoice by remember {
+                    mutableStateOf(false)
+                }
+
+                IngredientList(
+                    ingredients = selectedIngredients,
+                    onRemoveIngredient = onRemoveIngredient
+                )
+
+                ButtonComponent(
+                    onClick = { showIngredientChoice = true },
+                    label = stringResource(id = R.string.label_choose_ingredients)
+                )
+
+                if (showIngredientChoice){
+                    IngredientSelectionScreen(
+                        title = stringResource(id = R.string.label_choose_ingredients),
+                        ingredients = ingredients,
+                        selectedIngredients = selectedIngredients,
+                        onDismiss = { showIngredientChoice = false },
+                        onIngredientSelected = { ingredient, isSelected ->
+                            if (isSelected) {
+                                onAddIngredient(ingredient)
+                            } else {
+                                onRemoveIngredient(ingredient)
+                            }
+                        }
+                    )
+                }
 
             }
         },
@@ -303,9 +353,11 @@ fun MenuItemPopup(
         confirmButton = {
             ButtonComponent(
                 onClick = {
-                    hide()
-                    onConfirm()
-                    clear()
+                    if (isFormValid){
+                        hide()
+                        onConfirm()
+                        clear()
+                    }
                 },
                 label = stringResource(id = R.string.label_save)
             )
@@ -323,12 +375,21 @@ fun AddMenuItemButton(
     photo: FormField,
     clearFields: () -> Unit,
     addMenu: () -> Unit,
-    context: Context
+    context: Context,
+    isFormValid: Boolean,
+    selectedIngredients: List<String>,
+    ingredients: List<String>,
+    onAddIngredient: (String) -> Unit,
+    onRemoveIngredient: (String) -> Unit
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
 
     when {
         showAddDialog -> {
+            LaunchedEffect(key1 = Unit) {
+                clearFields()
+            }
+
             MenuItemPopup(
                 title = { Text(text = stringResource(id = R.string.label_edit_menu_item)) },
                 hide = { showAddDialog = false },
@@ -339,7 +400,12 @@ fun AddMenuItemButton(
                 price = price,
                 alcoholPercentage = alcoholPercentage,
                 photo = photo,
-                context = context
+                context = context,
+                isFormValid = isFormValid,
+                selectedIngredients,
+                ingredients,
+                onAddIngredient,
+                onRemoveIngredient
             )
         }
     }
