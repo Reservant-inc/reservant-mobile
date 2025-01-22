@@ -28,7 +28,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -50,6 +53,10 @@ fun OrderFormContent(
     val isOnSiteTag = "OnSite" in restaurant.tags
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
+
+    var isAddFriendPopupOpen by remember { mutableStateOf(false) }
+    val participantsInfo = remember { mutableStateMapOf<String, FriendRequestDTO>() }
+
 
     val now = LocalTime.now()
     val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
@@ -203,7 +210,7 @@ fun OrderFormContent(
             }
         }
 
-        if(!isTakeaway) {
+        if (!isTakeaway) {
             item {
                 Text(text = stringResource(id = R.string.label_number_of_guests))
                 Row(
@@ -224,9 +231,48 @@ fun OrderFormContent(
                     }
                 }
             }
+            // PARTICIPANTS SECTION
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.label_added_participants),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Show each participant
+                reservationViewModel.participantIds.forEach { friendId ->
+                    val friendDto = participantsInfo[friendId]
+                    if (friendDto != null) {
+                        UserCard(
+                            firstName = friendDto.otherUser?.firstName,
+                            lastName = friendDto.otherUser?.lastName,
+                            getImage = {
+                                friendDto.otherUser?.photo?.let { photo ->
+                                    reservationViewModel.getPhoto(photo)
+                                }
+                            },
+                            isDeletable = true,
+                            onRemove = {
+                                reservationViewModel.participantIds.remove(friendId)
+                                participantsInfo.remove(friendId)
+                            }
+                        )
+                    }
+                }
+
+                ButtonComponent(
+                    onClick = {
+                        isAddFriendPopupOpen = true
+                        reservationViewModel.loadFriendsPaging()
+                    },
+                    label = stringResource(R.string.label_add_participant)
+                )
+            }
+
         }
 
-        if(!isTakeaway) {
+        if (!isTakeaway) {
             item {
                 Text(text = stringResource(id = R.string.tip_label))
 
@@ -305,8 +351,107 @@ fun OrderFormContent(
                 })
         }
     }
+    if (isAddFriendPopupOpen) {
+        AddFriendPopupPaging(
+            onDismiss = { isAddFriendPopupOpen = false },
+            reservationViewModel = reservationViewModel,
+            onAddFriend = { friendId, friendDto ->
+                participantsInfo[friendId] = friendDto
+                if (!reservationViewModel.participantIds.contains(friendId)) {
+                    reservationViewModel.participantIds.add(friendId)
+                }
+                isAddFriendPopupOpen = false
+            }
+        )
+    }
 }
 
+@Composable
+fun AddFriendPopupPaging(
+    onDismiss: () -> Unit,
+    reservationViewModel: ReservationViewModel,
+    onAddFriend: (String, FriendRequestDTO) -> Unit
+) {
+    // Collect the paged flow
+    val lazyFriends = reservationViewModel.friendsFlow?.collectAsLazyPagingItems()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.label_select_friends)) },
+        text = {
+            if (lazyFriends == null) {
+                // Not loaded => show spinner
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                // Check load states
+                val loadState = lazyFriends.loadState.refresh
+                when {
+                    loadState is LoadState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    loadState is LoadState.Error -> {
+                        Text(
+                            text = stringResource(R.string.error_loading_data),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    else -> {
+                        if (lazyFriends.itemCount == 0) {
+                            Text(
+                                text = stringResource(R.string.label_no_friends),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        } else {
+                            LazyColumn(modifier = Modifier.height(300.dp)) {
+                                items(lazyFriends.itemCount) { index ->
+                                    val friend = lazyFriends[index]
+                                    if (friend != null) {
+                                        UserCard(
+                                            firstName = friend.otherUser?.firstName,
+                                            lastName = friend.otherUser?.lastName,
+                                            getImage = {
+                                                friend.otherUser?.photo?.let { photo ->
+                                                    reservationViewModel.getPhoto(photo)
+                                                }
+                                            },
+                                            onClick = {
+                                                friend.otherUser?.userId?.let { uid ->
+                                                    onAddFriend(uid, friend)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.label_close))
+            }
+        },
+        dismissButton = {}
+    )
+}
 
 @Composable
 fun CartItemCard(

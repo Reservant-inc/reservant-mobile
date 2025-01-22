@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -7,11 +8,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.DeliveryDTO
+import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -19,7 +24,9 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
+import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IDeliveryService
+import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.IVisitsService
@@ -36,7 +43,8 @@ class ReservationViewModel(
     private val visitsService: IVisitsService = VisitsService(),
     private val deliveryService: IDeliveryService = DeliveryService(),
     private val resourceProvider: ResourceProvider,
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val friendsService: IFriendsService = FriendsService(),
 ) : ReservantViewModel() {
 
     var note: FormField = FormField(OrderDTO::note.name)
@@ -84,8 +92,31 @@ class ReservationViewModel(
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
 
+    private val _friendsFlow = MutableStateFlow<Flow<PagingData<FriendRequestDTO>>?>(null)
+    val friendsFlow: Flow<PagingData<FriendRequestDTO>>?
+        get() = _friendsFlow.value
+
     var restaurant: RestaurantDTO? by mutableStateOf(null)
 
+    suspend fun getPhoto(url: String): Bitmap?{
+        val result = fileService.getImage(url)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
+    fun loadFriendsPaging() {
+        viewModelScope.launch {
+            val result = friendsService.getFriends()
+            if (!result.isError && result.value != null) {
+                // Store the paging Flow
+                _friendsFlow.value = result.value.cachedIn(viewModelScope)
+            } else {
+                // If error, set to null or handle it
+                _friendsFlow.value = null
+            }
+        }
+    }
     suspend fun getRestaurant(restaurantId: Int){
         val result = restaurantService.getRestaurant(restaurantId)
 
