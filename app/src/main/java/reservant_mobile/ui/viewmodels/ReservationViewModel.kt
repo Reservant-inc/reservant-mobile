@@ -53,7 +53,7 @@ class ReservationViewModel(
     var visitDate: FormField = FormField("VisitDate").apply { value = LocalDate.now().toString() }
     var startTime: FormField = FormField(VisitDTO::reservationDate.name)
     var endTime: FormField = FormField(VisitDTO::endTime.name)
-    var numberOfGuests by mutableStateOf(1)
+    var totalGuests by mutableStateOf(1)
     var tip by mutableStateOf(0.0)
     var visitId by mutableStateOf(0)
 
@@ -353,7 +353,7 @@ class ReservationViewModel(
         val visit = VisitDTO(
             date = "${visitDate.value}T${startTime.value}",
             endTime = "${visitDate.value}T${endTime.value}",
-            numberOfGuests = numberOfGuests,
+            numberOfGuests = totalGuests-participantIds.size,
             tip = tip,
             takeaway = isTakeaway,
             restaurantId = restaurantId,

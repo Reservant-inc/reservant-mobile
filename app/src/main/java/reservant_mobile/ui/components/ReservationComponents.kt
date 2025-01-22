@@ -219,14 +219,14 @@ fun OrderFormContent(
                 ) {
                     IconButton(
                         onClick = {
-                            if (reservationViewModel.numberOfGuests > reservationViewModel.participantIds.size + 1)
-                                reservationViewModel.numberOfGuests--
+                            if (reservationViewModel.totalGuests > reservationViewModel.participantIds.size + 1)
+                                reservationViewModel.totalGuests--
                         }
                     ) {
                         Icon(Icons.Default.Remove, contentDescription = null)
                     }
-                    Text(text = reservationViewModel.numberOfGuests.toString())
-                    IconButton(onClick = { reservationViewModel.numberOfGuests++ }) {
+                    Text(text = reservationViewModel.totalGuests.toString())
+                    IconButton(onClick = { reservationViewModel.totalGuests++ }) {
                         Icon(Icons.Default.Add, contentDescription = null)
                     }
                 }
@@ -261,13 +261,33 @@ fun OrderFormContent(
                     }
                 }
 
-                ButtonComponent(
-                    onClick = {
-                        isAddFriendPopupOpen = true
-                        reservationViewModel.loadFriendsPaging()
-                    },
-                    label = stringResource(R.string.label_add_participant)
-                )
+                val maxParticipants = reservationViewModel.totalGuests - 1
+                val currentCount = reservationViewModel.participantIds.size
+
+                val canAddMore =
+                    reservationViewModel.totalGuests > 1 && currentCount < maxParticipants
+
+                if (!canAddMore) {
+                    Text(
+                        text = when {
+                            reservationViewModel.totalGuests <= 1 ->
+                                stringResource(R.string.info_need_at_least_two_guests)
+
+                            else ->
+                                stringResource(R.string.info_reached_max_participants)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    ButtonComponent(
+                        onClick = {
+                            isAddFriendPopupOpen = true
+                            reservationViewModel.loadFriendsPaging()
+                        },
+                        label = stringResource(R.string.label_add_participant)
+                    )
+                }
             }
 
         }
