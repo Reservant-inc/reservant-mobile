@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import TicketViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +31,6 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UserCard
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.navigation.UserRoutes
-import reservant_mobile.ui.viewmodels.TicketViewModel
 
 @Composable
 fun ReportDetailsActivity(

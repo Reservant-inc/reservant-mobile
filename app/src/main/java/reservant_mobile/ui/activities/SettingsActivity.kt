@@ -256,7 +256,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 VisitHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
-                NewTicketActivity()
+                NewTicketActivity(navController)
             }
             composable<UserRoutes.TicketHistory>{
                 TicketHistoryActivity(navController = navController)

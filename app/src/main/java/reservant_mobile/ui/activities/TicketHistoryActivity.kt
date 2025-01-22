@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import TicketViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +54,6 @@ import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
-import reservant_mobile.ui.viewmodels.TicketViewModel
 
 @Composable
 fun TicketHistoryActivity(navController: NavController) {
