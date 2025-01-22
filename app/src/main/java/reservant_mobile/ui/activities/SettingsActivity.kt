@@ -397,6 +397,12 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                     onReturnClick = {navController.popBackStack()}
                 )
             }
+            composable<RestaurantRoutes.Details> {
+                RestaurantDetailActivity(
+                    restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId,
+                    onReturnClick = { navController.popBackStack() }
+                )
+            }
 
         }
 

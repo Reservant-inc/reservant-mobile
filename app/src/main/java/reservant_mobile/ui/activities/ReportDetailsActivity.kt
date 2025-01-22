@@ -1,6 +1,5 @@
 package reservant_mobile.ui.activities
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,9 +7,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.rounded.Details
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,7 +26,10 @@ import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ButtonComponent
+import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.UserCard
+import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.TicketViewModel
 
 @Composable
@@ -39,15 +44,19 @@ fun ReportDetailsActivity(
             }
         }
     )
+    val title = stringResource(R.string.report_title, report.reportId ?: "")
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.report_title, report.reportId ?: ""),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+        IconWithHeader(
+            icon = Icons.Rounded.Details,
+            text = title,
+            showBackButton = true,
+            onReturnClick = {
+                navController.popBackStack()
+            }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -105,29 +114,25 @@ fun ReportDetailsActivity(
         Spacer(modifier = Modifier.height(8.dp))
 
         report.visit?.let { visit ->
-            TextButton(onClick = { /**TODO**/ }) {
-                Text(
-                    text = stringResource(R.string.visit_details, visit.visitId ?: 0),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            ButtonComponent(
+                onClick = { navController.navigate(UserRoutes.VisitDetails(visit.visitId ?: 0)) },
+                label = stringResource(R.string.visit_details, visit.visitId ?: 0),
+                icon = Icons.Default.Visibility
+            )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { /**TODO**/ }) {
-                Text(
-                    text = visit.restaurant?.name ?: stringResource(R.string.unknown_restaurant),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            ButtonComponent(
+                onClick = { navController.navigate(RestaurantRoutes.Details(restaurantId = report.visit.restaurant?.restaurantId ?: 0)) },
+                label = visit.restaurant?.name ?: stringResource(R.string.unknown_restaurant),
+                icon = Icons.Default.Restaurant
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         ButtonComponent(
-            onClick = { /**TODO**/ },
+            onClick = { navController.navigate(UserRoutes.Chat(threadId = report.threadId ?: 0, threadTitle = title)) },
             label = stringResource(R.string.open_chat),
             icon = Icons.Default.Chat
         )
@@ -151,10 +156,12 @@ fun ReportDetailsActivity(
 
         report.resolvedBy?.let { user ->
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.resolved_by, user.firstName, user.lastName),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            UserCard(
+                firstName = user.firstName, lastName = user.lastName, getImage = {
+                    user.photo?.let { photo ->
+                        reportViewModel.getPhoto(photo)
+                    }
+                }
             )
         }
 
