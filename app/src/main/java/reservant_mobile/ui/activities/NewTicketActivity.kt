@@ -84,14 +84,13 @@ fun NewTicketActivity(
 
 @Composable
 fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
-    // we can track if the user clicked "select visit," etc.
     Column(modifier = Modifier.padding(16.dp)) {
-        Spacer (Modifier.height(72.dp))
+        Spacer(Modifier.height(72.dp))
         Text(text = "Report an Employee", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // A text field for the description
+        // Text field for the issue description
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
@@ -100,61 +99,54 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Button to pick a visit
         ButtonComponent(
             label = "Select Visit",
             onClick = {
-                // load user/restaurant visits if not loaded, show popup
                 reportsViewModel.loadVisitsForUserOrRestaurant()
                 reportsViewModel.isPickVisitDialogOpen = true
             }
         )
 
-        // If the user has chosen a visit, show next step
-        reportsViewModel.selectedVisit?.let { chosen ->
-            Text("Chosen visit: #${chosen.visitId}")
+        reportsViewModel.selectedVisit?.let { chosenVisit ->
+            // Display chosen visit information
+            Text("Chosen visit: #${chosenVisit.visitId}")
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Extract the first available employeeId from orders
+            val assignedEmployee = chosenVisit.orders?.firstNotNullOfOrNull { it.assignedEmployee }
 
-            ButtonComponent(
-                label = "Select Customer (Participant)",
-                onClick = {
-                    reportsViewModel.loadParticipantsFromVisit(chosen)
-                    reportsViewModel.isPickParticipantDialogOpen = true
-                }
-            )
-
-            reportsViewModel.selectedParticipant?.let { user ->
-                Text("Selected customer: ${user.firstName} ${user.lastName}")
+            if (assignedEmployee != null) {
+                reportsViewModel.selectedEmployee = assignedEmployee // Assign in ViewModel
+                Text("Assigned employee: ${assignedEmployee.firstName} ${assignedEmployee.lastName}")
+            } else {
+                Text("No employee assigned to this visit.")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Button to send the report
         ButtonComponent(
             label = "Send",
             onClick = {
-                // call sendReportEmployee
-                reportsViewModel.sendReportEmployee()
+                if (reportsViewModel.selectedEmployee == null) {
+                    reportsViewModel.errorMessage = "Cannot report. No employee is assigned to the selected visit."
+                } else {
+                    reportsViewModel.sendReportEmployee()
+                }
             }
         )
     }
 
-    // If picking a visit
+    // Show dialog for selecting a visit
     if (reportsViewModel.isPickVisitDialogOpen) {
         VisitSelectionPopup(
             reportsViewModel = reportsViewModel,
             onDismiss = { reportsViewModel.isPickVisitDialogOpen = false }
         )
     }
-    // If picking participant
-    if (reportsViewModel.isPickParticipantDialogOpen) {
-        ParticipantSelectionPopup(
-            reportsViewModel = reportsViewModel,
-            onDismiss = { reportsViewModel.isPickParticipantDialogOpen = false }
-        )
-    }
 
-    // Show success
+    // Show success dialog
     if (reportsViewModel.showSuccessDialog) {
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
@@ -169,7 +161,7 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
         )
     }
 
-    // Show error
+    // Show error dialog
     reportsViewModel.errorMessage?.let { err ->
         AlertDialog(
             onDismissRequest = { reportsViewModel.errorMessage = null },

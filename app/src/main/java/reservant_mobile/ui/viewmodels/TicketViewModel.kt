@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import reservant_mobile.data.models.dtos.UserSummaryDTO
 
 class TicketViewModel(
     private val reportsService: IReportsService = ReportsService(),
@@ -42,6 +43,7 @@ class TicketViewModel(
     var isPickParticipantDialogOpen by mutableStateOf(false)
     var participantList = mutableStateListOf<UserDTO>() // or simpler
     var selectedParticipant: UserDTO? by mutableStateOf(null)
+    var selectedEmployee: UserSummaryDTO? by mutableStateOf(null)
 
     // Possibly store success/failure
     var showSuccessDialog by mutableStateOf(false)
@@ -134,12 +136,12 @@ class TicketViewModel(
     // 2) "reportEmployee"
     fun sendReportEmployee() {
         val vId = selectedVisit?.visitId ?: return
-        val userId = selectedParticipant?.userId ?: return
+        val employeeId = selectedEmployee?.userId ?: return
         val desc = description
         viewModelScope.launch {
             val result = reportsService.reportEmployee(
                 description = desc,
-                reportedUserId = userId,
+                reportedUserId = employeeId,
                 visitId = vId
             )
             handleReportResult(result)
