@@ -314,7 +314,7 @@ fun RestaurantDetailActivity(
 
 
 
-                                if (restaurant.photos.size > 1) {
+                                if (restaurant.photos.isNotEmpty()) {
                                     var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
                                     LaunchedEffect(restaurant.photos) {
@@ -351,7 +351,7 @@ fun RestaurantDetailActivity(
                                                     image = img.asImageBitmap()
                                                 )
                                             }
-                                            if (images.size > 4) {
+                                            if (images.size > 1) {
                                                 Card(
                                                     modifier = Modifier
                                                         .size(100.dp)
