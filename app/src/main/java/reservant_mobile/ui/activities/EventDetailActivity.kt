@@ -188,6 +188,9 @@ fun EventDetailActivity(
 
                 if (showEditDialog) {
                     item {
+                        val deleted = stringResource(R.string.label_event_deleted)
+                        val error = stringResource(R.string.error_deleting_event)
+
                         EditEventDialog(
                             event = eventDetailVM.event!!,
                             onDismiss = { showEditDialog = false },
@@ -207,13 +210,13 @@ fun EventDetailActivity(
 
                                         Toast.makeText(
                                             context,
-                                            "Event deleted",
+                                            deleted,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }else{
                                         Toast.makeText(
                                             context,
-                                            "Error",
+                                            error,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }

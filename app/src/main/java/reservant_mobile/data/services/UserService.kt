@@ -77,6 +77,7 @@ interface IUserService{
                            assignedToId: String? = null,
                            status: ReportDTO.ReportStatus? = null): Result<Flow<PagingData<ReportDTO>>?>
     suspend fun deleteAccount(): Result<Boolean>
+    suspend fun isInterestedInEvent(eventId: Int): Result<Boolean?>
 
 }
 
@@ -371,4 +372,8 @@ class UserService(): ServiceUtil(), IUserService {
         return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
+    override suspend fun isInterestedInEvent(eventId: Int): Result<Boolean?> {
+        val res = api.get(User.IsInterestedInEvent.Id(eventId = eventId.toString()))
+        return complexResultWrapper(res)
+    }
 }
