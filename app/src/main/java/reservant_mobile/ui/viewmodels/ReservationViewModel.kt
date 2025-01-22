@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -7,11 +8,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.DeliveryDTO
+import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
@@ -19,7 +24,9 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.DeliveryService
+import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IDeliveryService
+import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IRestaurantService
 import reservant_mobile.data.services.IVisitsService
@@ -36,7 +43,8 @@ class ReservationViewModel(
     private val visitsService: IVisitsService = VisitsService(),
     private val deliveryService: IDeliveryService = DeliveryService(),
     private val resourceProvider: ResourceProvider,
-    private val restaurantService: IRestaurantService = RestaurantService()
+    private val restaurantService: IRestaurantService = RestaurantService(),
+    private val friendsService: IFriendsService = FriendsService(),
 ) : ReservantViewModel() {
 
     var note: FormField = FormField(OrderDTO::note.name)
@@ -45,7 +53,7 @@ class ReservationViewModel(
     var visitDate: FormField = FormField("VisitDate").apply { value = LocalDate.now().toString() }
     var startTime: FormField = FormField(VisitDTO::reservationDate.name)
     var endTime: FormField = FormField(VisitDTO::endTime.name)
-    var numberOfGuests by mutableStateOf(1)
+    var totalGuests by mutableStateOf(1)
     var tip by mutableStateOf(0.0)
     var visitId by mutableStateOf(0)
 
@@ -84,8 +92,31 @@ class ReservationViewModel(
     private val _deliveryResult = MutableStateFlow<Result<DeliveryDTO?>>(Result(isError = false, value = null))
     val deliveryResult: StateFlow<Result<DeliveryDTO?>> = _deliveryResult
 
+    private val _friendsFlow = MutableStateFlow<Flow<PagingData<FriendRequestDTO>>?>(null)
+    val friendsFlow: Flow<PagingData<FriendRequestDTO>>?
+        get() = _friendsFlow.value
+
     var restaurant: RestaurantDTO? by mutableStateOf(null)
 
+    suspend fun getPhoto(url: String): Bitmap?{
+        val result = fileService.getImage(url)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
+    fun loadFriendsPaging() {
+        viewModelScope.launch {
+            val result = friendsService.getFriends()
+            if (!result.isError && result.value != null) {
+                // Store the paging Flow
+                _friendsFlow.value = result.value.cachedIn(viewModelScope)
+            } else {
+                // If error, set to null or handle it
+                _friendsFlow.value = null
+            }
+        }
+    }
     suspend fun getRestaurant(restaurantId: Int){
         val result = restaurantService.getRestaurant(restaurantId)
 
@@ -271,31 +302,73 @@ class ReservationViewModel(
         }
     }
 
-    fun createOrder() {
-        viewModelScope.launch {
-            val orderItems = addedItems.map { (menuItem, quantity) ->
-                OrderDTO.OrderItemDTO(
-                    menuItemId = menuItem.menuItemId,
-                    amount = quantity
-                )
-            }
-            val noteValue = note.value.takeIf { it.isNotBlank() }
-            val order = OrderDTO(
-                visitId = visitId,
-                note = noteValue,
-                items = orderItems
+    suspend fun createOrder(): Result<OrderDTO?> {
+        // 1) Build the order items
+        val orderItems = addedItems.map { (menuItem, quantity) ->
+            OrderDTO.OrderItemDTO(
+                menuItemId = menuItem.menuItemId,
+                amount = quantity
             )
-            val orderResult = ordersService.createOrder(order)
-            _orderResult.value = orderResult
-
-            if (orderResult.isError) {
-                resourceProvider.showToast(resourceProvider.getString(R.string.error_place_order))
-            } else {
-                addedItems.clear()
-                errorMessage = null
-            }
         }
+
+        // 2) Create the OrderDTO
+        val noteValue = note.value.takeIf { it.isNotBlank() }
+        val order = OrderDTO(
+            visitId = visitId,
+            note = noteValue,
+            items = orderItems
+        )
+
+        // 3) Call the service
+        val orderResult = ordersService.createOrder(order)
+        _orderResult.value = orderResult
+
+        // 4) If there's an error, show a toast (optional)
+        if (orderResult.isError) {
+            resourceProvider.showToast(resourceProvider.getString(R.string.error_place_order))
+        } else {
+            // If success, clear cart or do any other logic
+            addedItems.clear()
+            errorMessage = null
+        }
+
+        // 5) Return the result to the caller
+        return orderResult
     }
+
+
+    suspend fun createVisitAndOrder(restaurantId: Int): Result<Pair<VisitDTO?, OrderDTO?>> {
+        // 1) Attempt to create the Visit
+        val visitRes = createVisit(restaurantId)
+        if (visitRes.isError) {
+            // Return an error => do not create the order
+            return Result(
+                isError = true,
+                errors = visitRes.errors,
+                value = Pair(null, null)
+            )
+        }
+
+        // 2) If visit succeeded, create the order
+        val orderRes = createOrder()  // Also returns Result<OrderDTO?>
+        if (orderRes.isError) {
+            // If the order fails, we can optionally roll back or just fail
+            return Result(
+                isError = true,
+                errors = orderRes.errors,
+                value = Pair(null, null)
+            )
+        }
+
+        // 3) If both succeeded, return them in a pair
+        val combinedValue = Pair(visitRes.value, orderRes.value)
+        return Result(
+            isError = false,
+            errors = emptyMap(),
+            value = combinedValue
+        )
+    }
+
 
     private fun getOrder(orderId: Any) {
         viewModelScope.launch {
@@ -322,7 +395,7 @@ class ReservationViewModel(
         val visit = VisitDTO(
             date = "${visitDate.value}T${startTime.value}",
             endTime = "${visitDate.value}T${endTime.value}",
-            numberOfGuests = numberOfGuests,
+            numberOfGuests = totalGuests-participantIds.size-1,
             tip = tip,
             takeaway = isTakeaway,
             restaurantId = restaurantId,
@@ -332,6 +405,16 @@ class ReservationViewModel(
         _visitResult.value = visitResult
 
         if (visitResult.isError) {
+            if(visitResult.errors != null) {
+                //TODO zmienić w przyszłości
+                val errorMap = visitResult.errors
+                if (errorMap != null && errorMap.containsValue(R.string.errorCode_Duplicate)) {
+                    resourceProvider.showToast(resourceProvider.getString(R.string.reservation_conflict_message))
+                }
+                if (errorMap != null && errorMap.containsValue(R.string.errorCode_NoAvailableTable)) {
+                    resourceProvider.showToast(resourceProvider.getString(R.string.errorCode_NoAvailableTable))
+                }
+            }
             resourceProvider.showToast(resourceProvider.getString(R.string.error_create_visit))
         } else {
             visitId = visitResult.value!!.visitId!!
