@@ -257,8 +257,8 @@ fun DeliveryItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             // Data zamówienia
-            val orderDateFormatted = delivery.orderTime?.let { formatToDateTime(it, "dd MMMM yyyy") }
-            val orderTimeFormatted = delivery.orderTime?.let { formatToDateTime(it, "HH:mm") }
+            val orderDateFormatted by remember { mutableStateOf(delivery.orderTime?.let { formatToDateTime(it, "dd MMMM yyyy") }) }
+            val orderTimeFormatted by remember { mutableStateOf(delivery.orderTime?.let { formatToDateTime(it, "HH:mm") })}
 
             Text(
                 text = "${stringResource(R.string.label_ordered_at)}: $orderDateFormatted | ${orderTimeFormatted ?: "--"}",
@@ -313,8 +313,8 @@ fun DeliveryItem(
 
             when {
                 delivery.canceledTime != null -> {
-                    val cancelDateFormatted = formatToDateTime(delivery.canceledTime, "dd MMMM yyyy")
-                    val cancelTimeFormatted = formatToDateTime(delivery.canceledTime, "HH:mm")
+                    val cancelDateFormatted by remember { mutableStateOf(formatToDateTime(delivery.canceledTime, "dd MMMM yyyy")) }
+                    val cancelTimeFormatted by remember { mutableStateOf(formatToDateTime(delivery.canceledTime, "HH:mm")) }
 
                     Text(
                         text = "${stringResource(R.string.label_canceled_at)} $cancelDateFormatted | $cancelTimeFormatted",
@@ -323,8 +323,8 @@ fun DeliveryItem(
                     )
                 }
                 delivery.deliveredTime != null -> {
-                    val deliveredDateFormatted = formatToDateTime(delivery.deliveredTime, "dd MMMM yyyy")
-                    val deliveredTimeFormatted = formatToDateTime(delivery.deliveredTime, "HH:mm")
+                    val deliveredDateFormatted by remember { mutableStateOf(formatToDateTime(delivery.deliveredTime, "dd MMMM yyyy")) }
+                    val deliveredTimeFormatted by remember { mutableStateOf(formatToDateTime(delivery.deliveredTime, "HH:mm"))}
 
                     Text(
                         text = "${stringResource(R.string.label_arrived_at)} $deliveredDateFormatted | $deliveredTimeFormatted",
