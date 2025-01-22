@@ -53,8 +53,14 @@ fun RestaurantReservationActivity(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text(stringResource(id = R.string.label_reservation)) },
-                        navigationIcon = {
+                        title = {
+                            Text(
+                                text = stringResource(
+                                    id = if (isReservation) R.string.label_reservation else R.string.label_order
+                                )
+                            )
+                        },
+                                navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,

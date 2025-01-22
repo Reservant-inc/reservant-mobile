@@ -46,6 +46,8 @@ fun OrderFormContent(
     getMenuPhoto: suspend (String) -> Bitmap?,
     isReservation: Boolean
 ) {
+    val isTakeawayTag = "Takeaway" in restaurant.tags
+    val isOnSiteTag = "OnSite" in restaurant.tags
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
 
@@ -73,20 +75,21 @@ fun OrderFormContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { Spacer(modifier = Modifier.height(36.dp)) }
-
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(id = R.string.label_takeaway),
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Switch(
-                    checked = isTakeaway,
-                    onCheckedChange = {
-                        isTakeaway = it
-                        reservationViewModel.isTakeaway = it
-                    }
-                )
+        if (isTakeawayTag && !isReservation) {
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(id = R.string.label_takeaway),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Switch(
+                        checked = isTakeaway,
+                        onCheckedChange = {
+                            isTakeaway = it
+                            reservationViewModel.isTakeaway = it
+                        }
+                    )
+                }
             }
         }
 
@@ -109,7 +112,11 @@ fun OrderFormContent(
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
             if (dayHours != null) {
                 Text(
-                    text = stringResource(id = R.string.opening_hours, dayHours.from?: "-", dayHours.until?: "-"),
+                    text = stringResource(
+                        id = R.string.opening_hours,
+                        dayHours.from ?: "-",
+                        dayHours.until ?: "-"
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
@@ -143,26 +150,27 @@ fun OrderFormContent(
                         errorText = reservationViewModel.startTimeErrorText
                     )
                 }
+                if (!isTakeaway) {
+                    Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
 
-                Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
-
-                Box(modifier = Modifier.weight(0.45f)) {
-                    MyTimePickerDialog(
-                        initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        onTimeSelected = { time ->
-                            reservationViewModel.updateEndTime(time, restaurant)
-                        },
-                        modifier = Modifier.scale(0.85f),
-                        onlyHalfHours = true,
-                        minTime = reservationViewModel.startTime.value,
-                        isError = reservationViewModel.isEndTimeError,
-                        errorText = reservationViewModel.endTimeErrorText
-                    )
+                    Box(modifier = Modifier.weight(0.45f)) {
+                        MyTimePickerDialog(
+                            initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
+                            onTimeSelected = { time ->
+                                reservationViewModel.updateEndTime(time, restaurant)
+                            },
+                            modifier = Modifier.scale(0.85f),
+                            onlyHalfHours = true,
+                            minTime = reservationViewModel.startTime.value,
+                            isError = reservationViewModel.isEndTimeError,
+                            errorText = reservationViewModel.endTimeErrorText
+                        )
+                    }
                 }
             }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             item {
                 Text(
                     text = stringResource(id = R.string.label_my_basket),
@@ -172,7 +180,7 @@ fun OrderFormContent(
             }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             if (reservationViewModel.addedItems.isNotEmpty()) {
                 items(reservationViewModel.addedItems) { item ->
                     var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
@@ -195,58 +203,68 @@ fun OrderFormContent(
             }
         }
 
-        item {
-            Text(text = stringResource(id = R.string.label_number_of_guests))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(
-                    onClick = {
-                        if (reservationViewModel.numberOfGuests > reservationViewModel.participantIds.size + 1)
-                            reservationViewModel.numberOfGuests--
-                    }
+        if(!isTakeaway) {
+            item {
+                Text(text = stringResource(id = R.string.label_number_of_guests))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(Icons.Default.Remove, contentDescription = null)
-                }
-                Text(text = reservationViewModel.numberOfGuests.toString())
-                IconButton(onClick = { reservationViewModel.numberOfGuests++ }) {
-                    Icon(Icons.Default.Add, contentDescription = null)
+                    IconButton(
+                        onClick = {
+                            if (reservationViewModel.numberOfGuests > reservationViewModel.participantIds.size + 1)
+                                reservationViewModel.numberOfGuests--
+                        }
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = null)
+                    }
+                    Text(text = reservationViewModel.numberOfGuests.toString())
+                    IconButton(onClick = { reservationViewModel.numberOfGuests++ }) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                    }
                 }
             }
         }
 
-        item {
-            Text(text = stringResource(id = R.string.tip_label))
+        if(!isTakeaway) {
+            item {
+                Text(text = stringResource(id = R.string.tip_label))
 
-            if(!isReservation) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(5, 10, 15).forEach { percentage ->
-                        Button(onClick = {
-                            val totalCost =
-                                reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-                                    (menuItem.price ?: 0.0) * quantity
-                                }
-                            reservationViewModel.tip = totalCost * percentage / 100.0
-                        }) {
-                            Text(text = "$percentage%")
+                if (!isReservation) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(5, 10, 15).forEach { percentage ->
+                            Button(onClick = {
+                                val totalCost =
+                                    reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                                        (menuItem.price ?: 0.0) * quantity
+                                    }
+                                reservationViewModel.tip = totalCost * percentage / 100.0
+                            }) {
+                                Text(text = "$percentage%")
+                            }
                         }
                     }
                 }
-            }
 
-            FormInput(
-                inputText = if (reservationViewModel.tip == 0.0) "" else String.format("%.2f", reservationViewModel.tip),
-                onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
-                label = stringResource(id = R.string.tip_label),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-                optional = true,
-                isError = reservationViewModel.isTipError(),
-                errorText = stringResource(id = R.string.error_tip)
-            )
+                FormInput(
+                    inputText = if (reservationViewModel.tip == 0.0) "" else String.format(
+                        "%.2f",
+                        reservationViewModel.tip
+                    ),
+                    onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
+                    label = stringResource(id = R.string.tip_label),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    optional = true,
+                    isError = reservationViewModel.isTipError(),
+                    errorText = stringResource(id = R.string.error_tip)
+                )
+            }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             item {
                 FormInput(
                     inputText = reservationViewModel.note.value,
@@ -276,10 +294,15 @@ fun OrderFormContent(
                     id = if (isReservation) R.string.submit_reservation else R.string.submit_order
                 ),
                 onClick = {
-                if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
-                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId, isReservation = isReservation))
-                }
-            })
+                    if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
+                        navController.navigate(
+                            RestaurantRoutes.Summary(
+                                restaurantId = restaurant.restaurantId,
+                                isReservation = isReservation
+                            )
+                        )
+                    }
+                })
         }
     }
 }
