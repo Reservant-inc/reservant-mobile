@@ -980,7 +980,8 @@ fun SearchBarWithFilter(
     filterOptions: List<String>? = null, // Optional list for string filters
     filterOptionsInt: List<Int>? = null, // Optional list for int filters
     additionalButtonOnClick: (() -> Unit)? = null,
-    additionalButtonIcon: ImageVector? = null
+    additionalButtonIcon: ImageVector? = null,
+    hideAllOption: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
@@ -1039,15 +1040,18 @@ fun SearchBarWithFilter(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                 ) {
-                    // Opcja "Wszystkie"
-                    DropdownMenuItem(
-                        text = { Text(text = labelAll) },
-                        onClick = {
-                            onFilterSelected?.invoke(null)
-                            onFilterSelectedInt?.invoke(null)
-                            expanded = false
-                        }
-                    )
+                    if(!hideAllOption){
+                        // Opcja "Wszystkie"
+                        DropdownMenuItem(
+                            text = { Text(text = labelAll) },
+                            onClick = {
+                                onFilterSelected?.invoke(null)
+                                onFilterSelectedInt?.invoke(null)
+                                expanded = false
+                            }
+                        )
+                    }
+
                     // Opcje filtrowania dla stringów
                     filterOptions?.forEach { filter ->
                         DropdownMenuItem(

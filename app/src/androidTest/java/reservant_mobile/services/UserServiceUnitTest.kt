@@ -199,4 +199,11 @@ class UserServiceUnitTest: ServiceTest(){
         }
         assertThat(itemsSnapshot).isNotEmpty()
     }
+
+    @Test
+    fun is_user_interested_in_event_return_not_null()= runTest{
+        val res = userService.isInterestedInEvent(1).value
+        assertThat(res).isNotNull()
+        assertThat(res).isFalse()
+    }
 }
