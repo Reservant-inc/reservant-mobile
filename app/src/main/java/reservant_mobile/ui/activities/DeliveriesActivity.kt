@@ -80,7 +80,7 @@ fun DeliveriesActivity(
 
     var searchQuery by remember { mutableStateOf("") }
 
-    val filterOptions = listOf("Not delivered", "Delivered")
+    val filterOptions by remember { mutableStateOf(listOf("Not delivered", "Delivered")) }
     var currentFilter by remember { mutableStateOf("Not delivered") }
 
 
