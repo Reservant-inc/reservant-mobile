@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.example.reservant_mobile.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,7 +114,8 @@ fun DeliveriesActivity(
 
                 deliveriesViewModel.setReturnDelivered(isDelivered)
             },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
+            hideAllOption = true
         )
 
         if (isLoading) {
@@ -173,14 +175,20 @@ fun DeliveriesActivity(
                 } else {
                     Text(
                         text = stringResource(R.string.label_no_deliveries),
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
                 }
             } ?: run {
                 // Jeśli lazyPagingItems == null
                 Text(
                     text = stringResource(R.string.label_no_deliveries),
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -194,12 +202,15 @@ fun DeliveryItem(
     onMarkArrivedClick: () -> Unit,
     ingredientsList: List<DeliveryDTO.DeliveryIngredientDTO>?
 ) {
+    // Kolory i inne zmienne – bez zmian
     val pastelRed = Color(0xFFFFC1C1)
     val pastelGreen = Color(0xFF67B873)
-
     val darkRed = Color(0xFFD32F2F)
     val darkGreen = Color(0xFF2E7D32)
     val darkGreenLabel = Color(58, 148, 16)
+
+    // Dodajemy tu jedną linijkę, aby móc skorzystać z listy restaurantIngredients:
+    val deliveriesViewModel = viewModel<DeliveriesViewModel>()
 
     var isIngredientsExpanded by remember { mutableStateOf(false) }
 
@@ -243,7 +254,6 @@ fun DeliveryItem(
                 )
             }
 
-
             Spacer(modifier = Modifier.height(4.dp))
 
             // Data zamówienia
@@ -262,14 +272,13 @@ fun DeliveryItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
+            // Obsługa listy składników
             if (!ingredientsList.isNullOrEmpty()) {
                 Text(
-                    text =
-                    if (isIngredientsExpanded)
+                    text = if (isIngredientsExpanded)
                         stringResource(R.string.label_hide_ingredients)
                     else
-                        stringResource(R.string.label_show_ingredients) ,
+                        stringResource(R.string.label_show_ingredients),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -281,9 +290,19 @@ fun DeliveryItem(
 
                 if (isIngredientsExpanded && ingredientsList.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
+
+
                     ingredientsList.forEach { ing ->
+
+                        val matchedIngredient = deliveriesViewModel.restaurantIngredients
+                            ?.find { it.ingredientId == ing.ingredientId }
+
+                        val finalIngredientName = matchedIngredient?.publicName
+                            ?: ing.ingredientName
+                            ?: "Unknown"
+
                         Text(
-                            text = "• ${ing.ingredientName ?: "Unknown"}" +
+                            text = "• $finalIngredientName" +
                                     " (${stringResource(R.string.label_ordered)}: ${ing.amountOrdered ?: 0.0})",
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -314,6 +333,7 @@ fun DeliveryItem(
                     )
                 }
                 else -> {
+                    // Dwa przyciski: Mark arrived, Cancel
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -334,7 +354,10 @@ fun DeliveryItem(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = stringResource(R.string.label_mark_arrived), fontSize = 12.sp)
+                            Text(
+                                text = stringResource(R.string.label_mark_arrived),
+                                fontSize = 12.sp
+                            )
                         }
                         ElevatedButton(
                             onClick = onCancelClick,
@@ -351,7 +374,10 @@ fun DeliveryItem(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = stringResource(R.string.label_cancel), fontSize = 12.sp)
+                            Text(
+                                text = stringResource(R.string.label_cancel),
+                                fontSize = 12.sp
+                            )
                         }
                     }
                 }

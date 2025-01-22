@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.cache
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.DeliveryDTO
+import reservant_mobile.data.models.dtos.IngredientDTO
 import reservant_mobile.data.services.IDeliveryService
 import reservant_mobile.data.services.DeliveryService
 import reservant_mobile.data.services.IRestaurantService
@@ -28,11 +29,14 @@ class DeliveriesViewModel(
     var isLoading = MutableStateFlow(false)
     var errorMessage = MutableStateFlow<String?>(null)
 
+    var restaurantIngredients: List<IngredientDTO>? = null
+
     private var returnDelivered: Boolean = false
 
     init {
         viewModelScope.launch {
             fetchDeliveriesForRestaurant()
+            getRestaurantIngredients()
         }
     }
 
@@ -50,6 +54,14 @@ class DeliveriesViewModel(
             return result.value?.ingredients
         }
         return null
+    }
+
+    suspend fun getRestaurantIngredients() {
+        val result = restaurantService.getIngredients(restaurantId)
+
+        if(!result.isError){
+            restaurantIngredients = result.value
+        }
     }
 
     private suspend fun fetchDeliveriesForRestaurant() {
