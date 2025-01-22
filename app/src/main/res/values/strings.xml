@@ -623,5 +623,7 @@
     <string name="label_mark_arrived">Mark arrived</string>
     <string name="label_show_ingredients">Show ingredients</string>
     <string name="label_hide_ingredients">Hide ingredients</string>
-    <string name="label_ordered_at">Orderet at</string>
+    <string name="label_ordered_at">Ordered at</string>
+    <string name="label_delivered">Delivered</string>
+    <string name="label_not_delivered">Not delivered</string>
 </resources>

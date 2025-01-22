@@ -1,5 +1,7 @@
 package reservant_mobile.ui.activities
 
+import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +36,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.reservant_mobile.R
@@ -46,6 +48,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.flow.MutableStateFlow
 import reservant_mobile.data.models.dtos.DeliveryDTO
 import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.IconWithHeader
@@ -58,12 +61,15 @@ fun DeliveriesActivity(
     restaurantId: Int,
     onReturnClick: () -> Unit
 ) {
+
     val deliveriesViewModel: DeliveriesViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
                 DeliveriesViewModel(restaurantId = restaurantId) as T
         }
     )
+
+    val context = LocalContext.current
 
     val deliveriesFlow = deliveriesViewModel.deliveries.collectAsState()
     val lazyPagingItems = deliveriesFlow.value?.collectAsLazyPagingItems()
@@ -73,13 +79,14 @@ fun DeliveriesActivity(
 
     var searchQuery by remember { mutableStateOf("") }
 
-    var selectedStatus by remember { mutableStateOf<String?>(null) }
+    val filterOptions = listOf("Not delivered", "Delivered")
+    var currentFilter by remember { mutableStateOf("Not delivered") }
 
-    val filterOptions = listOf("Delivered", "Canceled", "Pending")
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Nagłówek
         IconWithHeader(
             text = stringResource(R.string.label_deliveries),
             showBackButton = true,
@@ -87,14 +94,10 @@ fun DeliveriesActivity(
             icon = Icons.Filled.DeliveryDining
         )
 
-        // Wyświetlanie błędu
+        // Błąd z ViewModelu (toast)
         errorMessage?.let { err ->
-            Text(
-                text = err,
-                color = MaterialTheme.colorScheme.error,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
+            deliveriesViewModel.errorMessage.value = null
         }
 
         SearchBarWithFilter(
@@ -102,13 +105,15 @@ fun DeliveriesActivity(
             onSearchQueryChange = { query ->
                 searchQuery = query
             },
-            currentFilter = selectedStatus,
+            currentFilter = currentFilter,
             filterOptions = filterOptions,
-            onFilterSelected = { status ->
-                selectedStatus = status
+            onFilterSelected = { selected ->
+                currentFilter = selected ?: "Not delivered"
+                val isDelivered = (currentFilter == "Delivered")
+
+                deliveriesViewModel.setReturnDelivered(isDelivered)
             },
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         )
 
         if (isLoading) {
@@ -119,168 +124,64 @@ fun DeliveriesActivity(
                 CircularProgressIndicator()
             }
         } else {
-//            lazyPagingItems?.let { pagingItems ->
-//                LazyColumn(
-//                    verticalArrangement = Arrangement.spacedBy(8.dp),
-//                ) {
-//                    items(pagingItems.itemCount) { index ->
-//                        val delivery = pagingItems[index]
-//                        if (delivery != null) {
-//                            DeliveryItem(
-//                                delivery = delivery,
-//                                onCancelClick = {
-//                                    delivery.deliveryId?.let {
-//                                        deliveriesViewModel.markCanceled(it)
-//                                    }
-//                                },
-//                                onMarkArrivedClick = {
-//                                    delivery.deliveryId?.let {
-//                                        deliveriesViewModel.confirmDelivered(it)
-//                                    }
-//                                }
-//                            )
-//                        }
-//                    }
-//                }
-//            } ?: run {
-//                Text(
-//                    text = stringResource(R.string.label_no_deliveries),
-//                    modifier = Modifier.padding(8.dp)
-//                )
-//            }
 
-            val exampleDeliveries = listOf(
-                // 1) Dostawa w stanie oczekującym (ani anulowana, ani dostarczona)
-                DeliveryDTO(
-                    deliveryId = 1,
-                    orderTime = "2025-01-21T10:00:00.5059895",
-                    userFullName = "Jan Nowak",
-                    cost = 135.50,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 1,
-                            ingredientId = 101,
-                            amountOrdered = 5.0,
-                            ingredientName = "Pomidory"
-                        )
-                    )
-                ),
-                // 2) Kolejna oczekująca (bez deliveredTime ani canceledTime)
-                DeliveryDTO(
-                    deliveryId = 2,
-                    orderTime = "2025-01-22T09:15:20.5033188",
-                    userFullName = "Anna Kowalska",
-                    cost = 64.99,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 2,
-                            ingredientId = 202,
-                            amountOrdered = 1.0,
-                            ingredientName = "Ziemniaki"
-                        )
-                    )
-                ),
-                // 3) Dostawa już dostarczona (deliveredTime != null)
-                DeliveryDTO(
-                    deliveryId = 3,
-                    orderTime = "2025-01-23T15:05:10.1234567",
-                    deliveredTime = "2025-01-23T16:02:30.7654321",
-                    userFullName = "Restauracja Rondo",
-                    cost = 205.99,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 3,
-                            ingredientId = 202,
-                            amountOrdered = 10.0,
-                            amountDelivered = 10.0,
-                            ingredientName = "Makaron"
-                        ),
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 3,
-                            ingredientId = 303,
-                            amountOrdered = 2.0,
-                            amountDelivered = 2.0,
-                            ingredientName = "Oliwa z oliwek"
-                        )
-                    )
-                ),
-                // 4) Dostawa anulowana (canceledTime != null)
-                DeliveryDTO(
-                    deliveryId = 4,
-                    orderTime = "2025-01-24T11:20:45.9876543",
-                    canceledTime = "2025-01-24T12:00:00.8888888",
-                    userFullName = "Firma Cateringowa",
-                    cost = 380.10,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 4,
-                            ingredientId = 404,
-                            amountOrdered = 6.0,
-                            amountDelivered = 0.0,
-                            ingredientName = "Mąka pszenna"
-                        )
-                    )
-                ),
-                // 5) Dostawa oczekująca z większą liczbą składników
-                DeliveryDTO(
-                    deliveryId = 5,
-                    orderTime = "2025-01-25T08:45:59.1111111",
-                    userFullName = "Stanisław Bąk",
-                    cost = 99.00,
-                    ingredients = listOf(
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 5,
-                            ingredientId = 303,
-                            amountOrdered = 2.0,
-                            ingredientName = "Sos pomidorowy"
-                        ),
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 5,
-                            ingredientId = 404,
-                            amountOrdered = 12.0,
-                            ingredientName = "Ser mozzarella"
-                        ),
-                        DeliveryDTO.DeliveryIngredientDTO(
-                            deliveryId = 5,
-                            ingredientId = 505,
-                            amountOrdered = 1.0,
-                            ingredientName = "Bazylia świeża"
-                        )
-                    )
-                )
-            )
+            lazyPagingItems?.let { pagingItems ->
 
-            val filteredDeliveries = exampleDeliveries.filter { delivery ->
+                val allDeliveries = pagingItems.itemSnapshotList.items
 
-                val statusMatches = when (selectedStatus) {
-                    "Canceled" -> delivery.canceledTime != null
-                    "Delivered" -> delivery.deliveredTime != null
-                    "Pending" -> (delivery.canceledTime == null && delivery.deliveredTime == null)
-                    else -> true
+                val filteredDeliveries = if (searchQuery.isBlank()) {
+                    allDeliveries
+                } else {
+                    allDeliveries.filter { delivery ->
+                        delivery.userFullName
+                            ?.contains(searchQuery, ignoreCase = true) ?: false
+                    }
                 }
 
-                val searchMatches = delivery.userFullName
-                    ?.contains(searchQuery, ignoreCase = true) ?: false
+                if (filteredDeliveries.isNotEmpty()) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(filteredDeliveries) { delivery ->
 
-                statusMatches && searchMatches
-            }
+                            var ingredients by remember { mutableStateOf<List<DeliveryDTO.DeliveryIngredientDTO>?>(null) }
 
-            LazyColumn {
-                items(filteredDeliveries) { delivery ->
-                    DeliveryItem(
-                        delivery = delivery,
-                        onCancelClick = {
-                            delivery.deliveryId?.let {
-                                deliveriesViewModel.markCanceled(it)
+                            LaunchedEffect(delivery.deliveryId){
+                               ingredients = delivery.deliveryId?.let {
+                                    deliveriesViewModel.getDeliveryIngredients(
+                                        it
+                                    )
+                                }
                             }
-                        },
-                        onMarkArrivedClick = {
-                            delivery.deliveryId?.let {
-                                deliveriesViewModel.confirmDelivered(it)
-                            }
+
+                            DeliveryItem(
+                                delivery = delivery,
+                                onCancelClick = {
+                                    delivery.deliveryId?.let { id ->
+                                        deliveriesViewModel.markCanceled(id)
+                                    }
+                                },
+                                onMarkArrivedClick = {
+                                    delivery.deliveryId?.let { id ->
+                                        deliveriesViewModel.confirmDelivered(id)
+                                    }
+                                },
+                                ingredients
+                            )
                         }
+                    }
+                } else {
+                    Text(
+                        text = stringResource(R.string.label_no_deliveries),
+                        modifier = Modifier.padding(8.dp)
                     )
                 }
+            } ?: run {
+                // Jeśli lazyPagingItems == null
+                Text(
+                    text = stringResource(R.string.label_no_deliveries),
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }
@@ -290,7 +191,8 @@ fun DeliveriesActivity(
 fun DeliveryItem(
     delivery: DeliveryDTO,
     onCancelClick: () -> Unit,
-    onMarkArrivedClick: () -> Unit
+    onMarkArrivedClick: () -> Unit,
+    ingredientsList: List<DeliveryDTO.DeliveryIngredientDTO>?
 ) {
     val pastelRed = Color(0xFFFFC1C1)
     val pastelGreen = Color(0xFF67B873)
@@ -333,11 +235,14 @@ fun DeliveryItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Nazwa zamawiającego
-            val userName = delivery.userFullName ?: "Anonim"
-            Text(
-                text = userName,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            val userName = delivery.userFullName
+            if(userName != null){
+                Text(
+                    text = userName,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -357,8 +262,8 @@ fun DeliveryItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val ingredientsList = delivery.ingredients.orEmpty()
-            if (ingredientsList.isNotEmpty()) {
+
+            if (!ingredientsList.isNullOrEmpty()) {
                 Text(
                     text =
                     if (isIngredientsExpanded)
@@ -374,7 +279,7 @@ fun DeliveryItem(
                         .padding(vertical = 4.dp)
                 )
 
-                if (isIngredientsExpanded) {
+                if (isIngredientsExpanded && ingredientsList.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     ingredientsList.forEach { ing ->
                         Text(

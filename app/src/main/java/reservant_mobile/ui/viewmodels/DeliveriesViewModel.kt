@@ -28,32 +28,52 @@ class DeliveriesViewModel(
     var isLoading = MutableStateFlow(false)
     var errorMessage = MutableStateFlow<String?>(null)
 
+    private var returnDelivered: Boolean = false
+
     init {
         viewModelScope.launch {
             fetchDeliveriesForRestaurant()
         }
     }
 
-    private suspend fun fetchDeliveriesForRestaurant() {
+    fun setReturnDelivered(isDelivered: Boolean) {
+        returnDelivered = isDelivered
         viewModelScope.launch {
-            try {
-                isLoading.value = true
-                val result = restaurantService.getDeliveries(
-                    restaurantId,
-                    orderBy = GetDeliveriesSort.OrderTimeAsc
-                )
-                if (!result.isError) {
-                    _deliveries.value = result.value?.cachedIn(viewModelScope)
-                } else {
-                    errorMessage.value = "Błąd: nie udało się pobrać listy dostaw."
-                }
-            } catch (ex: Exception) {
-                errorMessage.value = "Wyjątek: ${ex.message}"
-            } finally {
-                isLoading.value = false
-            }
+            fetchDeliveriesForRestaurant()
         }
     }
+
+    suspend fun getDeliveryIngredients(deliveryId: Int): List<DeliveryDTO.DeliveryIngredientDTO>?{
+        val result = deliveryService.getDelivery(deliveryId)
+
+        if(!result.isError){
+            return result.value?.ingredients
+        }
+        return null
+    }
+
+    private suspend fun fetchDeliveriesForRestaurant() {
+        try {
+            isLoading.value = true
+            val result = restaurantService.getDeliveries(
+                restaurantId = restaurantId,
+                returnDelivered = returnDelivered,
+                userId = null,
+                userName = null,
+                orderBy = GetDeliveriesSort.OrderTimeDesc
+            )
+            if (!result.isError) {
+                _deliveries.value = result.value?.cachedIn(viewModelScope)
+            } else {
+                errorMessage.value = "Błąd: nie udało się pobrać listy dostaw."
+            }
+        } catch (ex: Exception) {
+            errorMessage.value = "Wyjątek: ${ex.message}"
+        } finally {
+            isLoading.value = false
+        }
+    }
+
 
     fun confirmDelivered(deliveryId: Int) {
         viewModelScope.launch {
