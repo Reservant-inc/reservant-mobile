@@ -612,4 +612,17 @@
     <string name="future_visits_tab">Upcoming</string>
     <string name="past_visits_tab">Past</string>
     <string name="label_my_visits">My visits</string>
+    <string name="label_select_report_status">Select status</string>
+    <string name="report_title">Report #%1$d</string>
+    <string name="category">Category: %1$s</string>
+    <string name="date">Date: %1$s</string>
+    <string name="description">Description: %1$s</string>
+    <string name="created_by">Created by: %1$s %2$s</string>
+    <string name="reported_user">Reported user: %1$s %2$s</string>
+    <string name="visit_info">Visit ID: %1$d, Restaurant: %2$s</string>
+    <string name="resolution_comment">Resolution comment: %1$s</string>
+    <string name="resolved_by">Resolved by: %1$s %2$s</string>
+    <string name="resolution_date">Resolved at: %1$s</string>
+    <string name="assigned_agent">Agent assigned: %1$s %2$s</string>
+    <string name="status">Status: %1$s</string>
 </resources>

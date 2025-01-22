@@ -16,58 +16,55 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.TicketDTO
+import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.navigation.UserRoutes
+import reservant_mobile.ui.viewmodels.ReviewsViewModel
+import reservant_mobile.ui.viewmodels.TicketViewModel
 
 @Composable
 fun TicketHistoryActivity(navController: NavController) {
-    val tickets = listOf(
-        TicketDTO(
-            "John Doe’s - Restaurant",
-            "Report: Brak pozycji w menu",
-            "Category: Technical",
-            "2023-08-12"
-        ),
-        TicketDTO(
-            "John Doe’s - Restaurant",
-            "Report: Zgubiony przedmiot",
-            "Category: Technical",
-            "2023-08-12"
-        ),
-        TicketDTO(
-            "John Doe’s - Restaurant",
-            "Report: Skarga na rezerwację",
-            "Category: Complaint",
-            "2023-08-12"
-        ),
-        TicketDTO(
-            "John Doe’s - Restaurant",
-            "Report: Brak pozycji w menu",
-            "Category: Technical",
-            "2023-08-12"
-        ),
-        TicketDTO(
-            "John Doe’s - Restaurant",
-            "Report: Brak pozycji w menu",
-            "Category: Technical",
-            "2023-08-12"
-        )
+    val reportViewModel: TicketViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return TicketViewModel() as T
+            }
+        }
     )
+    val statuses = listOf("All", "NotResolved", "ResolvedPositively", "ResolvedNegatively")
+
+    var selectedStatus by remember { mutableStateOf("All") }
+
+    val expanded = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -83,32 +80,34 @@ fun TicketHistoryActivity(navController: NavController) {
             }
         )
 
+        ComboBox(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            expanded = expanded,
+            value = selectedStatus,
+            onValueChange = { newStatus ->
+                selectedStatus = newStatus
+            },
+            options = statuses,
+            label = stringResource(R.string.label_select_report_status)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(horizontal = 16.dp)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                // Zakładki FloatingTabSwitch
-                FloatingTabSwitch(
-                    pages = listOf(
-                        stringResource(id = R.string.label_unresolved) to {
-                            TicketList(tickets)
-                        },
-                        stringResource(id = R.string.label_to_be_reviewed) to {
-                            TicketList(tickets)
-                        },
-                        stringResource(id = R.string.label_in_progress) to {
-                            TicketList(tickets)
-                        }
-                    )
-                )
-            }
+            ReportsTabContent(
+                status = selectedStatus,
+                viewModel = reportViewModel
+            )
         }
     }
 
-    // FloatingActionButton na dolnym prawym rogu ekranu
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -123,19 +122,182 @@ fun TicketHistoryActivity(navController: NavController) {
     }
 }
 
+
 @Composable
-fun TicketList(tickets: List<TicketDTO>) {
-    Column() {
-        Spacer(modifier = Modifier.height(90.dp))
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(tickets) { ticket ->
-                TicketCard(ticket = ticket, onClick = { /* Handle item click */ })
+fun ReportsTabContent(
+    status: String,
+    viewModel: TicketViewModel
+) {
+    LaunchedEffect(status) {
+        viewModel.loadReports(status)
+    }
+
+    val currentFlow = viewModel.reportsFlow.collectAsState().value
+    val lazyReports = currentFlow?.collectAsLazyPagingItems()
+
+    // Display
+    ReportsList(
+        lazyReports = lazyReports,
+        onRefresh = { viewModel.loadReports(status) }
+    )
+}
+
+@Composable
+fun ReportsList(
+    lazyReports: LazyPagingItems<ReportDTO>?,
+    onRefresh: () -> Unit = {}
+) {
+    if (lazyReports == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    val loadState = lazyReports.loadState.refresh
+    when {
+        loadState is LoadState.Loading -> {
+            // Show spinner
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
+        }
+
+        loadState is LoadState.Error -> {
+            // Show error
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Failed to load reports. Tap to retry.")
+            }
+        }
+
+        else -> {
+            // Not loading => show the list
+            if (lazyReports.itemCount == 0) {
+                Text("No reports found.")
+            } else {
+                LazyColumn {
+                    items(lazyReports.itemCount) { index ->
+                        val report = lazyReports[index]
+                        if (report != null) {
+                            ReportCard(report, {})
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+
+@Composable
+fun ReportCard(report: ReportDTO, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.report_title, report.reportId ?: ""),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.category, report.category ?: ""),
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = stringResource(R.string.date, report.reportDate ?: ""),
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            if (!report.description.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.description, report.description),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            report.createdBy?.let { user ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.created_by, user.firstName, user.lastName),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            report.reportedUser?.let { user ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.reported_user, user.firstName, user.lastName),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            report.visit?.let { visit ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.visit_info, visit.visitId ?: 0, visit.restaurant?.name ?: "-"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            if (!report.resolutionComment.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.resolution_comment, report.resolutionComment),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            report.resolvedBy?.let { user ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.resolved_by, user.firstName, user.lastName),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            if (report.resolutionDate != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.resolution_date, report.resolutionDate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            report.assignedAgents?.forEach { agentRecord ->
+                val agent = agentRecord.agent
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.assigned_agent, agent?.firstName ?: "-", agent?.lastName ?: "-"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.status, report.reportStatus ?: ""),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
+
 
 @Composable
 fun TicketCard(ticket: TicketDTO, onClick: () -> Unit) {
