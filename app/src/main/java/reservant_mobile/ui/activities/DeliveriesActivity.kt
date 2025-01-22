@@ -294,8 +294,12 @@ fun DeliveryItem(
 
                     ingredientsList.forEach { ing ->
 
-                        val matchedIngredient = deliveriesViewModel.restaurantIngredients
+                        val matchedIngredient by remember {
+                            mutableStateOf(
+                                deliveriesViewModel.restaurantIngredients
                             ?.find { it.ingredientId == ing.ingredientId }
+                            )
+                        }
 
                         val finalIngredientName = matchedIngredient?.publicName
                             ?: ing.ingredientName
