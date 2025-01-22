@@ -611,4 +611,5 @@
     <string name="resolution_date">Rozwiązano o: %1$s</string>
     <string name="assigned_agent">Przypisany agent: %1$s %2$s</string>
     <string name="status">Stan: %1$s</string>
+    <string name="ordered_at">Zamówiono w</string>
 </resources>
