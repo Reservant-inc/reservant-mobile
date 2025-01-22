@@ -49,8 +49,8 @@ fun OrderFormContent(
     getMenuPhoto: suspend (String) -> Bitmap?,
     isReservation: Boolean
 ) {
-    val isTakeawayTag = "Takeaway" in restaurant.tags
-    val isOnSiteTag = "OnSite" in restaurant.tags
+    val isTakeawayTag by remember { mutableStateOf("Takeaway" in restaurant.tags) }
+    val isOnSiteTag by remember { mutableStateOf("OnSite" in restaurant.tags) }
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
 
@@ -242,13 +242,13 @@ fun OrderFormContent(
 
                 // Show each participant
                 reservationViewModel.participantIds.forEach { friendId ->
-                    val friendDto = participantsInfo[friendId]
+                    val friendDto by remember(participantsInfo) { derivedStateOf { participantsInfo[friendId] } }
                     if (friendDto != null) {
                         UserCard(
-                            firstName = friendDto.otherUser?.firstName,
-                            lastName = friendDto.otherUser?.lastName,
+                            firstName = friendDto!!.otherUser?.firstName,
+                            lastName = friendDto!!.otherUser?.lastName,
                             getImage = {
-                                friendDto.otherUser?.photo?.let { photo ->
+                                friendDto!!.otherUser?.photo?.let { photo ->
                                     reservationViewModel.getPhoto(photo)
                                 }
                             },
@@ -261,11 +261,17 @@ fun OrderFormContent(
                     }
                 }
 
-                val maxParticipants = reservationViewModel.totalGuests - 1
-                val currentCount = reservationViewModel.participantIds.size
+                val maxParticipants by remember {
+                    mutableStateOf(reservationViewModel.totalGuests - 1)
+                }
 
-                val canAddMore =
-                    reservationViewModel.totalGuests > 1 && currentCount < maxParticipants
+                val currentCount by remember {
+                    derivedStateOf { reservationViewModel.participantIds.size }
+                }
+
+                val canAddMore by remember {
+                    derivedStateOf { reservationViewModel.totalGuests > 1 && currentCount < maxParticipants }
+                }
 
                 if (!canAddMore) {
                     Text(
@@ -432,14 +438,15 @@ fun AddFriendPopupPaging(
                     }
 
                     else -> {
-                        if (lazyFriends.itemCount == 0) {
+                        val itemCount by remember { derivedStateOf { lazyFriends.itemCount } }
+                        if (itemCount == 0) {
                             Text(
                                 text = stringResource(R.string.label_no_friends),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         } else {
                             LazyColumn(modifier = Modifier.height(300.dp)) {
-                                items(lazyFriends.itemCount) { index ->
+                                items(itemCount) { index ->
                                     val friend = lazyFriends[index]
                                     if (friend != null) {
                                         UserCard(
