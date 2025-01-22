@@ -302,31 +302,73 @@ class ReservationViewModel(
         }
     }
 
-    fun createOrder() {
-        viewModelScope.launch {
-            val orderItems = addedItems.map { (menuItem, quantity) ->
-                OrderDTO.OrderItemDTO(
-                    menuItemId = menuItem.menuItemId,
-                    amount = quantity
-                )
-            }
-            val noteValue = note.value.takeIf { it.isNotBlank() }
-            val order = OrderDTO(
-                visitId = visitId,
-                note = noteValue,
-                items = orderItems
+    suspend fun createOrder(): Result<OrderDTO?> {
+        // 1) Build the order items
+        val orderItems = addedItems.map { (menuItem, quantity) ->
+            OrderDTO.OrderItemDTO(
+                menuItemId = menuItem.menuItemId,
+                amount = quantity
             )
-            val orderResult = ordersService.createOrder(order)
-            _orderResult.value = orderResult
-
-            if (orderResult.isError) {
-                resourceProvider.showToast(resourceProvider.getString(R.string.error_place_order))
-            } else {
-                addedItems.clear()
-                errorMessage = null
-            }
         }
+
+        // 2) Create the OrderDTO
+        val noteValue = note.value.takeIf { it.isNotBlank() }
+        val order = OrderDTO(
+            visitId = visitId,
+            note = noteValue,
+            items = orderItems
+        )
+
+        // 3) Call the service
+        val orderResult = ordersService.createOrder(order)
+        _orderResult.value = orderResult
+
+        // 4) If there's an error, show a toast (optional)
+        if (orderResult.isError) {
+            resourceProvider.showToast(resourceProvider.getString(R.string.error_place_order))
+        } else {
+            // If success, clear cart or do any other logic
+            addedItems.clear()
+            errorMessage = null
+        }
+
+        // 5) Return the result to the caller
+        return orderResult
     }
+
+
+    suspend fun createVisitAndOrder(restaurantId: Int): Result<Pair<VisitDTO?, OrderDTO?>> {
+        // 1) Attempt to create the Visit
+        val visitRes = createVisit(restaurantId)
+        if (visitRes.isError) {
+            // Return an error => do not create the order
+            return Result(
+                isError = true,
+                errors = visitRes.errors,
+                value = Pair(null, null)
+            )
+        }
+
+        // 2) If visit succeeded, create the order
+        val orderRes = createOrder()  // Also returns Result<OrderDTO?>
+        if (orderRes.isError) {
+            // If the order fails, we can optionally roll back or just fail
+            return Result(
+                isError = true,
+                errors = orderRes.errors,
+                value = Pair(null, null)
+            )
+        }
+
+        // 3) If both succeeded, return them in a pair
+        val combinedValue = Pair(visitRes.value, orderRes.value)
+        return Result(
+            isError = false,
+            errors = emptyMap(),
+            value = combinedValue
+        )
+    }
+
 
     private fun getOrder(orderId: Any) {
         viewModelScope.launch {
