@@ -31,6 +31,7 @@ import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.IconWithHeader
+import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 
 @Composable
@@ -218,15 +219,40 @@ fun OrderSummaryActivity(
         ButtonComponent(
             onClick = {
                 reservationViewModel.viewModelScope.launch {
-                    val visitResult = reservationViewModel.createVisit(restaurantId)
+                    // 1) Attempt to create the visit
+                    val visitRes = reservationViewModel.createVisit(restaurantId)
+                    if (!visitRes.isError && visitRes.value != null) {
+                        // SUCCESS => store the visit
+                        reservationViewModel.returnedVisit = visitRes.value
 
-                    if (!visitResult.isError && !isReservation) {
-                        reservationViewModel.createOrder()
-                    }
-
-                    if(!visitResult.isError){
-                        reservationViewModel.returnedVisit = visitResult.value
+                        // 2) If you need deposit logic, do it here
                         showDepositDialog = true
+                        // If deposit is not needed, remove or skip this step
+
+                        // 3) If it's not a reservation, create the order
+                        if (!isReservation) {
+                            val orderRes = reservationViewModel.createOrder()
+                            if (!orderRes.isError && orderRes.value != null) {
+                                // Order success => do something
+                                // e.g. navigate to summary screen
+//                                navController.navigate(
+//                                    RestaurantRoutes.Details(
+//                                        restaurantId = restaurantId
+//                                    )
+//                                )
+                            } else {
+                                // handle order error if needed
+                            }
+                        } else {
+                            // If it's a reservation, maybe navigate or do something else
+//                            navController.navigate(
+//                                RestaurantRoutes.Details(
+//                                    restaurantId = restaurantId
+//                                )
+//                            )
+                        }
+                    } else {
+                        // handle visit error
                     }
                 }
             },
@@ -322,6 +348,11 @@ fun OrderSummaryActivity(
                         TextButton(
                             onClick = {
                                 showDepositDialog = false
+                                navController.navigate(
+                                    RestaurantRoutes.Details(
+                                        restaurantId = restaurantId
+                                    )
+                                )
                             }
                         ) {
                             Text(
@@ -350,6 +381,11 @@ fun OrderSummaryActivity(
                     TextButton(
                         onClick = {
                             showConfirmDialog = false
+                            navController.navigate(
+                                RestaurantRoutes.Details(
+                                    restaurantId = restaurantId
+                                )
+                            )
                         }
                     ) {
                         Text(

@@ -28,7 +28,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
+import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.ui.navigation.RestaurantRoutes
@@ -46,8 +49,14 @@ fun OrderFormContent(
     getMenuPhoto: suspend (String) -> Bitmap?,
     isReservation: Boolean
 ) {
+    val isTakeawayTag = "Takeaway" in restaurant.tags
+    val isOnSiteTag = "OnSite" in restaurant.tags
     var isTakeaway by remember { mutableStateOf(false) }
     var isDelivery by remember { mutableStateOf(false) }
+
+    var isAddFriendPopupOpen by remember { mutableStateOf(false) }
+    val participantsInfo = remember { mutableStateMapOf<String, FriendRequestDTO>() }
+
 
     val now = LocalTime.now()
     val nowFormatted = String.format("%02d:%02d", now.hour, now.minute)
@@ -73,20 +82,21 @@ fun OrderFormContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { Spacer(modifier = Modifier.height(36.dp)) }
-
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(id = R.string.label_takeaway),
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Switch(
-                    checked = isTakeaway,
-                    onCheckedChange = {
-                        isTakeaway = it
-                        reservationViewModel.isTakeaway = it
-                    }
-                )
+        if (isTakeawayTag && !isReservation) {
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(id = R.string.label_takeaway),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Switch(
+                        checked = isTakeaway,
+                        onCheckedChange = {
+                            isTakeaway = it
+                            reservationViewModel.isTakeaway = it
+                        }
+                    )
+                }
             }
         }
 
@@ -109,7 +119,11 @@ fun OrderFormContent(
             val dayHours = restaurant.openingHours?.getOrNull(dayIndex)
             if (dayHours != null) {
                 Text(
-                    text = stringResource(id = R.string.opening_hours, dayHours.from?: "-", dayHours.until?: "-"),
+                    text = stringResource(
+                        id = R.string.opening_hours,
+                        dayHours.from ?: "-",
+                        dayHours.until ?: "-"
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
@@ -143,26 +157,27 @@ fun OrderFormContent(
                         errorText = reservationViewModel.startTimeErrorText
                     )
                 }
+                if (!isTakeaway) {
+                    Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
 
-                Icon(imageVector = Icons.Filled.Remove, contentDescription = "spacer")
-
-                Box(modifier = Modifier.weight(0.45f)) {
-                    MyTimePickerDialog(
-                        initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
-                        onTimeSelected = { time ->
-                            reservationViewModel.updateEndTime(time, restaurant)
-                        },
-                        modifier = Modifier.scale(0.85f),
-                        onlyHalfHours = true,
-                        minTime = reservationViewModel.startTime.value,
-                        isError = reservationViewModel.isEndTimeError,
-                        errorText = reservationViewModel.endTimeErrorText
-                    )
+                    Box(modifier = Modifier.weight(0.45f)) {
+                        MyTimePickerDialog(
+                            initialTime = nextHour.format(DateTimeFormatter.ofPattern("HH:mm")),
+                            onTimeSelected = { time ->
+                                reservationViewModel.updateEndTime(time, restaurant)
+                            },
+                            modifier = Modifier.scale(0.85f),
+                            onlyHalfHours = true,
+                            minTime = reservationViewModel.startTime.value,
+                            isError = reservationViewModel.isEndTimeError,
+                            errorText = reservationViewModel.endTimeErrorText
+                        )
+                    }
                 }
             }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             item {
                 Text(
                     text = stringResource(id = R.string.label_my_basket),
@@ -172,7 +187,7 @@ fun OrderFormContent(
             }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             if (reservationViewModel.addedItems.isNotEmpty()) {
                 items(reservationViewModel.addedItems) { item ->
                     var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
@@ -195,58 +210,127 @@ fun OrderFormContent(
             }
         }
 
-        item {
-            Text(text = stringResource(id = R.string.label_number_of_guests))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(
-                    onClick = {
-                        if (reservationViewModel.numberOfGuests > reservationViewModel.participantIds.size + 1)
-                            reservationViewModel.numberOfGuests--
-                    }
+        if (!isTakeaway) {
+            item {
+                Text(text = stringResource(id = R.string.label_number_of_guests))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(Icons.Default.Remove, contentDescription = null)
-                }
-                Text(text = reservationViewModel.numberOfGuests.toString())
-                IconButton(onClick = { reservationViewModel.numberOfGuests++ }) {
-                    Icon(Icons.Default.Add, contentDescription = null)
+                    IconButton(
+                        onClick = {
+                            if (reservationViewModel.totalGuests > reservationViewModel.participantIds.size + 1)
+                                reservationViewModel.totalGuests--
+                        }
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = null)
+                    }
+                    Text(text = reservationViewModel.totalGuests.toString())
+                    IconButton(onClick = { reservationViewModel.totalGuests++ }) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                    }
                 }
             }
+            // PARTICIPANTS SECTION
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.label_added_participants),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Show each participant
+                reservationViewModel.participantIds.forEach { friendId ->
+                    val friendDto = participantsInfo[friendId]
+                    if (friendDto != null) {
+                        UserCard(
+                            firstName = friendDto.otherUser?.firstName,
+                            lastName = friendDto.otherUser?.lastName,
+                            getImage = {
+                                friendDto.otherUser?.photo?.let { photo ->
+                                    reservationViewModel.getPhoto(photo)
+                                }
+                            },
+                            isDeletable = true,
+                            onRemove = {
+                                reservationViewModel.participantIds.remove(friendId)
+                                participantsInfo.remove(friendId)
+                            }
+                        )
+                    }
+                }
+
+                val maxParticipants = reservationViewModel.totalGuests - 1
+                val currentCount = reservationViewModel.participantIds.size
+
+                val canAddMore =
+                    reservationViewModel.totalGuests > 1 && currentCount < maxParticipants
+
+                if (!canAddMore) {
+                    Text(
+                        text = when {
+                            reservationViewModel.totalGuests <= 1 ->
+                                stringResource(R.string.info_need_at_least_two_guests)
+
+                            else ->
+                                stringResource(R.string.info_reached_max_participants)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    ButtonComponent(
+                        onClick = {
+                            isAddFriendPopupOpen = true
+                            reservationViewModel.loadFriendsPaging()
+                        },
+                        label = stringResource(R.string.label_add_participant)
+                    )
+                }
+            }
+
         }
 
-        item {
-            Text(text = stringResource(id = R.string.tip_label))
+        if (!isTakeaway) {
+            item {
+                Text(text = stringResource(id = R.string.tip_label))
 
-            if(!isReservation) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(5, 10, 15).forEach { percentage ->
-                        Button(onClick = {
-                            val totalCost =
-                                reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
-                                    (menuItem.price ?: 0.0) * quantity
-                                }
-                            reservationViewModel.tip = totalCost * percentage / 100.0
-                        }) {
-                            Text(text = "$percentage%")
+                if (!isReservation) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(5, 10, 15).forEach { percentage ->
+                            Button(onClick = {
+                                val totalCost =
+                                    reservationViewModel.addedItems.sumOf { (menuItem, quantity) ->
+                                        (menuItem.price ?: 0.0) * quantity
+                                    }
+                                reservationViewModel.tip = totalCost * percentage / 100.0
+                            }) {
+                                Text(text = "$percentage%")
+                            }
                         }
                     }
                 }
-            }
 
-            FormInput(
-                inputText = if (reservationViewModel.tip == 0.0) "" else String.format("%.2f", reservationViewModel.tip),
-                onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
-                label = stringResource(id = R.string.tip_label),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
-                optional = true,
-                isError = reservationViewModel.isTipError(),
-                errorText = stringResource(id = R.string.error_tip)
-            )
+                FormInput(
+                    inputText = if (reservationViewModel.tip == 0.0) "" else String.format(
+                        "%.2f",
+                        reservationViewModel.tip
+                    ),
+                    onValueChange = { reservationViewModel.tip = it.toDoubleOrNull() ?: 0.0 },
+                    label = stringResource(id = R.string.tip_label),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    optional = true,
+                    isError = reservationViewModel.isTipError(),
+                    errorText = stringResource(id = R.string.error_tip)
+                )
+            }
         }
 
-        if(!isReservation) {
+        if (!isReservation) {
             item {
                 FormInput(
                     inputText = reservationViewModel.note.value,
@@ -276,14 +360,118 @@ fun OrderFormContent(
                     id = if (isReservation) R.string.submit_reservation else R.string.submit_order
                 ),
                 onClick = {
-                if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
-                    navController.navigate(RestaurantRoutes.Summary(restaurantId = restaurant.restaurantId, isReservation = isReservation))
-                }
-            })
+                    if (reservationViewModel.isReservationValid(isReservation = isReservation)) {
+                        navController.navigate(
+                            RestaurantRoutes.Summary(
+                                restaurantId = restaurant.restaurantId,
+                                isReservation = isReservation
+                            )
+                        )
+                    }
+                })
         }
+    }
+    if (isAddFriendPopupOpen) {
+        AddFriendPopupPaging(
+            onDismiss = { isAddFriendPopupOpen = false },
+            reservationViewModel = reservationViewModel,
+            onAddFriend = { friendId, friendDto ->
+                participantsInfo[friendId] = friendDto
+                if (!reservationViewModel.participantIds.contains(friendId)) {
+                    reservationViewModel.participantIds.add(friendId)
+                }
+                isAddFriendPopupOpen = false
+            }
+        )
     }
 }
 
+@Composable
+fun AddFriendPopupPaging(
+    onDismiss: () -> Unit,
+    reservationViewModel: ReservationViewModel,
+    onAddFriend: (String, FriendRequestDTO) -> Unit
+) {
+    // Collect the paged flow
+    val lazyFriends = reservationViewModel.friendsFlow?.collectAsLazyPagingItems()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.label_select_friends)) },
+        text = {
+            if (lazyFriends == null) {
+                // Not loaded => show spinner
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                // Check load states
+                val loadState = lazyFriends.loadState.refresh
+                when {
+                    loadState is LoadState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    loadState is LoadState.Error -> {
+                        Text(
+                            text = stringResource(R.string.error_loading_data),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                    else -> {
+                        if (lazyFriends.itemCount == 0) {
+                            Text(
+                                text = stringResource(R.string.label_no_friends),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        } else {
+                            LazyColumn(modifier = Modifier.height(300.dp)) {
+                                items(lazyFriends.itemCount) { index ->
+                                    val friend = lazyFriends[index]
+                                    if (friend != null) {
+                                        UserCard(
+                                            firstName = friend.otherUser?.firstName,
+                                            lastName = friend.otherUser?.lastName,
+                                            getImage = {
+                                                friend.otherUser?.photo?.let { photo ->
+                                                    reservationViewModel.getPhoto(photo)
+                                                }
+                                            },
+                                            onClick = {
+                                                friend.otherUser?.userId?.let { uid ->
+                                                    onAddFriend(uid, friend)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.label_close))
+            }
+        },
+        dismissButton = {}
+    )
+}
 
 @Composable
 fun CartItemCard(

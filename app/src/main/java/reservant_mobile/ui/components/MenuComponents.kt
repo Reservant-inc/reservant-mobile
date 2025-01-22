@@ -25,13 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.reservant_mobile.R
@@ -75,7 +72,7 @@ fun MenuPopup(
                     inputText = name.value,
                     onValueChange = { name.value = it },
                     isError = isNameInvalid,
-                    errorText = stringResource(id = R.string.error_invalid_menu_name)
+                    errorText = stringResource(id = R.string.error_invalid_name)
                 )
                 FormInput(
                     label = stringResource(id = R.string.label_alternate_name),
@@ -83,7 +80,7 @@ fun MenuPopup(
                     inputText = altName.value,
                     onValueChange = { altName.value = it },
                     isError = isAltNameInvalid,
-                    errorText = stringResource(id = R.string.error_invalid_menu_name)
+                    errorText = stringResource(id = R.string.error_invalid_name)
                 )
                 ComboBox(
                     label = stringResource(id = R.string.label_menu_type),

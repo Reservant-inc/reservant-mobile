@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DeliveryDining
 import androidx.compose.material.icons.outlined.Dining
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.HideImage
@@ -677,6 +678,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             icon = Icons.Outlined.Delete,
                             titleStringId = R.string.label_delete
                         ),
+                        Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.DeliveryDining,
+                            titleStringId = R.string.label_deliveries
+                        ),
                     )
                     LazyVerticalGrid(
                         modifier = Modifier
@@ -747,6 +755,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantRoutes.Tables> {
             EmployeeTablesActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId,
+                onReturnClick = { navController.popBackStack() }
+            )
+        }
+        composable<RestaurantRoutes.Deliveries> {
+            DeliveriesActivity(
+                navController = navController,
+                restaurantId = it.toRoute<RestaurantRoutes.Deliveries>().restaurantId,
                 onReturnClick = { navController.popBackStack() }
             )
         }

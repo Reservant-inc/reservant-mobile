@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FoodBank
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,12 +54,12 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     name = viewmodel.name,
                     altName = viewmodel.alternateName,
                     price = viewmodel.price,
+                    photoField = viewmodel.photo,
                     alcoholPercentage = viewmodel.alcoholPercentage,
-                    //photo = viewmodel.photo, // TODO: fetchowanie zdjec menu
                     menuItem = item,
                     onEditClick = {
                         viewmodel.viewModelScope.launch {
-                            viewmodel.editMenuItem(item, context)
+                            viewmodel.editMenuItem(item)
                         }
                     },
                     onDeleteClick = {
@@ -68,14 +69,24 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                     },
                     clearFields = viewmodel::clearFields,
                     role = Roles.RESTAURANT_OWNER,
-                    context = context
+                    context = context,
+                    getPhoto = {
+                        item.photo?.let {
+                            viewmodel.fetchPhoto(it)
+                        }
+                    },
+                    isFormValid = viewmodel.isFormValid(),
+                    ingredients = viewmodel.restaurantIngredients.map { it.publicName.orEmpty() },
+                    selectedIngredients = viewmodel.ingredients,
+                    onRemoveIngredient = { s -> viewmodel.onIngredientRemoved(s)},
+                    onAddIngredient = { s -> viewmodel.onIngredientAdded(s) },
+                    fetchIngredients = { i -> viewmodel.fetchIngredientsForMenuItem(i) }
                 )
             }
         }
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-            //.padding(8.dp)
         ){
             AddMenuItemButton(
                 name = viewmodel.name,
@@ -89,22 +100,14 @@ fun MenuItemManagementActivity(onReturnClick: () -> Unit ,menuId: Int, restauran
                         viewmodel.createMenuItem(context)
                     }
                 },
-                context = context
+                context = context,
+                isFormValid = viewmodel.isFormValid(),
+                ingredients = viewmodel.restaurantIngredients.map { it.publicName.orEmpty() },
+                selectedIngredients = viewmodel.ingredients,
+                onRemoveIngredient = { s -> viewmodel.onIngredientRemoved(s)},
+                onAddIngredient = { s -> viewmodel.onIngredientAdded(s) }
             )
         }
     }
-
-
-//    LazyColumn (
-//        modifier = Modifier.padding(16.dp, 8.dp, 16.dp, 8.dp)
-//    ){
-//        items(viewmodel.items) { item ->
-//            MenuItemCard(
-//                menuItem = item,
-//                onEditClick = {}, //TODO
-//                onDeleteClick = { viewmodel.deleteMenu(item) }
-//            )
-//        }
-//    }
 
 }
