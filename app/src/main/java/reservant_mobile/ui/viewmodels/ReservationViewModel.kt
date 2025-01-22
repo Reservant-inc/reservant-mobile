@@ -395,7 +395,7 @@ class ReservationViewModel(
         val visit = VisitDTO(
             date = "${visitDate.value}T${startTime.value}",
             endTime = "${visitDate.value}T${endTime.value}",
-            numberOfGuests = totalGuests-participantIds.size,
+            numberOfGuests = totalGuests-participantIds.size-1,
             tip = tip,
             takeaway = isTakeaway,
             restaurantId = restaurantId,
