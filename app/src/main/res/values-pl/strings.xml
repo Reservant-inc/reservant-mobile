@@ -606,4 +606,6 @@
     <string name="visit_quantity_label">Ilość</string>
     <string name="visit_price_label">Cena</string>
     <string name="visit_status_label">Status</string>
+    <string name="reservation_conflict_message">Masz już rezerwację w tym okresie.</string>
+    <string name="errorCode_NoAvailableTable">W podanym czasie nie ma wolnego stolika.</string>
 </resources>

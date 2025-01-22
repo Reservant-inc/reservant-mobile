@@ -405,6 +405,16 @@ class ReservationViewModel(
         _visitResult.value = visitResult
 
         if (visitResult.isError) {
+            if(visitResult.errors != null) {
+                //TODO zmienić w przyszłości
+                val errorMap = visitResult.errors
+                if (errorMap != null && errorMap.containsValue(R.string.errorCode_Duplicate)) {
+                    resourceProvider.showToast(resourceProvider.getString(R.string.reservation_conflict_message))
+                }
+                if (errorMap != null && errorMap.containsValue(R.string.errorCode_NoAvailableTable)) {
+                    resourceProvider.showToast(resourceProvider.getString(R.string.errorCode_NoAvailableTable))
+                }
+            }
             resourceProvider.showToast(resourceProvider.getString(R.string.error_create_visit))
         } else {
             visitId = visitResult.value!!.visitId!!

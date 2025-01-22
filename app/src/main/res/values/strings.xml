@@ -620,4 +620,6 @@
     <string name="visit_quantity_label">Qty</string>
     <string name="visit_price_label">Price</string>
     <string name="visit_status_label">Status</string>
+    <string name="reservation_conflict_message">You already have a reservation during this time period.</string>
+    <string name="errorCode_NoAvailableTable">There is no table available in this time period.</string>
 </resources>
