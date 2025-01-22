@@ -235,21 +235,21 @@ fun OrderSummaryActivity(
                             if (!orderRes.isError && orderRes.value != null) {
                                 // Order success => do something
                                 // e.g. navigate to summary screen
-                                navController.navigate(
-                                    RestaurantRoutes.Details(
-                                        restaurantId = restaurantId
-                                    )
-                                )
+//                                navController.navigate(
+//                                    RestaurantRoutes.Details(
+//                                        restaurantId = restaurantId
+//                                    )
+//                                )
                             } else {
                                 // handle order error if needed
                             }
                         } else {
                             // If it's a reservation, maybe navigate or do something else
-                            navController.navigate(
-                                RestaurantRoutes.Details(
-                                    restaurantId = restaurantId
-                                )
-                            )
+//                            navController.navigate(
+//                                RestaurantRoutes.Details(
+//                                    restaurantId = restaurantId
+//                                )
+//                            )
                         }
                     } else {
                         // handle visit error
@@ -348,6 +348,11 @@ fun OrderSummaryActivity(
                         TextButton(
                             onClick = {
                                 showDepositDialog = false
+                                navController.navigate(
+                                    RestaurantRoutes.Details(
+                                        restaurantId = restaurantId
+                                    )
+                                )
                             }
                         ) {
                             Text(
@@ -376,6 +381,11 @@ fun OrderSummaryActivity(
                     TextButton(
                         onClick = {
                             showConfirmDialog = false
+                            navController.navigate(
+                                RestaurantRoutes.Details(
+                                    restaurantId = restaurantId
+                                )
+                            )
                         }
                     ) {
                         Text(

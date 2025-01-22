@@ -1,6 +1,7 @@
 package reservant_mobile.ui.activities
 
 import VisitHistoryViewModel
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ fun VisitDetailActivity(
 ) {
     val viewModel: VisitHistoryViewModel = viewModel()
     val visit by viewModel.visit.collectAsState()
+    val orderMap by viewModel.ordersMap.collectAsState()
 
     // Load the visit once
     LaunchedEffect(visitId) {
@@ -102,9 +104,22 @@ fun VisitDetailActivity(
                     }
 
                     items(visit!!.orders!!.size) { index ->
-                        val order = visit!!.orders!![index]
-                        OrderCardReadOnly(order)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        val partialOrder = visit!!.orders!![index]
+                        val orderId = partialOrder.orderId!!
+                        val loadedOrder = orderMap[orderId]
+
+                        // Trigger load if not present
+                        LaunchedEffect(orderId) {
+                            if (loadedOrder == null) {
+                                viewModel.loadSingleOrder(orderId)
+                            }
+                        }
+
+                        if (loadedOrder == null) {
+                            CircularProgressIndicator()
+                        } else {
+                            OrderCardReadOnly(loadedOrder)
+                        }
                     }
                 }
             }
@@ -239,7 +254,7 @@ fun InfoSectionReadOnly(visit: VisitDTO) {
 
         // If there's an orders array, sum the cost
         val totalCost = visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0
-        if (totalCost == 0.0) {
+        if (visit.orders?.size == 0) {
             Text(
                 text = stringResource(R.string.reservation_label),
                 style = MaterialTheme.typography.headlineSmall,
@@ -298,7 +313,8 @@ fun OrderCardReadOnly(order: OrderDTO) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Show status & cost
+
+            // Show order status & cost
             val status = order.status?.toString() ?: stringResource(R.string.unknown_status)
             Text(
                 text = stringResource(R.string.order_status_colon, status),
@@ -316,24 +332,34 @@ fun OrderCardReadOnly(order: OrderDTO) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // Show each item
+            val quantityLabel = stringResource(R.string.visit_quantity_label)  // e.g. "Qty"
+            val priceLabel = stringResource(R.string.visit_price_label)        // e.g. "Price"
+            val statusLabel = stringResource(R.string.visit_status_label)      // e.g. "Status"
+
             order.items?.forEachIndexed { index, item ->
                 val dishName = item.menuItem?.name ?: stringResource(R.string.unknown_dish)
                 val quantity = item.amount ?: 0
                 val price = item.oneItemPrice ?: 0.0
                 val itemStatus = item.status ?: stringResource(R.string.unknown_status)
 
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = dishName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.dish_item_info, quantity, price, itemStatus),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                // Dish name in bold
+                Text(
+                    text = dishName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
 
+                // Single line for "Qty", "Price", "Status"
+                Text(
+                    text = buildString {
+                        append("$quantityLabel: $quantity   ")
+                        append("$priceLabel: ${"%.2f".format(price)}   ")
+                        append("$statusLabel: $itemStatus")
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                // Divider if not the last item
                 if (index < order.items.size - 1) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(

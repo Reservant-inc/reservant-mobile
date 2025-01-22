@@ -603,4 +603,7 @@
     <string name="label_added_participants">Dodano uczestników</string>
     <string name="info_reached_max_participants">Osiągnąłeś maksymalną dozwoloną liczbę uczestników.</string>
     <string name="info_need_at_least_two_guests">Przed dodaniem uczestników musisz ustawić co najmniej dwóch gości.</string>
+    <string name="visit_quantity_label">Ilość</string>
+    <string name="visit_price_label">Cena</string>
+    <string name="visit_status_label">Status</string>
 </resources>

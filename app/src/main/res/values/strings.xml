@@ -617,4 +617,7 @@
     <string name="label_added_participants">Added Participants</string>
     <string name="info_reached_max_participants">You have reached the maximum participants allowed.</string>
     <string name="info_need_at_least_two_guests">You must set at least two guests before adding participants.</string>
+    <string name="visit_quantity_label">Qty</string>
+    <string name="visit_price_label">Price</string>
+    <string name="visit_status_label">Status</string>
 </resources>
