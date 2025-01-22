@@ -612,4 +612,7 @@
     <string name="assigned_agent">Przypisany agent: %1$s %2$s</string>
     <string name="status">Stan: %1$s</string>
     <string name="ordered_at">Zamówiono w</string>
+    <string name="open_chat">Otwórz czat</string>
+    <string name="visit_details">Szczegóły wizyty</string>
+    <string name="reported_user_report">Zgłoszony użytkownik:</string>
 </resources>

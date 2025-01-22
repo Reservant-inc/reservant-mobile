@@ -1,5 +1,6 @@
 package reservant_mobile.ui.viewmodels
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,6 +27,13 @@ class TicketViewModel(
     private val _reportsFlow = MutableStateFlow<Flow<PagingData<ReportDTO>>?>(null)
     val reportsFlow: StateFlow<Flow<PagingData<ReportDTO>>?> = _reportsFlow.asStateFlow()
 
+    suspend fun getPhoto(url: String): Bitmap?{
+        val result = fileService.getImage(url)
+        if (!result.isError){
+            return result.value!!
+        }
+        return null
+    }
     fun loadReports(reportStatus: String) {
         val status = if (reportStatus == "All") null
         else ReportDTO.ReportStatus.valueOf(reportStatus)

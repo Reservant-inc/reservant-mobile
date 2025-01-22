@@ -626,4 +626,7 @@
     <string name="assigned_agent">Agent assigned: %1$s %2$s</string>
     <string name="status">Status: %1$s</string>
     <string name="ordered_at">Ordered at</string>
+    <string name="open_chat">Open chat</string>
+    <string name="visit_details">Visit details</string>
+    <string name="reported_user_report">Reported user:</string>
 </resources>

@@ -1,6 +1,7 @@
 package reservant_mobile.ui.navigation
 
 import kotlinx.serialization.Serializable
+import reservant_mobile.data.models.dtos.ReportDTO
 
 data object UserRoutes {
 
@@ -30,6 +31,11 @@ data object UserRoutes {
     @Serializable
     data class VisitDetails(
         val visitId: Int
+    )
+
+    @Serializable
+    data class ReportDetails(
+        val report: ReportDTO,
     )
 
     @Serializable

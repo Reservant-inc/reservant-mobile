@@ -47,6 +47,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.models.dtos.TicketDTO
+import reservant_mobile.data.utils.formatToDateTime
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.IconWithHeader
@@ -106,7 +107,8 @@ fun TicketHistoryActivity(navController: NavController) {
         ) {
             ReportsTabContent(
                 status = selectedStatus,
-                viewModel = reportViewModel
+                viewModel = reportViewModel,
+                navController = navController
             )
         }
     }
@@ -129,7 +131,8 @@ fun TicketHistoryActivity(navController: NavController) {
 @Composable
 fun ReportsTabContent(
     status: String,
-    viewModel: TicketViewModel
+    viewModel: TicketViewModel,
+    navController: NavController
 ) {
     LaunchedEffect(status) {
         viewModel.loadReports(status)
@@ -141,14 +144,16 @@ fun ReportsTabContent(
     // Display
     ReportsList(
         lazyReports = lazyReports,
-        onRefresh = { viewModel.loadReports(status) }
+        onRefresh = { viewModel.loadReports(status) },
+        navController = navController
     )
 }
 
 @Composable
 fun ReportsList(
     lazyReports: LazyPagingItems<ReportDTO>?,
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
+    navController: NavController
 ) {
     if (lazyReports == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -182,7 +187,7 @@ fun ReportsList(
                     items(lazyReports.itemCount) { index ->
                         val report = lazyReports[index]
                         if (report != null) {
-                            ReportCard(report, {})
+                            ReportCard(report) { navController.navigate(UserRoutes.ReportDetails(report)) }
                         }
                     }
                 }
@@ -221,8 +226,9 @@ fun ReportCard(report: ReportDTO, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
+                val formattedDate = report.reportDate?.let { formatToDateTime(it, "dd MMMM yyyy | HH:mm") } ?: ""
                 Text(
-                    text = stringResource(R.string.date, report.reportDate ?: ""),
+                    text = stringResource(R.string.date, formattedDate),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
