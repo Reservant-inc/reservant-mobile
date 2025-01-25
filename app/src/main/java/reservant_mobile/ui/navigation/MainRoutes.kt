@@ -7,7 +7,9 @@ data object MainRoutes{
     object Home
 
     @Serializable
-    object Settings
+    data class Settings(
+        val restaurantId: Int = 0
+    )
 
     @Serializable
     object ChatList

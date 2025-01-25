@@ -85,7 +85,7 @@ import reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlin.reflect.typeOf
 
 @Composable
-fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false, onReturnClick: () -> Unit = {}) {
+fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false, onReturnClick: () -> Unit = {}, restaurantId: Int = 0) {
     val loginViewModel = viewModel<LoginViewModel>()
     var showLogoutPopup by remember { mutableStateOf(false) }
     var showDeleteAccountPopup by remember { mutableStateOf(false) }
@@ -93,7 +93,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
     Surface {
         val navController = rememberNavController()
 
-        NavHost(navController = navController, startDestination = MainRoutes.Settings){
+        NavHost(navController = navController, startDestination = MainRoutes.Settings(restaurantId = restaurantId)){
             composable<MainRoutes.Settings> {
 
                 Column(
@@ -151,7 +151,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         icon = Icons.Filled.Report,
                         text = stringResource(id = R.string.label_complaints),
                         onClick = {
-                            navController.navigate(UserRoutes.TicketHistory)
+                            navController.navigate(UserRoutes.TicketHistory(restaurantId = restaurantId))
                         }
                     )
 
@@ -160,7 +160,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         icon = Icons.AutoMirrored.Filled.Help,
                         text = stringResource(id = R.string.label_helpdesk),
                         onClick = {
-                            navController.navigate(UserRoutes.Ticket)
+                            navController.navigate(UserRoutes.Ticket(restaurantId = restaurantId))
                         }
                     )
 
@@ -256,10 +256,10 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 VisitHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
-                NewTicketActivity(navController)
+                NewTicketActivity(navController = navController, restaurantId = it.toRoute<UserRoutes.Ticket>().restaurantId,)
             }
             composable<UserRoutes.TicketHistory>{
-                TicketHistoryActivity(navController = navController)
+                TicketHistoryActivity(navController = navController, restaurantId = it.toRoute<UserRoutes.TicketHistory>().restaurantId)
             }
             composable<UserRoutes.Wallet>{
                 WalletActivity(

@@ -56,7 +56,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @Composable
-fun TicketHistoryActivity(navController: NavController) {
+fun TicketHistoryActivity(navController: NavController, restaurantId: Int) {
     val reportViewModel: TicketViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -120,7 +120,7 @@ fun TicketHistoryActivity(navController: NavController) {
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
-            onClick = { navController.navigate(UserRoutes.Ticket) }
+            onClick = { navController.navigate(UserRoutes.Ticket(restaurantId = restaurantId )) }
         ) {
             Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
         }

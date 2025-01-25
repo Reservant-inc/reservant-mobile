@@ -39,7 +39,8 @@ import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @Composable
 fun NewTicketActivity(
-    navController: NavController
+    navController: NavController,
+    restaurantId: Int
 ) {
     val reportsViewModel = viewModel<TicketViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -59,7 +60,7 @@ fun NewTicketActivity(
         }
         // If user IS an employee => show "Report Customer"
         if (isEmployee) {
-            add("Report Customer" to { ReportCustomerTab(reportsViewModel) })
+            add("Report Customer" to { ReportCustomerTab(reportsViewModel, restaurantId) })
         }
         if (!isEmployee) {
             add("Report Lost Item" to { ReportLostItemTab(reportsViewModel) })
@@ -279,7 +280,7 @@ fun ParticipantSelectionPopup(
 
 
 @Composable
-fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
+fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer (Modifier.height(72.dp))
         Text(text = "Report a Customer", style = MaterialTheme.typography.titleLarge)
@@ -299,7 +300,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
         ButtonComponent(
             label = "Select Visit",
             onClick = {
-                reportsViewModel.loadVisitsForUserOrRestaurant()
+                reportsViewModel.loadVisitsForUserOrRestaurant(restaurantId = restaurantId)
                 reportsViewModel.isPickVisitDialogOpen = true
             }
         )

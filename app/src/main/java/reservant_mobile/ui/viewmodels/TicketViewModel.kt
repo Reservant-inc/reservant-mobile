@@ -81,12 +81,12 @@ class TicketViewModel(
 
     // For employees, fetch visits from a restaurant. For customers, fetch personal visits.
     // This is a simplified example.
-    fun loadVisitsForUserOrRestaurant() {
+    fun loadVisitsForUserOrRestaurant(restaurantId: Int = 0) {
         viewModelScope.launch {
             val isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
             val visitsResult = if (isEmployee) {
                 // Example: load visits for a specific restaurantId = 7
-                restaurantService.getVisits(restaurantId = 7)
+                restaurantService.getVisits(restaurantId = restaurantId)
             } else {
                 // For a normal user, get their visit history
                 userService.getUserVisitHistory()
