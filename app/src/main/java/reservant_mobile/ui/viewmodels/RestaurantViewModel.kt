@@ -287,10 +287,6 @@ class RestaurantViewModel(
                 logo.value = "Bledny plik"
         }
 
-
-        println("PHOTOS 1: $restaurantGallery")
-        println("PHOTOS 2: $photos")
-
         if(restaurantGallery.isNotEmpty()){
             photos = restaurantGallery.map {
                 if(!it!!.isError){
