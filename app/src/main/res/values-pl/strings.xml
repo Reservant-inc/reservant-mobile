@@ -598,4 +598,8 @@
     <string name="future_visits_tab">Nadchodzące</string>
     <string name="past_visits_tab">Przeszłe</string>
     <string name="label_my_visits">Moje wizyty</string>
+    <string name="label_change_table">Zmień stolik</string>
+    <string name="label_select_table">Wybierz stolik</string>
+    <string name="label_table_number">Stolik #</string>
+    <string name="label_seats">Miejsca</string>
 </resources>
