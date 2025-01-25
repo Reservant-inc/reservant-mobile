@@ -85,7 +85,11 @@ class EmployeeOrderViewModel(
         viewModelScope.launch {
             val result = visitsService.updateTable(visitId, tableId)
             if (!result.isError) {
-                fetchVisitDetailsById(visitId)
+                visitCache[visitId]?.let { oldVisit ->
+                    val updated = oldVisit.copy(tableId = tableId)
+                    visitCache[visitId] = updated
+                    fetchVisitDetails(updated)
+                }
             }
         }
     }
