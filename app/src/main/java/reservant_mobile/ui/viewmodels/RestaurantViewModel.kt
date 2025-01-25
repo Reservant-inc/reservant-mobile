@@ -386,7 +386,7 @@ class RestaurantViewModel(
             groupId = selectedGroup?.restaurantGroupId,
             photos = photos,
             tables = emptyList(),
-            location = LocationDTO(latitude = 52.39625635, longitude = 20.91364863552046),
+            location = loc,
             openingHours = openingHours.map {
                 RestaurantDTO.AvailableHours(
                     from = it.first?.ifEmpty { null },

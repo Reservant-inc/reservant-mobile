@@ -523,7 +523,7 @@ fun RegisterRestaurantActivity(
                         mutableStateOf(pair.first != null && pair.second != null)
                     }
 
-                    val today by remember {
+                    var today by remember {
                         mutableStateOf(restaurantViewModel.openingHours[index])
                     }
 
@@ -550,6 +550,8 @@ fun RegisterRestaurantActivity(
                                 "09:00" to "18:00"
                             else
                                 null to null
+
+                            today = restaurantViewModel.openingHours[index]
 
                             isOpeningTimeInvalid = restaurantViewModel.isOpeningHoursTimeInvalid(
                                 restaurantViewModel.openingHours[index]
