@@ -181,7 +181,7 @@ fun RestaurantCard(
                                     if (currentTime > closingTime) closingTime else openingTime
                                 )
                             }
-                            
+
                             Text(
                                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                                 text = "${stringResource(id = R.string.label_closed)}: $displayTime",
