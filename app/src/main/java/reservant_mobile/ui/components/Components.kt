@@ -131,10 +131,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.toRoute
 import com.example.reservant_mobile.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -144,10 +141,8 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.activities.FilterOptionWithStars
-import reservant_mobile.ui.navigation.MainRoutes
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
-import kotlin.reflect.KClass
 import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -455,27 +450,18 @@ fun BottomNavigation(
                 }
             ) {
                 items.forEach { item ->
-
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                         label = { Text(stringResource(id = item.label)) },
                         selected = selectedItem == item,
                         alwaysShowLabel = true,
                         onClick = {
-                            navController.navigate(item.route)
-                            selectedItem = item
-                        }
-                    )
-
-                    if (item.label == R.string.label_home){
-                        navController.addOnDestinationChangedListener{ _, destination, _ ->
-                            if(destination.hasRoute<MainRoutes.Home>()){
+                            if (selectedItem != item) {
+                                navController.navigate(item.route)
                                 selectedItem = item
                             }
                         }
-                    }
-
-
+                    )
                 }
             }
         }
