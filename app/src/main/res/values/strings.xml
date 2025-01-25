@@ -612,6 +612,10 @@
     <string name="future_visits_tab">Upcoming</string>
     <string name="past_visits_tab">Past</string>
     <string name="label_my_visits">My visits</string>
+    <string name="label_change_table">Change table</string>
+    <string name="label_select_table">Select table</string>
+    <string name="label_table_number">Table #</string>
+    <string name="label_seats">Seats</string>
     <string name="label_select_report_status">Select status</string>
     <string name="report_title">Report #%1$d</string>
     <string name="category">Category: %1$s</string>
