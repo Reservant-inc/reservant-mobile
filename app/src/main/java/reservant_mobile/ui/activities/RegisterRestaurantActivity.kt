@@ -539,7 +539,7 @@ fun RegisterRestaurantActivity(
                     var isOpeningTimeInvalid by remember {
                         mutableStateOf(restaurantViewModel.isOpeningHoursTimeInvalid(pair))
                     }
-                    
+
                     OpeningHourDayInput(
                         dayOfWeek = dayOfWeek,
                         isOpen = isOpen,
