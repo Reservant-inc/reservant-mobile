@@ -271,6 +271,7 @@ fun RestaurantDetailActivity(
                                     modifier = Modifier
                                         .padding(horizontal = 8.dp)
                                         .scale(0.9f)
+                                        .horizontalScroll(rememberScrollState())
                                 ) {
                                     for (tag in restaurant.tags) {
                                         TagItem(
