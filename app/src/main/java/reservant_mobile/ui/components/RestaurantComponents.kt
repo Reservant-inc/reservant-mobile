@@ -475,6 +475,7 @@ fun OpeningHours(
                         if (availableHours.from == null && availableHours.until == null){
                             withStyle(SpanStyle(color = MaterialTheme.colorScheme.error)){
                                 append(stringResource(id = R.string.label_closed))
+                                append("\n")
                             }
                         } else {
                             append("${availableHours.from} - ${availableHours.until}\n")
