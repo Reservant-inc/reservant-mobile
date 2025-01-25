@@ -86,6 +86,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.models.dtos.RestaurantGroupDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.models.dtos.ReviewDTO
 import reservant_mobile.data.services.UserService
@@ -98,6 +99,7 @@ import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.EventsContent
 import reservant_mobile.ui.components.FloatingTabSwitch
 import reservant_mobile.ui.components.FullscreenGallery
+import reservant_mobile.ui.components.FullscreenPhoto
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.LoadedPhotoComponent
 import reservant_mobile.ui.components.MenuContent
@@ -162,6 +164,9 @@ fun RestaurantDetailActivity(
     ) {
         composable<RestaurantRoutes.Details> {
             var showGallery by remember { mutableStateOf(false) }
+            var showPhoto by remember { mutableStateOf(false) }
+            var selectedPhoto: Bitmap? by remember { mutableStateOf(null) }
+
             var isFavorite by remember { mutableStateOf(false) }
 
             Box(
@@ -314,7 +319,7 @@ fun RestaurantDetailActivity(
 
 
 
-                                if (restaurant.photos.size > 1) {
+                                if (restaurant.photos.isNotEmpty()) {
                                     var images by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
                                     LaunchedEffect(restaurant.photos) {
@@ -348,7 +353,11 @@ fun RestaurantDetailActivity(
                                         ) {
                                             images.take(4).forEach { img ->
                                                 ImageCard(
-                                                    image = img.asImageBitmap()
+                                                    image = img.asImageBitmap(),
+                                                    onClick = {
+                                                        selectedPhoto = img
+                                                        showPhoto = true
+                                                    }
                                                 )
                                             }
                                             if (images.size > 4) {
@@ -466,8 +475,18 @@ fun RestaurantDetailActivity(
                         images = loadedImages.orEmpty()
                     }
                 }
-                FullscreenGallery(onDismiss = { showGallery = false }, bitmaps = images)
+                FullscreenGallery(
+                    onDismiss = { showGallery = false },
+                    onPhotoClick = {
+                        selectedPhoto = it
+                        showPhoto = true
+                    },
+                    bitmaps = images
+                )
 
+            }
+            if (showPhoto) {
+                FullscreenPhoto(onDismiss = { showPhoto = false }, bitmap = selectedPhoto)
             }
             if (isCartVisible) {
                 ModalBottomSheet(

@@ -1,7 +1,6 @@
 package reservant_mobile.ui.components
 
 import android.graphics.Bitmap
-import androidx.annotation.FloatRange
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,11 +52,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.reservant_mobile.R
@@ -320,16 +315,14 @@ fun MenuContent(
         menuItems?.forEach { menuItem ->
             var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
 
-            LaunchedEffect(menuItem.photo) {
-                menuItem.photo?.let { photo ->
-                    menuPhoto = getMenuPhoto(photo)
-                }
-            }
-
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,
-                photo = menuPhoto,
+                getPhoto = {
+                    menuItem.photo?.let {
+                        getMenuPhoto(it)
+                    }
+                },
                 onInfoClick = { /* TODO: Handle info */ },
                 onAddClick = {
                     onAddClick(menuItem)

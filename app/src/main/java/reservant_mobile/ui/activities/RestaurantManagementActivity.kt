@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DeliveryDining
 import androidx.compose.material.icons.outlined.Dining
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.HideImage
@@ -88,6 +89,7 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
+import reservant_mobile.ui.components.FullscreenPhoto
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
@@ -467,6 +469,14 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             }
         }
         composable<RestaurantManagementRoutes.RestaurantPreview> {
+
+            var showPhoto by remember { mutableStateOf(false) }
+            var selectedPhoto: Bitmap? by remember { mutableStateOf(null) }
+
+            if (showPhoto) {
+                FullscreenPhoto(onDismiss = { showPhoto = false }, bitmap = selectedPhoto)
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -604,7 +614,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         ) {
                                             gallery.forEach {
                                                 ImageCard(
-                                                    it.asImageBitmap()
+                                                    it.asImageBitmap(),
+                                                    onClick = {
+                                                        selectedPhoto = it
+                                                        showPhoto = true
+                                                    }
                                                 )
                                             }
                                         }
@@ -677,6 +691,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             icon = Icons.Outlined.Delete,
                             titleStringId = R.string.label_delete
                         ),
+                        Option(
+                            onClick = { navController.navigate(
+                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.DeliveryDining,
+                            titleStringId = R.string.label_deliveries
+                        ),
                     )
                     LazyVerticalGrid(
                         modifier = Modifier
@@ -747,6 +768,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
         composable<RestaurantRoutes.Tables> {
             EmployeeTablesActivity(
                 restaurantId = it.toRoute<RestaurantRoutes.ManageOrders>().restaurantId,
+                onReturnClick = { navController.popBackStack() }
+            )
+        }
+        composable<RestaurantRoutes.Deliveries> {
+            DeliveriesActivity(
+                navController = navController,
+                restaurantId = it.toRoute<RestaurantRoutes.Deliveries>().restaurantId,
                 onReturnClick = { navController.popBackStack() }
             )
         }

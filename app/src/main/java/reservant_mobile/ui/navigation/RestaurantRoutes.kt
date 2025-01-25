@@ -66,6 +66,11 @@ data object RestaurantRoutes {
     )
 
     @Serializable
+    data class Deliveries(
+        val restaurantId: Int
+    )
+
+    @Serializable
     data class IngredientHistory(
         val ingredient: IngredientDTO
     )

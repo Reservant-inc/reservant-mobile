@@ -63,8 +63,11 @@ import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.PermissionStrings
 import reservant_mobile.data.constants.PrefsKeys
 import reservant_mobile.data.constants.Roles
+import reservant_mobile.data.models.dtos.IngredientDTO
+import reservant_mobile.data.models.dtos.ReportDTO
 import reservant_mobile.data.services.LocalDataService
 import reservant_mobile.data.services.UserService
+import reservant_mobile.data.utils.toCustomNavType
 import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.IconWithHeader
@@ -79,6 +82,7 @@ import reservant_mobile.ui.navigation.RestaurantManagementRoutes
 import reservant_mobile.ui.navigation.RestaurantRoutes
 import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.LoginViewModel
+import kotlin.reflect.typeOf
 
 @Composable
 fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false, onReturnClick: () -> Unit = {}) {
@@ -160,20 +164,6 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         }
                     )
 
-//                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-//                        UnderlinedItem(
-//                            icon = Icons.Filled.CardGiftcard,
-//                            text = stringResource(id = R.string.label_promo_codes),
-//                            onClick = {  Navigate to Promo Codes  }
-//                        )
-//
-//
-//                    UnderlinedItem(
-//                        icon = Icons.Filled.Settings,
-//                        text = stringResource(id = R.string.label_app_settings),
-//                        onClick = { }
-//                    )
-
                     UnderlinedItem(
                         icon = Icons.Filled.Brightness4,
                         text = stringResource(id = R.string.label_toggle_dark_theme),
@@ -252,7 +242,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 VisitHistoryActivity(navController = navController)
             }
             composable<UserRoutes.Ticket>{
-                NewTicketActivity()
+                NewTicketActivity(navController)
             }
             composable<UserRoutes.TicketHistory>{
                 TicketHistoryActivity(navController = navController)
@@ -261,6 +251,12 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 WalletActivity(
                     onReturnClick = { navController.popBackStack() }
                 )
+            }
+            composable<UserRoutes.ReportDetails>(
+                typeMap = mapOf(typeOf<ReportDTO>() to toCustomNavType(ReportDTO.serializer())),
+            ) {
+                val item = it.toRoute<UserRoutes.ReportDetails>().report
+                ReportDetailsActivity(report = item, navController = navController)
             }
             composable<EventRoutes.Details>{
                 EventDetailActivity(
@@ -385,6 +381,12 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                 VisitDetailActivity(
                     visitId = it.toRoute<UserRoutes.VisitDetails>().visitId,
                     onReturnClick = {navController.popBackStack()}
+                )
+            }
+            composable<RestaurantRoutes.Details> {
+                RestaurantDetailActivity(
+                    restaurantId = it.toRoute<RestaurantRoutes.Details>().restaurantId,
+                    onReturnClick = { navController.popBackStack() }
                 )
             }
 

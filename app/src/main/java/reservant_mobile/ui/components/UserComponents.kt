@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,18 +38,20 @@ fun UserCard(
     firstName: String?,
     lastName: String?,
     getImage: suspend () -> Bitmap?,
-    onClick: () -> Unit = {  }
-){
-    Card (
+    onClick: () -> Unit = { },
+    // New:
+    isDeletable: Boolean = false,
+    onRemove: (() -> Unit)? = null
+) {
+    Card(
         onClick = onClick,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-    ){
+    ) {
         Row(modifier = Modifier.padding(8.dp)) {
+            // Photo section
             LoadedPhotoComponent(
                 photoModifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -65,16 +71,31 @@ fun UserCard(
 
             Column(
                 Modifier
-                    .weight(0.8f)
-                    .align(Alignment.CenterVertically)) {
+                    .weight(if (isDeletable) 0.7f else 0.8f)
+                    .align(Alignment.CenterVertically)
+            ) {
                 Text(
-                    text = "$firstName $lastName",
+                    text = "${firstName ?: ""} ${lastName ?: ""}".trim(),
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp)
                 )
+            }
+
+            if (isDeletable && onRemove != null) {
+                androidx.compose.material3.IconButton(
+                    onClick = { onRemove() },
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.remove),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun ThreadListItem(

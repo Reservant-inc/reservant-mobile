@@ -18,6 +18,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +55,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -142,7 +143,6 @@ import reservant_mobile.data.utils.BottomNavItem
 import reservant_mobile.ui.activities.FilterOptionWithStars
 import reservant_mobile.ui.viewmodels.RestaurantViewModel
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -239,9 +239,9 @@ fun ButtonComponent(
         modifier =
         if(fullWidth)
             modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(gradientBrush, RoundedCornerShape(16.dp))
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .background(gradientBrush, RoundedCornerShape(16.dp))
         else
             modifier
                 .wrapContentWidth()
@@ -422,7 +422,8 @@ fun ShowErrorToast(context: Context, id: Int) {
 fun BottomNavigation(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
-    items: List<BottomNavItem>
+    items: List<BottomNavItem>,
+    defaultSelectedItem: MutableState<BottomNavItem?>? = null
 ) {
     var selectedItem by remember { mutableStateOf(items.first()) }
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
@@ -453,11 +454,12 @@ fun BottomNavigation(
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                         label = { Text(stringResource(id = item.label)) },
-                        selected = selectedItem == item,
+                        selected = (defaultSelectedItem?.value ?: selectedItem) == item,
                         alwaysShowLabel = true,
                         onClick = {
                             if (selectedItem != item) {
                                 navController.navigate(item.route)
+                                defaultSelectedItem?.value = item
                                 selectedItem = item
                             }
                         }
@@ -800,8 +802,76 @@ fun TagItem(
 }
 
 @Composable
+fun IngredientList(ingredients: List<String>, onRemoveIngredient: (String) -> Unit){
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(vertical = 8.dp)
+    ) {
+        ingredients.forEach {
+            TagItem(tag = it, onRemove = { onRemoveIngredient(it) })
+        }
+    }
+}
+
+@Composable
+fun IngredientSelectionScreen(
+    title: String,
+    ingredients: List<String>,
+    selectedIngredients: List<String>,
+    onDismiss: () -> Unit,
+    onIngredientSelected: (String, Boolean) -> Unit
+){
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            LazyColumn {
+                items(ingredients) { ingredient ->
+                    var isChecked by remember {
+                        mutableStateOf(selectedIngredients.contains(ingredient))
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked,
+                            onCheckedChange = { isSelected ->
+                                onIngredientSelected(ingredient, isSelected)
+                                isChecked = !isChecked
+                            }
+                        )
+                        Text(
+                            text = ingredient,
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .clickable {
+                                    onIngredientSelected(ingredient, !isChecked)
+                                    isChecked = !isChecked
+                                }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("OK")
+            }
+        }
+    )
+}
+
+@Composable
 fun FullscreenGallery(
     onDismiss: () -> Unit,
+    onPhotoClick: (Bitmap) -> Unit = {},
     bitmaps: List<Bitmap>
 ) {
 
@@ -822,7 +892,7 @@ fun FullscreenGallery(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(onClick = onDismiss) {
                         Icon(
@@ -853,12 +923,77 @@ fun FullscreenGallery(
                                     bitmap = bitmaps[index].asImageBitmap(),
                                     contentDescription = "Image $index",
                                     modifier = Modifier
+                                        .clickable {
+                                            onPhotoClick(bitmaps[index])
+                                        }
                                         .fillMaxSize()
                                         .background(Color.Gray),
                                     contentScale = ContentScale.Crop
                                 )
                             }
                         }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FullscreenPhoto(
+    onDismiss: () -> Unit,
+    bitmap: Bitmap?
+) {
+    val size = 1000.dp
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 64.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(
+                        Color.Black.copy(alpha = 0.8f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                if (bitmap != null) {
+                    Card(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .aspectRatio(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Gray),
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 } else {
                     Box(
@@ -913,7 +1048,8 @@ fun SearchBarWithFilter(
     filterOptions: List<String>? = null, // Optional list for string filters
     filterOptionsInt: List<Int>? = null, // Optional list for int filters
     additionalButtonOnClick: (() -> Unit)? = null,
-    additionalButtonIcon: ImageVector? = null
+    additionalButtonIcon: ImageVector? = null,
+    hideAllOption: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     val labelAll = stringResource(id = R.string.label_all)
@@ -972,15 +1108,18 @@ fun SearchBarWithFilter(
                     onDismissRequest = { expanded = false },
                     modifier = Modifier.wrapContentSize(Alignment.TopEnd)
                 ) {
-                    // Opcja "Wszystkie"
-                    DropdownMenuItem(
-                        text = { Text(text = labelAll) },
-                        onClick = {
-                            onFilterSelected?.invoke(null)
-                            onFilterSelectedInt?.invoke(null)
-                            expanded = false
-                        }
-                    )
+                    if(!hideAllOption){
+                        // Opcja "Wszystkie"
+                        DropdownMenuItem(
+                            text = { Text(text = labelAll) },
+                            onClick = {
+                                onFilterSelected?.invoke(null)
+                                onFilterSelectedInt?.invoke(null)
+                                expanded = false
+                            }
+                        )
+                    }
+
                     // Opcje filtrowania dla stringów
                     filterOptions?.forEach { filter ->
                         DropdownMenuItem(
@@ -1180,11 +1319,13 @@ fun ImageCard(
 
 @Composable
 fun ImageCard(
-    image: ImageBitmap
+    image: ImageBitmap,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
+        onClick = { onClick() },
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Image(
