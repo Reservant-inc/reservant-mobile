@@ -746,8 +746,16 @@ fun RegisterRestaurantActivity(
                                     restaurantViewModel.maxReservationMinutes.name,
                                     "30"
                                 )
-                            else
-                                stringResource(id = R.string.error_registerRestaurant_invalid_max_duration)
+                            else{
+                                val parsedDur = restaurantViewModel.maxReservationMinutes.value.toIntOrNull()
+                                if( parsedDur != null && parsedDur < 30){
+                                    stringResource(id = R.string.error_registerRestaurant_invalid_max_duration)
+                                }
+                                else{
+                                    stringResource(id = R.string.error_registerRestaurant_invalid_max_duration2)
+                                }
+                            }
+
                         ,
                         formSent = formSent3,
                         keyboardOptions = KeyboardOptions(

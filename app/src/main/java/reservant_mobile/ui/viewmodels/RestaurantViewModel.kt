@@ -522,6 +522,7 @@ class RestaurantViewModel(
 
         return maxResMinutesInt == null ||
                 maxResMinutesInt < 30 ||
+                maxResMinutesInt > 1440 ||
                 getFieldError(resultRegistration, maxReservationMinutes.name) != -1
     }
 

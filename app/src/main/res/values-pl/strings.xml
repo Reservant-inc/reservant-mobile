@@ -642,4 +642,5 @@
     <string name="error_invalid_price">Niepoprawna cena</string>
     <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
     <string name="label_choose_ingredients">Wybierz składniki</string>
+    <string name="error_registerRestaurant_invalid_max_duration2">Maksymalny czas trwania rezerwacji jes za długi</string>
 </resources>
