@@ -247,7 +247,7 @@ class RestaurantViewModel(
                 sendPhoto(it, context)
             }
         } else {
-            listOf(null)
+            emptyList()
         }
 
         val permission = if (!businessPermission.value.endsWith(
@@ -287,13 +287,14 @@ class RestaurantViewModel(
                 logo.value = "Bledny plik"
         }
 
-
-        photos = restaurantGallery.map {
-            if(it != null && !it.isError){
-                it.value?.fileName ?: ""
-            }
-            else {
-                "Bledny plik"
+        if(restaurantGallery.isNotEmpty()){
+            photos = restaurantGallery.map {
+                if(!it!!.isError){
+                    it.value?.fileName ?: ""
+                }
+                else {
+                    "Bledny plik"
+                }
             }
         }
 
@@ -521,6 +522,7 @@ class RestaurantViewModel(
 
         return maxResMinutesInt == null ||
                 maxResMinutesInt < 30 ||
+                maxResMinutesInt > 1440 ||
                 getFieldError(resultRegistration, maxReservationMinutes.name) != -1
     }
 

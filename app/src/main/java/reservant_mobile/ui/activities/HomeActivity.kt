@@ -68,13 +68,16 @@ fun HomeActivity() {
         BottomNavItem.Profile
     )
 
+    val selectedBottomBarItem = mutableStateOf<BottomNavItem?>(null)
+
     AppTheme (darkTheme = darkTheme) {
         Scaffold(
             bottomBar = {
                  BottomNavigation(
                      navController =  innerNavController,
                      bottomBarState = bottomBarState,
-                     items = items
+                     items = items,
+                     defaultSelectedItem = selectedBottomBarItem
                  )
             }
         ){
@@ -87,6 +90,9 @@ fun HomeActivity() {
                 }
 
                 composable<MainRoutes.Home>{
+                    LaunchedEffect(Unit) {
+                        selectedBottomBarItem.value = items.first()
+                    }
                     MapActivity(isUserLoggedIn = true)
                 }
                 composable<RestaurantManagementRoutes.Restaurant>{
@@ -99,6 +105,9 @@ fun HomeActivity() {
                     )
                 }
                 composable<MainRoutes.Settings>{
+                    LaunchedEffect(Unit) {
+                        selectedBottomBarItem.value = items.last()
+                    }
                     SettingsActivity(
                         homeNavController = innerNavController,
                         themeChange = {
@@ -111,6 +120,9 @@ fun HomeActivity() {
                     )
                 }
                 composable<MainRoutes.ChatList> {
+                    LaunchedEffect(Unit) {
+                        selectedBottomBarItem.value = items[1]
+                    }
                     ChatListActivity()
                 }
                 composable<AuthRoutes.Landing>{

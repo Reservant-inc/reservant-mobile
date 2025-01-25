@@ -422,7 +422,8 @@ fun ShowErrorToast(context: Context, id: Int) {
 fun BottomNavigation(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
-    items: List<BottomNavItem>
+    items: List<BottomNavItem>,
+    defaultSelectedItem: MutableState<BottomNavItem?>? = null
 ) {
     var selectedItem by remember { mutableStateOf(items.first()) }
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
@@ -453,11 +454,12 @@ fun BottomNavigation(
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                         label = { Text(stringResource(id = item.label)) },
-                        selected = selectedItem == item,
+                        selected = (defaultSelectedItem?.value ?: selectedItem) == item,
                         alwaysShowLabel = true,
                         onClick = {
                             if (selectedItem != item) {
                                 navController.navigate(item.route)
+                                defaultSelectedItem?.value = item
                                 selectedItem = item
                             }
                         }
