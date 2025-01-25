@@ -247,7 +247,7 @@ class RestaurantViewModel(
                 sendPhoto(it, context)
             }
         } else {
-            listOf(null)
+            emptyList()
         }
 
         val permission = if (!businessPermission.value.endsWith(
@@ -288,12 +288,17 @@ class RestaurantViewModel(
         }
 
 
-        photos = restaurantGallery.map {
-            if(it != null && !it.isError){
-                it.value?.fileName ?: ""
-            }
-            else {
-                "Bledny plik"
+        println("PHOTOS 1: $restaurantGallery")
+        println("PHOTOS 2: $photos")
+
+        if(restaurantGallery.isNotEmpty()){
+            photos = restaurantGallery.map {
+                if(!it!!.isError){
+                    it.value?.fileName ?: ""
+                }
+                else {
+                    "Bledny plik"
+                }
             }
         }
 
