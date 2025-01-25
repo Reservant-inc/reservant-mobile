@@ -57,7 +57,7 @@
     <string name="error_registerRestaurant_invalid_file">Niepoprawny plik - maksymalny rozmiar %1$dKB</string>
     <string name="label_optional">- opcjonalne</string>
     <string name="error_registerRestaurant_invalid_description">Niepoprawny opis</string>
-    <string name="error_registerRestaurant_invalid_max_duration">Maksymalny czas trwania rezerwacji musi być pomiędzy 30 a 720 minut</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Maksymalny czas trwania rezerwacji musi być >= 30 minut</string>
     <string name="label_registerRestaurant_delivery">Dostawa na naszym pośrednictwem:</string>
     <string name="label_registerRestaurant_choseTags">Wybierz tagi opisujące twój lokal</string>
     <string name="label_yes">tak</string>
