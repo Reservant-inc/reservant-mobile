@@ -45,6 +45,9 @@ class TicketViewModel(
     var selectedParticipant: UserDTO? by mutableStateOf(null)
     var selectedEmployee: UserSummaryDTO? by mutableStateOf(null)
 
+    var selectedStatus by mutableStateOf(ReportDTO.ReportStatus.All)
+
+
     // Possibly store success/failure
     var showSuccessDialog by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
@@ -64,10 +67,13 @@ class TicketViewModel(
         }
         return null
     }
-    fun loadReports(reportStatus: String) {
-        val status = if (reportStatus == "All") null
-        else ReportDTO.ReportStatus.valueOf(reportStatus)
 
+    fun loadReports(reportStatus: ReportDTO.ReportStatus) {
+        val status = if (reportStatus == ReportDTO.ReportStatus.All) {
+            null
+        } else {
+            reportStatus
+        }
         viewModelScope.launch {
             val result = userService.getReports(status = status)
             if (!result.isError && result.value != null) {
@@ -77,6 +83,7 @@ class TicketViewModel(
             }
         }
     }
+
 
 
     // For employees, fetch visits from a restaurant. For customers, fetch personal visits.
