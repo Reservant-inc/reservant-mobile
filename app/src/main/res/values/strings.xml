@@ -61,7 +61,7 @@
     <string name="error_registerRestaurant_invalid_file">Invalid file - max size %1$dKB</string>
     <string name="label_optional">" - optional"</string>
     <string name="error_registerRestaurant_invalid_description">Invalid description</string>
-    <string name="error_registerRestaurant_invalid_max_duration">Reservation duration has to be >= 30 minutes</string>
+    <string name="error_registerRestaurant_invalid_max_duration">Reservation duration has to be between 30 and 720 minutes</string>
     <string name="label_restaurant_logo" translatable="false">Logo</string>
     <string name="label_registerRestaurant_delivery">Delivery by us:</string>
     <string name="label_registerRestaurant_choseTags">Choose tags for your premises</string>
