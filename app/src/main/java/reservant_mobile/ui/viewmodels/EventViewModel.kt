@@ -313,11 +313,15 @@ class EventViewModel(
     }
 
     fun isDescriptionInvalid(): Boolean {
-        return description.isBlank() || getFieldError(result, "description") != -1
+        return description.isBlank() || description.length > 200 || getFieldError(result, "description") != -1
     }
 
     fun getDescriptionError(): Int {
-        return getFieldError(result, "description")
+        return when {
+            description.isBlank() -> R.string.error_field_required
+            description.length > 200 -> R.string.error_description_too_long
+            else -> getFieldError(result, "description")
+        }
     }
 
     fun isEventDateInvalid(): Boolean {

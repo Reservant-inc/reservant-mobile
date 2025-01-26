@@ -668,4 +668,5 @@
     <string name="label_new_password">New password</string>
     <string name="label_old_password">Old password</string>
     <string name="label_change_password">Change password</string>
+    <string name="error_description_too_long">Description cannot exceed 200 characters</string>
 </resources>
