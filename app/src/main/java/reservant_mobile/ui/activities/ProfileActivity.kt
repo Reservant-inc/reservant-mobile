@@ -1174,17 +1174,17 @@ fun ChangePasswordDialog(
                         }
                     }
                 ) {
-                    Text("Save")
+                    Text(stringResource(id = R.string.label_save))
                 }
             }
 
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.label_cancel))
             }
         },
-        title = { Text("Change password") },
+        title = { Text(stringResource(id = R.string.label_change_password)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1345,15 +1345,15 @@ fun EditProfileDialog(
                     }
                 }
             ) {
-                Text("Save")
+                Text(stringResource(id = R.string.label_save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.label_cancel))
             }
         },
-        title = { Text("Edit Profile") },
+        title = { Text(stringResource(id = R.string.label_edit_profile)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1362,7 +1362,7 @@ fun EditProfileDialog(
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("First Name") },
+                    label = { Text(stringResource(id = R.string.label_name)) },
                     isError = firstName.isBlank() && formSent,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -1370,7 +1370,7 @@ fun EditProfileDialog(
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Last Name") },
+                    label = { Text(stringResource(id = R.string.label_lastname)) },
                     isError = lastName.isBlank() && formSent,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -1406,7 +1406,7 @@ fun EditProfileDialog(
                 )
 
                 MyDatePickerDialog(
-                    label = "Birth Date",
+                    label = stringResource(id = R.string.label_birthday),
                     onDateChange = { selectedDate ->
                         birthDate = selectedDate
                     },
@@ -1415,7 +1415,7 @@ fun EditProfileDialog(
                 )
 
                 FormFileInput(
-                    label = "Profile Photo",
+                    label = stringResource(id = R.string.label_profile_picture),
                     onFilePicked = { file ->
                         photo = file.toString()
                     },
@@ -1427,7 +1427,7 @@ fun EditProfileDialog(
                         onChangePassword()
                         onDismiss()
                     },
-                    label = "Change password"
+                    label = stringResource(id = R.string.label_change_password)
                 )
             }
         }

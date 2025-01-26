@@ -665,4 +665,5 @@
     <string name="errorCode_IdentityError">Passwords must have at least one non alphanumeric character.</string>
     <string name="label_new_password">New password</string>
     <string name="label_old_password">Old password</string>
+    <string name="label_change_password">Change password</string>
 </resources>
