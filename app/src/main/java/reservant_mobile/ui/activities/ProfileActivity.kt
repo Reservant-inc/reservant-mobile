@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -62,6 +64,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -86,6 +90,7 @@ import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.Country
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.CountryPickerView
 import reservant_mobile.ui.components.EventCard
 import reservant_mobile.ui.components.FloatingTabSwitch
@@ -114,6 +119,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
     var showErrorToast by remember { mutableStateOf(false) }
 
     var showEditDialog by remember { mutableStateOf(false) }
+    var showChangePassword by remember { mutableStateOf(false) }
 
     val friendsFlow by profileViewModel.friendsFlow.collectAsState()
     val friendsPagingItems = friendsFlow?.collectAsLazyPagingItems()
@@ -170,9 +176,21 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                         navController.popBackStack()
                     },
                     onDismiss = { showEditDialog = false },
+                    onChangePassword = { showChangePassword = true },
                     context = context
                 )
             }
+        }
+
+        if(showChangePassword){
+            ChangePasswordDialog(
+                viewModel = profileViewModel,
+                onDismiss = {
+                    profileViewModel.oldPassword.value = ""
+                    profileViewModel.newPassword.value = ""
+                    profileViewModel.repeatNewPassword.value = ""
+                    showChangePassword = false },
+            )
         }
 
         if(!profileViewModel.isLoading){
@@ -1121,12 +1139,166 @@ fun getCountriesList(): List<Country> {
 
     return countries.sortedBy { it.fullName }
 }
+
+
+@Composable
+fun ChangePasswordDialog(
+    viewModel: ProfileViewModel,
+    onDismiss: () -> Unit
+){
+    var isOldPasswordVisible by remember { mutableStateOf(false) }
+    var isNewPasswordVisible by remember { mutableStateOf(false) }
+    var isRepeatPasswordVisible by remember { mutableStateOf(false) }
+
+    var isLoading by remember { mutableStateOf(false) }
+
+
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            if (isLoading){
+                CircularProgressIndicator()
+            }else {
+                TextButton(
+                    onClick = {
+                        viewModel.viewModelScope.launch {
+                            isLoading = true
+                            val res = viewModel.changePassword()
+                            isLoading = false
+
+                            if(res){
+                                onDismiss()
+                            }
+
+                        }
+                    }
+                ) {
+                    Text("Save")
+                }
+            }
+
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Change password") },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                FormInput(
+                    inputText = viewModel.oldPassword.value,
+                    onValueChange = {
+                        viewModel.oldPassword.value = it
+                    },
+                    label = stringResource(R.string.label_old_password),
+                    leadingIcon = {
+                        IconButton(onClick = { isOldPasswordVisible = !isOldPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isOldPasswordVisible)
+                                    Icons.Filled.Visibility
+                                else
+                                    Icons.Filled.VisibilityOff,
+                                contentDescription = stringResource(R.string.label_password_visibility)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isOldPasswordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    isError = viewModel.oldPassword.value.isBlank() || viewModel.getOldPasswordError() != -1,
+                    errorText = stringResource(
+                        if(viewModel.getOldPasswordError() != -1)
+                            viewModel.getOldPasswordError()
+                        else{
+                            R.string.error_field_required
+                        }
+                    ),
+                )
+                FormInput(
+                    inputText = viewModel.newPassword.value,
+                    onValueChange = {
+                        viewModel.newPassword.value = it
+                    },
+                    label = stringResource(R.string.label_new_password),
+                    leadingIcon = {
+                        IconButton(onClick = { isNewPasswordVisible = !isNewPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isNewPasswordVisible)
+                                    Icons.Filled.Visibility
+                                else
+                                    Icons.Filled.VisibilityOff,
+                                contentDescription = stringResource(R.string.label_password_visibility)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isNewPasswordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    isError = viewModel.isNewPasswordInvalid(),
+                    errorText = if(viewModel.getNewPasswordError() != -1){
+                        stringResource(viewModel.getNewPasswordError())
+                    }else {
+                        stringResource(R.string.error_register_invalid_password)
+
+                    }
+                )
+                FormInput(
+                    inputText = viewModel.repeatNewPassword.value,
+                    onValueChange = {
+                        viewModel.repeatNewPassword.value = it
+                    },
+                    label = stringResource(R.string.label_register_repeat_password),
+                    leadingIcon = {
+                        IconButton(onClick = { isRepeatPasswordVisible = !isRepeatPasswordVisible }) {
+                            Icon(
+                                imageVector = if (isRepeatPasswordVisible)
+                                    Icons.Filled.Visibility
+                                else
+                                    Icons.Filled.VisibilityOff,
+                                contentDescription = stringResource(R.string.label_password_visibility)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isRepeatPasswordVisible)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    isError = viewModel.repeatNewPassword.value.isNotBlank() &&
+                            viewModel.repeatNewPassword.value != viewModel.newPassword.value,
+                    errorText = stringResource(R.string.error_register_password_match),
+                )
+            }
+        }
+    )
+}
+
+
 @Composable
 fun EditProfileDialog(
     viewModel: ProfileViewModel,
     user: UserDTO,
     onDismiss: () -> Unit,
     onSave: (UserDTO) -> Unit,
+    onChangePassword: () -> Unit = {},
     context: Context
 ) {
     var firstName by remember { mutableStateOf(user.firstName) }
@@ -1248,6 +1420,14 @@ fun EditProfileDialog(
                         photo = file.toString()
                     },
                     context = context,
+                )
+
+                ButtonComponent(
+                    onClick = {
+                        onChangePassword()
+                        onDismiss()
+                    },
+                    label = "Change password"
                 )
             }
         }
