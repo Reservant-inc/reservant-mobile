@@ -52,7 +52,7 @@ fun NewTicketActivity(
     val isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
 
     val tabPages = buildList<Pair<String, @Composable () -> Unit>> {
-        add("Report Bug" to { ReportBugTab(reportsViewModel) })
+        add(stringResource(R.string.report_bug) to { ReportBugTab(reportsViewModel) })
         if (!isEmployee) {
             add(stringResource(R.string.report_employee) to { ReportEmployeeTab(reportsViewModel) })
         }
@@ -62,8 +62,6 @@ fun NewTicketActivity(
         if (!isEmployee) {
             add(stringResource(R.string.report_lost_item) to { ReportLostItemTab(reportsViewModel) })
         }
-        // Everyone can see Bug
-        add(stringResource(R.string.report_bug) to { ReportBugTab(reportsViewModel) })
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
