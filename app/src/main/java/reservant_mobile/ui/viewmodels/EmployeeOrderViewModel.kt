@@ -155,24 +155,26 @@ class EmployeeOrderViewModel(
         }
     }
 
-    fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String, visitId: Int) {
-        viewModelScope.launch {
-            val orderDTO = OrderDTO(
-                employeeId = employeeId,
-                items = listOf(
-                    OrderDTO.OrderItemDTO(
-                        menuItemId = menuItemId,
-                        status = status
-                    )
+    suspend fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String, visitId: Int): Boolean {
+
+        val orderDTO = OrderDTO(
+            employeeId = employeeId,
+            items = listOf(
+                OrderDTO.OrderItemDTO(
+                    menuItemId = menuItemId,
+                    status = status
                 )
             )
-            val result = ordersService.changeOrderStatus(orderId, orderDTO)
-            if (!result.isError) {
-                fetchVisitDetailsById(visitId)
-            } else {
-                // Error
-            }
+        )
+        val result = ordersService.changeOrderStatus(orderId, orderDTO)
+        if (!result.isError) {
+            fetchVisitDetailsById(visitId)
+            return true
+        } else {
+            // Error
         }
+        return false
+
     }
 
 
