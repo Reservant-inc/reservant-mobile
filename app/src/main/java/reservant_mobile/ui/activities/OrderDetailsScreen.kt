@@ -48,6 +48,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.StatusUtils
@@ -691,10 +692,19 @@ fun ChangeStatusDialog(
 ) {
     val context = LocalContext.current
 
-    val employeeList by viewModel.employees.collectAsState()
-    val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap =
-        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val allEmployees by viewModel.employees.collectAsState()
+
+
+    val filteredEmployees = allEmployees.filterNot { employee ->
+        employee.roles.orEmpty().contains(Roles.RESTAURANT_BACKDOORS_EMPLOYEE)
+    }
+
+    val employeeNames = filteredEmployees.map { "${it.firstName} ${it.lastName}" }
+
+    val employeeIdMap = filteredEmployees.associateBy(
+        keySelector = { "${it.firstName} ${it.lastName}" },
+        valueTransform = { it.employeeId }
+    )
 
     var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
