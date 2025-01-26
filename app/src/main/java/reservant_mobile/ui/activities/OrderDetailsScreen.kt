@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,8 +44,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.StatusUtils
@@ -286,6 +290,8 @@ fun DishCard(
 
     val showChangeStatusDialog = remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -351,17 +357,41 @@ fun DishCard(
     }
 
     if (showChangeStatusDialog.value) {
+        val changedText = stringResource(R.string.label_status_changed)
+        val errorText = stringResource(R.string.error_status_change)
+
         ChangeStatusDialog(
             onDismiss = { showChangeStatusDialog.value = false },
             onSubmit = { employeeId, status ->
-                viewModel.changeOrderStatus(
-                    orderId = orderId,
-                    menuItemId = item.menuItemId ?: 0,
-                    employeeId = employeeId,
-                    status = status,
-                    visitId = visitId
-                )
-                showChangeStatusDialog.value = false
+                viewModel.viewModelScope.launch {
+                    val success = viewModel.changeOrderStatus(
+                        orderId = orderId,
+                        menuItemId = item.menuItemId ?: 0,
+                        employeeId = employeeId,
+                        status = status,
+                        visitId = visitId
+                    )
+
+                    if(success){
+                        Toast
+                            .makeText(
+                                context,
+                                changedText,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        showChangeStatusDialog.value = false
+                    }else{
+                        Toast
+                            .makeText(
+                                context,
+                                errorText,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    }
+
+                }
             },
             viewModel = viewModel,
             status = item.status ?: ""
@@ -662,10 +692,22 @@ fun ChangeStatusDialog(
 ) {
     val context = LocalContext.current
 
-    val employeeList by viewModel.employees.collectAsState()
-    val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap =
-        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val allEmployees by viewModel.employees.collectAsState()
+
+
+    val filteredEmployees by remember {
+        mutableStateOf(
+            allEmployees.filterNot { employee ->
+        employee.isBackdoorEmployee }
+        )
+    }
+
+    val employeeNames = filteredEmployees.map { "${it.firstName} ${it.lastName}" }
+
+    val employeeIdMap = filteredEmployees.associateBy(
+        keySelector = { "${it.firstName} ${it.lastName}" },
+        valueTransform = { it.employeeId }
+    )
 
     var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }

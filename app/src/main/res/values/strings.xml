@@ -661,6 +661,8 @@
     <string name="error_invalid_alcohol_percentage">Invalid alcohol percentage</string>
     <string name="label_choose_ingredients">Choose ingredients</string>
     <string name="error_registerRestaurant_invalid_max_duration2">Reservation duration is too long</string>
+    <string name="label_status_changed">Changed status</string>
+    <string name="error_status_change">Couldn\'t change status</string>
     <string name="errorCode_IncorrectPassword">Incorrect password</string>
     <string name="errorCode_IdentityError">Passwords must have at least one non alphanumeric character.</string>
     <string name="label_new_password">New password</string>
