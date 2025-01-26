@@ -536,7 +536,6 @@ fun EditEventDialog(
     val canSave = name.isNotBlank() &&
             description.isNotBlank() &&
             maxPeopleInt != null &&
-            photo.isNotBlank() &&
             eventDateTime != null && joinUntilDateTime != null &&
             eventDateTime.isAfter(now) &&
             joinUntilDateTime.isAfter(now) &&
