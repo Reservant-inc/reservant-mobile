@@ -130,13 +130,15 @@ class TicketViewModel(
         val vId = selectedVisit?.visitId ?: return
         val userId = selectedParticipant?.userId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportCustomer(
-                description = desc,
-                reportedUserId = userId,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError() && !isParticipantsError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportCustomer(
+                    description = desc,
+                    reportedUserId = userId,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
@@ -145,13 +147,15 @@ class TicketViewModel(
         val vId = selectedVisit?.visitId ?: return
         val employeeId = selectedEmployee?.userId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportEmployee(
-                description = desc,
-                reportedUserId = employeeId,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError() && !isEmplyeeError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportEmployee(
+                    description = desc,
+                    reportedUserId = employeeId,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
@@ -159,29 +163,49 @@ class TicketViewModel(
     fun sendReportLostItem() {
         val vId = selectedVisit?.visitId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportLostItem(
-                description = desc,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportLostItem(
+                    description = desc,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
     // 4) "reportBug"
     fun sendReportBug() {
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportBug(desc)
-            handleReportResult(result)
+        if(!isDescriptionError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportBug(desc)
+                handleReportResult(result)
+            }
         }
     }
 
     private fun handleReportResult(res: Result<ReportDTO?>) {
         if (!res.isError && res.value != null) {
+            description = ""
+            selectedEmployee = null
+            selectedParticipant = null
+            selectedVisit = null
             showSuccessDialog = true
         } else {
             errorMessage = "Failed to send report"
         }
+    }
+    fun isDescriptionError(): Boolean {
+        return description.isNullOrEmpty()
+    }
+    fun isVisitError(): Boolean {
+        return selectedVisit == null
+    }
+    fun isEmplyeeError(): Boolean {
+        return selectedEmployee == null
+    }
+    fun isParticipantsError(): Boolean {
+        return selectedParticipant == null
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.FormInput
@@ -85,6 +86,7 @@ fun NewTicketActivity(
 
 @Composable
 fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
         Text(text = "Report an Employee", style = MaterialTheme.typography.titleLarge)
@@ -95,7 +97,10 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the issue"
+            label = "Description of the issue",
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = "Description cannot be empty",
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -109,12 +114,24 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
             }
         )
 
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = "Visit cannot be empty"
+        )
+
         reportsViewModel.selectedVisit?.let { chosenVisit ->
             // Display chosen visit information
             Text("Chosen visit: #${chosenVisit.visitId}")
 
             // Extract the first available employeeId from orders
             val assignedEmployee = chosenVisit.orders?.firstNotNullOfOrNull { it.assignedEmployee }
+
+            ErrorText(
+                formSent = formSent,
+                isError = reportsViewModel.isEmplyeeError(),
+                textError = "Emplyee cannot be empty"
+            )
 
             if (assignedEmployee != null) {
                 reportsViewModel.selectedEmployee = assignedEmployee // Assign in ViewModel
@@ -130,6 +147,7 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
         ButtonComponent(
             label = "Send",
             onClick = {
+                formSent = true
                 if (reportsViewModel.selectedEmployee == null) {
                     reportsViewModel.errorMessage = "Cannot report. No employee is assigned to the selected visit."
                 } else {
@@ -226,6 +244,7 @@ fun VisitSelectionPopup(
                                             onClick = {
                                                 // Use the selected visit
                                                 reportsViewModel.selectedVisit = visit
+                                                reportsViewModel.selectedParticipant = null
                                                 onDismiss()
                                             }
                                         )
@@ -281,6 +300,7 @@ fun ParticipantSelectionPopup(
 
 @Composable
 fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
+    var formSent by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer (Modifier.height(72.dp))
         Text(text = "Report a Customer", style = MaterialTheme.typography.titleLarge)
@@ -291,7 +311,10 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the issue"
+            label = "Description of the issue",
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = "Description cannot be empty",
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -303,6 +326,11 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
                 reportsViewModel.loadVisitsForUserOrRestaurant(restaurantId = restaurantId)
                 reportsViewModel.isPickVisitDialogOpen = true
             }
+        )
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = "Visit cannot be empty"
         )
 
         // Once a visit is chosen, show more steps
@@ -320,6 +348,12 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
                 }
             )
 
+            ErrorText(
+                formSent = formSent,
+                isError = reportsViewModel.isParticipantsError(),
+                textError = "Participant cannot be empty"
+            )
+
             // Show the currently selected user if any
             reportsViewModel.selectedParticipant?.let { user ->
                 Text("Selected customer: ${user.firstName} ${user.lastName}")
@@ -332,6 +366,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
         ButtonComponent(
             label = "Send",
             onClick = {
+                formSent = true
                 reportsViewModel.sendReportCustomer()
             }
         )
@@ -385,6 +420,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
 
 @Composable
 fun ReportBugTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer (Modifier.height(72.dp))
         Text(text = "Report a Bug", style = MaterialTheme.typography.titleLarge)
@@ -394,7 +430,10 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Describe the bug"
+            label = "Describe the bug",
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = "Description cannot be empty",
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -417,7 +456,9 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
             confirmButton = {
                 ButtonComponent(
                     label = "OK",
-                    onClick = { reportsViewModel.showSuccessDialog = false }
+                    onClick = {
+                        formSent = true
+                        reportsViewModel.showSuccessDialog = false }
                 )
             }
         )
@@ -441,6 +482,7 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
 
 @Composable
 fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer (Modifier.height(72.dp))
         Text(text = "Report Lost Item", style = MaterialTheme.typography.titleLarge)
@@ -451,7 +493,10 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the lost item"
+            label = "Description of the lost item",
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = "Description cannot be empty",
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -464,6 +509,11 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
                 reportsViewModel.isPickVisitDialogOpen = true
             }
         )
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = "Visit cannot be empty"
+        )
 
         reportsViewModel.selectedVisit?.let { chosen ->
             Text("Chosen visit: #${chosen.visitId}")
@@ -475,6 +525,7 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
         ButtonComponent(
             label = "Send",
             onClick = {
+                formSent = true
                 reportsViewModel.sendReportLostItem()
             }
         )
@@ -515,6 +566,17 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
                     onClick = { reportsViewModel.errorMessage = null }
                 )
             }
+        )
+    }
+}
+
+@Composable
+fun ErrorText(formSent: Boolean, isError: Boolean, textError: String) {
+    if (formSent && isError) {
+        Text(
+            text = textError,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
