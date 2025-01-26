@@ -367,13 +367,13 @@ fun ProductCard(
                 Column{
                     OutlinedButton(
                         onClick = onAddClick,
-                        border = BorderStroke(1.dp, Color(0xFF955E71)),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.padding(bottom = 8.dp)
                     ) {
                         Text(
                             text = stringResource(id = R.string.add),
-                            color = Color(0xFF955E71),
+                            color = MaterialTheme.colorScheme.primary,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )

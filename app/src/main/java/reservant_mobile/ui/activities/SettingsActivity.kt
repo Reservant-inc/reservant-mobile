@@ -164,20 +164,6 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                         }
                     )
 
-//                    if (Roles.RESTAURANT_EMPLOYEE !in UserService.UserObject.roles)
-//                        UnderlinedItem(
-//                            icon = Icons.Filled.CardGiftcard,
-//                            text = stringResource(id = R.string.label_promo_codes),
-//                            onClick = {  Navigate to Promo Codes  }
-//                        )
-//
-//
-//                    UnderlinedItem(
-//                        icon = Icons.Filled.Settings,
-//                        text = stringResource(id = R.string.label_app_settings),
-//                        onClick = { }
-//                    )
-
                     UnderlinedItem(
                         icon = Icons.Filled.Brightness4,
                         text = stringResource(id = R.string.label_toggle_dark_theme),

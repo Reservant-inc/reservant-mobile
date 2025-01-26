@@ -90,7 +90,9 @@ fun ChatListActivity() {
 
                                 val title by remember {
                                     mutableStateOf(
-                                        thread.title ?: thread.participants!!.joinToString(separator = ", ") { it.firstName }
+                                        if (thread.title.isNullOrEmpty())
+                                            thread.participants!!.joinToString(separator = ", ") { it.firstName }
+                                        else thread.title
                                     )
                                 }
 

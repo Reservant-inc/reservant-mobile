@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantEmployeeDTO
+import reservant_mobile.data.models.dtos.TableDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IRestaurantService
@@ -31,6 +32,12 @@ class EmployeeOrderViewModel(
 
     private val _refreshTrigger = MutableStateFlow(0)
 
+    private val _selectedVisitDetails = MutableStateFlow<VisitDetailsUIState?>(null)
+    val selectedVisitDetails: StateFlow<VisitDetailsUIState?> = _selectedVisitDetails.asStateFlow()
+
+    private val _tables = MutableStateFlow<List<TableDTO>>(emptyList())
+    val tables: StateFlow<List<TableDTO>> = _tables.asStateFlow()
+
     fun getVisitsFlow(
         dateStart: LocalDateTime? = null,
         dateEnd: LocalDateTime? = null,
@@ -53,9 +60,6 @@ class EmployeeOrderViewModel(
         }
     }
 
-    private val _selectedVisitDetails = MutableStateFlow<VisitDetailsUIState?>(null)
-    val selectedVisitDetails: StateFlow<VisitDetailsUIState?> = _selectedVisitDetails.asStateFlow()
-
     fun fetchVisitDetailsById(visitId: Int) {
         val visit = visitCache[visitId] ?: return
         fetchVisitDetails(visit)
@@ -64,6 +68,29 @@ class EmployeeOrderViewModel(
     fun cacheVisit(visit: VisitDTO) {
         visit.visitId?.let {
             visitCache[it] = visit
+        }
+    }
+
+
+    fun fetchTables() {
+        viewModelScope.launch {
+            val res = restaurantService.getCurrentTables(restaurantId)
+            if (!res.isError && res.value != null) {
+                _tables.value = res.value
+            }
+        }
+    }
+
+    fun updateTable(visitId: Int, tableId: Int) {
+        viewModelScope.launch {
+            val result = visitsService.updateTable(visitId, tableId)
+            if (!result.isError) {
+                visitCache[visitId]?.let { oldVisit ->
+                    val updated = oldVisit.copy(tableId = tableId)
+                    visitCache[visitId] = updated
+                    fetchVisitDetails(updated)
+                }
+            }
         }
     }
 
@@ -128,24 +155,26 @@ class EmployeeOrderViewModel(
         }
     }
 
-    fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String, visitId: Int) {
-        viewModelScope.launch {
-            val orderDTO = OrderDTO(
-                employeeId = employeeId,
-                items = listOf(
-                    OrderDTO.OrderItemDTO(
-                        menuItemId = menuItemId,
-                        status = status
-                    )
+    suspend fun changeOrderStatus(orderId: Int, menuItemId: Int, employeeId: String, status: String, visitId: Int): Boolean {
+
+        val orderDTO = OrderDTO(
+            employeeId = employeeId,
+            items = listOf(
+                OrderDTO.OrderItemDTO(
+                    menuItemId = menuItemId,
+                    status = status
                 )
             )
-            val result = ordersService.changeOrderStatus(orderId, orderDTO)
-            if (!result.isError) {
-                fetchVisitDetailsById(visitId)
-            } else {
-                // Error
-            }
+        )
+        val result = ordersService.changeOrderStatus(orderId, orderDTO)
+        if (!result.isError) {
+            fetchVisitDetailsById(visitId)
+            return true
+        } else {
+            // Error
         }
+        return false
+
     }
 
 

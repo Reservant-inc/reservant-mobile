@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 enum class MessageThreadType{
     Normal,
     Event,
-    Report
+    Report,
+    Private
 }

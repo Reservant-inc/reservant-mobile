@@ -598,6 +598,10 @@
     <string name="future_visits_tab">Nadchodzące</string>
     <string name="past_visits_tab">Przeszłe</string>
     <string name="label_my_visits">Moje wizyty</string>
+    <string name="label_change_table">Zmień stolik</string>
+    <string name="label_select_table">Wybierz stolik</string>
+    <string name="label_table_number">Stolik #</string>
+    <string name="label_seats">Miejsca</string>
     <string name="label_select_report_status">Wybierz status</string>
     <string name="report_title">Raport #%1$d</string>
     <string name="category">Kategoria: %1$s</string>
@@ -677,4 +681,12 @@
     <string name="report_lost_item_title">Zgłoś Zgubioną Rzecz</string>
     <string name="description_lost_item_label">Opis zgubionego przedmiotu</string>
     <string name="report_lost_item_success_message">Dziękujemy za zgłoszenie zgubionej rzeczy.</string>
+    <string name="error_registerRestaurant_invalid_max_duration2">Maksymalny czas trwania rezerwacji jes za długi</string>
+    <string name="label_status_changed">Zmieniono status</string>
+    <string name="error_status_change">Nie można zmienić statusu</string>
+    <string name="errorCode_IncorrectPassword">Nieprawidłowe hasło</string>
+    <string name="errorCode_IdentityError">Hasła muszą zawierać co najmniej jeden znak niealfanumeryczny.</string>
+    <string name="label_new_password">Nowe hasło</string>
+    <string name="label_old_password">Stare hasło</string>
+    <string name="label_change_password">Zmień hasło</string>
 </resources>

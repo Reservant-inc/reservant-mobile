@@ -141,38 +141,45 @@ class EventViewModel(
         return false
     }
 
-    suspend fun updateEvent(dto: EventDTO, context: Context): Boolean{
+    suspend fun updateEvent(dto: EventDTO, context: Context): Boolean {
+        if (dto.photo.isNullOrBlank()) {
 
-        var eventPhotoResult = sendPhoto(dto.photo, context)
+            val oldPhoto = event?.photo ?: ""
 
-        val resultDTO: EventDTO
+            val filenameWithoutPrefix = oldPhoto.replace("/uploads/", "")
 
-        if (eventPhotoResult != null) {
-            if (!eventPhotoResult.isError) {
+            val updatedDto = dto.copy(
+                photo = filenameWithoutPrefix
+            )
 
-                resultDTO = EventDTO(
-                    eventId = eventId,
-                    name = dto.name,
-                    description = dto.description,
-                    maxPeople = dto.maxPeople,
-                    restaurant = event?.restaurant,
-                    restaurantId = event?.restaurant?.restaurantId,
-                    time = dto.time,
-                    mustJoinUntil = dto.mustJoinUntil,
-                    photo = eventPhotoResult.value!!.fileName
+            val result = eventService.updateEvent(eventId, updatedDto)
+            return if (!result.isError) {
+                getEvent()
+                true
+            } else {
+                println("ERROR WHILE UPDATING EVENT: ${result.errors}")
+                false
+            }
+        } else {
+
+            val eventPhotoResult = sendPhoto(dto.photo, context)
+            if (eventPhotoResult != null && !eventPhotoResult.isError) {
+                val newPhotoName = eventPhotoResult.value?.fileName ?: ""
+                val updatedDto = dto.copy(
+                    photo = newPhotoName
                 )
-                val result = eventService.updateEvent(eventId, resultDTO)
+                val result = eventService.updateEvent(eventId, updatedDto)
                 if (!result.isError) {
                     getEvent()
                     return true
                 } else {
-                    println("ERROR WHILE UPDATING EVENT: " + result.errors)
+                    println("ERROR WHILE UPDATING EVENT: ${result.errors}")
                 }
             }
         }
-
         return false
     }
+
 
     private suspend fun getEvent(): Boolean {
         isLoading = true

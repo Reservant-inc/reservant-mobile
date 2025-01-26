@@ -7,10 +7,9 @@ object StatusUtils {
     data class StatusOption(val statusString: String, val displayNameResId: Int)
 
     val statusOptions = listOf(
-        StatusOption("Ordered", R.string.status_ordered),
         StatusOption("InProgress", R.string.status_in_progress),
         StatusOption("Ready", R.string.status_ready),
-        StatusOption("Delivered", R.string.status_delivered),
+        StatusOption("Taken", R.string.taken_label),
         StatusOption("Cancelled", R.string.status_cancelled)
     )
 

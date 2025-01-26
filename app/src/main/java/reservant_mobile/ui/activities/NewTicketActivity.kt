@@ -1,4 +1,3 @@
-// NewTicketActivity.kt
 package reservant_mobile.ui.activities
 
 import TicketViewModel
@@ -51,15 +50,12 @@ fun NewTicketActivity(
     )
     // Determine user role
     val isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
-    val isCustomer = !isEmployee
 
-    // Build a list of tabs depending on role:
     val tabPages = buildList<Pair<String, @Composable () -> Unit>> {
-        // If user is NOT an employee => show "Report Employee"
+        add("Report Bug" to { ReportBugTab(reportsViewModel) })
         if (!isEmployee) {
             add(stringResource(R.string.report_employee) to { ReportEmployeeTab(reportsViewModel) })
         }
-        // If user IS an employee => show "Report Customer"
         if (isEmployee) {
             add(stringResource(R.string.report_customer) to { ReportCustomerTab(reportsViewModel, restaurantId) })
         }
@@ -78,7 +74,6 @@ fun NewTicketActivity(
             onReturnClick = { navController.popBackStack() }
         )
 
-        // The floating tab switch for the tabs we built
         FloatingTabSwitch(
             pages = tabPages
         )

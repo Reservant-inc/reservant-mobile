@@ -165,9 +165,16 @@ fun FindFriendsActivity(navController: NavHostController){
                 }
             }
         }
-
         composable<UserRoutes.UserProfile>{
             ProfileActivity(navController = innerNavController, userId = it.toRoute<UserRoutes.UserProfile>().userId)
         }
+        composable<UserRoutes.Chat>{
+            ChatActivity(
+                navController = navController,
+                threadId = it.toRoute<UserRoutes.Chat>().threadId,
+                title = it.toRoute<UserRoutes.Chat>().threadTitle,
+            )
+        }
+
     }
 }

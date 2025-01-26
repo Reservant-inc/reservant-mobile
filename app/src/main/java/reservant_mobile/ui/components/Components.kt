@@ -422,7 +422,8 @@ fun ShowErrorToast(context: Context, id: Int) {
 fun BottomNavigation(
     navController: NavHostController,
     bottomBarState: MutableState<Boolean>,
-    items: List<BottomNavItem>
+    items: List<BottomNavItem>,
+    defaultSelectedItem: MutableState<BottomNavItem?>? = null
 ) {
     var selectedItem by remember { mutableStateOf(items.first()) }
     val outlineVariant = MaterialTheme.colorScheme.outlineVariant
@@ -453,11 +454,12 @@ fun BottomNavigation(
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = item.route.toString()) },
                         label = { Text(stringResource(id = item.label)) },
-                        selected = selectedItem == item,
+                        selected = (defaultSelectedItem?.value ?: selectedItem) == item,
                         alwaysShowLabel = true,
                         onClick = {
                             if (selectedItem != item) {
                                 navController.navigate(item.route)
+                                defaultSelectedItem?.value = item
                                 selectedItem = item
                             }
                         }
@@ -869,6 +871,7 @@ fun IngredientSelectionScreen(
 @Composable
 fun FullscreenGallery(
     onDismiss: () -> Unit,
+    onPhotoClick: (Bitmap) -> Unit = {},
     bitmaps: List<Bitmap>
 ) {
 
@@ -889,7 +892,7 @@ fun FullscreenGallery(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(onClick = onDismiss) {
                         Icon(
@@ -920,12 +923,77 @@ fun FullscreenGallery(
                                     bitmap = bitmaps[index].asImageBitmap(),
                                     contentDescription = "Image $index",
                                     modifier = Modifier
+                                        .clickable {
+                                            onPhotoClick(bitmaps[index])
+                                        }
                                         .fillMaxSize()
                                         .background(Color.Gray),
                                     contentScale = ContentScale.Crop
                                 )
                             }
                         }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FullscreenPhoto(
+    onDismiss: () -> Unit,
+    bitmap: Bitmap?
+) {
+    val size = 1000.dp
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 64.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .background(
+                        Color.Black.copy(alpha = 0.8f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                if (bitmap != null) {
+                    Card(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .aspectRatio(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Image",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Gray),
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 } else {
                     Box(
@@ -1251,11 +1319,13 @@ fun ImageCard(
 
 @Composable
 fun ImageCard(
-    image: ImageBitmap
+    image: ImageBitmap,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.size(100.dp),
         shape = RoundedCornerShape(16.dp),
+        onClick = { onClick() },
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Image(

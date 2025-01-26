@@ -89,6 +89,7 @@ import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.DeleteCountdownPopup
 import reservant_mobile.ui.components.DetailItem
+import reservant_mobile.ui.components.FullscreenPhoto
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
@@ -468,6 +469,14 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
             }
         }
         composable<RestaurantManagementRoutes.RestaurantPreview> {
+
+            var showPhoto by remember { mutableStateOf(false) }
+            var selectedPhoto: Bitmap? by remember { mutableStateOf(null) }
+
+            if (showPhoto) {
+                FullscreenPhoto(onDismiss = { showPhoto = false }, bitmap = selectedPhoto)
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -605,7 +614,11 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                         ) {
                                             gallery.forEach {
                                                 ImageCard(
-                                                    it.asImageBitmap()
+                                                    it.asImageBitmap(),
+                                                    onClick = {
+                                                        selectedPhoto = it
+                                                        showPhoto = true
+                                                    }
                                                 )
                                             }
                                         }

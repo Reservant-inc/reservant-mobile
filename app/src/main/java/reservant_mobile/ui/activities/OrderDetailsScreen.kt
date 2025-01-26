@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +18,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.TableBar
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,10 +44,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
+import kotlinx.coroutines.launch
+import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
-import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.StatusUtils
 import reservant_mobile.data.utils.formatToDateTime
@@ -68,9 +74,23 @@ fun OrderDetailsScreen(
 ) {
     LaunchedEffect(visitId) {
         viewModel.fetchVisitDetailsById(visitId)
+        viewModel.fetchTables()
     }
 
     val visitDetails by viewModel.selectedVisitDetails.collectAsState()
+
+    var showChangeTableDialog by remember { mutableStateOf(false) }
+
+    if (showChangeTableDialog) {
+        ChangeTableDialog(
+            onDismiss = { showChangeTableDialog = false },
+            onSubmit = { newTableId ->
+                viewModel.updateTable(visitId, newTableId)
+                showChangeTableDialog = false
+            },
+            viewModel = viewModel
+        )
+    }
 
     visitDetails?.let { details ->
         Column(
@@ -81,7 +101,19 @@ fun OrderDetailsScreen(
                 icon = if (isReservation) Icons.Outlined.Event else Icons.Outlined.Book,
                 text = stringResource(if (isReservation) R.string.reservation_details else R.string.order_details),
                 showBackButton = true,
-                onReturnClick = onReturnClick
+                onReturnClick = onReturnClick,
+                actions = {
+
+                    IconButton(
+                        onClick = { showChangeTableDialog = true }
+                    ) {
+                        Icon(
+                            Icons.Outlined.TableBar,
+                            contentDescription = "Change Table"
+                        )
+                    }
+
+                }
             )
 
             LazyColumn(
@@ -258,6 +290,8 @@ fun DishCard(
 
     val showChangeStatusDialog = remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -323,17 +357,41 @@ fun DishCard(
     }
 
     if (showChangeStatusDialog.value) {
+        val changedText = stringResource(R.string.label_status_changed)
+        val errorText = stringResource(R.string.error_status_change)
+
         ChangeStatusDialog(
             onDismiss = { showChangeStatusDialog.value = false },
             onSubmit = { employeeId, status ->
-                viewModel.changeOrderStatus(
-                    orderId = orderId,
-                    menuItemId = item.menuItemId ?: 0,
-                    employeeId = employeeId,
-                    status = status,
-                    visitId = visitId
-                )
-                showChangeStatusDialog.value = false
+                viewModel.viewModelScope.launch {
+                    val success = viewModel.changeOrderStatus(
+                        orderId = orderId,
+                        menuItemId = item.menuItemId ?: 0,
+                        employeeId = employeeId,
+                        status = status,
+                        visitId = visitId
+                    )
+
+                    if(success){
+                        Toast
+                            .makeText(
+                                context,
+                                changedText,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                        showChangeStatusDialog.value = false
+                    }else{
+                        Toast
+                            .makeText(
+                                context,
+                                errorText,
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    }
+
+                }
             },
             viewModel = viewModel,
             status = item.status ?: ""
@@ -573,6 +631,59 @@ fun ParticipantCard(participantName: String) {
 }
 
 @Composable
+fun ChangeTableDialog(
+    onDismiss: () -> Unit,
+    onSubmit: (Int) -> Unit,
+    viewModel: EmployeeOrderViewModel
+) {
+    val tables = viewModel.tables.collectAsState()
+    val expandedTables = remember { mutableStateOf(false) }
+
+    val tablesList = tables.value
+    val tableOptions = tablesList.associate { table ->
+        "${stringResource(R.string.label_table_number)}${table.tableId} | ${stringResource(R.string.label_seats)}: ${table.capacity}" to table.tableId
+    }
+    val optionsList = tableOptions.keys.toList()
+
+    var selectedTableId by remember {
+        mutableStateOf(tablesList.firstOrNull()?.tableId ?: 0)
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.label_change_table)) },
+        text = {
+            Column {
+                ComboBox(
+                    expanded = expandedTables,
+                    value = tablesList.firstOrNull { it.tableId == selectedTableId }?.let {
+                        "${stringResource(R.string.label_table_number)}${it.tableId} | ${stringResource(R.string.label_seats)}: ${it.capacity}"
+                    } ?: "",
+                    onValueChange = { selectedString ->
+                        selectedTableId = tableOptions[selectedString] ?: selectedTableId
+                    },
+                    options = optionsList,
+                    label = stringResource(R.string.label_select_table)
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onSubmit(selectedTableId) }
+            ) {
+                Text(text = stringResource(R.string.submit))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+
+@Composable
 fun ChangeStatusDialog(
     onDismiss: () -> Unit,
     onSubmit: (String, String) -> Unit,
@@ -581,10 +692,22 @@ fun ChangeStatusDialog(
 ) {
     val context = LocalContext.current
 
-    val employeeList by viewModel.employees.collectAsState()
-    val employeeNames = employeeList.map { "${it.firstName} ${it.lastName}" }
-    val employeeIdMap =
-        employeeList.associateBy({ "${it.firstName} ${it.lastName}" }, { it.employeeId })
+    val allEmployees by viewModel.employees.collectAsState()
+
+
+    val filteredEmployees by remember {
+        mutableStateOf(
+            allEmployees.filterNot { employee ->
+        employee.isBackdoorEmployee }
+        )
+    }
+
+    val employeeNames = filteredEmployees.map { "${it.firstName} ${it.lastName}" }
+
+    val employeeIdMap = filteredEmployees.associateBy(
+        keySelector = { "${it.firstName} ${it.lastName}" },
+        valueTransform = { it.employeeId }
+    )
 
     var selectedEmployeeName by remember { mutableStateOf(UserService.UserObject.firstName + " " + UserService.UserObject.lastName) }
     val expandedEmployee = remember { mutableStateOf(false) }
