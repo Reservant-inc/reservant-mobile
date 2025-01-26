@@ -647,4 +647,6 @@
     <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
     <string name="label_choose_ingredients">Wybierz składniki</string>
     <string name="error_registerRestaurant_invalid_max_duration2">Maksymalny czas trwania rezerwacji jes za długi</string>
+    <string name="label_status_changed">Zmieniono status</string>
+    <string name="error_status_change">Nie można zmienić statusu</string>
 </resources>
