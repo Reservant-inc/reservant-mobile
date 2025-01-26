@@ -647,4 +647,9 @@
     <string name="error_invalid_alcohol_percentage">Niepoprawna zawartość alkoholu</string>
     <string name="label_choose_ingredients">Wybierz składniki</string>
     <string name="error_registerRestaurant_invalid_max_duration2">Maksymalny czas trwania rezerwacji jes za długi</string>
+    <string name="errorCode_IncorrectPassword">Nieprawidłowe hasło</string>
+    <string name="errorCode_IdentityError">Hasła muszą zawierać co najmniej jeden znak niealfanumeryczny.</string>
+    <string name="label_new_password">Nowe hasło</string>
+    <string name="label_old_password">Stare hasło</string>
+    <string name="label_change_password">Zmień hasło</string>
 </resources>

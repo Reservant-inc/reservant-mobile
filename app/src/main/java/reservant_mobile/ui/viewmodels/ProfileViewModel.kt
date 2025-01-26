@@ -15,10 +15,12 @@ import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
+import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
+import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.FriendsService
@@ -69,6 +71,12 @@ class ProfileViewModel(
     private var updateProfileResult by mutableStateOf<Result<UserDTO?>?>(null)
 
     private val _userThreadsFlow = MutableStateFlow<Flow<PagingData<ThreadDTO>>?>(null)
+
+    val oldPassword: FormField = FormField("oldPassword")
+    val newPassword: FormField = FormField("newPassword")
+    val repeatNewPassword: FormField = FormField("none") ///idfc
+    private var changePasswordResult by mutableStateOf(Result(isError=false, value=false))
+
 
     init {
         viewModelScope.launch {
@@ -165,6 +173,17 @@ class ProfileViewModel(
                 loadFullUser()
             }
         }
+    }
+
+    suspend fun changePassword(): Boolean {
+        if(newPassword.value != repeatNewPassword.value) return false
+
+        changePasswordResult = userService.changePassword(oldPassword.value, newPassword.value)
+
+        return !changePasswordResult.isError &&
+                !isNewPasswordInvalid() &&
+                getFieldError(changePasswordResult,newPassword.name) == -1 &&
+                getFieldError(changePasswordResult,oldPassword.name) == -1
     }
 
     fun isPhoneInvalid(phoneNum: String): Boolean {
@@ -360,5 +379,20 @@ class ProfileViewModel(
             }
         }
     }
+
+    fun getOldPasswordError(): Int {
+        val res = getFieldError(changePasswordResult,oldPassword.name)
+        return res
+    }
+
+    fun getNewPasswordError(): Int {
+        return getFieldError(changePasswordResult,newPassword.name)
+    }
+
+    fun isNewPasswordInvalid() : Boolean{
+        return isInvalidWithRegex(Regex.PASSWORD_REG, newPassword.value) ||
+                getFieldError(changePasswordResult, newPassword.name) != -1
+    }
+
 
 }
