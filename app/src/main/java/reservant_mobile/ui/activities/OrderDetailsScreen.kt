@@ -695,8 +695,11 @@ fun ChangeStatusDialog(
     val allEmployees by viewModel.employees.collectAsState()
 
 
-    val filteredEmployees = allEmployees.filterNot { employee ->
-        employee.roles.orEmpty().contains(Roles.RESTAURANT_BACKDOORS_EMPLOYEE)
+    val filteredEmployees by remember {
+        mutableStateOf(
+            allEmployees.filterNot { employee ->
+        employee.isBackdoorEmployee }
+        )
     }
 
     val employeeNames = filteredEmployees.map { "${it.firstName} ${it.lastName}" }
