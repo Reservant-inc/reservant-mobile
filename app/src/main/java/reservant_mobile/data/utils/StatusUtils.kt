@@ -9,6 +9,7 @@ object StatusUtils {
     val statusOptions = listOf(
         StatusOption("InProgress", R.string.status_in_progress),
         StatusOption("Ready", R.string.status_ready),
+        StatusOption("Taken", R.string.taken_label),
         StatusOption("Cancelled", R.string.status_cancelled)
     )
 
