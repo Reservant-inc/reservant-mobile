@@ -182,6 +182,7 @@ fun EmployeeAddOrderFormContent(
                 }
             }
         )
+        Spacer(Modifier.height(16.dp))
     }
 
     if (isMenuPopupOpen) {
@@ -209,86 +210,99 @@ fun FullScreenMenuDialog(
             shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.background
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize().padding(bottom = 80.dp)) { // Miejsce na przycisk
-                    // Pasek z tytułem i przyciskiem zamknięcia
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.select_menu_items),
-                            style = MaterialTheme.typography.titleLarge
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Pasek z tytułem i przyciskiem zamknięcia
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.select_menu_items),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.label_close)
                         )
-                        IconButton(onClick = onDismiss) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.label_close)
-                            )
-                        }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    // Pasek wyboru menu
-                    Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState())
-                            .padding(vertical = 8.dp)
-                    ) {
-                        menus.forEach { menu ->
-                            MenuTypeButton(
-                                menuType = menu.name,
-                                onMenuClick = {
-                                    menu.menuId?.let { menuId ->
-                                        restaurantDetailVM.viewModelScope.launch {
-                                            restaurantDetailVM.loadFullMenu(menuId)
-                                        }
+                // Pasek wyboru menu
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    menus.forEach { menu ->
+                        MenuTypeButton(
+                            menuType = menu.name,
+                            onMenuClick = {
+                                menu.menuId?.let { menuId ->
+                                    restaurantDetailVM.viewModelScope.launch {
+                                        restaurantDetailVM.loadFullMenu(menuId)
                                     }
                                 }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Lista elementów menu
-                    if (menuItems.isNullOrEmpty()) {
-                        Text(stringResource(R.string.no_menus_found))
-                    } else {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(menuItems.size) { index ->
-                                val menuItem = menuItems[index]
-                                var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
-                                LaunchedEffect(menuItem.photo) {
-                                    menuItem.photo?.let { photo ->
-                                        menuPhoto = restaurantDetailVM.getPhoto(photo)
-                                    }
-                                }
-
-                                MenuItemCard(
-                                    menuItem = menuItem,
-                                    role = Roles.CUSTOMER,
-                                    getPhoto = { menuPhoto },
-                                    onInfoClick = { /* Możesz dodać obsługę */ },
-                                    onAddClick = {
-                                        reservationViewModel.addItemToCart(menuItem)
-                                    }
-                                )
                             }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Lista elementów menu (scrollowalna)
+                if (menuItems.isNullOrEmpty()) {
+                    Text(
+                        text = stringResource(R.string.no_menus_found),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f) // Scrollowalny koszyk zajmuje resztę przestrzeni
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        items(menuItems.size) { index ->
+                            val menuItem = menuItems[index]
+                            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                            LaunchedEffect(menuItem.photo) {
+                                menuItem.photo?.let { photo ->
+                                    menuPhoto = restaurantDetailVM.getPhoto(photo)
+                                }
+                            }
+
+                            MenuItemCard(
+                                menuItem = menuItem,
+                                role = Roles.CUSTOMER,
+                                getPhoto = { menuPhoto },
+                                onInfoClick = { /* Możesz dodać obsługę */ },
+                                onAddClick = {
+                                    reservationViewModel.addItemToCart(menuItem)
+                                }
+                            )
                         }
                     }
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Przycisk zatwierdzenia na dole
                 Button(
                     onClick = {
                         onDismiss()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
                         .padding(16.dp)
                 ) {
                     Text(text = stringResource(R.string.ok))
@@ -297,4 +311,5 @@ fun FullScreenMenuDialog(
         }
     }
 }
+
 
