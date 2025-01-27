@@ -1,24 +1,20 @@
 package reservant_mobile.ui.viewmodels
 
-import android.content.Context
-import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.RestaurantMenuDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
-import reservant_mobile.data.services.FileService
 import reservant_mobile.data.services.IRestaurantMenuService
 import reservant_mobile.data.services.RestaurantMenuService
-import reservant_mobile.data.utils.getFileName
-import reservant_mobile.data.utils.isFileSizeInvalid
-import java.util.regex.Pattern
+import reservant_mobile.data.utils.formatToDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MenuManagementViewModel(
     private val restaurantId: Int,
@@ -37,7 +33,6 @@ class MenuManagementViewModel(
     var menuType = FormField(RestaurantMenuDTO::menuType.name)
     var dateFrom = FormField(RestaurantMenuDTO::dateFrom.name)
     var dateUntil = FormField(RestaurantMenuDTO::dateUntil.name)
-    //var photo = FormField(RestaurantMenuDTO::photo.name)
 
     var fetchResult: Result<List<RestaurantMenuDTO>?> by mutableStateOf(Result(isError = false, value = null))
     var result by mutableStateOf(Result(isError = false, value = null))
@@ -57,14 +52,6 @@ class MenuManagementViewModel(
             menus = fetchResult.value!!.toMutableList()
         }
     }
-
-    /*suspend fun getPhoto(menu: RestaurantMenuDTO): Bitmap? {
-        val resultFirstStep = fileService.getImage(menu.photo)
-        if (!resultFirstStep.isError){
-            return resultFirstStep.value!!
-        }
-        return null
-    }*/
 
     private fun createMenuDTO(menuId: Int? = null): RestaurantMenuDTO {
         return RestaurantMenuDTO(
@@ -99,7 +86,7 @@ class MenuManagementViewModel(
     suspend fun editMenu(menu: RestaurantMenuDTO) {
         isSaving = true
 
-        val editedMenu = createMenuDTO(menu.menuId)
+        val editedMenu = createMenuDTO(menu.menuId).copy(menuItemsIds = menu.menuItemsIds)
 
         val result = service.editMenu(editedMenu.menuId!!, editedMenu)
         println("returned: ${result.isError}")
@@ -140,29 +127,44 @@ class MenuManagementViewModel(
     }
 
     fun isNameInvalid(): Boolean{
-        return isInvalidWithRegex(Regex.NAME_REG, name.value)
+        return name.value.isBlank()
     }
 
     fun isAltNameInvalid(): Boolean{
-        return isInvalidWithRegex(Regex.NAME_REG, alternateName.value)
+        return isInvalidWithRegex(Regex.NAME_REG, alternateName.value) && alternateName.value.isNotBlank()
     }
 
     fun isMenuTypeInvalid(): Boolean {
         return menuType.value.isBlank()
     }
 
-    /*fun photoErrors(context: Context): Int {
-        if (photo.value.isBlank()) return R.string.error_file_not_given
+    fun isDateUntilInvalid(): Boolean {
+        if (dateUntil.value.isNotBlank()){
+            val dateToDT = LocalDate.parse(dateUntil.value, DateTimeFormatter.ISO_DATE)
+            return dateToDT <= LocalDate.now()
+        }
 
-        if (!getFileName(context, photo.value).endsWith(".jpg", ignoreCase = true)) return R.string.error_wrong_file_format
-
-        return -1
+        return false
     }
 
-    fun isPhotoTooLarge(context: Context): Int {
-        if (photo.value.isBlank()) return -1
-        if (isFileSizeInvalid(context, photo.value)) return R.string.error_registerRestaurant_invalid_file
-        return -1
-    }*/
+    fun areDatesInvalid(): Boolean {
+        if (dateFrom.value.isNotBlank() && dateUntil.value.isNotBlank()){
+            val dateFromDT = LocalDate.parse(dateFrom.value, DateTimeFormatter.ISO_DATE)
+            val dateToDT = LocalDate.parse(dateUntil.value, DateTimeFormatter.ISO_DATE)
+
+            return dateFromDT > dateToDT
+        }
+
+        return false
+    }
+
+    fun isMenuValid(): Boolean {
+        return !isNameInvalid() &&
+                !isAltNameInvalid() &&
+                !isMenuTypeInvalid() &&
+                !areDatesInvalid() &&
+                !isDateUntilInvalid()
+    }
+
 
 }

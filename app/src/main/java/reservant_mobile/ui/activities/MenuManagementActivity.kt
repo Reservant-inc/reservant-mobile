@@ -103,11 +103,14 @@ fun MenuManagementActivity(
                                 dateUntil = viewmodel.dateUntil,
                                 menu = menu,
                                 onEditClick = {
-                                    viewmodel.viewModelScope.launch {
-                                        viewmodel.editMenu(menu)
-                                        if (!viewmodel.result.isError){
-                                            viewmodel.clearFields()
-                                            showEditPopup.value = false
+                                    if (viewmodel.isMenuValid()){
+                                        viewmodel.viewModelScope.launch {
+
+                                            viewmodel.editMenu(menu)
+                                            if (!viewmodel.result.isError){
+                                                viewmodel.clearFields()
+                                                showEditPopup.value = false
+                                            }
                                         }
                                     }
                                 },
@@ -134,7 +137,9 @@ fun MenuManagementActivity(
                                 isAltNameInvalid = viewmodel.isAltNameInvalid(),
                                 isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
                                 menuTypes = viewmodel.menuTypes,
-                                clearFields = { viewmodel.clearFields() }
+                                clearFields = { viewmodel.clearFields() },
+                                areDatesInvalid = viewmodel.areDatesInvalid(),
+                                isDateUntilInvalid = viewmodel.isDateUntilInvalid()
                             )
 
                             if (viewmodel.result.isError){
@@ -170,14 +175,18 @@ fun MenuManagementActivity(
                         isNameInvalid = viewmodel.isNameInvalid(),
                         isAltNameInvalid = viewmodel.isAltNameInvalid(),
                         isMenuTypeInvalid = viewmodel.isMenuTypeInvalid(),
+                        areDatesInvalid = viewmodel.areDatesInvalid(),
+                        isDateUntilInvalid = viewmodel.isDateUntilInvalid(),
                         menuTypes = viewmodel.menuTypes,
                         addMenu = {
-                            viewmodel.viewModelScope.launch {
-                                viewmodel.addMenu()
-                                if (!viewmodel.result.isError){
-                                    showAddDialog.value = false
-                                }
+                            if (viewmodel.isMenuValid()){
+                                viewmodel.viewModelScope.launch {
+                                    viewmodel.addMenu()
+                                    if (!viewmodel.result.isError){
+                                        showAddDialog.value = false
+                                    }
 
+                                }
                             }
                         }
                     )
