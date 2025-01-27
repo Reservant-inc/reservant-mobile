@@ -1,9 +1,11 @@
 package reservant_mobile.ui.viewmodels
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
+import reservant_mobile.data.models.dtos.FileUploadDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.RestaurantDTO
@@ -22,6 +25,7 @@ import reservant_mobile.data.models.dtos.UserSummaryDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
+import reservant_mobile.data.services.DataType
 import reservant_mobile.data.services.EventService
 import reservant_mobile.data.services.FriendsService
 import reservant_mobile.data.services.IEventService
@@ -34,6 +38,9 @@ import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.UserService.UserObject
 import reservant_mobile.data.services.VisitsService
 import reservant_mobile.data.utils.GetUserEventsCategory
+import reservant_mobile.data.utils.getFileFromUri
+import reservant_mobile.data.utils.getFileName
+import reservant_mobile.data.utils.isFileNameInvalid
 
 class ProfileViewModel(
     private val userService: IUserService = UserService(),
@@ -161,18 +168,65 @@ class ProfileViewModel(
         }
     }
 
-    fun updateProfile(user: UserDTO) {
-        if(user.phoneNumber != null && isPhoneInvalid(user.phoneNumber.number)){
+    suspend fun updateProfile(user: UserDTO, context: Context) {
+        if (user.phoneNumber != null && isPhoneInvalid(user.phoneNumber.number)) {
             return
         }
 
-        viewModelScope.launch {
+        if (!user.photo.isNullOrBlank()) {
+            val photoResult = sendPhoto(user.photo, context)
+
+            if (photoResult != null && !photoResult.isError) {
+                val updatedPhoto = photoResult.value?.fileName
+
+                val updatedUser = UserDTO(
+                    firstName = user.firstName,
+                    lastName = user.lastName,
+                    birthDate = user.birthDate,
+                    photo = updatedPhoto,
+                    phoneNumber = user.phoneNumber
+                )
+
+                val result = userService.editUserInfo(updatedUser)
+                updateProfileResult = result
+
+                if (!result.isError) {
+                    loadFullUser()
+                }
+            } else {
+
+                val result = userService.editUserInfo(user)
+                updateProfileResult = result
+
+                if (!result.isError) {
+                    loadFullUser()
+                }
+            }
+        } else {
             val result = userService.editUserInfo(user)
             updateProfileResult = result
+
             if (!result.isError) {
                 loadFullUser()
             }
         }
+    }
+
+
+
+    suspend fun sendPhoto(uri: String?, context: Context): Result<FileUploadDTO?>? {
+        if (isFileNameInvalid(uri?.let { getFileName(context, it) })) {
+            return null
+        }
+
+        val file = uri?.let { getFileFromUri(context, it.toUri()) }
+        var fDto = file?.let { fileService.sendFile(DataType.PNG, it) }
+        if (fDto != null) {
+            if (fDto.value == null) {
+                fDto = file?.let { fileService.sendFile(DataType.JPG, it) }
+            }
+        }
+        return fDto
     }
 
     suspend fun changePassword(): Boolean {
