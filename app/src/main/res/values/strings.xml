@@ -668,6 +668,8 @@
     <string name="label_new_password">New password</string>
     <string name="label_old_password">Old password</string>
     <string name="label_change_password">Change password</string>
+    <string name="error_description_too_long">Description cannot exceed 200 characters</string>
+    <string name="error_name_too_long">Name cannot exceed 50 characters</string>
     <string name="error_dateFrom_after_To">Date from must be after date to</string>
     <string name="error_dateTo_before_From">Date to must be after date from</string>
     <string name="label_no_employee_assigned">No employee assigned</string>
