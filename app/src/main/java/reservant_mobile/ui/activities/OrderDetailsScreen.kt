@@ -195,12 +195,10 @@ fun OrderDetailsScreen(
                 }
             }
 
-            if(!isReservation){
-                ButtonComponent(
-                    onClick = { navHostController.navigate(RestaurantRoutes.AddOrder(restaurantId = restaurantId, visitId = visitId)) },
-                    label = stringResource(R.string.add_order)
-                    )
-            }
+            ButtonComponent(
+                onClick = { navHostController.navigate(RestaurantRoutes.AddOrder(restaurantId = restaurantId, visitId = visitId)) },
+                label = stringResource(R.string.add_order)
+            )
         }
     } ?: run {
         LoadingScreenWithTimeout(Duration.parse("10s"), stringResource(R.string.error_orders))
