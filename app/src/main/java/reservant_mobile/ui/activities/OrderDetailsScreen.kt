@@ -51,17 +51,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.reservant_mobile.R
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.StatusUtils
 import reservant_mobile.data.utils.formatToDateTime
-import reservant_mobile.ui.components.BadgeFloatingButton
+import reservant_mobile.ui.components.ButtonComponent
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.navigation.RestaurantRoutes
-import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
 import java.time.LocalDate
@@ -196,22 +194,16 @@ fun OrderDetailsScreen(
                     }
                 }
             }
+
+            if(!isReservation){
+                ButtonComponent(
+                    onClick = { navHostController.navigate(RestaurantRoutes.AddOrder(restaurantId = restaurantId, visitId = visitId)) },
+                    label = stringResource(R.string.add_order)
+                    )
+            }
         }
     } ?: run {
         LoadingScreenWithTimeout(Duration.parse("10s"), stringResource(R.string.error_orders))
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        FloatingActionButton(
-            onClick = { navHostController.navigate(RestaurantRoutes.AddOrder(restaurantId = restaurantId, visitId = visitId)) }
-        ) {
-            Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
-        }
     }
 }
 

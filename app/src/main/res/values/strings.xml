@@ -718,4 +718,5 @@
     <string name="select_menu_items">Select menu items</string>
     <string name="no_menus_found">No menus found</string>
     <string name="employee_add_order_title">Add order for visit #%1$d</string>
+    <string name="add_order">Add order</string>
 </resources>
