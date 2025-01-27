@@ -436,7 +436,7 @@ class ReservationViewModel(
             val visit = VisitDTO(
                 date = "${visitDate.value}T${startTime.value}",
                 endTime = "${visitDate.value}T${endTime.value}",
-                numberOfGuests = totalGuests-participantIds.size-1,
+                numberOfGuests = totalGuests-participantIds.size,
                 tip = tip,
                 takeaway = isTakeaway,
                 restaurantId = restaurantId,
@@ -444,6 +444,7 @@ class ReservationViewModel(
             )
             val result = visitsService.createGuestVisit(visit)
             if (!result.isError && result.value != null) {
+                visitId = result.value.visitId!!
                 successMessage = resourceProvider.getString(R.string.visit_created_success)
                 // Czyścimy pola
                 totalGuests = 1
@@ -455,29 +456,6 @@ class ReservationViewModel(
             }
         }
     }
-
-    // -------------------------
-    //  Wczytywanie użytkowników (zamiast znajomych)
-    // -------------------------
-    private val _usersFlow = MutableStateFlow<Flow<PagingData<UserDTO>>?>(null)
-    val usersFlow: Flow<PagingData<UserDTO>>? get() = _usersFlow.value
-
-    fun loadUsersPaging(searchName: String) {
-        Log.d("DEBUG", "loadUsersPaging(...) called with $searchName")
-        val finalName = if (searchName.isBlank()) "." else searchName
-        viewModelScope.launch {
-            val result = userService.getUsers(name = finalName)
-            Log.d("DEBUG", "userService.getUsers($finalName) => isError=${result.isError}")
-            if (!result.isError && result.value != null) {
-                _usersFlow.value = result.value.cachedIn(viewModelScope)
-                Log.d("DEBUG", "_usersFlow assigned new Flow with query=$finalName")
-            } else {
-                _usersFlow.value = null
-                Log.d("DEBUG", "_usersFlow set to null (error or no data)")
-            }
-        }
-    }
-
 
     fun getVisit(visitId: Any) {
         viewModelScope.launch {
