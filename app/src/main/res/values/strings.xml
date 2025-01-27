@@ -677,12 +677,10 @@
     <string name="no_employee_report_error">Cannot report. No employee is assigned to the selected visit.</string>
     <string name="report_sent_title">Report Sent</string>
     <string name="report_sent_message">Thank you for your report!</string>
-    <string name="error_title">Error</string>
     <string name="ok_button">OK</string>
     <string name="select_visit_title">Select a Visit</string>
     <string name="loading_visits">Loading visits...</string>
     <string name="close_button">Close</string>
-    <string name="select_participant_title">Select Participant</string>
     <string name="no_participants_found">No participants found.</string>
     <string name="report_customer_title">Report a Customer</string>
     <string name="select_customer_button">Select Customer (Participant)</string>

@@ -663,12 +663,10 @@
     <string name="no_employee_report_error">Nie można zgłosić. Brak przypisanego pracownika do wybranej wizyty.</string>
     <string name="report_sent_title">Zgłoszenie Wysłane</string>
     <string name="report_sent_message">Dziękujemy za Twoje zgłoszenie!</string>
-    <string name="error_title">Błąd</string>
     <string name="ok_button">OK</string>
     <string name="select_visit_title">Wybierz Wizytę</string>
     <string name="loading_visits">Ładowanie wizyt...</string>
     <string name="close_button">Zamknij</string>
-    <string name="select_participant_title">Wybierz Uczestnika</string>
     <string name="no_participants_found">Nie znaleziono uczestników.</string>
     <string name="report_customer_title">Zgłoś Klienta</string>
     <string name="select_customer_button">Wybierz Klienta (Uczestnika)</string>
