@@ -24,6 +24,7 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.ButtonComponent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -161,6 +162,7 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
 
     // Show success dialog
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
             title = { Text(stringResource(R.string.report_sent_title)) },
@@ -383,6 +385,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
 
     // If success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
             title = { Text(stringResource(R.string.report_sent_title)) },
@@ -436,6 +439,7 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
         ButtonComponent(
             label = stringResource(R.string.send_button),
             onClick = {
+                formSent = true
                 reportsViewModel.sendReportBug()
             }
         )
@@ -443,6 +447,7 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
 
     // Show success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
             title = { Text(stringResource(R.string.report_sent_title)) },
@@ -536,6 +541,7 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
 
     // Show success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
             title = { Text(stringResource(R.string.report_sent_title)) },

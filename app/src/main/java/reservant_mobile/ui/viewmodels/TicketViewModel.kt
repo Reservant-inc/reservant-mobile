@@ -112,16 +112,35 @@ class TicketViewModel(
 
     fun loadParticipantsFromVisit(visit: VisitDTO) {
         participantList.clear()
-        // "participants" -> map them to a list of userDTO
         visit.participants?.forEach { part ->
             participantList.add(
                 UserDTO(
                     userId = part.userId,
-                    firstName = part.firstName ?: "" ,
+                    firstName = part.firstName ?: "",
                     lastName = part.lastName ?: "",
-                    // etc.
+                    photo = part.photo
                 )
             )
+        }
+
+        viewModelScope.launch {
+            val clientId = visit.clientId ?: return@launch
+
+            val result = userService.getUserSimpleInfo(clientId)
+            if (!result.isError && result.value != null) {
+                val userSummary = result.value
+
+                val userDTO = UserDTO(
+                    userId = userSummary.userId,
+                    firstName = userSummary.firstName ?: "",
+                    lastName = userSummary.lastName ?: "",
+                    photo = userSummary.photo,
+                )
+
+                if (participantList.none { it.userId == userDTO.userId }) {
+                    participantList.add(userDTO)
+                }
+            }
         }
     }
 
