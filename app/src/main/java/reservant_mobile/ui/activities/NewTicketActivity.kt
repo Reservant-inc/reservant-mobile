@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.FormInput
@@ -82,6 +83,7 @@ fun NewTicketActivity(
 @Composable
 fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
     var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
         Text(text = stringResource(R.string.report_employee_title), style = MaterialTheme.typography.titleLarge)
@@ -143,6 +145,7 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
             label = stringResource(R.string.send_button),
             onClick = {
                 formSent = true
+                focusManager.clearFocus()
                 if (reportsViewModel.selectedEmployee == null) {
                     reportsViewModel.errorMessage = noEmployeeErrorMessage
                 } else {
@@ -297,6 +300,7 @@ fun ParticipantSelectionPopup(
 @Composable
 fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
     var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
         Text(text = stringResource(R.string.report_customer_title), style = MaterialTheme.typography.titleLarge)
@@ -363,6 +367,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
             label = stringResource(R.string.send_button),
             onClick = {
                 formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportCustomer()
             }
         )
@@ -418,6 +423,7 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
 @Composable
 fun ReportBugTab(reportsViewModel: TicketViewModel) {
     var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
         Text(text = stringResource(R.string.report_bug_title), style = MaterialTheme.typography.titleLarge)
@@ -440,6 +446,7 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
             label = stringResource(R.string.send_button),
             onClick = {
                 formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportBug()
             }
         )
@@ -456,7 +463,6 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
                 ButtonComponent(
                     label = stringResource(R.string.ok_button),
                     onClick = {
-                        formSent = true
                         reportsViewModel.showSuccessDialog = false
                     }
                 )
@@ -483,6 +489,7 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
 @Composable
 fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
     var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
         Text(text = stringResource(R.string.report_lost_item_title), style = MaterialTheme.typography.titleLarge)
@@ -526,6 +533,7 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
             label = stringResource(R.string.send_button),
             onClick = {
                 formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportLostItem()
             }
         )
