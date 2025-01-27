@@ -42,7 +42,7 @@ sealed class BottomNavItem(
 
     data object Profile :
         BottomNavItem(
-            MainRoutes.Settings,
+            MainRoutes.Settings(),
             Icons.Filled.Settings,
             R.string.label_settings
         )
@@ -53,5 +53,4 @@ sealed class BottomNavItem(
             Icons.Filled.RestaurantMenu,
             R.string.label_employee
         )
-
 }

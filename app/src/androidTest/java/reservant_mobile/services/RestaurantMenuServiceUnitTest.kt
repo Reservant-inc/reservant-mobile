@@ -28,7 +28,7 @@ class RestaurantMenuServiceUnitTest: ServiceTest() {
             alternateName = "Testovací menu",
             menuType = "Food",
             dateFrom = "2020-02-20",
-            menuItemsIds = emptyList()
+            menuItemIds = emptyList()
         )
 
         menuItem = RestaurantMenuItemDTO(

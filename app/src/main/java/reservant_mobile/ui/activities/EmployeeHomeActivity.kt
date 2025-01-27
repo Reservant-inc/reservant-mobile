@@ -335,7 +335,7 @@ fun EmployeeHomeActivity() {
                         EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
                             icon = Icons.Outlined.Settings,
-                            onClick = { innerNavController.navigate(MainRoutes.Settings) }
+                            onClick = { innerNavController.navigate(MainRoutes.Settings(restaurantId = restaurant.restaurantId)) }
                         ),
                     )
 
@@ -393,7 +393,8 @@ fun EmployeeHomeActivity() {
                         withBackButton = true,
                         onReturnClick = {
                             innerNavController.popBackStack()
-                        }
+                        },
+                        restaurantId = it.toRoute<MainRoutes.Settings>().restaurantId
                     )
                 }
                 composable<AuthRoutes.Landing> {

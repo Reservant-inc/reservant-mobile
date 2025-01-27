@@ -72,7 +72,12 @@ fun AddEventActivity(navController: NavHostController) {
             onValueChange = { addEventViewModel.eventName = it },
             label = stringResource(id = R.string.label_event_name),
             isError = addEventViewModel.isEventNameInvalid() && addEventViewModel.formSent,
-            errorText = stringResource(R.string.error_field_required),
+            errorText = stringResource(
+            if(addEventViewModel.getNameError() != -1)
+                addEventViewModel.getNameError()
+            else
+                R.string.error_field_required
+            ),
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             formSent = addEventViewModel.formSent

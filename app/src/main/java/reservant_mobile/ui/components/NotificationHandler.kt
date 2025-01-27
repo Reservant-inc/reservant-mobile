@@ -15,6 +15,7 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonPrimitive
 import reservant_mobile.data.constants.Roles
 import reservant_mobile.data.models.dtos.NotificationDTO
 import reservant_mobile.data.models.dtos.fields.Result
@@ -116,29 +117,46 @@ class NotificationHandler (
             return
         }
 
-        while (true){
+        session?.let {
+            while (true){
 
-            val notification = service.receiveNotificationFromSession(session!!)
+                val notification = service.receiveNotificationFromSession(it)
+                if (!notification.isError && notification.value != null){
+                    val photo = notification.value.photo?.let {
+                        fileService.getImage(it)
+                    } ?: Result(isError = true, value = null)
 
-            if (!notification.isError && notification.value != null){
-                val photo = notification.value.photo?.let {
-                    fileService.getImage(it)
-                } ?: Result(isError = true, value = null)
+                    notification.value.notificationType?.let {
 
-                notification.value.notificationType?.let {
+                        if(it == NotificationDTO.NotificationType.NotificationNewMessage){
+                            val authorName = (notification.value.details?.get("authorName")?.jsonPrimitive?.content ?: "")
+                            val userName = "${UserService.UserObject.firstName} ${UserService.UserObject.lastName}"
+                            if (authorName != userName){
+                                val pair = it.getContent(notification.value.details)
 
-                    val pair = it.getContent(notification.value.details)
+                                showBasicNotification(
+                                    pair.first,
+                                    pair.second,
+                                    photo.value
+                                )
+                            }
+                        } else {
+                            val pair = it.getContent(notification.value.details)
+                            showBasicNotification(
+                                pair.first,
+                                pair.second,
+                                photo.value
+                            )
+                        }
 
-                    showBasicNotification(
-                        pair.first,
-                        pair.second,
-                        photo.value
-                    )
+                    }
+
                 }
 
             }
 
         }
+
 
     }
 

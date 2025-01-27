@@ -277,7 +277,14 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservati
     val formattedDate = visit.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
-    val clientId = "Pracownik - Brakuje w backu"
+    val employee by remember {
+        mutableStateOf(visit.orders?.get(0)?.assignedEmployee)
+    }
+
+    val employeeStr by remember {
+        mutableStateOf(employee?.let { "${it.firstName} ${it.lastName}" })
+    }
+
     val tableId = visit.tableId?.toString() ?: stringResource(R.string.unknown_table)
 
     Card(
@@ -314,7 +321,7 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservati
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = clientId,
+                    text = employeeStr ?: stringResource(id = R.string.label_no_employee_assigned),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(modifier = Modifier.height(4.dp))

@@ -305,7 +305,7 @@ class EventViewModel(
     }
 
     fun isEventNameInvalid(): Boolean {
-        return eventName.isBlank()
+        return eventName.isBlank() || eventName.length > 50
     }
 
     fun getEventNameError(): Int {
@@ -313,11 +313,23 @@ class EventViewModel(
     }
 
     fun isDescriptionInvalid(): Boolean {
-        return description.isBlank() || getFieldError(result, "description") != -1
+        return description.isBlank() || description.length > 200 || getFieldError(result, "description") != -1
     }
 
     fun getDescriptionError(): Int {
-        return getFieldError(result, "description")
+        return when {
+            description.isBlank() -> R.string.error_field_required
+            description.length > 200 -> R.string.error_description_too_long
+            else -> getFieldError(result, "description")
+        }
+    }
+
+    fun getNameError(): Int {
+        return when {
+            description.isBlank() -> R.string.error_field_required
+            description.length > 50 -> R.string.error_name_too_long
+            else -> getFieldError(result, "name")
+        }
     }
 
     fun isEventDateInvalid(): Boolean {

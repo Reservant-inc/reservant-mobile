@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.FormInput
@@ -23,6 +25,7 @@ import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.ButtonComponent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -38,7 +41,8 @@ import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
 @Composable
 fun NewTicketActivity(
-    navController: NavController
+    navController: NavController,
+    restaurantId: Int
 ) {
     val reportsViewModel = viewModel<TicketViewModel>(
         factory = object : ViewModelProvider.Factory {
@@ -50,17 +54,16 @@ fun NewTicketActivity(
     val isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
 
     val tabPages = buildList<Pair<String, @Composable () -> Unit>> {
-        add("Report Bug" to { ReportBugTab(reportsViewModel) })
+        add(stringResource(R.string.report_bug) to { ReportBugTab(reportsViewModel) })
         if (!isEmployee) {
-            add("Report Employee" to { ReportEmployeeTab(reportsViewModel) })
+            add(stringResource(R.string.report_employee) to { ReportEmployeeTab(reportsViewModel) })
         }
         if (isEmployee) {
-            add("Report Customer" to { ReportCustomerTab(reportsViewModel) })
+            add(stringResource(R.string.report_customer) to { ReportCustomerTab(reportsViewModel, restaurantId) })
         }
         if (!isEmployee) {
-            add("Report Lost Item" to { ReportLostItemTab(reportsViewModel) })
+            add(stringResource(R.string.report_lost_item) to { ReportLostItemTab(reportsViewModel) })
         }
-
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -79,9 +82,11 @@ fun NewTicketActivity(
 
 @Composable
 fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
         Spacer(Modifier.height(72.dp))
-        Text(text = "Report an Employee", style = MaterialTheme.typography.titleLarge)
+        Text(text = stringResource(R.string.report_employee_title), style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -89,43 +94,60 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the issue"
+            label = stringResource(R.string.description_label),
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = stringResource(R.string.description_error),
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Button to pick a visit
         ButtonComponent(
-            label = "Select Visit",
+            label = stringResource(R.string.select_visit_button),
             onClick = {
                 reportsViewModel.loadVisitsForUserOrRestaurant()
                 reportsViewModel.isPickVisitDialogOpen = true
             }
         )
 
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = stringResource(R.string.visit_error)
+        )
+
         reportsViewModel.selectedVisit?.let { chosenVisit ->
             // Display chosen visit information
-            Text("Chosen visit: #${chosenVisit.visitId}")
+            Text(stringResource(R.string.chosen_visit, chosenVisit.visitId ?: 0))
 
             // Extract the first available employeeId from orders
             val assignedEmployee = chosenVisit.orders?.firstNotNullOfOrNull { it.assignedEmployee }
 
+            ErrorText(
+                formSent = formSent,
+                isError = reportsViewModel.isEmplyeeError(),
+                textError = stringResource(R.string.employee_error)
+            )
+
             if (assignedEmployee != null) {
                 reportsViewModel.selectedEmployee = assignedEmployee // Assign in ViewModel
-                Text("Assigned employee: ${assignedEmployee.firstName} ${assignedEmployee.lastName}")
+                Text(stringResource(R.string.assigned_employee, assignedEmployee.firstName ?: "", assignedEmployee.lastName ?: ""))
             } else {
-                Text("No employee assigned to this visit.")
+                Text(stringResource(R.string.no_employee_assigned))
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Button to send the report
+        val noEmployeeErrorMessage = stringResource(R.string.no_employee_report_error)
         ButtonComponent(
-            label = "Send",
+            label = stringResource(R.string.send_button),
             onClick = {
+                formSent = true
+                focusManager.clearFocus()
                 if (reportsViewModel.selectedEmployee == null) {
-                    reportsViewModel.errorMessage = "Cannot report. No employee is assigned to the selected visit."
+                    reportsViewModel.errorMessage = noEmployeeErrorMessage
                 } else {
                     reportsViewModel.sendReportEmployee()
                 }
@@ -143,13 +165,14 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
 
     // Show success dialog
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
-            title = { Text("Report Sent") },
-            text = { Text("Thank you for your report!") },
+            title = { Text(stringResource(R.string.report_sent_title)) },
+            text = { Text(stringResource(R.string.report_sent_message)) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.showSuccessDialog = false }
                 )
             }
@@ -160,11 +183,11 @@ fun ReportEmployeeTab(reportsViewModel: TicketViewModel) {
     reportsViewModel.errorMessage?.let { err ->
         AlertDialog(
             onDismissRequest = { reportsViewModel.errorMessage = null },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error_title)) },
             text = { Text(err) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.errorMessage = null }
                 )
             }
@@ -185,12 +208,12 @@ fun VisitSelectionPopup(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select a Visit") },
+        title = { Text(stringResource(R.string.select_visit_title)) },
         text = {
             // If null => not loaded or an error
             if (lazyVisits == null) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("Loading visits...")
+                    Text(stringResource(R.string.loading_visits))
                 }
             } else {
                 // We can handle load states:
@@ -203,12 +226,12 @@ fun VisitSelectionPopup(
                     }
                     loadState is LoadState.Error -> {
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text("Error loading visits")
+                            Text(stringResource(R.string.error_loading_visits))
                         }
                     }
                     else -> {
                         if (lazyVisits.itemCount == 0) {
-                            Text("No visits found.")
+                            Text(stringResource(R.string.no_visits_found))
                         } else {
                             // Show them in a LazyColumn
                             LazyColumn {
@@ -220,6 +243,7 @@ fun VisitSelectionPopup(
                                             onClick = {
                                                 // Use the selected visit
                                                 reportsViewModel.selectedVisit = visit
+                                                reportsViewModel.selectedParticipant = null
                                                 onDismiss()
                                             }
                                         )
@@ -232,7 +256,7 @@ fun VisitSelectionPopup(
             }
         },
         confirmButton = {
-            ButtonComponent(label = "Close", onClick = onDismiss)
+            ButtonComponent(label = stringResource(R.string.close_button), onClick = onDismiss)
         }
     )
 }
@@ -245,10 +269,10 @@ fun ParticipantSelectionPopup(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select Participant") },
+        title = { Text(stringResource(R.string.select_participant_title)) },
         text = {
             if (reportsViewModel.participantList.isEmpty()) {
-                Text("No participants found.")
+                Text(stringResource(R.string.no_participants_found))
             } else {
                 // Could be a LazyColumn if big list
                 Column {
@@ -267,17 +291,19 @@ fun ParticipantSelectionPopup(
             }
         },
         confirmButton = {
-            ButtonComponent(label = "Close", onClick = onDismiss)
+            ButtonComponent(label = stringResource(R.string.close_button), onClick = onDismiss)
         }
     )
 }
 
 
 @Composable
-fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
+fun ReportCustomerTab(reportsViewModel: TicketViewModel, restaurantId: Int) {
+    var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
-        Spacer (Modifier.height(72.dp))
-        Text(text = "Report a Customer", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(72.dp))
+        Text(text = stringResource(R.string.report_customer_title), style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -285,38 +311,52 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the issue"
+            label = stringResource(R.string.description_label),
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = stringResource(R.string.description_error),
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Button to pick a visit
         ButtonComponent(
-            label = "Select Visit",
+            label = stringResource(R.string.select_visit_button),
             onClick = {
-                reportsViewModel.loadVisitsForUserOrRestaurant()
+                reportsViewModel.loadVisitsForUserOrRestaurant(restaurantId = restaurantId)
                 reportsViewModel.isPickVisitDialogOpen = true
             }
+        )
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = stringResource(R.string.visit_error)
         )
 
         // Once a visit is chosen, show more steps
         reportsViewModel.selectedVisit?.let { chosenVisit ->
-            Text("Chosen visit: #${chosenVisit.visitId}")
+            Text(stringResource(R.string.chosen_visit, chosenVisit.visitId ?: 0))
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // Now pick the participant (the customer)
             ButtonComponent(
-                label = "Select Customer (Participant)",
+                label = stringResource(R.string.select_customer_button),
                 onClick = {
                     reportsViewModel.loadParticipantsFromVisit(chosenVisit)
                     reportsViewModel.isPickParticipantDialogOpen = true
                 }
             )
 
+            ErrorText(
+                formSent = formSent,
+                isError = reportsViewModel.isParticipantsError(),
+                textError = stringResource(R.string.participant_error)
+            )
+
             // Show the currently selected user if any
             reportsViewModel.selectedParticipant?.let { user ->
-                Text("Selected customer: ${user.firstName} ${user.lastName}")
+                Text(stringResource(R.string.selected_customer, user.firstName, user.lastName))
             }
         }
 
@@ -324,8 +364,10 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
 
         // Finally send the report
         ButtonComponent(
-            label = "Send",
+            label = stringResource(R.string.send_button),
             onClick = {
+                formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportCustomer()
             }
         )
@@ -348,13 +390,14 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
 
     // If success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
-            title = { Text("Report Sent") },
-            text = { Text("Successfully reported a customer.") },
+            title = { Text(stringResource(R.string.report_sent_title)) },
+            text = { Text(stringResource(R.string.report_customer_success_message)) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.showSuccessDialog = false }
                 )
             }
@@ -365,11 +408,11 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
     reportsViewModel.errorMessage?.let { err ->
         AlertDialog(
             onDismissRequest = { reportsViewModel.errorMessage = null },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error_title)) },
             text = { Text(err) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.errorMessage = null }
                 )
             }
@@ -379,24 +422,31 @@ fun ReportCustomerTab(reportsViewModel: TicketViewModel) {
 
 @Composable
 fun ReportBugTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
-        Spacer (Modifier.height(72.dp))
-        Text(text = "Report a Bug", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(72.dp))
+        Text(text = stringResource(R.string.report_bug_title), style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Describe the bug"
+            label = stringResource(R.string.describe_bug_label),
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = stringResource(R.string.description_error),
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // No need to pick visit or participant, just send
         ButtonComponent(
-            label = "Send",
+            label = stringResource(R.string.send_button),
             onClick = {
+                formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportBug()
             }
         )
@@ -404,14 +454,17 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
 
     // Show success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
-            title = { Text("Report Sent") },
-            text = { Text("Thank you for reporting the bug!") },
+            title = { Text(stringResource(R.string.report_sent_title)) },
+            text = { Text(stringResource(R.string.report_bug_success_message)) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
-                    onClick = { reportsViewModel.showSuccessDialog = false }
+                    label = stringResource(R.string.ok_button),
+                    onClick = {
+                        reportsViewModel.showSuccessDialog = false
+                    }
                 )
             }
         )
@@ -421,11 +474,11 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
     reportsViewModel.errorMessage?.let { err ->
         AlertDialog(
             onDismissRequest = { reportsViewModel.errorMessage = null },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error_title)) },
             text = { Text(err) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.errorMessage = null }
                 )
             }
@@ -435,9 +488,11 @@ fun ReportBugTab(reportsViewModel: TicketViewModel) {
 
 @Composable
 fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
+    var formSent by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
     Column(modifier = Modifier.padding(16.dp)) {
-        Spacer (Modifier.height(72.dp))
-        Text(text = "Report Lost Item", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(72.dp))
+        Text(text = stringResource(R.string.report_lost_item_title), style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -445,30 +500,40 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
         FormInput(
             inputText = reportsViewModel.description,
             onValueChange = { reportsViewModel.description = it },
-            label = "Description of the lost item"
+            label = stringResource(R.string.description_lost_item_label),
+            isError = reportsViewModel.isDescriptionError(),
+            errorText = stringResource(R.string.description_error),
+            formSent = formSent
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Possibly pick a visit (where the item was lost)
         ButtonComponent(
-            label = "Select Visit",
+            label = stringResource(R.string.select_visit_button),
             onClick = {
                 reportsViewModel.loadVisitsForUserOrRestaurant()
                 reportsViewModel.isPickVisitDialogOpen = true
             }
         )
+        ErrorText(
+            formSent = formSent,
+            isError = reportsViewModel.isVisitError(),
+            textError = stringResource(R.string.visit_error)
+        )
 
         reportsViewModel.selectedVisit?.let { chosen ->
-            Text("Chosen visit: #${chosen.visitId}")
+            Text(stringResource(R.string.chosen_visit, chosen.visitId ?: 0))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Send button
         ButtonComponent(
-            label = "Send",
+            label = stringResource(R.string.send_button),
             onClick = {
+                formSent = true
+                focusManager.clearFocus()
                 reportsViewModel.sendReportLostItem()
             }
         )
@@ -484,13 +549,14 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
 
     // Show success
     if (reportsViewModel.showSuccessDialog) {
+        formSent = false
         AlertDialog(
             onDismissRequest = { reportsViewModel.showSuccessDialog = false },
-            title = { Text("Report Sent") },
-            text = { Text("Thank you for reporting a lost item.") },
+            title = { Text(stringResource(R.string.report_sent_title)) },
+            text = { Text(stringResource(R.string.report_lost_item_success_message)) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.showSuccessDialog = false }
                 )
             }
@@ -501,14 +567,25 @@ fun ReportLostItemTab(reportsViewModel: TicketViewModel) {
     reportsViewModel.errorMessage?.let { err ->
         AlertDialog(
             onDismissRequest = { reportsViewModel.errorMessage = null },
-            title = { Text("Error") },
+            title = { Text(stringResource(R.string.error_title)) },
             text = { Text(err) },
             confirmButton = {
                 ButtonComponent(
-                    label = "OK",
+                    label = stringResource(R.string.ok_button),
                     onClick = { reportsViewModel.errorMessage = null }
                 )
             }
+        )
+    }
+}
+
+@Composable
+fun ErrorText(formSent: Boolean, isError: Boolean, textError: String) {
+    if (formSent && isError) {
+        Text(
+            text = textError,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
