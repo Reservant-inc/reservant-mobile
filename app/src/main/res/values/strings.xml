@@ -703,6 +703,15 @@
     <string name="label_new_password">New password</string>
     <string name="label_old_password">Old password</string>
     <string name="label_change_password">Change password</string>
+    <string name="visit_created_success">Visit created successfully</string>
+    <string name="employee_create_visit_title">Create visit (Employee)</string>
+    <string name="error_title">Error</string>
+    <string name="success_title">Success</string>
+    <string name="error_correct_time">Please set date and time correctly</string>
+    <string name="create_visit">Create Visit</string>
+    <string name="select_participant_title">Select participant</string>
+    <string name="error_loading_users">Error loading users</string>
+    <string name="no_users_found">No users found</string>
     <string name="error_description_too_long">Description cannot exceed 200 characters</string>
     <string name="error_name_too_long">Name cannot exceed 50 characters</string>
     <string name="error_dateFrom_after_To">Date from must be after date to</string>

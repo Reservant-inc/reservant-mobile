@@ -1,6 +1,7 @@
 package reservant_mobile.ui.viewmodels
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,6 +21,7 @@ import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.models.dtos.RestaurantDTO
 import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
+import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.models.dtos.fields.FormField
 import reservant_mobile.data.models.dtos.fields.Result
@@ -29,9 +31,11 @@ import reservant_mobile.data.services.IDeliveryService
 import reservant_mobile.data.services.IFriendsService
 import reservant_mobile.data.services.IOrdersService
 import reservant_mobile.data.services.IRestaurantService
+import reservant_mobile.data.services.IUserService
 import reservant_mobile.data.services.IVisitsService
 import reservant_mobile.data.services.OrdersService
 import reservant_mobile.data.services.RestaurantService
+import reservant_mobile.data.services.UserService
 import reservant_mobile.data.services.VisitsService
 import reservant_mobile.data.utils.ResourceProvider
 import java.time.LocalDate
@@ -45,6 +49,7 @@ class ReservationViewModel(
     private val resourceProvider: ResourceProvider,
     private val restaurantService: IRestaurantService = RestaurantService(),
     private val friendsService: IFriendsService = FriendsService(),
+    private val userService: IUserService = UserService()
 ) : ReservantViewModel() {
 
     var note: FormField = FormField(OrderDTO::note.name)
@@ -67,9 +72,8 @@ class ReservationViewModel(
     var deliveryCost by mutableStateOf(0.0)
 
     var returnedVisit by mutableStateOf<VisitDTO?>(null)
-
+    var successMessage by mutableStateOf<String?>(null)
     var errorMessage by mutableStateOf<String?>(null)
-        private set
     var isDateError by mutableStateOf(false)
         private set
     var dateErrorText by mutableStateOf<String?>(null)
@@ -421,6 +425,36 @@ class ReservationViewModel(
             errorMessage = null
         }
         return visitResult
+    }
+
+    // -------------------------
+    //  Metoda kluczowa: createGuestVisit
+    // -------------------------
+    fun createGuestVisit(restaurantId: Int) {
+        viewModelScope.launch {
+            // Zbuduj obiekt VisitDTO (lub cokolwiek Twój endpoint /visits/guests wymaga)
+            val visit = VisitDTO(
+                date = "${visitDate.value}T${startTime.value}",
+                endTime = "${visitDate.value}T${endTime.value}",
+                numberOfGuests = totalGuests-participantIds.size,
+                tip = tip,
+                takeaway = isTakeaway,
+                restaurantId = restaurantId,
+                participantIds = participantIds
+            )
+            val result = visitsService.createGuestVisit(visit)
+            if (!result.isError && result.value != null) {
+                visitId = result.value.visitId!!
+                successMessage = resourceProvider.getString(R.string.visit_created_success)
+                // Czyścimy pola
+                totalGuests = 1
+                tip = 0.0
+                isTakeaway = false
+                participantIds.clear()
+            } else {
+                errorMessage = resourceProvider.getString(R.string.error_create_visit)
+            }
+        }
     }
 
     fun getVisit(visitId: Any) {

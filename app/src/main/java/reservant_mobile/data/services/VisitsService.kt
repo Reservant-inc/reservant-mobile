@@ -16,6 +16,7 @@ interface IVisitsService{
     suspend fun confirmStart(visitId: Any): Result<Boolean>
     suspend fun confirmEnd(visitId: Any): Result<Boolean>
     suspend fun updateTable(visitId: Any, tableId: Any): Result<Boolean>
+    suspend fun createGuestVisit(visit: VisitDTO): Result<VisitDTO?>
 
 }
 
@@ -59,5 +60,10 @@ class VisitsService():ServiceUtil(), IVisitsService {
         val obj = mapOf("tableId" to tableId.toString())
         val res = api.put(Visits.VisitID.Table(parent = Visits.VisitID(visitId = visitId.toString())), obj)
         return booleanResultWrapper(res, expectedCode = HttpStatusCode.NoContent)
+    }
+
+    override suspend fun createGuestVisit(visit: VisitDTO): Result<VisitDTO?> {
+        val res = api.post(Visits.Guests(), visit)
+        return complexResultWrapper(res)
     }
 }
