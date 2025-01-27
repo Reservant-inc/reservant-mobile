@@ -177,6 +177,19 @@ class EmployeeOrderViewModel(
 
     }
 
+    fun fetchUserNameById(userId: String, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            val result = userService.getUserSimpleInfo(userId)
+            if (!result.isError && result.value != null) {
+                val userName = "${result.value.firstName ?: ""} ${result.value.lastName ?: ""}".trim()
+                onResult(userName)
+            } else {
+                onResult(null) // Brak danych lub błąd
+            }
+        }
+    }
+
+
 
 }
 

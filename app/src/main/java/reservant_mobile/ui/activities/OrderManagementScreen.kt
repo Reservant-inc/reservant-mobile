@@ -240,6 +240,13 @@ fun OrderList(
     viewModel: EmployeeOrderViewModel,
     isReservation: Boolean = false
 ) {
+    var name = ""
+    viewModel.fetchUserNameById("12345") { userName ->
+        if (userName != null) {
+            name = userName
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -247,7 +254,7 @@ fun OrderList(
             val visit = visits[index]
             if (visit != null) {
                 viewModel.cacheVisit(visit)
-                VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation)
+                VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation, name = name)
             } else {
                 Text(text = stringResource(R.string.loading_visit))
             }
@@ -274,7 +281,7 @@ fun OrderList(
 
 
 @Composable
-fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservation: Boolean = false) {
+fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservation: Boolean = false, name: String) {
     val formattedDate = visit.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
