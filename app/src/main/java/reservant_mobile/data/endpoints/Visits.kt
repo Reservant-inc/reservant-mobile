@@ -21,4 +21,6 @@ class Visits {
         @Resource("table")
         class Table(val parent: VisitID)
     }
+    @Resource("guests")
+    class Guests(val parent: Visits = Visits())
 }

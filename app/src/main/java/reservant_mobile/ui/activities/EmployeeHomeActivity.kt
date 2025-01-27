@@ -24,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Inbox
 import androidx.compose.material.icons.outlined.Settings
@@ -327,6 +328,11 @@ fun EmployeeHomeActivity() {
                             }
                         ),
                         EmpMenuOption(
+                            text = stringResource(id = R.string.create_visit),
+                            icon = Icons.Outlined.AddBox,
+                            onClick = { innerNavController.navigate(RestaurantRoutes.Visit(  restaurantId = restaurant.restaurantId)) }
+                        ),
+                        EmpMenuOption(
                             text = stringResource(id = R.string.label_settings),
                             icon = Icons.Outlined.Settings,
                             onClick = { innerNavController.navigate(MainRoutes.Settings) }
@@ -413,6 +419,12 @@ fun EmployeeHomeActivity() {
                     EmployeeTablesActivity(
                         onReturnClick = { innerNavController.popBackStack() },
                         restaurantId = it.toRoute<RestaurantRoutes.Tables>().restaurantId
+                    )
+                }
+                composable<RestaurantRoutes.Visit> {
+                    EmployeeCreateVisitActivity(
+                        restaurantId = it.toRoute<RestaurantRoutes.Visit>().restaurantId,
+                        navController = innerNavController
                     )
                 }
                 composable<RestaurantRoutes.Warehouse> {
