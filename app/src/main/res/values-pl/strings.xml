@@ -705,4 +705,5 @@
     <string name="no_menus_found">Nie znaleziono menu</string>
     <string name="employee_add_order_title">Dodaj zamówienie dla wizyty #%1$d</string>
     <string name="add_order">Dodaj zamówienie</string>
+    <string name="empty_cart">Koszyk jest pusty!</string>
 </resources>

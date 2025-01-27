@@ -1,5 +1,6 @@
 package reservant_mobile.ui.activities
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import reservant_mobile.data.models.dtos.RestaurantMenuItemDTO
 import reservant_mobile.data.utils.DefaultResourceProvider
 import reservant_mobile.ui.components.MenuItemCard
 import reservant_mobile.ui.components.MenuTypeButton
+import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.viewmodels.ReservationViewModel
 import reservant_mobile.ui.viewmodels.RestaurantDetailViewModel
 
@@ -79,7 +81,8 @@ fun EmployeeAddOrderActivity(
         EmployeeAddOrderFormContent(
             modifier = Modifier.padding(it),
             reservationViewModel = reservationViewModel,
-            restaurantDetailVM = restaurantDetailVM
+            restaurantDetailVM = restaurantDetailVM,
+            context = LocalContext.current
         )
     }
 
@@ -117,13 +120,15 @@ fun EmployeeAddOrderActivity(
 fun EmployeeAddOrderFormContent(
     modifier: Modifier = Modifier,
     reservationViewModel: ReservationViewModel,
-    restaurantDetailVM: RestaurantDetailViewModel
+    restaurantDetailVM: RestaurantDetailViewModel,
+    context: Context
 ) {
     val focusManager = LocalFocusManager.current
     val cartItems = reservationViewModel.addedItems
 
     // Popup z menu
     var isMenuPopupOpen by remember { mutableStateOf(false) }
+    var isCartEmpty by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.padding(16.dp)) {
         // Notatka
@@ -176,12 +181,22 @@ fun EmployeeAddOrderFormContent(
         ButtonComponent(
             label = stringResource(R.string.label_send),
             onClick = {
-                focusManager.clearFocus()
-                reservationViewModel.viewModelScope.launch {
-                    reservationViewModel.createOrder()
+                if(!reservationViewModel.isCartEmpty()) {
+                    isCartEmpty = false
+                    focusManager.clearFocus()
+                    reservationViewModel.viewModelScope.launch {
+                        reservationViewModel.createOrder()
+                    }
+                }
+                else{
+                    isCartEmpty = true
                 }
             }
         )
+        if(isCartEmpty) {
+            ShowErrorToast(context = context, id = R.string.empty_cart)
+            isCartEmpty = false
+        }
         Spacer(Modifier.height(16.dp))
     }
 
