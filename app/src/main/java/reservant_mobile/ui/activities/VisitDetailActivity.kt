@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -253,7 +255,9 @@ fun InfoSectionReadOnly(visit: VisitDTO) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // If there's an orders array, sum the cost
-        val totalCost = visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0
+        val totalCost by remember {
+            mutableStateOf(visit.orders?.sumOf { it.cost ?: 0.0 } ?: 0.0)
+        }
         if (visit.orders?.size == 0) {
             Text(
                 text = stringResource(R.string.reservation_label),
@@ -262,12 +266,12 @@ fun InfoSectionReadOnly(visit: VisitDTO) {
                 color = MaterialTheme.colorScheme.primary
             )
         } else {
-            Text(
+            /*Text(
                 text = stringResource(R.string.total_cost_label, "%.2f".format(totalCost)),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
-            )
+            )*/
         }
     }
 }
