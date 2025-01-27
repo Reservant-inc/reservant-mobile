@@ -529,7 +529,7 @@ fun JoinRequestsTab(
                     if (interestedUsersPagingItems != null) {
                         when (interestedUsersPagingItems.loadState.refresh) {
                             is LoadState.Loading -> {
-                                 CircularProgressIndicator()
+                                 //
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
