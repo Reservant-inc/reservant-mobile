@@ -293,7 +293,7 @@ fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservati
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 
     val employee by remember {
-        mutableStateOf(visit.orders?.get(0)?.assignedEmployee)
+        mutableStateOf(visit.orders?.firstOrNull()?.assignedEmployee)
     }
 
     val employeeStr by remember {
