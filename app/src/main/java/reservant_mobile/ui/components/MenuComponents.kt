@@ -52,6 +52,8 @@ fun MenuPopup(
     isMenuTypeInvalid: Boolean = false,
     dateFrom: FormField,
     dateUntil: FormField,
+    areDatesInvalid: Boolean = false,
+    isDateUntilInvalid: Boolean = false,
     isSaving: Boolean = false
 ) {
 
@@ -98,7 +100,9 @@ fun MenuPopup(
                     startDate = dateFrom.value.ifEmpty {
                         LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                     },
-                    onDateChange = { dateFrom.value = it }
+                    onDateChange = { dateFrom.value = it },
+                    isError = areDatesInvalid,
+                    errorText = stringResource(id = R.string.error_dateFrom_after_To)
                 )
                 MyDatePickerDialog(
                     label = stringResource(id = R.string.label_date_to),
@@ -108,7 +112,12 @@ fun MenuPopup(
                     startDate = dateUntil.value.ifEmpty {
                         LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
                     },
-                    onDateChange = { dateUntil.value = it }
+                    onDateChange = { dateUntil.value = it },
+                    isError = areDatesInvalid || isDateUntilInvalid,
+                    errorText = stringResource(
+                        id = if (isDateUntilInvalid) R.string.errorCode_DateMustBeInFuture
+                        else R.string.error_dateTo_before_From
+                    )
                 )
 
             }
@@ -154,7 +163,9 @@ fun MenuCard(
     isSaving: Boolean = false,
     isNameInvalid: Boolean = false,
     isAltNameInvalid: Boolean = false,
-    isMenuTypeInvalid: Boolean = false
+    isMenuTypeInvalid: Boolean = false,
+    areDatesInvalid: Boolean = false,
+    isDateUntilInvalid: Boolean = false
 ) {
 
     when {
@@ -194,7 +205,9 @@ fun MenuCard(
                 isSaving = isSaving,
                 isNameInvalid = isNameInvalid,
                 isAltNameInvalid = isAltNameInvalid,
-                isMenuTypeInvalid = isMenuTypeInvalid
+                isMenuTypeInvalid = isMenuTypeInvalid,
+                areDatesInvalid = areDatesInvalid,
+                isDateUntilInvalid = isDateUntilInvalid
             )
         }
     }
@@ -305,6 +318,8 @@ fun AddMenuButton(
     isNameInvalid: Boolean = false,
     isAltNameInvalid: Boolean = false,
     isMenuTypeInvalid: Boolean = false,
+    areDatesInvalid: Boolean = false,
+    isDateUntilInvalid: Boolean = false,
     showAddDialog: MutableState<Boolean> = mutableStateOf(false)
 ) {
     when {
@@ -323,7 +338,9 @@ fun AddMenuButton(
                 isSaving = isSaving,
                 isNameInvalid = isNameInvalid,
                 isAltNameInvalid = isAltNameInvalid,
-                isMenuTypeInvalid = isMenuTypeInvalid
+                isMenuTypeInvalid = isMenuTypeInvalid,
+                areDatesInvalid = areDatesInvalid,
+                isDateUntilInvalid = isDateUntilInvalid
             )
         }
     }

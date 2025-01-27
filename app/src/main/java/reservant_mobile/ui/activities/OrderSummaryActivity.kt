@@ -226,13 +226,16 @@ fun OrderSummaryActivity(
                         reservationViewModel.returnedVisit = visitRes.value
 
                         // 2) If you need deposit logic, do it here
-                        showDepositDialog = true
+                        if(isReservation){
+                            showDepositDialog = true
+                        }
                         // If deposit is not needed, remove or skip this step
 
                         // 3) If it's not a reservation, create the order
                         if (!isReservation) {
                             val orderRes = reservationViewModel.createOrder()
                             if (!orderRes.isError && orderRes.value != null) {
+                                showDepositDialog = true
                                 // Order success => do something
                                 // e.g. navigate to summary screen
 //                                navController.navigate(

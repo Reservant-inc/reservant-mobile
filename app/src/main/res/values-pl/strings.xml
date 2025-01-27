@@ -656,4 +656,7 @@
     <string name="label_change_password">Zmień hasło</string>
     <string name="error_description_too_long">Opis nie może przekraczać 200 znaków</string>
     <string name="error_name_too_long">Nazwa nie może przekraczać 50 znaków</string>
+    <string name="error_dateFrom_after_To">Data od musi być po dacie do</string>
+    <string name="error_dateTo_before_From">Data do musi być przed datą od</string>
+    <string name="label_no_employee_assigned">Pracownik nieprzypisany</string>
 </resources>

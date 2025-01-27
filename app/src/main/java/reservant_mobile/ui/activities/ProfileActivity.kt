@@ -171,9 +171,11 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     viewModel = profileViewModel,
                     user = fullUser,
                     onSave = {
-                        profileViewModel.updateProfile(it)
-                        showEditDialog = false
-                        navController.popBackStack()
+                        profileViewModel.viewModelScope.launch {
+                            profileViewModel.updateProfile(it, context)
+                            showEditDialog = false
+                            navController.popBackStack()
+                        }
                     },
                     onDismiss = { showEditDialog = false },
                     onChangePassword = { showChangePassword = true },
@@ -527,7 +529,7 @@ fun JoinRequestsTab(
                     if (interestedUsersPagingItems != null) {
                         when (interestedUsersPagingItems.loadState.refresh) {
                             is LoadState.Loading -> {
-                                 CircularProgressIndicator()
+                                 //
                             }
                             is LoadState.NotLoading -> {
                                 if (interestedUsersPagingItems.itemCount > 0) {
