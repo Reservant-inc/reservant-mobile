@@ -9,11 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -182,9 +184,8 @@ fun EmployeeAddOrderFormContent(
         )
     }
 
-    // Menu popup
     if (isMenuPopupOpen) {
-        MenuPopupDialog(
+        FullScreenMenuDialog(
             onDismiss = { isMenuPopupOpen = false },
             reservationViewModel = reservationViewModel,
             restaurantDetailVM = restaurantDetailVM
@@ -194,7 +195,7 @@ fun EmployeeAddOrderFormContent(
 
 
 @Composable
-fun MenuPopupDialog(
+fun FullScreenMenuDialog(
     onDismiss: () -> Unit,
     reservationViewModel: ReservationViewModel,
     restaurantDetailVM: RestaurantDetailViewModel
@@ -202,66 +203,98 @@ fun MenuPopupDialog(
     val menus = restaurantDetailVM.menus ?: emptyList()
     val menuItems = restaurantDetailVM.currentMenu?.menuItems
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_menu_items)) },
-        text = {
-            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                // Pasek wyboru menu
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState())
-                ) {
-                    menus.forEach { menu ->
-                        MenuTypeButton(
-                            menuType = menu.name ?: "",
-                            onMenuClick = {
-                                menu.menuId?.let { menuId ->
-                                    restaurantDetailVM.viewModelScope.launch {
-                                        restaurantDetailVM.loadFullMenu(menuId)
-                                    }
-                                }
-                            }
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().padding(bottom = 80.dp)) { // Miejsce na przycisk
+                    // Pasek z tytułem i przyciskiem zamknięcia
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.select_menu_items),
+                            style = MaterialTheme.typography.titleLarge
                         )
-
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.label_close)
+                            )
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Lista elementów menu
-                if (menuItems.isNullOrEmpty()) {
-                    Text(stringResource(R.string.no_menus_found))
-                } else {
-                    LazyColumn {
-                        items(menuItems.size) { index ->
-                            val menuItem = menuItems[index]
-                            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
-                            LaunchedEffect(menuItem.photo) {
-                                menuItem.photo?.let { photo ->
-                                    menuPhoto = restaurantDetailVM.getPhoto(photo)
-                                }
-                            }
-
-                            MenuItemCard(
-                                menuItem = menuItem,
-                                role = Roles.CUSTOMER,
-                                getPhoto = { menuPhoto },
-                                onInfoClick = { /* Możesz dodać obsługę */ },
-                                onAddClick = {
-                                    reservationViewModel.addItemToCart(menuItem)
+                    // Pasek wyboru menu
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(vertical = 8.dp)
+                    ) {
+                        menus.forEach { menu ->
+                            MenuTypeButton(
+                                menuType = menu.name,
+                                onMenuClick = {
+                                    menu.menuId?.let { menuId ->
+                                        restaurantDetailVM.viewModelScope.launch {
+                                            restaurantDetailVM.loadFullMenu(menuId)
+                                        }
+                                    }
                                 }
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Lista elementów menu
+                    if (menuItems.isNullOrEmpty()) {
+                        Text(stringResource(R.string.no_menus_found))
+                    } else {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(menuItems.size) { index ->
+                                val menuItem = menuItems[index]
+                                var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
+
+                                LaunchedEffect(menuItem.photo) {
+                                    menuItem.photo?.let { photo ->
+                                        menuPhoto = restaurantDetailVM.getPhoto(photo)
+                                    }
+                                }
+
+                                MenuItemCard(
+                                    menuItem = menuItem,
+                                    role = Roles.CUSTOMER,
+                                    getPhoto = { menuPhoto },
+                                    onInfoClick = { /* Możesz dodać obsługę */ },
+                                    onAddClick = {
+                                        reservationViewModel.addItemToCart(menuItem)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                Button(
+                    onClick = {
+                        onDismiss()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    Text(text = stringResource(R.string.ok))
                 }
             }
-        },
-        confirmButton = {
-            ButtonComponent(
-                label = stringResource(R.string.label_close),
-                onClick = onDismiss
-            )
         }
-    )
+    }
 }
+
