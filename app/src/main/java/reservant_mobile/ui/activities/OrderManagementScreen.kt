@@ -226,7 +226,8 @@ fun OrderManagementScreen(
                 visitId = it.toRoute<RestaurantRoutes.OrderDetail>().visitId,
                 isReservation = isReservation,
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                restaurantId = restaurantId
             )
         }
     }
@@ -245,9 +246,23 @@ fun OrderList(
         items(visits.itemCount) { index ->
             val visit = visits[index]
             if (visit != null) {
+                val name = remember { mutableStateOf("") }
+
+                viewModel.fetchUserNameById(visit.clientId ?: "") { userName ->
+                    userName?.let {
+                        name.value = it
+                    }
+                }
+
                 viewModel.cacheVisit(visit)
-                VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation)
-            } else {
+                VisitCard(
+                    visit = visit,
+                    homeNavController = homeNavController,
+                    isReservation = isReservation,
+                    name = name.value
+                )
+            }
+            else {
                 Text(text = stringResource(R.string.loading_visit))
             }
         }
@@ -273,7 +288,7 @@ fun OrderList(
 
 
 @Composable
-fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservation: Boolean = false) {
+fun VisitCard(visit: VisitDTO, homeNavController: NavHostController, isReservation: Boolean = false, name: String) {
     val formattedDate = visit.date?.let { formatToDateTime(it, "HH:mm") }
     val formattedCost = visit.orders?.sumOf { it.cost ?: 0.0 }?.let { "%.2f zł".format(it) }
 

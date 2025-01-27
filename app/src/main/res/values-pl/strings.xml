@@ -701,4 +701,9 @@
     <string name="error_dateFrom_after_To">Data od musi być po dacie do</string>
     <string name="error_dateTo_before_From">Data do musi być przed datą od</string>
     <string name="label_no_employee_assigned">Pracownik nieprzypisany</string>
+    <string name="select_menu_items">Wybierz elementy menu</string>
+    <string name="no_menus_found">Nie znaleziono menu</string>
+    <string name="employee_add_order_title">Dodaj zamówienie dla wizyty #%1$d</string>
+    <string name="add_order">Dodaj zamówienie</string>
+    <string name="empty_cart">Koszyk jest pusty!</string>
 </resources>
