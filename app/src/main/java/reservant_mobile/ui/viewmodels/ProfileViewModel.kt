@@ -262,22 +262,22 @@ class ProfileViewModel(
         }
     }
 
-    fun acceptUser(eventId: String, userId: String) {
-        viewModelScope.launch {
-            val result = eventService.acceptUser(eventId, userId)
-            if (!result.isError) {
-                fetchInterestedUsers(eventId)
-            }
+    suspend fun acceptUser(eventId: String, userId: String): Boolean {
+        val result = eventService.acceptUser(eventId, userId)
+        if (!result.isError) {
+            fetchInterestedUsers(eventId)
+            return true
         }
+        return false
     }
 
-    fun rejectUser(eventId: String, userId: String) {
-        viewModelScope.launch {
-            val result = eventService.rejectUser(eventId, userId)
-            if (!result.isError) {
-                fetchInterestedUsers(eventId)
-            }
+    suspend fun rejectUser(eventId: String, userId: String): Boolean {
+        val result = eventService.rejectUser(eventId, userId)
+        if (!result.isError) {
+            fetchInterestedUsers(eventId)
+            return true
         }
+        return false
     }
 
     suspend fun getPhoto(photoStr: String): Bitmap? {

@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -512,6 +513,8 @@ fun JoinRequestsTab(
 
         var isEmpty by remember { mutableStateOf(true) }
 
+        val context = LocalContext.current
+
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -554,14 +557,60 @@ fun JoinRequestsTab(
                                             Spacer(modifier = Modifier.height(8.dp))
 
                                             interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
+                                                val acceptText = stringResource(R.string.label_successfully_accepted)
+                                                val acceptError = stringResource(R.string.error_cannot_accept)
+                                                val rejectText = stringResource(R.string.label_successfully_rejected)
+                                                val rejectError = stringResource(R.string.error_cannot_reject)
+
+
                                                 UserListItem(
                                                     user = participant,
                                                     showButtons = true,
                                                     onApproveClick = {
-                                                        profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                                        profileViewModel.viewModelScope.launch {
+                                                            val success = profileViewModel.acceptUser(
+                                                                event.eventId.toString(),
+                                                                participant.userId
+                                                            )
+
+                                                            if(success){
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    acceptText,
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }else{
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    acceptError,
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+
+                                                        }
                                                     },
                                                     onRejectClick = {
-                                                        profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                                        profileViewModel.viewModelScope.launch {
+                                                            val success = profileViewModel.rejectUser(
+                                                                event.eventId.toString(),
+                                                                participant.userId
+                                                            )
+
+                                                            if(success){
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    rejectText,
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }else{
+                                                                Toast.makeText(
+                                                                    context,
+                                                                    rejectError,
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+
+                                                        }
                                                     },
                                                     onCardClick = {
                                                         navController.navigate(UserRoutes.UserProfile(userId = participant.userId))

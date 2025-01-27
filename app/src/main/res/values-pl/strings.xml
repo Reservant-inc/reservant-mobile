@@ -659,4 +659,8 @@
     <string name="error_dateFrom_after_To">Data od musi być po dacie do</string>
     <string name="error_dateTo_before_From">Data do musi być przed datą od</string>
     <string name="label_no_employee_assigned">Pracownik nieprzypisany</string>
+    <string name="label_successfully_accepted">Pomyślnie zaakceptowano</string>
+    <string name="error_cannot_accept">Błąd podczas akceptowania</string>
+    <string name="label_successfully_rejected">Pomyślnie odrzucono</string>
+    <string name="error_cannot_reject">Błąd podczas odrzucania</string>
 </resources>
