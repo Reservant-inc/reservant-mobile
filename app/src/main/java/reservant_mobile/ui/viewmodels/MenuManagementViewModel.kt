@@ -86,7 +86,7 @@ class MenuManagementViewModel(
     suspend fun editMenu(menu: RestaurantMenuDTO) {
         isSaving = true
 
-        val editedMenu = createMenuDTO(menu.menuId).copy(menuItemsId = menu.menuItemsId)
+        val editedMenu = createMenuDTO(menu.menuId).copy(menuItemIds = menu.menuItemIds)
 
         val result = service.editMenu(editedMenu.menuId!!, editedMenu)
         println("returned: ${result.isError}")
