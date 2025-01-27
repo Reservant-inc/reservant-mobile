@@ -240,19 +240,18 @@ fun OrderList(
     viewModel: EmployeeOrderViewModel,
     isReservation: Boolean = false
 ) {
-    var name = ""
-    viewModel.fetchUserNameById("12345") { userName ->
-        if (userName != null) {
-            name = userName
-        }
-    }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(visits.itemCount) { index ->
             val visit = visits[index]
             if (visit != null) {
+                var name = ""
+                viewModel.fetchUserNameById(visit.clientId ?: "") { userName ->
+                    if (userName != null) {
+                        name = userName
+                    }
+                }
                 viewModel.cacheVisit(visit)
                 VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation, name = name)
             } else {
