@@ -246,15 +246,23 @@ fun OrderList(
         items(visits.itemCount) { index ->
             val visit = visits[index]
             if (visit != null) {
-                var name = ""
+                val name = remember { mutableStateOf("") }
+
                 viewModel.fetchUserNameById(visit.clientId ?: "") { userName ->
-                    if (userName != null) {
-                        name = userName
+                    userName?.let {
+                        name.value = it
                     }
                 }
+
                 viewModel.cacheVisit(visit)
-                VisitCard(visit = visit, homeNavController = homeNavController, isReservation = isReservation, name = name)
-            } else {
+                VisitCard(
+                    visit = visit,
+                    homeNavController = homeNavController,
+                    isReservation = isReservation,
+                    name = name.value
+                )
+            }
+            else {
                 Text(text = stringResource(R.string.loading_visit))
             }
         }
