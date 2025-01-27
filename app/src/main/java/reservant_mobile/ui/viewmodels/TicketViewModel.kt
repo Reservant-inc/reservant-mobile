@@ -45,6 +45,9 @@ class TicketViewModel(
     var selectedParticipant: UserDTO? by mutableStateOf(null)
     var selectedEmployee: UserSummaryDTO? by mutableStateOf(null)
 
+    var selectedStatus by mutableStateOf(ReportDTO.ReportStatus.All)
+
+
     // Possibly store success/failure
     var showSuccessDialog by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
@@ -64,10 +67,13 @@ class TicketViewModel(
         }
         return null
     }
-    fun loadReports(reportStatus: String) {
-        val status = if (reportStatus == "All") null
-        else ReportDTO.ReportStatus.valueOf(reportStatus)
 
+    fun loadReports(reportStatus: ReportDTO.ReportStatus) {
+        val status = if (reportStatus == ReportDTO.ReportStatus.All) {
+            null
+        } else {
+            reportStatus
+        }
         viewModelScope.launch {
             val result = userService.getReports(status = status)
             if (!result.isError && result.value != null) {
@@ -79,14 +85,15 @@ class TicketViewModel(
     }
 
 
+
     // For employees, fetch visits from a restaurant. For customers, fetch personal visits.
     // This is a simplified example.
-    fun loadVisitsForUserOrRestaurant() {
+    fun loadVisitsForUserOrRestaurant(restaurantId: Int = 0) {
         viewModelScope.launch {
             val isEmployee = Roles.RESTAURANT_EMPLOYEE in UserService.UserObject.roles
             val visitsResult = if (isEmployee) {
                 // Example: load visits for a specific restaurantId = 7
-                restaurantService.getVisits(restaurantId = 7)
+                restaurantService.getVisits(restaurantId = restaurantId)
             } else {
                 // For a normal user, get their visit history
                 userService.getUserVisitHistory()
@@ -105,16 +112,35 @@ class TicketViewModel(
 
     fun loadParticipantsFromVisit(visit: VisitDTO) {
         participantList.clear()
-        // "participants" -> map them to a list of userDTO
         visit.participants?.forEach { part ->
             participantList.add(
                 UserDTO(
                     userId = part.userId,
-                    firstName = part.firstName ?: "" ,
+                    firstName = part.firstName ?: "",
                     lastName = part.lastName ?: "",
-                    // etc.
+                    photo = part.photo
                 )
             )
+        }
+
+        viewModelScope.launch {
+            val clientId = visit.clientId ?: return@launch
+
+            val result = userService.getUserSimpleInfo(clientId)
+            if (!result.isError && result.value != null) {
+                val userSummary = result.value
+
+                val userDTO = UserDTO(
+                    userId = userSummary.userId,
+                    firstName = userSummary.firstName ?: "",
+                    lastName = userSummary.lastName ?: "",
+                    photo = userSummary.photo,
+                )
+
+                if (participantList.none { it.userId == userDTO.userId }) {
+                    participantList.add(userDTO)
+                }
+            }
         }
     }
 
@@ -123,13 +149,15 @@ class TicketViewModel(
         val vId = selectedVisit?.visitId ?: return
         val userId = selectedParticipant?.userId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportCustomer(
-                description = desc,
-                reportedUserId = userId,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError() && !isParticipantsError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportCustomer(
+                    description = desc,
+                    reportedUserId = userId,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
@@ -138,13 +166,15 @@ class TicketViewModel(
         val vId = selectedVisit?.visitId ?: return
         val employeeId = selectedEmployee?.userId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportEmployee(
-                description = desc,
-                reportedUserId = employeeId,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError() && !isEmplyeeError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportEmployee(
+                    description = desc,
+                    reportedUserId = employeeId,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
@@ -152,29 +182,49 @@ class TicketViewModel(
     fun sendReportLostItem() {
         val vId = selectedVisit?.visitId ?: return
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportLostItem(
-                description = desc,
-                visitId = vId
-            )
-            handleReportResult(result)
+        if(!isDescriptionError() && !isVisitError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportLostItem(
+                    description = desc,
+                    visitId = vId
+                )
+                handleReportResult(result)
+            }
         }
     }
 
     // 4) "reportBug"
     fun sendReportBug() {
         val desc = description
-        viewModelScope.launch {
-            val result = reportsService.reportBug(desc)
-            handleReportResult(result)
+        if(!isDescriptionError()) {
+            viewModelScope.launch {
+                val result = reportsService.reportBug(desc)
+                handleReportResult(result)
+            }
         }
     }
 
     private fun handleReportResult(res: Result<ReportDTO?>) {
         if (!res.isError && res.value != null) {
+            description = ""
+            selectedEmployee = null
+            selectedParticipant = null
+            selectedVisit = null
             showSuccessDialog = true
         } else {
             errorMessage = "Failed to send report"
         }
+    }
+    fun isDescriptionError(): Boolean {
+        return description.isNullOrEmpty()
+    }
+    fun isVisitError(): Boolean {
+        return selectedVisit == null
+    }
+    fun isEmplyeeError(): Boolean {
+        return selectedEmployee == null
+    }
+    fun isParticipantsError(): Boolean {
+        return selectedParticipant == null
     }
 }

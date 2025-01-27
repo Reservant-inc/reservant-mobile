@@ -20,10 +20,14 @@ data object UserRoutes {
     )
 
     @Serializable
-    object Ticket
+    data class Ticket(
+        val restaurantId: Int
+    )
 
     @Serializable
-    object TicketHistory
+    data class TicketHistory(
+        val restaurantId: Int
+    )
 
     @Serializable
     object Orders

@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +57,7 @@ import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.ReviewsViewModel
 
 @Composable
-fun TicketHistoryActivity(navController: NavController) {
+fun TicketHistoryActivity(navController: NavController, restaurantId: Int) {
     val reportViewModel: TicketViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -64,9 +65,12 @@ fun TicketHistoryActivity(navController: NavController) {
             }
         }
     )
-    val statuses = listOf("All", "NotResolved", "ResolvedPositively", "ResolvedNegatively")
+    val statuses = ReportDTO.ReportStatus.values().toList()
+    val context = LocalContext.current
+    val statusesMap = remember {
+        statuses.associateBy { context.getString(it.stringId) }
+    }
 
-    var selectedStatus by remember { mutableStateOf("All") }
 
     val expanded = remember { mutableStateOf(false) }
 
@@ -89,11 +93,14 @@ fun TicketHistoryActivity(navController: NavController) {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             expanded = expanded,
-            value = selectedStatus,
-            onValueChange = { newStatus ->
-                selectedStatus = newStatus
+            value = stringResource(id = reportViewModel.selectedStatus.stringId),
+            onValueChange = { newValue ->
+                val foundStatus = statusesMap[newValue]
+                if (foundStatus != null) {
+                    reportViewModel.selectedStatus = foundStatus
+                }
             },
-            options = statuses,
+            options = statuses.map { stringResource(id = it.stringId) },
             label = stringResource(R.string.label_select_report_status)
         )
 
@@ -106,7 +113,7 @@ fun TicketHistoryActivity(navController: NavController) {
                 .padding(horizontal = 16.dp)
         ) {
             ReportsTabContent(
-                status = selectedStatus,
+                status = reportViewModel.selectedStatus,
                 viewModel = reportViewModel,
                 navController = navController
             )
@@ -120,7 +127,7 @@ fun TicketHistoryActivity(navController: NavController) {
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
-            onClick = { navController.navigate(UserRoutes.Ticket) }
+            onClick = { navController.navigate(UserRoutes.Ticket(restaurantId = restaurantId )) }
         ) {
             Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
         }
@@ -130,7 +137,7 @@ fun TicketHistoryActivity(navController: NavController) {
 
 @Composable
 fun ReportsTabContent(
-    status: String,
+    status: ReportDTO.ReportStatus,
     viewModel: TicketViewModel,
     navController: NavController
 ) {
@@ -251,9 +258,14 @@ fun ReportCard(report: ReportDTO, onClick: () -> Unit) {
                     )
                 }
 
+
+                val statusLabel = report.reportStatus?.let {
+                    stringResource(it.stringId)
+                } ?: ""
+
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.status, report.reportStatus ?: ""),
+                    text = stringResource(R.string.status, statusLabel),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
