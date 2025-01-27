@@ -82,12 +82,12 @@ fun HomeActivity() {
             }
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
-/*                viewmodel.viewModelScope.launch {
+                viewmodel.viewModelScope.launch {
                     notificationHandler.use {
                         it.createSession()
                         it.awaitNotification()
                     }
-                }*/
+                }
 
                 composable<MainRoutes.Home>{
                     LaunchedEffect(Unit) {
