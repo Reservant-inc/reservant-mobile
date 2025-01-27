@@ -16,14 +16,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.TableBar
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,10 +56,12 @@ import reservant_mobile.data.models.dtos.OrderDTO
 import reservant_mobile.data.services.UserService
 import reservant_mobile.data.utils.StatusUtils
 import reservant_mobile.data.utils.formatToDateTime
+import reservant_mobile.ui.components.BadgeFloatingButton
 import reservant_mobile.ui.components.ComboBox
 import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.LoadingScreenWithTimeout
 import reservant_mobile.ui.navigation.RestaurantRoutes
+import reservant_mobile.ui.navigation.UserRoutes
 import reservant_mobile.ui.viewmodels.EmployeeOrderViewModel
 import reservant_mobile.ui.viewmodels.VisitDetailsUIState
 import java.time.LocalDate
@@ -66,6 +71,7 @@ import kotlin.time.Duration
 
 @Composable
 fun OrderDetailsScreen(
+    restaurantId: Int,
     visitId: Int,
     onReturnClick: () -> Unit,
     viewModel: EmployeeOrderViewModel,
@@ -193,6 +199,19 @@ fun OrderDetailsScreen(
         }
     } ?: run {
         LoadingScreenWithTimeout(Duration.parse("10s"), stringResource(R.string.error_orders))
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        FloatingActionButton(
+            onClick = { navHostController.navigate(RestaurantRoutes.AddOrder(restaurantId = restaurantId, visitId = visitId)) }
+        ) {
+            Icon(imageVector = Icons.Rounded.Add, contentDescription = "add")
+        }
     }
 }
 

@@ -444,6 +444,14 @@ fun EmployeeHomeActivity() {
                     )
                 }
 
+                composable<RestaurantRoutes.AddOrder> {
+                    EmployeeAddOrderActivity(
+                        navController = innerNavController,
+                        restaurantId = it.toRoute<RestaurantRoutes.AddOrder>().restaurantId,
+                        visitId = it.toRoute<RestaurantRoutes.AddOrder>().visitId
+                    )
+                }
+
                 composable<RestaurantRoutes.IngredientHistory>(
                     typeMap = mapOf(typeOf<IngredientDTO>() to toCustomNavType(IngredientDTO.serializer())),
                 ) {

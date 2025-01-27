@@ -226,7 +226,8 @@ fun OrderManagementScreen(
                 visitId = it.toRoute<RestaurantRoutes.OrderDetail>().visitId,
                 isReservation = isReservation,
                 viewModel = viewModel,
-                navHostController = navHostController
+                navHostController = navHostController,
+                restaurantId = restaurantId
             )
         }
     }
