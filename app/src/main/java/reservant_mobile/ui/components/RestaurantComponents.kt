@@ -9,11 +9,14 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -84,7 +87,8 @@ fun RestaurantCard(
 ) {
     Card(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(vertical = 10.dp)
+            .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable { onClick() },
@@ -97,46 +101,59 @@ fun RestaurantCard(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if(image != null){
-                Image(
-                    bitmap = image,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(100.dp)
-                        .width(100.dp),
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.Center
-                )
-            }
-            else {
-                Image(
-                    painter = painterResource(R.drawable.restaurant_template_icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .height(100.dp)
-                        .width(100.dp),
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.Center
-                )
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .fillMaxHeight()
+            ) {
+                val imageModifier = Modifier
+                    .fillMaxSize()
+
+                if (image != null) {
+                    Image(
+                        bitmap = image,
+                        contentDescription = null,
+                        modifier = imageModifier,
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.restaurant_template_icon),
+                        contentDescription = null,
+                        modifier = imageModifier,
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-
+                    .weight(1f)
+                    .padding(horizontal = 10.dp)
+                    .padding(vertical = 4.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                     text = name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2
                 )
+
                 Text(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp), // Reduced spacing between lines
                     text = "$location, $city",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    maxLines = 2
                 )
 
                 availableHours?.let {
