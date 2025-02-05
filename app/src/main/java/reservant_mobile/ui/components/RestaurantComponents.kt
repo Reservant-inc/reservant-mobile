@@ -107,11 +107,10 @@ fun RestaurantCard(
             Box(
                 modifier = Modifier
                     .width(100.dp)
-                    .heightIn(100.dp, 120.dp)
+                    .fillMaxHeight()
             ) {
                 val imageModifier = Modifier
                     .fillMaxSize()
-                    .clip(MaterialTheme.shapes.medium)
 
                 if (image != null) {
                     Image(
@@ -133,7 +132,7 @@ fun RestaurantCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 10.dp)
                     .padding(vertical = 4.dp),
                 verticalArrangement = Arrangement.Center
             ) {
