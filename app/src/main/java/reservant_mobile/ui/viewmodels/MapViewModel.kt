@@ -177,7 +177,7 @@ class MapViewModel : ReservantViewModel() {
                             name = dto.name,
                             address = dto.address,
                             city = dto.city,
-                            logo = getPhoto(dto.logo!!),
+                            logo = getPhoto(dto.logo!!,150,150),
                             location = dto.location,
                             availableHours = dto.openingHours
                         )
@@ -276,10 +276,19 @@ class MapViewModel : ReservantViewModel() {
         }
     }
 
+    suspend fun getPhoto(photoStr: String, height: Int, weight: Int): Bitmap? {
+        val result = fileService.getImage(photoStr)
+        if (!result.isError){
+            val res = Bitmap.createScaledBitmap(result.value!!, weight, height, false);
+            return res
+        }
+        return null
+    }
+
     suspend fun getPhoto(photoStr: String): Bitmap? {
         val result = fileService.getImage(photoStr)
         if (!result.isError){
-            return  result.value!!
+            return result.value!!
         }
         return null
     }
