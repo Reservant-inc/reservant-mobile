@@ -165,15 +165,11 @@ class NotificationHandler (
     }
 
     override fun close() {
-        if (session != null){
-            session?.let {
-                it.launch {
-                    it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
-                    println("[NOTIFICATIONS] Websocket session closed")
-                }
+        session?.let {
+            it.launch {
+                it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
+                println("[NOTIFICATIONS] Websocket session closed")
             }
-        } else {
-            println("[NOTIFICATIONS] close() was called but session is null")
         }
 
         session = null
