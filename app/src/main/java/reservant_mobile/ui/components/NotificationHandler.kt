@@ -129,26 +129,12 @@ class NotificationHandler (
 
                     notification.value.notificationType?.let {
 
-                        if(it == NotificationDTO.NotificationType.NotificationNewMessage){
-                            val authorName = (notification.value.details?.get("authorName")?.jsonPrimitive?.content ?: "")
-                            val userName = "${UserService.UserObject.firstName} ${UserService.UserObject.lastName}"
-                            if (authorName != userName){
-                                val pair = it.getContent(notification.value.details)
-
-                                showBasicNotification(
-                                    pair.first,
-                                    pair.second,
-                                    photo.value
-                                )
-                            }
-                        } else {
-                            val pair = it.getContent(notification.value.details)
-                            showBasicNotification(
-                                pair.first,
-                                pair.second,
-                                photo.value
-                            )
-                        }
+                        val pair = it.getContent(notification.value.details)
+                        showBasicNotification(
+                            pair.first,
+                            pair.second,
+                            photo.value
+                        )
 
                     }
 
