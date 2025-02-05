@@ -59,6 +59,8 @@ fun HomeActivity() {
     LaunchedEffect(key1 = Unit) {
         val tmp = localDataService.getData(PrefsKeys.APP_THEME)
         darkTheme = if(tmp.isEmpty()) isSystemInDarkMode else tmp == ThemePrefsKeys.DARK.themeValue
+        notificationHandler.createSession()
+        notificationHandler.awaitNotification()
     }
 
     val items = listOfNotNull(
@@ -82,12 +84,6 @@ fun HomeActivity() {
             }
         ){
             NavHost(navController = innerNavController, startDestination = MainRoutes.Home, modifier = Modifier.padding(it)){
-                viewmodel.viewModelScope.launch {
-                    notificationHandler.use {
-                        it.createSession()
-                        it.awaitNotification()
-                    }
-                }
 
                 composable<MainRoutes.Home>{
                     LaunchedEffect(Unit) {
@@ -116,7 +112,8 @@ fun HomeActivity() {
                                 val tmp = if(darkTheme) ThemePrefsKeys.DARK else ThemePrefsKeys.LIGHT
                                 localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
                             }
-                        }
+                        },
+                        notificationHandler = notificationHandler
                     )
                 }
                 composable<MainRoutes.ChatList> {

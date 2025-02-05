@@ -85,7 +85,14 @@ import reservant_mobile.ui.viewmodels.LoginViewModel
 import kotlin.reflect.typeOf
 
 @Composable
-fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Unit, withBackButton:Boolean = false, onReturnClick: () -> Unit = {}, restaurantId: Int = 0) {
+fun SettingsActivity(
+    homeNavController: NavHostController,
+    themeChange: () -> Unit,
+    withBackButton:Boolean = false,
+    onReturnClick: () -> Unit = {},
+    restaurantId: Int = 0,
+    notificationHandler: NotificationHandler? = null
+) {
     val loginViewModel = viewModel<LoginViewModel>()
     var showLogoutPopup by remember { mutableStateOf(false) }
     var showDeleteAccountPopup by remember { mutableStateOf(false) }
@@ -199,6 +206,7 @@ fun SettingsActivity(homeNavController: NavHostController, themeChange: () -> Un
                             )
                         }
                         loginViewModel.logout()
+                        notificationHandler?.close()
                         homeNavController.navigate(AuthRoutes.Landing) {
                             popUpTo(0)
                         }

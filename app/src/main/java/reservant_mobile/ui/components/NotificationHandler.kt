@@ -13,6 +13,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.utils.io.core.Closeable
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonPrimitive
@@ -118,36 +119,22 @@ class NotificationHandler (
         }
 
         session?.let {
-            while (true){
-
+            while (it.isActive){
                 val notification = service.receiveNotificationFromSession(it)
                 if (!notification.isError && notification.value != null){
+                    println("[NOTIFICATIONS] notification received, displaying")
                     val photo = notification.value.photo?.let {
                         fileService.getImage(it)
                     } ?: Result(isError = true, value = null)
 
                     notification.value.notificationType?.let {
 
-                        if(it == NotificationDTO.NotificationType.NotificationNewMessage){
-                            val authorName = (notification.value.details?.get("authorName")?.jsonPrimitive?.content ?: "")
-                            val userName = "${UserService.UserObject.firstName} ${UserService.UserObject.lastName}"
-                            if (authorName != userName){
-                                val pair = it.getContent(notification.value.details)
-
-                                showBasicNotification(
-                                    pair.first,
-                                    pair.second,
-                                    photo.value
-                                )
-                            }
-                        } else {
-                            val pair = it.getContent(notification.value.details)
-                            showBasicNotification(
-                                pair.first,
-                                pair.second,
-                                photo.value
-                            )
-                        }
+                        val pair = it.getContent(notification.value.details)
+                        showBasicNotification(
+                            pair.first,
+                            pair.second,
+                            photo.value
+                        )
 
                     }
 
@@ -181,11 +168,12 @@ class NotificationHandler (
         session?.let {
             it.launch {
                 it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
-                println("[NOTIFICATION] Websocket session closed")
+                println("[NOTIFICATIONS] Websocket session closed")
             }
         }
 
         session = null
+
     }
 
 
