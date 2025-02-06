@@ -94,6 +94,7 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
+import reservant_mobile.ui.components.OpeningHours
 import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagsDetailView
@@ -570,6 +571,15 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     label = stringResource(R.string.label_restaurant_tables),
                                     value = "${restaurant.tables.size}"
                                 )
+
+                                Text(
+                                    stringResource(id = R.string.label_opening_hours),
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+                                restaurant.openingHours?.let { OpeningHours(openingHours = it) }
 
                                 HorizontalDivider(
                                     modifier = Modifier

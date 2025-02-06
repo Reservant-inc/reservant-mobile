@@ -496,6 +496,7 @@
     <string name="error_tip">Tip must be non-negative</string>
     <string name="restaurant_closed">The restaurant is closed on the selected day</string>
     <string name="opening_hours">Opening hours: %1$s - %2$s</string>
+    <string name="label_opening_hours">Opening hours:</string>
     <string name="error_no_date">No date selected</string>
     <string name="error_date_in_past">The date cannot be earlier than today</string>
     <string name="error_restaurant_closed">The restaurant is closed on the selected day</string>
