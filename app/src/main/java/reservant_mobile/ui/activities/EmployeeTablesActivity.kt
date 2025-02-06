@@ -250,10 +250,10 @@ fun TableCard(
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = when ( /**table.status**/ "Available") { //TODO
-                "Available" -> Color(0xFFDFFFD6) // Light green for available
-                "Occupied" -> Color(0xFFFFD6D6) // Light red for occupied
-                else -> Color.LightGray // Default color for other statuses
+            containerColor = when (table.status) {
+                TableDTO.TableStatus.Available -> Color(0xFFDFFFD6) // Light green for available
+                TableDTO.TableStatus.Taken -> Color(0xFFFFD6D6)
+                else -> Color.LightGray
             }
         )
     ) {

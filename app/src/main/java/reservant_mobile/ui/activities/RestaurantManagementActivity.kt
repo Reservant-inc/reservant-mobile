@@ -665,6 +665,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
+                                RestaurantRoutes.Tables(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.TableBar,
+                            titleStringId = R.string.label_restaurant_tables
+                        ),
+                        Option(
+                            onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Stats(
                                     statsType = StatsType.RESTAURANT.nameVal,
                                     queryId = restaurant.restaurantId
@@ -689,10 +696,10 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
-                                RestaurantRoutes.Tables(restaurantId = restaurant.restaurantId)
+                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
                             )},
-                            icon = Icons.Outlined.TableBar,
-                            titleStringId = R.string.label_restaurant_tables
+                            icon = Icons.Outlined.DeliveryDining,
+                            titleStringId = R.string.label_deliveries
                         ),
                         Option(
                             onClick = {
@@ -700,13 +707,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             },
                             icon = Icons.Outlined.Delete,
                             titleStringId = R.string.label_delete
-                        ),
-                        Option(
-                            onClick = { navController.navigate(
-                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
-                            )},
-                            icon = Icons.Outlined.DeliveryDining,
-                            titleStringId = R.string.label_deliveries
                         ),
                     )
                     LazyVerticalGrid(
