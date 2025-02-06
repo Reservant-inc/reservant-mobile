@@ -205,12 +205,13 @@ fun RestaurantDetailActivity(
                                         photoModifier = Modifier
                                             .fillMaxWidth()
                                             .height(200.dp),
-                                        placeholderModifier = Modifier.align(Alignment.Center)
-                                    ) {
-                                        restaurant.logo?.let { logo ->
-                                            restaurantDetailVM.getPhoto(logo)
+                                        placeholderModifier = Modifier.align(Alignment.Center),
+                                        getPhoto = {
+                                            restaurant.logo?.let { logo ->
+                                                restaurantDetailVM.getPhoto(logo)
+                                            }
                                         }
-                                    }
+                                    )
 
                                     IconButton(
                                         onClick = onReturnClick,

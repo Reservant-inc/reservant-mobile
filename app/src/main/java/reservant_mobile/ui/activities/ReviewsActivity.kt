@@ -189,16 +189,18 @@ fun ReviewCardWithReply(
                     placeholderModifier = Modifier.size(40.dp)
                         .clip(CircleShape)
                         .background(Color.Gray),
-                    placeholder = R.drawable.unknown_profile_photo
-                ) {
-                    if(userDto != null){
-                        userDto.photo?.let { photo ->
-                            reviewsViewModel.getPhoto(photo)
+                    placeholder = R.drawable.unknown_profile_photo,
+                    getPhoto = {
+                        if(userDto != null){
+                            userDto.photo?.let { photo ->
+                                reviewsViewModel.getPhoto(photo)
+                            }
+                        }else{
+                            null
                         }
-                    }else{
-                        null
                     }
-                }
+                )
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = review.authorFullName ?: "Gall Anonim",

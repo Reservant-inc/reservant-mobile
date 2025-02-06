@@ -119,12 +119,13 @@ fun EventDetailActivity(
                             .fillMaxWidth()
                             .height(200.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .shadow(8.dp, RoundedCornerShape(8.dp))
-                    ){
-                        eventDetailVM.event!!.photo?.let {
-                            eventDetailVM.getPhoto(it)
+                            .shadow(8.dp, RoundedCornerShape(8.dp)),
+                        getPhoto = {
+                            eventDetailVM.event!!.photo?.let {
+                                eventDetailVM.getPhoto(it)
+                            }
                         }
-                    }
+                    )
                 }
                 if(!eventDetailVM.isEventOwner){
                     item {

@@ -160,12 +160,13 @@ fun ChatActivity(navController: NavHostController, threadId: Int, title: String)
                                                    .size(32.dp)
                                                    .align(Alignment.Bottom)
                                                    .clip(CircleShape),
-                                               placeholder = R.drawable.ic_profile_placeholder
-                                           ) {
-                                               sender?.photo?.let{
-                                                   chatViewModel.fetchPhoto(it)
+                                               placeholder = R.drawable.ic_profile_placeholder,
+                                               getPhoto = {
+                                                   sender?.photo?.let{
+                                                       chatViewModel.fetchPhoto(it)
+                                                   }
                                                }
-                                           }
+                                           )
                                        }
                                        Text(
                                            text = message.contents,

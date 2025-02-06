@@ -1425,6 +1425,7 @@ fun LoadedPhotoComponent(
     contentScale: ContentScale = ContentScale.Fit,
     placeholder: Int = R.drawable.unknown_image,
     getPhoto: suspend () -> Bitmap?,
+    reloadImageKey: Any = Unit
 ) {
     var isLoading by remember {
         mutableStateOf(true)
@@ -1434,7 +1435,7 @@ fun LoadedPhotoComponent(
         mutableStateOf<Bitmap?>(null)
     }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = reloadImageKey) {
         bitmap = getPhoto()
         isLoading = false
     }
