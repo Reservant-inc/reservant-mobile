@@ -363,15 +363,14 @@ fun IconWithHeader(
                         .align(Alignment.CenterVertically)
                 )
             }
-            if (showBackButton){
-                Spacer(modifier = Modifier.weight(1f))
-            }
             if (actions != null) {
                 Box(
-                    modifier = Modifier
+                    modifier = Modifier.weight(1f)
                 ) {
                     actions()
                 }
+            } else if (showBackButton){
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
 
