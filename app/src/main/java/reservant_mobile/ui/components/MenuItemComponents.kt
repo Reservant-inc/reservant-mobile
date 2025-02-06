@@ -177,16 +177,7 @@ fun MenuItemCard(
                     ) {
                         when (role) {
                             Roles.CUSTOMER -> {
-                                IconButton(
-                                    onClick = onInfoClick,
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Info,
-                                        contentDescription = "Info",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                                
                                 IconButton(
                                     onClick = {
                                         onAddClick()
