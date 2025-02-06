@@ -169,12 +169,11 @@ fun EventDetailActivity(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
                                 .background(
                                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                                .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
