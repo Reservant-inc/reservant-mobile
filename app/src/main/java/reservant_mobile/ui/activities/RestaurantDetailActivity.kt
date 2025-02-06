@@ -167,8 +167,6 @@ fun RestaurantDetailActivity(
             var showPhoto by remember { mutableStateOf(false) }
             var selectedPhoto: Bitmap? by remember { mutableStateOf(null) }
 
-            var isFavorite by remember { mutableStateOf(false) }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -205,12 +203,13 @@ fun RestaurantDetailActivity(
                                         photoModifier = Modifier
                                             .fillMaxWidth()
                                             .height(200.dp),
-                                        placeholderModifier = Modifier.align(Alignment.Center)
-                                    ) {
-                                        restaurant.logo?.let { logo ->
-                                            restaurantDetailVM.getPhoto(logo)
+                                        placeholderModifier = Modifier.align(Alignment.Center),
+                                        getPhoto = {
+                                            restaurant.logo?.let { logo ->
+                                                restaurantDetailVM.getPhoto(logo)
+                                            }
                                         }
-                                    }
+                                    )
 
                                     IconButton(
                                         onClick = onReturnClick,
@@ -241,15 +240,7 @@ fun RestaurantDetailActivity(
                                         style = MaterialTheme.typography.headlineMedium,
                                         modifier = Modifier.weight(1f)
                                     )
-                                    IconButton(
-                                        onClick = { isFavorite = !isFavorite },
-                                    ) {
-                                        Icon(
-                                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                            contentDescription = null,
-                                            tint = if (isFavorite) MaterialTheme.colorScheme.secondary else LocalContentColor.current
-                                        )
-                                    }
+
                                 }
 
                                 Row(

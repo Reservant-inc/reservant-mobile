@@ -3,6 +3,7 @@ package reservant_mobile.ui.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +35,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -172,16 +177,7 @@ fun MenuItemCard(
                     ) {
                         when (role) {
                             Roles.CUSTOMER -> {
-                                IconButton(
-                                    onClick = onInfoClick,
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.Info,
-                                        contentDescription = "Info",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+
                                 IconButton(
                                     onClick = {
                                         onAddClick()
@@ -234,7 +230,8 @@ fun MenuItemCard(
                     photoModifier = mod,
                     placeholderModifier = mod,
                     placeholder = R.drawable.unknown_image,
-                    getPhoto = getPhoto
+                    getPhoto = getPhoto,
+                    reloadImageKey = getPhoto
                 )
 
             }

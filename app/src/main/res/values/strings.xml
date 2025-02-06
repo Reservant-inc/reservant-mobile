@@ -233,7 +233,7 @@
     <string name="label_apply">Apply</string>
     <string name="message_not_found_any">Not found any %1$s</string>
     <string name="label_stars">stars</string>
-    <string name="label_interested">interested</string>
+    <string name="label_interested">Interested</string>
     <string name="label_takePart">take part</string>
     <string name="error_loading_events">Error while loading events</string>
     <string name="error_loading_more_events">Error while loading more events</string>
@@ -496,6 +496,7 @@
     <string name="error_tip">Tip must be non-negative</string>
     <string name="restaurant_closed">The restaurant is closed on the selected day</string>
     <string name="opening_hours">Opening hours: %1$s - %2$s</string>
+    <string name="label_opening_hours">Opening hours:</string>
     <string name="error_no_date">No date selected</string>
     <string name="error_date_in_past">The date cannot be earlier than today</string>
     <string name="error_restaurant_closed">The restaurant is closed on the selected day</string>
@@ -568,7 +569,7 @@
     <string name="error_cant_send_message">Can\'t send message</string>
     <string name="label_friend_requests">Friend requests</string>
     <string name="label_report_resolved_positively">Resolved positively</string>
-    <string name="label_report_resolved_negatively">ReResolved negatively</string>
+    <string name="label_report_resolved_negatively">Resolved negatively</string>
     <string name="error_create_restaurant">Error while creating restaurant</string>
     <string name="label_edit_opening_hours">Edit opening hours</string>
     <string name="label_add_opening_hours">Add opening hours</string>

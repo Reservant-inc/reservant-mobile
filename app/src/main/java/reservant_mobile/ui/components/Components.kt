@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -323,17 +324,29 @@ fun IconWithHeader(
             .fillMaxWidth()
             .padding(bottom = 8.dp)
     ) {
-        Box(Modifier.fillMaxWidth()) {
+
+        val arrangement = if (showBackButton)
+            Arrangement.SpaceBetween
+        else Arrangement.Center
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = arrangement
+        ) {
             if (showBackButton) {
                 ReturnButton(
+                    modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
                     onReturnClick = onReturnClick,
-                    modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
             Row(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
-                    .align(Alignment.Center)
+                    .align(Alignment.CenterVertically)
+                    .weight(4f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Icon(
                     imageVector = icon,
@@ -350,10 +363,12 @@ fun IconWithHeader(
                         .align(Alignment.CenterVertically)
                 )
             }
+            if (showBackButton){
+                Spacer(modifier = Modifier.weight(1f))
+            }
             if (actions != null) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
                 ) {
                     actions()
                 }
@@ -1425,6 +1440,7 @@ fun LoadedPhotoComponent(
     contentScale: ContentScale = ContentScale.Fit,
     placeholder: Int = R.drawable.unknown_image,
     getPhoto: suspend () -> Bitmap?,
+    reloadImageKey: Any = Unit
 ) {
     var isLoading by remember {
         mutableStateOf(true)
@@ -1434,7 +1450,7 @@ fun LoadedPhotoComponent(
         mutableStateOf<Bitmap?>(null)
     }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = reloadImageKey) {
         bitmap = getPhoto()
         isLoading = false
     }

@@ -94,6 +94,7 @@ import reservant_mobile.ui.components.IconWithHeader
 import reservant_mobile.ui.components.ImageCard
 import reservant_mobile.ui.components.MissingPage
 import reservant_mobile.ui.components.MyFloatingActionButton
+import reservant_mobile.ui.components.OpeningHours
 import reservant_mobile.ui.components.ReturnButton
 import reservant_mobile.ui.components.ShowErrorToast
 import reservant_mobile.ui.components.TagsDetailView
@@ -571,6 +572,15 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                                     value = "${restaurant.tables.size}"
                                 )
 
+                                Text(
+                                    stringResource(id = R.string.label_opening_hours),
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+                                restaurant.openingHours?.let { OpeningHours(openingHours = it) }
+
                                 HorizontalDivider(
                                     modifier = Modifier
                                         .padding(top = 8.dp),
@@ -655,6 +665,13 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
+                                RestaurantRoutes.Tables(restaurantId = restaurant.restaurantId)
+                            )},
+                            icon = Icons.Outlined.TableBar,
+                            titleStringId = R.string.label_restaurant_tables
+                        ),
+                        Option(
+                            onClick = { navController.navigate(
                                 RestaurantManagementRoutes.Stats(
                                     statsType = StatsType.RESTAURANT.nameVal,
                                     queryId = restaurant.restaurantId
@@ -679,10 +696,10 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                         ),
                         Option(
                             onClick = { navController.navigate(
-                                RestaurantRoutes.Tables(restaurantId = restaurant.restaurantId)
+                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
                             )},
-                            icon = Icons.Outlined.TableBar,
-                            titleStringId = R.string.label_restaurant_tables
+                            icon = Icons.Outlined.DeliveryDining,
+                            titleStringId = R.string.label_deliveries
                         ),
                         Option(
                             onClick = {
@@ -690,13 +707,6 @@ fun RestaurantManagementActivity(navControllerHome: NavHostController) {
                             },
                             icon = Icons.Outlined.Delete,
                             titleStringId = R.string.label_delete
-                        ),
-                        Option(
-                            onClick = { navController.navigate(
-                                RestaurantRoutes.Deliveries(restaurantId = restaurant.restaurantId)
-                            )},
-                            icon = Icons.Outlined.DeliveryDining,
-                            titleStringId = R.string.label_deliveries
                         ),
                     )
                     LazyVerticalGrid(

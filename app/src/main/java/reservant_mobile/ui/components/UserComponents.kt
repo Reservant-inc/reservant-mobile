@@ -121,10 +121,9 @@ fun ThreadListItem(
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primary),
             placeholder = R.drawable.ic_profile_placeholder,
-            contentScale = ContentScale.Crop
-        ) {
-            getPhoto()
-        }
+            contentScale = ContentScale.Crop,
+            getPhoto = getPhoto
+        )
 
         Column(modifier = Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
             Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -132,11 +131,7 @@ fun ThreadListItem(
                 Text(text = userNames, fontSize = 14.sp)
             }
         }
-        /*Text(
-            text = thread.timeStamp,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )*/
+
     }
     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 }

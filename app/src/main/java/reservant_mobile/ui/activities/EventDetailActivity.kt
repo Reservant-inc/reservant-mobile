@@ -119,12 +119,13 @@ fun EventDetailActivity(
                             .fillMaxWidth()
                             .height(200.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .shadow(8.dp, RoundedCornerShape(8.dp))
-                    ){
-                        eventDetailVM.event!!.photo?.let {
-                            eventDetailVM.getPhoto(it)
+                            .shadow(8.dp, RoundedCornerShape(8.dp)),
+                        getPhoto = {
+                            eventDetailVM.event!!.photo?.let {
+                                eventDetailVM.getPhoto(it)
+                            }
                         }
-                    }
+                    )
                 }
                 if(!eventDetailVM.isEventOwner){
                     item {
@@ -168,12 +169,11 @@ fun EventDetailActivity(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
                                 .background(
                                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                                .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(

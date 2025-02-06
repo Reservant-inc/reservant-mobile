@@ -337,8 +337,6 @@ fun MenuContent(
         }
 
         menuItems?.forEach { menuItem ->
-            var menuPhoto by remember { mutableStateOf<Bitmap?>(null) }
-
             MenuItemCard(
                 menuItem = menuItem,
                 role = Roles.CUSTOMER,

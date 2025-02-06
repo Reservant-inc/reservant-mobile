@@ -77,14 +77,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.reservant_mobile.R
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import reservant_mobile.data.constants.Regex
 import reservant_mobile.data.models.dtos.EventDTO
 import reservant_mobile.data.models.dtos.FriendRequestDTO
 import reservant_mobile.data.models.dtos.FriendStatus
 import reservant_mobile.data.models.dtos.PhoneNumberDTO
-import reservant_mobile.data.models.dtos.ThreadDTO
 import reservant_mobile.data.models.dtos.UserDTO
 import reservant_mobile.data.models.dtos.VisitDTO
 import reservant_mobile.data.services.UserService
@@ -224,13 +221,13 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                                     placeholder = R.drawable.unknown_profile_photo,
                                     placeholderModifier = Modifier
                                         .size(80.dp)
-                                        .clip(CircleShape)
-
-                                ) {
-                                    profileViewModel.simpleProfileUser?.photo?.let {photo ->
-                                        profileViewModel.getPhoto(photo)
+                                        .clip(CircleShape),
+                                    getPhoto = {
+                                        profileViewModel.simpleProfileUser?.photo?.let {photo ->
+                                            profileViewModel.getPhoto(photo)
+                                        }
                                     }
-                                }
+                                )
                                 Spacer(modifier = Modifier.width(16.dp))
 
                                 Column {
@@ -454,7 +451,7 @@ fun ProfileActivity(navController: NavHostController, userId: String) {
                     FloatingTabSwitch(
                         pages = listOf(
                             stringResource(R.string.label_visits) to {
-                                CurrentOrdersTab(
+                                CurrentVisitsTab(
                                     visitsPagingItems = visitsPagingItems
                                 )
                             },
@@ -667,7 +664,7 @@ fun JoinRequestsTab(
 
 
 @Composable
-fun CurrentOrdersTab(
+fun CurrentVisitsTab(
     visitsPagingItems: LazyPagingItems<VisitDTO>?
 ) {
     if (visitsPagingItems == null) {
@@ -1084,7 +1081,7 @@ fun OrderCard(visit: VisitDTO) {
                     )
                     Text(
                         text = "${stringResource(R.string.label_visit_date)}: " +
-                                (visit.date?.let { formatToDateTime(it) } ?: ""),
+                                (visit.date?.let { formatToDateTime(it, "dd MMM yyyy HH:mm") } ?: ""),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )

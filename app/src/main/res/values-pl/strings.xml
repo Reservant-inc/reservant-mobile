@@ -228,7 +228,7 @@
     <string name="label_apply">Zastosuj</string>
     <string name="message_not_found_any">Nie znaleziono %1$s</string>
     <string name="label_stars">gwiazdki</string>
-    <string name="label_interested">zainteresowani</string>
+    <string name="label_interested">Zainteresowany</string>
     <string name="label_takePart">bierze udział</string>
     <string name="error_loading_events">Błąd podczas wczytywania wydarzeń</string>
     <string name="error_loading_more_events">Bład podczas wczytywania następnych wydarzeń</string>
@@ -484,6 +484,7 @@
     <string name="error_tip">Napiwek musi być nieujemny</string>
     <string name="restaurant_closed">Restauracja jest zamknięta w wybranym dniu</string>
     <string name="opening_hours">Godziny otwarcia: %1$s - %2$s</string>
+    <string name="label_opening_hours">Godziny otwarcia:</string>
     <string name="error_no_date">Nie wybrano daty</string>
     <string name="error_date_in_past">Data nie może być wcześniejsza niż dziś</string>
     <string name="error_restaurant_closed">Restauracja jest zamknięta w wybranym dniu</string>
