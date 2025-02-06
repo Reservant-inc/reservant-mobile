@@ -50,7 +50,11 @@ fun HomeActivity() {
     val bottomBarState = remember { (mutableStateOf(true)) }
     val viewmodel = viewModel<ReservantViewModel>()
     val localDataService = LocalDataService()
-    val notificationHandler = NotificationHandler(LocalContext.current, primaryColor = MaterialTheme.colorScheme.primary)
+    val context = LocalContext.current
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val notificationHandler by remember {
+        mutableStateOf(NotificationHandler(context = context, primaryColor = primaryColor))
+    }
 
     val isSystemInDarkMode = isSystemInDarkTheme()
     var darkTheme by remember {
@@ -113,7 +117,7 @@ fun HomeActivity() {
                                 localDataService.saveData(PrefsKeys.APP_THEME, tmp.themeValue)
                             }
                         },
-                        notificationHandler = notificationHandler
+                        closeWebsocketSession = { notificationHandler.close() }
                     )
                 }
                 composable<MainRoutes.ChatList> {

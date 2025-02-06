@@ -30,7 +30,7 @@ class NotificationHandler (
     private val service: NotificationService = NotificationService(),
     private val fileService: FileService = FileService(),
     private val primaryColor: Color
-) : Closeable {
+) {
 
     private val restaurantChannelId = getString(context, R.string.restaurant_notification_channel_id)
     private val friendsChannelId = getString(context, R.string.friends_notification_channel_id)
@@ -107,7 +107,7 @@ class NotificationHandler (
         if (!res.isError && res.value != null){
             session = res.value
             println("[NOTIFICATIONS] Websocket session created")
-        }else{
+        } else {
             println("[NOTIFICATIONS] Error occurred while creating session")
         }
     }
@@ -164,12 +164,10 @@ class NotificationHandler (
         )
     }
 
-    override fun close() {
+    suspend fun close() {
         session?.let {
-            it.launch {
-                it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
-                println("[NOTIFICATIONS] Websocket session closed")
-            }
+            it.close(CloseReason(CloseReason.Codes.GOING_AWAY, ""))
+            println("[NOTIFICATIONS] Websocket session closed")
         }
 
         session = null

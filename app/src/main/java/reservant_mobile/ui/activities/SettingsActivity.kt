@@ -91,7 +91,7 @@ fun SettingsActivity(
     withBackButton:Boolean = false,
     onReturnClick: () -> Unit = {},
     restaurantId: Int = 0,
-    notificationHandler: NotificationHandler? = null
+    closeWebsocketSession: suspend () -> Unit = {}
 ) {
     val loginViewModel = viewModel<LoginViewModel>()
     var showLogoutPopup by remember { mutableStateOf(false) }
@@ -205,8 +205,8 @@ fun SettingsActivity(
                                 data = ""
                             )
                         }
+                        closeWebsocketSession()
                         loginViewModel.logout()
-                        notificationHandler?.close()
                         homeNavController.navigate(AuthRoutes.Landing) {
                             popUpTo(0)
                         }
