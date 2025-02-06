@@ -177,7 +177,7 @@ fun MenuItemCard(
                     ) {
                         when (role) {
                             Roles.CUSTOMER -> {
-                                
+
                                 IconButton(
                                     onClick = {
                                         onAddClick()

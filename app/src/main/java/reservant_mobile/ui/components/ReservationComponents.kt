@@ -477,7 +477,6 @@ fun AddFriendPopupPaging(
 fun CartItemCard(
     item: Pair<RestaurantMenuItemDTO, Int>,
     photo: Bitmap? = null,
-    onInfoClick: () -> Unit = {},
     onIncreaseQuantity: () -> Unit = {},
     onDecreaseQuantity: () -> Unit = {},
     onRemove: () -> Unit = {}
@@ -559,16 +558,6 @@ fun CartItemCard(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = onInfoClick,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = "Info",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
 
                 IconButton(
                     onClick = onDecreaseQuantity,
