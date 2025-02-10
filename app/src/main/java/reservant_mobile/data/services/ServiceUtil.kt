@@ -32,6 +32,7 @@ abstract class ServiceUtil(protected var api: APIService = APIService()) {
     }
 
     protected suspend fun booleanResultWrapper(res: Result<HttpResponse?>, expectedCode: HttpStatusCode = HttpStatusCode.OK): Result<Boolean> {
+
         if(res.isError)
             return Result(isError = true, errors = res.errors, value = false)
 

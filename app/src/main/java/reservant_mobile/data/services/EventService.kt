@@ -102,7 +102,7 @@ class EventService(): ServiceUtil(), IEventService{
             parent = Events.Id(eventId=eventId.toString()),
             userId = userId
         ),"")
-        return booleanResultWrapper(res)
+        return booleanResultWrapper(res, HttpStatusCode.NoContent)
     }
 
     override suspend fun rejectUser(eventId: Any, userId: String): Result<Boolean> {
