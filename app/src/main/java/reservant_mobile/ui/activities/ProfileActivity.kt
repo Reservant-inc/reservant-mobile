@@ -2,6 +2,7 @@ package reservant_mobile.ui.activities
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -551,14 +552,33 @@ fun JoinRequestsTab(
                                             Spacer(modifier = Modifier.height(8.dp))
 
                                             interestedUsersPagingItems.itemSnapshotList.items.forEach { participant ->
+
+                                                val context = LocalContext.current
+                                                var success by remember {
+                                                    mutableStateOf(true)
+                                                }
+
+                                                LaunchedEffect(key1 = success) {
+                                                    if (!success){
+                                                        Toast.makeText(context, "Error occurred, try again later", Toast.LENGTH_SHORT)
+                                                            .show()
+
+                                                        success = true
+                                                    }
+                                                }
+
                                                 UserListItem(
                                                     user = participant,
                                                     showButtons = true,
                                                     onApproveClick = {
-                                                        profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                                        profileViewModel.viewModelScope.launch {
+                                                            success = profileViewModel.acceptUser(event.eventId.toString(), participant.userId)
+                                                        }
                                                     },
                                                     onRejectClick = {
-                                                        profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                                        profileViewModel.viewModelScope.launch {
+                                                            success = profileViewModel.rejectUser(event.eventId.toString(), participant.userId)
+                                                        }
                                                     },
                                                     onCardClick = {
                                                         navController.navigate(UserRoutes.UserProfile(userId = participant.userId))
