@@ -40,9 +40,9 @@ import reservant_mobile.data.models.dtos.fields.Result
 
 class APIService{
 
-    private val backendIp= "172.21.40.127"
+    private val backendIp= "api.reservant.app"
     private val backendPort= 12038
-    val backendUrl= "http://$backendIp:$backendPort"
+    val backendUrl= "https://$backendIp:$backendPort"
 
     private val localService = LocalDataService()
 
