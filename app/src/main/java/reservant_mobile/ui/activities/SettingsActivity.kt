@@ -22,11 +22,13 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.ContactPage
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.RestaurantMenu
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.rounded.RestaurantMenu
@@ -45,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -172,6 +175,22 @@ fun SettingsActivity(
                     )
 
                     UnderlinedItem(
+                        icon = Icons.Filled.Security,
+                        text = stringResource(id = R.string.label_privacy),
+                        onClick = {
+                            navController.navigate(UserRoutes.PrivacyPolicy)
+                        }
+                    )
+
+                    UnderlinedItem(
+                        icon = Icons.Filled.ContactPage,
+                        text = stringResource(id = R.string.label_terms),
+                        onClick = {
+                            navController.navigate(UserRoutes.TermsOfService)
+                        }
+                    )
+
+                    UnderlinedItem(
                         icon = Icons.Filled.Brightness4,
                         text = stringResource(id = R.string.label_toggle_dark_theme),
                         onClick = { themeChange() },
@@ -259,6 +278,14 @@ fun SettingsActivity(
                 WalletActivity(
                     onReturnClick = { navController.popBackStack() }
                 )
+            }
+            composable<UserRoutes.PrivacyPolicy>{
+                val uriHandler = LocalUriHandler.current
+                uriHandler.openUri("https://reservant.app/privacy-policy")
+            }
+            composable<UserRoutes.TermsOfService>{
+                val uriHandler = LocalUriHandler.current
+                uriHandler.openUri("https://reservant.app/terms-of-service")
             }
             composable<UserRoutes.ReportDetails>(
                 typeMap = mapOf(typeOf<ReportDTO>() to toCustomNavType(ReportDTO.serializer())),

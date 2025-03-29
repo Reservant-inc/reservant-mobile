@@ -50,4 +50,10 @@ data object UserRoutes {
 
     @Serializable
     object BecomeRestaurantOwner
+
+    @Serializable
+    object PrivacyPolicy
+
+    @Serializable
+    object TermsOfService
 }
