@@ -22,6 +22,7 @@ import io.ktor.client.plugins.resources.put
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.plugins.websocket.wss
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.setBody
@@ -180,13 +181,34 @@ class APIService{
         }
     }
 
-    suspend fun createWebsocketSession(path: String):Result<DefaultClientWebSocketSession?> {
+//    suspend fun createWebsocketSession(path: String):Result<DefaultClientWebSocketSession?> {
+//        return try {
+//            val ws = wsClient.webSocketSession(method = HttpMethod.Get, host = "wss://api.reservant.app", port = backendPort, path = path)
+//            Result(isError = false, value = ws)
+//        }catch (e: Exception){
+//            println("[WS ERROR]: "+e.message)
+//            Result(isError = true, errors = mapOf("TOAST" to  R.string.error_connection_server), value = null)
+//        }
+//    }
+
+    suspend fun createWebsocketSession(path: String): Result<DefaultClientWebSocketSession?> {
         return try {
-            val ws = wsClient.webSocketSession(method = HttpMethod.Get, host = backendIp, port = backendPort, path = path)
+            val url = buildString {
+                append("wss://")
+                append(backendIp)
+                append(":$backendPort")
+                append(path)
+            }
+
+            val ws = wsClient.webSocketSession(url)
             Result(isError = false, value = ws)
-        }catch (e: Exception){
-            println("[WS ERROR]: "+e.message)
-            Result(isError = true, errors = mapOf("TOAST" to  R.string.error_connection_server), value = null)
+        } catch (e: Exception) {
+            println("[WS ERROR]: ${e.message}")
+            Result(
+                isError = true,
+                errors = mapOf("TOAST" to R.string.error_connection_server),
+                value = null
+            )
         }
     }
 }
