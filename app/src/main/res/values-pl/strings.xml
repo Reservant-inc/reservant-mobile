@@ -707,4 +707,6 @@
     <string name="employee_add_order_title">Dodaj zamówienie dla wizyty #%1$d</string>
     <string name="add_order">Dodaj zamówienie</string>
     <string name="empty_cart">Koszyk jest pusty!</string>
+    <string name="label_privacy">Polityka prywatności</string>
+    <string name="label_terms">Zasady użytkowania</string>
 </resources>
