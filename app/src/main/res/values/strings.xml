@@ -721,4 +721,6 @@
     <string name="employee_add_order_title">Add order for visit #%1$d</string>
     <string name="add_order">Add order</string>
     <string name="empty_cart">Cart is empty!</string>
+    <string name="label_privacy">Privacy policy</string>
+    <string name="label_terms">Terms of service</string>
 </resources>
