@@ -10,10 +10,10 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.reservant_mobile"
+        applicationId = "com.reservant.reservant_mobile"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
