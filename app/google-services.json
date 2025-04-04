@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:802234769564:android:d5a4e21b4ae1e23a458d59",
         "android_client_info": {
-          "package_name": "com.example.reservant_mobile"
+          "package_name": "com.reservant.reservant_mobile"
         }
       },
       "oauth_client": [],
