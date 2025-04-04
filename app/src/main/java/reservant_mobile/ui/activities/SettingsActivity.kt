@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -280,12 +281,26 @@ fun SettingsActivity(
                 )
             }
             composable<UserRoutes.PrivacyPolicy>{
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {}
+
                 val uriHandler = LocalUriHandler.current
-                uriHandler.openUri("https://reservant.app/privacy-policy")
+                LaunchedEffect(key1 = false) {
+                    uriHandler.openUri("https://reservant.app/privacy-policy")
+                    navController.popBackStack()
+                }
             }
             composable<UserRoutes.TermsOfService>{
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {}
+
                 val uriHandler = LocalUriHandler.current
-                uriHandler.openUri("https://reservant.app/terms-of-service")
+                LaunchedEffect(key1 = false) {
+                    uriHandler.openUri("https://reservant.app/terms-of-service")
+                    navController.popBackStack()
+                }
             }
             composable<UserRoutes.ReportDetails>(
                 typeMap = mapOf(typeOf<ReportDTO>() to toCustomNavType(ReportDTO.serializer())),
